@@ -1,0 +1,171 @@
+" options
+set activate=quickmark,paste
+" set complete=bShsf
+set complete=sl
+set suggestengines=tsukkee
+set editor=/opt/local/bin/gvim -f
+set guioptions=mTb
+set hlsearch
+set verbose=9
+set wildoptions=auto
+
+" migemo_hint.js
+set hintmatching=custom
+
+set titlestring=Firefox
+
+set nextpattern+=次(の)?ページ,\b次.*,↑\b,
+set previouspattern+=前(の)?ページ,\b前.*,\b↓
+
+" LDRize
+" noremap V :toggleldrc<CR>
+" let g:ldrc_captureMappings="['i','j','k','p','o','?']"
+
+" direct_bookmark
+let g:direct_sbm_use_services_by_tag = "dl"
+let g:direct_sbm_use_services_by_post = "dl"
+
+" key mappings
+
+" 多めにスクロールするようにする
+noremap j 5j
+noremap k 5k
+noremap h 3h
+noremap l 3l
+
+" ghでハイライトオフ
+noremap gh :nohl<CR>
+
+" sでStartCommand検索
+noremap s :open tsukkee<Space>
+noremap S :tabopen tsukkee<Space>
+
+
+" Windows環境のCtrl+cでコピーを殺すのを回避
+javascript <<EOF
+liberator.mappings.addUserMap([liberator.modes.NORMAL], ['<C-c>'],
+    'Copy selected text or Stop',
+    function() {
+        var sel = liberator.buffer.getCurrentWord();
+        if(sel) {
+            liberator.util.copyToClipboard(sel, true);
+            echo('Yanked: ' + liberator.util.escapeHTML(sel));
+        }
+        else {
+            BrowserStop();
+            liberator.echo('Stopped loading !');
+        }
+    }, {}
+);
+EOF
+
+" Ctrl-Tab
+javascript <<EOF
+liberator.commands.addUserCommand(['ctrltab'],
+    "Activate Ctrl-Tab",
+    function (args, special)
+    {
+        allTabs.open();
+    }, {}
+);
+EOF
+noremap c :ctrltab<CR>
+
+" disable accesskey
+javascript <<EOF
+liberator.options.setPref('ui.key.generalAccessKey', 0);
+EOF
+
+javascript <<EOF
+liberator.mappings.addUserMap([liberator.modes.NORMAL], [',f'],
+	'Start Toolbar-HINTS (open current tab)',
+	function(){ plugins.bookmarkToolbarHints.startup(liberator.CURRENT_TAB); }
+);
+liberator.mappings.addUserMap([liberator.modes.NORMAL], [',F'],
+	'Start Toolbar-HINTS (open new tab)',
+	function(){ plugins.bookmarkToolbarHints.startup(liberator.NEW_TAB); }
+);
+EOF
+
+" feedSomeKey
+autocmd LocationChange .* :fmapc
+" autocmd LocationChange .* js liberator.log('LocationChange' + content.location.href)
+javascript <<EOF
+// Gmail
+autocommands.add('LocationChange', /mail\.google\.com\/(mail|a)\//, [
+    'js plugins.feedKey.setup(',
+    '"c / y j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc".split(/ +/).map(function(i) [i, "4" + i])',
+    ');'
+].join(''));
+
+/*
+// livedoor Reader, Fastladder
+autocommands.add('LocationChange', /reader\.livedoor\.com\/reader\//,
+    'js plugins.feedKey.setup("j k s a p v c <Space> <S-Space> z Z < > q w b i r ?".split(/ +/));');
+
+autocommands.add('LocationChange', /fastladder\.com\/reader\//,
+    'js plugins.feedKey.setup("j k s a p v c <Space> <S-Space> z Z < > q w b i r ?".split(/ +/));');
+*/
+EOF
+
+" test
+javascript <<EOF
+/*
+window.addEventListener("keypress", function(e) {
+    var key = liberator.events.toString(e);
+    liberator.log("keypress: " + key);
+}, true);
+*/
+
+/*
+liberator.log('content');
+liberator.log(content.document);
+
+var isKeyDownMap = {};
+window.addEventListener("keydown", function(e) {
+    var key = e.keyCode;
+
+    if(!isKeyDownMap[key]) isKeyDownMap[key] = 1;
+    else isKeyDownMap[key]++;
+
+    liberator.log('keydown: ' + key);
+    liberator.log(isKeyDownMap);
+}, true);
+
+window.addEventListener("keyup", function(e) {
+    liberator.log("keyup: " + e.keyCode);
+            
+    var ctrl = false;
+    var alt = false;
+    var shift = false;
+    var meta = false;
+    var key = e.keyCode;
+    var charCode = 0; 
+
+    if(key < 65 || 90 < key) return true;
+
+    if(isKeyDownMap[key] > 0) {
+        isKeyDownMap[key]--;
+
+        setTimeout(function() {
+            // modes.passAllKeys = false;
+            // modes.passNextKey = true;
+
+            var evt = content.document.createEvent("KeyEvents");
+            evt.initKeyEvent("keyup", true, true, content, ctrl, alt, shift, meta, key, charCode);
+            content.document.dispatchEvent(evt);
+
+            liberator.log('evt');
+            liberator.log(evt);
+        }, 0);
+    }
+
+    return true;
+}, true);
+*/
+EOF
+
+" 確認
+echo ".vimperatorrc sourced"
+
+" vim: set ft=vimperator:

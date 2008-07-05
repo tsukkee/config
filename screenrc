@@ -1,0 +1,39 @@
+# エンコーディング
+defencoding UTF-8
+
+# スタートアップ画面オフ
+startup_message off
+
+# プレフックス
+escape ^y^y
+
+# ディタッチ
+autodetach on
+
+# ビジュアルベル
+vbell off
+
+# bind w windowlist -b
+
+# 出るらしい
+bell "Bell in window %."
+activity "Activity in window %."
+
+# タブっぽい表示
+# hardstatus alwayslastline "%{= wk}%-Lw%n%f* %t%{= wk}%+Lw %= %y/%m/%d %c "
+hardstatus alwayslastline "%-w%{=b}%n %t%{-}%+w"
+
+# 戻る行数
+scrollback 100000
+
+# ターミナルのサイズ変わるの防止
+# Aborted because of window size chage
+# を防止できるらしい
+termcapinfo xterm* 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
+
+# あらかじめいくつかタブを開いておく
+screen -t default 0
+screen -t vim     1 vim
+screen -t synergy 2
+select 1
+select 0
