@@ -463,7 +463,8 @@ if has('mac')
     command! Cot  silent exe '!open -a CotEditor %'
 endif
 
-let g:lisp_rainbow = 1
+" others
+command! HTMLEscape silent exe "rubydo $_ = $_.gsub('&', '&amp;').gsub('>', '&gt;').gsub('<', '&lt;').gsub('\"', '&quot;')"
 
 " load private information
 source ~/.vimrc_passwords
