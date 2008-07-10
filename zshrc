@@ -2,8 +2,8 @@
 umask 22
 
 # キーバインド
-# bindkey -v # vi風
-bindkey -e # emacs風
+bindkey -v # vi風
+# bindkey -e # emacs風
 
 # 履歴補完
 autoload history-search-end
@@ -39,37 +39,31 @@ setopt hist_ignore_all_dups
 setopt hist_reduce_blanks
 setopt share_history
 
-# 環境変数
-export DISPLAY=localhost:0.0
-export PATH=/usr/local/bin:/usr/local/sbin/:\
-/usr/bin:/usr/sbin:\
-/usr/X11R6/bin:\
-/Developer/SDKs/Flex2/bin:$PATH
-
-export MANPATH=/usr/local/man:\
-/usr/share/man:\
-/usr/X11R6/man:$MANPATH
-
-test -d /opt && export PATH=/opt/local/bin:/opt/local/sbin:$PATH && export MANPATH=/opt/local/share/man:$MANPATH
-
-export LANG=ja_JP.UTF-8
-
-export EDITOR=vim
-export PAGER=lv
-export BLOCKSIZE=k
-export QTDIR=/opt/local/lib/qt3
-export C_INCLUDE_PATH=/opt/local/include:$C_INCLUDE_PATH
-export CPLUS_INCLUDE_PATH=/opt/local/include:$CPLUS_INCLUDE_PATH
-export OBJC_INCLUDE_PATH=/opt/local/include:$OBJC_INCLUDE_PATH
-export HREF_DATADIR=/usr/local/share/ref
-
+# プロンプト
 PROMPT='%S%n @ %m:%~ %s
 %# '
 
-function chpwd() {
-    RPROMPT=`ruby -e "d=Dir.new('./');%w(.hg .git .svn).each{|i| puts i if d.include?(i)}"`
+function is_git {
+    git branch --no-color 2> /dev/null | sed -e 's/..*/\.git/'
 }
-chpwd
+
+function is_hg {
+    hg branch 2> /dev/null | sed -e 's/..*/\.hg/'
+}
+
+function is_svn {
+    test -d .svn && echo .svn
+}
+
+function chpwd() {
+#    RPROMPT=`ruby -e "d=Dir.new('./');%w(.hg .git .svn).each{|i| puts i if d.include?(i)}"`
+}
+# chpwd
+
+function precmd {
+    RPROMPT="%S$(is_git)$(is_hg)$(is_svn)%s"
+}
+precmd
 
 # エイリアス
 alias less=lv

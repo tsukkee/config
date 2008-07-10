@@ -19,7 +19,7 @@ endif
 
 " 実験版MacVim
 if has('gui_macvim')
-    set guifont=Osaka-Mono:h14
+    " set guifont=Osaka-Mono:h14
     " set guifont=mplus-1mn-regular:h14
     set transparency=5
     set showtabline=2
