@@ -95,59 +95,10 @@ endif
 set encoding=utf-8
 set fileencodings=iso-2022-jp,utf-8,cp932,euc-jp
 
-" 厳密な文字コード判別 {{{
-" http://www.kawaz.jp/pukiwiki/?vim#content_1_7
-" http://d.hatena.ne.jp/hazy-moon/20061229/1167407073
-" if &encoding !=# 'utf-8'
-    " set encoding=japan
-    " set fileencoding=japan
-" endif
-" if has('iconv')
-    " let s:enc_euc = 'euc-jp'
-    " let s:enc_jis = 'iso-2022-jp'
-    " iconvがeucJP-msに対応しているかをチェック
-    " if iconv("?x87?x64?x87?x6a", 'cp932', 'eucjp-ms') ==# "?xad?xc5?xad?xcb"
-        " let s:enc_euc = 'eucjp-ms'
-        " let s:enc_jis = 'iso-2022-jp-3'
-    " iconvがJISX0213に対応しているかをチェック
-    " elseif iconv("?x87?x64?x87?x6a", 'cp932', 'euc-jisx0213') ==# "?xad?xc5?xad?xcb"
-        " let s:enc_euc = 'euc-jisx0213'
-        " let s:enc_jis = 'iso-2022-jp-3'
-    " endif
-    " fileencodingsを構築
-    " if &encoding ==# 'utf-8'
-        " let s:fileencodings_default = &fileencodings
-        " let &fileencodings = s:enc_jis .','. s:enc_euc .',cp932'
-        " let &fileencodings = &fileencodings .','. s:fileencodings_default
-        " unlet s:fileencodings_default
-    " else
-        " let &fileencodings = &fileencodings .','. s:enc_jis
-        " set fileencodings+=utf-8,ucs-2le,ucs-2
-        " if &encoding =~# '^?(euc-jp?|euc-jisx0213?|eucjp-ms?)$'
-            " set fileencodings+=cp932
-            " set fileencodings-=euc-jp
-            " set fileencodings-=euc-jisx0213
-            " set fileencodings-=eucjp-ms
-            " let &encoding = s:enc_euc
-            " let &fileencoding = s:enc_euc
-        " else
-            " let &fileencodings = &fileencodings .','. s:enc_euc
-        " endif
-    " endif
-    " 定数を処分
-    " unlet s:enc_euc
-    " unlet s:enc_jis
-" endif
-" }}}
-
 " UTF-8の□や○でカーソル位置がずれないようにする
 set ambiwidth=double
 
 " ファイルタイプ関連
-" 使用できる色は
-" :edit $VIMRUNTIME/syntax/colortest.vim
-" :source %
-
 syntax on " シンタックスカラーリングオン
 
 " 全角スペースをハイライト
@@ -180,12 +131,6 @@ highlight Pmenu ctermbg=lightcyan ctermfg=black
 highlight PmenuSel ctermbg=blue ctermfg=black 
 highlight PmenuSbar ctermbg=darkgray 
 highlight PmenuThumb ctermbg=lightgray
-
-" Migemo
-if has('migemo')
-    set migemo
-    set migemodict=/opt/local/share/migemo/utf-8/migemo-dict
-endif
 
 " Kaoriya
 if has('kaoriya')
@@ -257,16 +202,12 @@ endif
 " MacPortsのPrivatePortsで入るのはjexctags
 set tags=./tags,./TAGS,tags,TAGS
 if has('mac')
-    let Tlist_Ctags_Cmd='/opt/local/bin/jexctags'
     command! CtagsR !jexctags -R --tag-relative=no --fields=+iaS --extra=+q
 endif
 
 if has('win32')
-    let Tlist_Ctags_Cmd='D:/Applications/Vim/ctags.exe'
     command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
 endif
-
-" noremap <Space>c :TlistToggle<CR>
 
 " Rails
 autocmd FileType ruby,eruby,yaml set softtabstop=2 shiftwidth=2 tabstop=2
@@ -327,30 +268,6 @@ let g:AutoComplPop_Behavior = {
     \       },
     \   ],
     \   }
-    " \   'php' : [
-    " \       {
-    " \           'command'  : "\<C-n>",
-    " \           'pattern'  : '\k\k\k$',
-    " \           'excluded' : '^$',
-    " \           'repeat'   : 0,
-    " \       },
-    " \       {
-    " \           'command'  : "\<C-x>\<C-f>",
-    " \           'pattern'  : (has('win32') || has('win64') ? '\f[/\\]\f*$' : '\f[/]\f*$'),
-    " \           'excluded' : '[*/\\][/\\]\f*$\|[^[:print:]]\f*$',
-    " \           'repeat'   : 1,
-    " \       },
-    " \       {
-    " \           'command'  : "\<C-x>\<C-o>",
-    " \           'pattern'  : '\k\k$',
-    " \           'excluded' : '^$',
-    " \           'repeat'   : 0,
-    " \       },
-    " \   ],
-    " \   }
-
-" php-doc
-" autocmd FileType php nnoremap <Space>p :call PhpDocSingle()<CR>
 
 " Firefoxリロード {{{
 " 要MozRepl
@@ -411,49 +328,29 @@ if has('win32')
     let g:visual_studio_python_exe = "C:/Python25/python.exe"
 endif
 
-" vimwiki
-" let g:vimwiki_upper = "A-Z"
-" let g:vimwiki_lower = "a-z"
-
 " git
 let git_diff_spawn_mode = 1
 autocmd BufNewFile,BufRead COMMIT_EDITMSG set filetype=git
-
-" hgutils
-" let g:hgutils_leader = "H"
 
 " TeXShop タイプセット {{{
 " 要RubyOSA
 function! TexShop_TypeSet()
     if has('ruby') && has('mac')
         ruby <<EOF
-        require 'rubygems'
-        require 'rbosa'
+        unless $texshop
+            require 'rubygems'
+            require 'rbosa'
 
-        texshop = OSA.app("TeXShop")
-        texshop.documents.each {|d|
-            texshop.typesetinteractive(d)
+            $texshop = OSA.app("TeXShop")
+        end
+        $texshop.documents.each {|d|
+            $texshop.typesetinteractive(d)
         }
 EOF
     endif
 endfunction
 
-function! TexShop_Activate()
-    if has('ruby') && has('mac')
-        ruby <<EOF
-        require 'rubygems'
-        require 'rbosa'
-
-        texshop = OSA.app("TeXShop")
-        iTerm = OSA.app("iTerm").activate
-        [texshop, iTerm].each {|app| app.activate}
-EOF
-    endif
-endfunction
-
-" 最新のVim + Rubyであぼーんする
-" autocmd FileType tex noremap <buffer> <silent> ,t :<C-u>call TexShop_TypeSet()<CR>
-" autocmd FileType tex noremap <buffer> <silent> ,a :<C-u>call TexShop_Activate()<CR>
+autocmd FileType tex noremap <buffer> <silent> ,t :<C-u>call TexShop_TypeSet()<CR>
 " }}}
 
 " Mac関連
