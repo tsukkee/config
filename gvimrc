@@ -1,7 +1,7 @@
 " ==================== 画面表示設定 ==================== "
 set title       " タイトル表示
 set linespace=0 " 行間
-set columns=125 " 幅
+set columns=155 " 幅
 set lines=50    " 高さ
 set nolinebreak " 改行しない
 set textwidth=0 " 改行しない

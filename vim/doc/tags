@@ -148,6 +148,7 @@ NERDTreeFunctionality	NERD_tree.txt	/*NERDTreeFunctionality*
 NERDTreeGlobalCommands	NERD_tree.txt	/*NERDTreeGlobalCommands*
 NERDTreeHighlightCursorline	NERD_tree.txt	/*NERDTreeHighlightCursorline*
 NERDTreeIgnore	NERD_tree.txt	/*NERDTreeIgnore*
+NERDTreeInvalidBookmarks	NERD_tree.txt	/*NERDTreeInvalidBookmarks*
 NERDTreeLicense	NERD_tree.txt	/*NERDTreeLicense*
 NERDTreeMappings	NERD_tree.txt	/*NERDTreeMappings*
 NERDTreeMouseMode	NERD_tree.txt	/*NERDTreeMouseMode*

@@ -1,7 +1,11 @@
-# 環境変数
-DISPLAY=localhost:0.0; export DISPLAY
-LANG=ja_JP.UTF-8; export LANG
+# Display
+export DISPLAY=localhost:0.0
 
+# Language
+export LANG=ja_JP.UTF-8
+export __CF_USER_TEXT_ENCODING='0x1F5:0x08000100:14'
+
+# Path
 PATH=/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 MANPATH=/usr/local/man:/usr/share/man:$MANPATH
 test -d /usr/local && PATH=/usr/local/bin:/usr/local/sbin:$PATH &&
@@ -13,21 +17,25 @@ test -d /opt       && PATH=/opt/local/bin:/opt/local/sbin:$PATH &&
 test -d /Developer/SDKs/Flex2 && PATH=/Developer/SDKs/Flex2/bin:$PATH
 export PATH MANPATH
 
+# Editor
 if test -x /opt/local/bin/vim; then
-    EDITOR=/opt/local/bin/vim; export EDITOR
+    EDITOR=/opt/local/bin/vim
 else
-    EDITOR=/usr/bin/vim; export EDITOR
+    EDITOR=/usr/bin/vim 
 fi
+export EDITOR
 
+# Pager
 if test -x /opt/local/bin/lv; then
-    PAGER=/opt/local/bin/lv; export PAGER
-    LV="-E'$EDITOR +%d'"; export LV
+    PAGER=/opt/local/bin/lv
+    export LV="-E'$EDITOR +%d'"
 else 
-    PAGER=/usr/bin/less; export PAGER
+    PAGER=/usr/bin/less
 fi
+export PAGER
 
-BLOCKSIZE=k; export BLOCKSIZE
-
+# Others
+export BLOCKSIZE=k
 export C_INCLUDE_PATH=/opt/local/include:$C_INCLUDE_PATH
 export CPLUS_INCLUDE_PATH=/opt/local/include:$CPLUS_INCLUDE_PATH
 export LIBRARY_PATH=/opt/local/lib:$LIBRARY_PATH

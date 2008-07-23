@@ -168,22 +168,23 @@ cnoremap <C-x> <C-r>=expand('%:p:h')<CR>/
 cnoremap <C-z> <C-r>=expand('%:p:r')<CR> 
 
 " コピペ
-" Macの場合は普通にCommand-C，Command-Vも使えたりする
-if has('mac')
-    vnoremap <silent> <Space>y :call YankPB()<CR>
-    function! YankPB()
-        let tmp = tempname()
-        call writefile(getline(a:firstline, a:lastline), tmp, 'b')
-        silent exec "!cat " . tmp . " | iconv -f utf-8 -t shift-jis | pbcopy"
-    endfunction
-
-    nnoremap <silent> <Space>p :call PastePB()<CR>
-    function! PastePB()
-        let tmp =  system("pbpaste | iconv -f shift-jis -t utf-8")
-        silent exec "normal a" . tmp . "\<Esc>"
-    endfunction
-endif
-if has('win32')
+" Macの場合は一部でCommand-C，Command-Vも使えたりする
+" reference
+" http://subtech.g.hatena.ne.jp/cho45/20061010/1160459376
+" http://vim.wikia.com/wiki/Mac_OS_X_clipboard_sharing
+"
+" need  'set enc=utf-8' and
+" below environment variable for UTF-8 characters
+" export __CF_USER_TEXT_ENCODING='0x1F5:0x08000100:14'
+"
+" Vim(Mac)
+if has('mac') && !has('gui')
+    nnoremap <silent> <Space>y :.w !pbcopy<CR><CR>
+    vnoremap <silent> <Space>y :w !pbcopy<CR><CR>
+    nnoremap <silent> <Space>p :r !pbpaste<CR>
+    vnoremap <silent> <Space>p :r !pbpaste<CR>
+" GVim(Mac & Win)
+else
     noremap <Space>y "+y
     noremap <Space>p "+p
 endif
