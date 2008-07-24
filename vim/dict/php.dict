@@ -1,4 +1,3 @@
-_
 abs
 acos
 acosh
@@ -434,7 +433,6 @@ image2wbmp
 image_type_to_extension
 image_type_to_mime_type
 imagealphablending
-imageantialias
 imagearc
 imagechar
 imagecharup
@@ -447,14 +445,12 @@ imagecolorclosesthwb
 imagecolordeallocate
 imagecolorexact
 imagecolorexactalpha
-imagecolormatch
 imagecolorresolve
 imagecolorresolvealpha
 imagecolorset
 imagecolorsforindex
 imagecolorstotal
 imagecolortransparent
-imageconvolution
 imagecopy
 imagecopymerge
 imagecopymergegray
@@ -469,7 +465,6 @@ imagecreatefromjpeg
 imagecreatefrompng
 imagecreatefromstring
 imagecreatefromwbmp
-imagecreatefromxbm
 imagecreatetruecolor
 imagedashedline
 imagedestroy
@@ -480,7 +475,6 @@ imagefilledellipse
 imagefilledpolygon
 imagefilledrectangle
 imagefilltoborder
-imagefilter
 imagefontheight
 imagefontwidth
 imageftbbox
@@ -492,14 +486,12 @@ imagegif
 imageinterlace
 imageistruecolor
 imagejpeg
-imagelayereffect
 imageline
 imageloadfont
 imagepalettecopy
 imagepng
 imagepolygon
 imagerectangle
-imagerotate
 imagesavealpha
 imagesetbrush
 imagesetpixel
@@ -515,7 +507,6 @@ imagettfbbox
 imagettftext
 imagetypes
 imagewbmp
-imagexbm
 imap_8bit
 imap_alerts
 imap_append
