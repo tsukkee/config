@@ -1,52 +1,42 @@
-" ==================== 基本の設定 ==================== "
-" 全般設定
-set nocompatible     " 必ず最初に書く
-set viminfo+=!       " YankRing用に!を追加
-set shellslash       " Windowsでディレクトリパスの区切り文字に / を使えるようにする
-set lazyredraw       " マクロなどを実行中は描画を中断
-colorscheme xoria256 " カラースキーム
+" ==================== Basic settins ==================== "
+" General
+set viminfo+=!       " add '!' for YankRing plugin
+set shellslash       " to use '/' for path delimiter in Windows
+colorscheme xoria256 " colorscheme
 
-" タブ周り
-" tabstopはTab文字を画面上で何文字分に展開するか
-" shiftwidthはcindentやautoindent時に挿入されるインデントの幅
-" softtabstopはTabキー押し下げ時の挿入される空白の量，0の場合はtabstopと同じ，BSにも影響する
+" Tab character
 set tabstop=4 shiftwidth=4 softtabstop=0
-set expandtab   " タブを空白文字に展開
-set smartindent " スマートインデント
+set expandtab   " use space instead of tab
+set smartindent " smart indent
 
-" 入力補助
-set backspace=indent,eol,start " バックスペースでなんでも消せるように
-set formatoptions+=m           " 整形オプション，マルチバイト系を追加
+" Input support
+set backspace=indent,eol,start " to delete everything with backspace key
+set formatoptions+=m           " add multibyte support
 
-" コマンド補完
-set wildmenu                   " コマンド補完を強化
-set wildmode=list:longest,full " リスト表示
+" Command completion
+set wildmenu                   " enhance command completion
+set wildmode=list:longest,full " first 'list:lingest' and second 'full'
 
-" 検索関連
-set wrapscan   " 最後まで検索したら先頭へ戻る
-set ignorecase " 大文字小文字無視
-set smartcase  " 大文字ではじめたら大文字小文字無視しない
-set incsearch  " インクリメンタルサーチ
-set hlsearch   " 検索文字をハイライト
+" Searching
+set wrapscan   " search wrap around the end of the file
+set ignorecase " ignore case
+set smartcase  " override 'ignorecase' if the search pattern contains upper case
+set incsearch  " incremental search
+set hlsearch   " highlight searched words
 
-" ファイル関連
-set nobackup   " バックアップ取らない
-set autoread   " 他で書き換えられたら自動で読み直す
-set noswapfile " スワップファイル作らない
-set hidden     " 編集中でも他のファイルを開けるようにする
+" Reading and writing file
+set nobackup   " don't backup
+set autoread   " auto reload when file rewrite other application
+set noswapfile " don't use swap file
 
-" ヘルプファイル
+" Help files
 if has('mac')
-    " set runtimepath+=~/.vim/ja/
     helptags ~/.vim/doc/
-    " helptags ~/.vim/ja/doc/
 elseif has('win32')
-    " set runtimepath+=~/vimfiles/ja/
     helptags ~/vimfiles/doc/
-    " helptags ~/vimfiles/ja/doc/
 endif
 
-"表示関連
+" Display
 set showmatch         " 括弧の対応をハイライト
 set showcmd           " 入力中のコマンドを表示
 set number            " 行番号表示
@@ -67,7 +57,7 @@ augroup cch
     autocmd WinEnter,BufRead * set cursorline
 augroup END
 
-" fold関連
+" Folding
 set foldmethod=marker
 " 行頭でhを押すと折りたたみを閉じる
 nnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zc' : 'h'
@@ -78,15 +68,13 @@ vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
 " 折りたたみ上でlを押すと選択範囲に含まれる折りたたみを開く
 vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 
-" ステータスライン関連
+" Status line
 set laststatus=2
 set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%4v(ASCII=%03.3b,HEX=%02.2B)\ %l/%L(%P)%m
 
-" エンコーディング関連
+" File encoding
 set ffs=unix,dos,mac " 改行文字
 
-" 文字コードの自動認識
-" 適当な文字コード判別
 if has('mac')
     set termencoding=utf-8
 elseif has('win32')
@@ -95,25 +83,25 @@ endif
 set encoding=utf-8
 set fileencodings=iso-2022-jp,utf-8,cp932,euc-jp
 
-" UTF-8の□や○でカーソル位置がずれないようにする
+" For multibyte characters, such as □, ○.
 set ambiwidth=double
 
-" ファイルタイプ関連
-syntax on " シンタックスカラーリングオン
+" File type
+syntax on " syntax coloring
 
-" 全角スペースをハイライト
+" Hightlight Zenkaku space
 highlight ZenkakuSpace ctermbg=darkcyan ctermfg=darkcyan
 match ZenkakuSpace /　/
 
-set complete+=k    " 補完に辞書ファイル追加
-filetype indent on " ファイルタイプによるインデントを行う
-filetype plugin on " ファイルタイプごとのプラグインを使う
+set complete+=k    " to use dictionary for completion
+filetype indent on " to use filetype indent
+filetype plugin on " to use filetype plugin
 
-" 辞書関連
+" Dictionary
 autocmd FileType javascript :set dictionary+=~/.vim/dict/javascript.dict
 autocmd FileType php :set dictionary+=~/.vim/dict/php.dict
 
-" Omni補完関連
+" Omni completion
 set completeopt+=menuone " 補完表示設定
 
 " TabでOmni補完及びポップアップメニューの選択
@@ -126,18 +114,24 @@ function! InsertTabWrapper()
 endfunction
 inoremap <Tab> <C-r>=InsertTabWrapper()<CR>
 
+function! InsertCrWrapper()
+    if pumvisible()
+        return "\<C-e>"
+    else
+        return "\<CR>"
+    endif
+endfunction
+inoremap <CR> <C-r>=InsertCrWrapper()<CR>
+
 " ポップアップメニューの色変える
 highlight Pmenu ctermbg=lightcyan ctermfg=black 
 highlight PmenuSel ctermbg=blue ctermfg=black 
 highlight PmenuSbar ctermbg=darkgray 
 highlight PmenuThumb ctermbg=lightgray
 
-" Kaoriya
-if has('kaoriya')
-    " imを無効にする
-    set iminsert=0
-    set imsearch=0
-endif
+" imを無効にする
+set iminsert=0
+set imsearch=0
 
 " ==================== キーマップ ==================== "
 " 表示行単位で移動
@@ -160,10 +154,10 @@ vnoremap $  g$
 vnoremap g$ $
 
 
-" ハイライト消す
+" Delete highlight
 nnoremap <silent> gh :nohlsearch<CR>
 
-" expand path
+" Expand path
 cnoremap <C-x> <C-r>=expand('%:p:h')<CR>/
 cnoremap <C-z> <C-r>=expand('%:p:r')<CR> 
 
@@ -210,12 +204,8 @@ if has('win32')
     command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
 endif
 
-" Rails
+" Ruby
 autocmd FileType ruby,eruby,yaml set softtabstop=2 shiftwidth=2 tabstop=2
-autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
-autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
-autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
-let g:rails_level = 4
 
 " refe
 " autocmd FileType ruby,eruby nnoremap <silent> K :Refe <cword><CR>
@@ -224,9 +214,6 @@ let g:rails_level = 4
 au BufNewFile,BufRead *.thtml setfiletype php
 au BufNewFile,BufRead *.ctp setfiletype php
 
-" .vimperatorrc
-au BufNewFile,BufRead .vimperatorrc,_vimperatorrc setfiletype vimperator
-
 " NERD_comments
 let NERDSpaceDelims = 1
 let NERDShutUp = 1
@@ -234,16 +221,12 @@ let NERDShutUp = 1
 " NERD_tree
 nnoremap <silent> <Space>t :NERDTreeToggle<CR>
 
-" Fuzzy
+" FuzzyFinder
 nnoremap <silent> <Space>fb :FuzzyFinderBuffer<CR>
 nnoremap <silent> <Space>ff :FuzzyFinderFile<CR>
 nnoremap <silent> <Space>fm :FuzzyFinderMruFile<CR>
 nnoremap <silent> <Space>fc :FuzzyFinderMruCmd<CR>
 nnoremap <silent> <C-]> :FuzzyFinderTag! <C-r>=expand('<cword>')<CR><CR>
-
-" AutoComplete
-" autocmd BufNewFile,BufRead *    :AutoComplPopEnable<CR>
-" autocmd BufNewFile,BufRead .tex :AutoComplPopDisable<CR>
 
 let g:AutoComplPop_IgnoreCaseOption = 0
 let g:AutoComplPop_CompleteoptPreview = 1
@@ -288,24 +271,6 @@ EOF
     endif
 endfunction
 nnoremap <silent> <Space>rf :<C-u>call ReloadFirefox()<CR>
-
-function! ScrollFirefox(n)
-    if has('ruby')
-        ruby <<EOF
-        require "net/telnet"
-
-        telnet = Net::Telnet.new({
-            "Host" => "localhost",
-            "Port" => 4242
-        })
-
-        telnet.puts("content.scrollBy(0, #{eva("a:n")})")
-        telnet.close
-EOF
-    endif
-endfunction
-nmap <silent> <D-n> :call ScrollFirefox(100)<CR>
-nmap <silent> <D-p> :call ScrollFirefox(-100)<CR>
 " }}}
 
 " Safariリロード {{{
@@ -354,7 +319,7 @@ endfunction
 autocmd FileType tex noremap <buffer> <silent> ,t :<C-u>call TexShop_TypeSet()<CR>
 " }}}
 
-" Mac関連
+" for Mac
 if has('mac')
     command! Here silent exe '!open ' . expand('%:p:h') . '/'
     command! This silent exe '!open %'
