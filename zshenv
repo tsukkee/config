@@ -26,13 +26,9 @@ fi
 export EDITOR
 
 # Pager
-if test -x /opt/local/bin/lv; then
-    PAGER=/opt/local/bin/lv
-    export LV="-E'$EDITOR +%d'"
-else 
-    PAGER=/usr/bin/less
+if test -x /usr/local/bin/vimpager; then 
+    export PAGER=/usr/local/bin/vimpager
 fi
-export PAGER
 
 # Others
 export BLOCKSIZE=k
