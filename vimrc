@@ -1,5 +1,6 @@
 " ==================== Basic settins ==================== "
 " General
+set nocompatible     
 set viminfo+=!       " add '!' for YankRing plugin
 set shellslash       " to use '/' for path delimiter in Windows
 colorscheme xoria256 " colorscheme
@@ -105,23 +106,8 @@ autocmd FileType php :set dictionary+=~/.vim/dict/php.dict
 set completeopt+=menuone " 補完表示設定
 
 " TabでOmni補完及びポップアップメニューの選択
-function! InsertTabWrapper()
-    if pumvisible()
-        return "\<C-n>"
-    else
-        return "\<Tab>"
-    endif
-endfunction
-inoremap <Tab> <C-r>=InsertTabWrapper()<CR>
-
-function! InsertCrWrapper()
-    if pumvisible()
-        return "\<C-e>"
-    else
-        return "\<CR>"
-    endif
-endfunction
-inoremap <CR> <C-r>=InsertCrWrapper()<CR>
+inoremap <silent> <expr> <CR> (pumvisible() ? "\<C-e>" : "") . "\<CR>"
+inoremap <silent> <expr> <Tab> pumvisible() ? "\<C-y>" : "\<Tab>"
 
 " ポップアップメニューの色変える
 highlight Pmenu ctermbg=lightcyan ctermfg=black 
@@ -206,9 +192,6 @@ endif
 
 " Ruby
 autocmd FileType ruby,eruby,yaml set softtabstop=2 shiftwidth=2 tabstop=2
-
-" refe
-" autocmd FileType ruby,eruby nnoremap <silent> K :Refe <cword><CR>
 
 " CakePHP
 au BufNewFile,BufRead *.thtml setfiletype php
