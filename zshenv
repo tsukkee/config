@@ -26,9 +26,9 @@ fi
 export EDITOR
 
 # Pager
-if test -x /usr/local/bin/vimpager; then 
-    export PAGER=/usr/local/bin/vimpager
-fi
+# if test -x /usr/local/bin/vimpager; then 
+    # export PAGER=/usr/local/bin/vimpager
+# fi
 
 # Others
 export BLOCKSIZE=k
