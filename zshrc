@@ -2,8 +2,8 @@
 umask 22
 
 # キーバインド
-bindkey -v # vi風
-# bindkey -e # emacs風
+# bindkey -v # vi風
+bindkey -e # emacs風
 
 # 履歴補完
 autoload history-search-end

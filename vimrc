@@ -1,6 +1,6 @@
 " ==================== Basic settins ==================== "
 " General
-set nocompatible     
+set nocompatible     " 
 set viminfo+=!       " add '!' for YankRing plugin
 set shellslash       " to use '/' for path delimiter in Windows
 colorscheme xoria256 " colorscheme
@@ -84,7 +84,7 @@ endif
 set encoding=utf-8
 set fileencodings=iso-2022-jp,utf-8,cp932,euc-jp
 
-" For multibyte characters, such as □, ○.
+" For multibyte characters, such as □, ○
 set ambiwidth=double
 
 " File type
@@ -99,8 +99,8 @@ filetype indent on " to use filetype indent
 filetype plugin on " to use filetype plugin
 
 " Dictionary
-autocmd FileType javascript :set dictionary+=~/.vim/dict/javascript.dict
-autocmd FileType php :set dictionary+=~/.vim/dict/php.dict
+autocmd FileType javascript setlocal dictionary+=~/.vim/dict/javascript.dict
+autocmd FileType php setlocal dictionary+=~/.vim/dict/php.dict
 
 " Omni completion
 set completeopt+=menuone " 補完表示設定
@@ -144,12 +144,12 @@ vnoremap g$ $
 nnoremap <silent> gh :nohlsearch<CR>
 
 " Expand path
-cnoremap <C-x> <C-r>=expand('%:p:h')<CR>/
-cnoremap <C-z> <C-r>=expand('%:p:r')<CR> 
+cnoremap <expr> <C-x> expand('%:p:h') . "/"
+cnoremap <expr> <C-z> expand('%:p:r') 
 
-" コピペ
-" Macの場合は一部でCommand-C，Command-Vも使えたりする
-" reference
+" Copy and paste
+" Command-C and Command-V are also available in MacVim
+" Reference:
 " http://subtech.g.hatena.ne.jp/cho45/20061010/1160459376
 " http://vim.wikia.com/wiki/Mac_OS_X_clipboard_sharing
 "
@@ -169,8 +169,8 @@ else
     noremap <Space>p "+p
 endif
 
-" マウス操作を有効にする
-" iTermのみ，Terminal.appでは無効
+" Enable mouse wheel
+" In Mac, Only on iTerm.app, disable on Terminal.app
 if has('mac')
     set mouse=a
     set ttymouse=xterm2
@@ -191,7 +191,7 @@ if has('win32')
 endif
 
 " Ruby
-autocmd FileType ruby,eruby,yaml set softtabstop=2 shiftwidth=2 tabstop=2
+autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
 
 " CakePHP
 au BufNewFile,BufRead *.thtml setfiletype php
@@ -236,8 +236,8 @@ let g:AutoComplPop_Behavior = {
     \   ],
     \   }
 
-" Firefoxリロード {{{
-" 要MozRepl
+" Reload Firefox {{{
+" Need MozRepl and +ruby
 function! ReloadFirefox()
     if has('ruby')
         ruby <<EOF
@@ -256,8 +256,8 @@ endfunction
 nnoremap <silent> <Space>rf :<C-u>call ReloadFirefox()<CR>
 " }}}
 
-" Safariリロード {{{
-" 要RubyOSA
+" Reload Safari {{{
+" Need RubyOSA and +ruby
 function! ReloadSafari()
     if has('ruby') && has('mac')
         ruby <<EOF
@@ -273,16 +273,16 @@ nnoremap <silent> <Space>rs :<C-u>call ReloadSafari()<CR>
 " }}}
 
 " visual studio
-if has('win32')
-    let g:visual_studio_python_exe = "C:/Python25/python.exe"
-endif
+" if has('win32')
+    " let g:visual_studio_python_exe = "C:/Python25/python.exe"
+" endif
 
 " git
 let git_diff_spawn_mode = 1
-autocmd BufNewFile,BufRead COMMIT_EDITMSG set filetype=git
+autocmd BufNewFile,BufRead COMMIT_EDITMSG setlocal filetype=git
 
-" TeXShop タイプセット {{{
-" 要RubyOSA
+" TeXShop {{{
+" Need RubyOSA and +ruby
 function! TexShop_TypeSet()
     if has('ruby') && has('mac')
         ruby <<EOF
@@ -302,15 +302,15 @@ endfunction
 autocmd FileType tex noremap <buffer> <silent> ,t :<C-u>call TexShop_TypeSet()<CR>
 " }}}
 
-" for Mac
+" Utility command for Mac
 if has('mac')
     command! Here silent exe '!open ' . expand('%:p:h') . '/'
     command! This silent exe '!open %'
     command! Cot  silent exe '!open -a CotEditor %'
 endif
 
-" others
+" Others
 command! HTMLEscape silent exe "rubydo $_ = $_.gsub('&', '&amp;').gsub('>', '&gt;').gsub('<', '&lt;').gsub('\"', '&quot;')"
 
-" load private information
+" Load private information
 source ~/.vimrc_passwords

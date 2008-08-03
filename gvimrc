@@ -43,6 +43,7 @@ set imsearch=0
 
 if has('win32')
     au BufNewFile,BufRead *.cpp,*.h set noexpandtab
+    set guioptions-=T
 end
 
 if has('mac')
