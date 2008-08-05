@@ -1,6 +1,6 @@
 " flyquickfixmake
 augroup plugin-flyquickfixmake
-    autocmd!
+    autocmd! plugin-flyquickfixmake
     autocmd FileType ruby       call s:Setup("ruby")
     autocmd FileType php        call s:Setup("php")
     autocmd FileType javascript call s:Setup("javascript")
