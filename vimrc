@@ -81,7 +81,6 @@ if has('mac')
 elseif has('win32')
     set termencoding=cp932
 endif
-set encoding=utf-8
 set fileencodings=iso-2022-jp,utf-8,cp932,euc-jp
 
 " For multibyte characters, such as □, ○
