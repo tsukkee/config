@@ -299,6 +299,7 @@ EOF
 endfunction
 
 autocmd FileType tex noremap <buffer> <silent> ,t :<C-u>call TexShop_TypeSet()<CR>
+autocmd FileType tex setlocal spell spelllang=en_us
 " }}}
 
 " Utility command for Mac

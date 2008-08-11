@@ -1,7 +1,5 @@
 " ==================== basic options ==================== "
-
 set activate=quickmark,paste
-" set complete=bShsf
 set complete=sl
 set suggestengines=tsukkee
 set editor=/opt/local/bin/gvim -f
@@ -23,7 +21,6 @@ EOF
 
 
 " ==================== key mappings ==================== "
-
 " 多めにスクロールするようにする
 noremap j 5j
 noremap k 5k
@@ -36,7 +33,6 @@ noremap gh :nohl<CR>
 " sでStartCommand検索
 noremap s :open tsukkee<Space>
 noremap S :tabopen tsukkee<Space>
-
 
 " Windows環境のCtrl+cでコピーを殺すのを回避
 javascript <<EOF
@@ -56,29 +52,13 @@ liberator.mappings.addUserMap([liberator.modes.NORMAL], ['<C-c>'],
 );
 EOF
 
-" Ctrl-Tab
-javascript <<EOF
-liberator.commands.addUserCommand(['ctrltab'],
-    "Activate Ctrl-Tab",
-    function (args, special)
-    {
-        allTabs.open();
-    }, {}
-);
-EOF
-noremap c :ctrltab<CR>
-
 
 " ==================== plugin options ==================== "
-
 " migemo_hint
 set hintmatching=custom
 
-" direct_bookmark
-let g:direct_sbm_use_services_by_tag = "dl"
-let g:direct_sbm_use_services_by_post = "dl"
-
 " bookmarktoolbar-hints
+" for Mac
 javascript <<EOF
 liberator.mappings.addUserMap([liberator.modes.NORMAL], [',f'],
     'Start Toolbar-HINTS (open current tab)',
@@ -105,12 +85,11 @@ autocommands.add('LocationChange', /reader\.livedoor\.com\/reader\//,
     'js plugins.feedKey.setup("j k s a p v V c <Space> <S-Space> z Z < > q w b i r g ?".split(/ +/));');
 
 autocommands.add('LocationChange', /fastladder\.com\/reader\//,
-    'js plugins.feedKey.setup("j k s a p v c <Space> <S-Space> z Z < > q w b i r g ?".split(/ +/));');
+    'js plugins.feedKey.setup("j k s a p v V c <Space> <S-Space> z Z < > q w b i r g ?".split(/ +/));');
 EOF
 
 
 " ==================== others ==================== "
 echo ".vimperatorrc sourced"
-
 
 " vim: set ft=vimperator:
