@@ -44,13 +44,7 @@ set imsearch=0
 if has('win32')
     set guioptions-=T
 
-    " for VC 2005
-    augroup visualstudio
-        autocmd! visualstudio
-        autocmd FileType cpp,h setlocal noexpandtab
-        autocmd FileType cpp,h setlocal errorformat=%*\\d>%f(%l)\ :\ %t%[A-z]%#\ %m
-        autocmd FileType cpp,h setlocal makeprg=\"C:\\Program\ Files\\Microsoft\ Visual\ Studio\ 8\\Common7\\IDE\\devenv.com\"\ $* 
-    augroup END
+    autocmd FileType cpp,h setlocal noexpandtab
 end
 
 if has('mac')
