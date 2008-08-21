@@ -175,6 +175,20 @@ if has('mac')
     set ttymouse=xterm2
 endif
 
+" Binary (see :h xxd)
+" vim -b :edit binary using xxd-format!
+" reference: http://jarp.does.notwork.org/diary/200606a.html#200606021
+augroup Binary
+    autocmd!
+    autocmd BufReadPre   *.bin,*.swf let &bin=1
+    autocmd BufReadPost  *.bin,*.swf if &bin | silent %!xxd -g 1
+    autocmd BufReadPost  *.bin,*.swf set ft=xxd | endif
+    autocmd BufWritePre  *.bin,*.swf if &bin | %!xxd -r
+    autocmd BufWritePre  *.bin,*.swf endif
+    autocmd BufWritePost *.bin,*.swf if &bin | silent %!xxd -g 1
+    autocmd BufWritePost *.bin,*.swf set nomod | endif
+augroup END
+
 " ==================== プラグインの設定 ==================== "
 " 基本的に<Space>に割り当てとけばかぶらない？
 
