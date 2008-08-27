@@ -323,6 +323,12 @@ if has('mac')
     command! Cot  silent exe '!open -a CotEditor %'
 endif
 
+" TOhtml
+let html_number_lines = 0
+let html_use_css = 1
+let use_xhtml = 1
+let html_use_encoding = "utf-8"
+
 " Others
 command! HTMLEscape silent exe "rubydo $_ = $_.gsub('&', '&amp;').gsub('>', '&gt;').gsub('<', '&lt;').gsub('\"', '&quot;')"
 
