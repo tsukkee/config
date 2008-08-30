@@ -3,11 +3,13 @@ set activate=quickmark,paste
 set complete=sl
 set suggestengines=tsukkee
 set editor=/opt/local/bin/gvim -f
+set focuscontent
 set guioptions=mTb
 set hlsearch
-set verbose=9
-set wildoptions=auto
+set showstatuslinks=2
 set titlestring=Firefox
+" set verbose=9
+set wildoptions=auto
 
 set nextpattern+=次(の)?ページ,\b次.*,↑\b,
 set previouspattern+=前(の)?ページ,\b前.*,\b↓
