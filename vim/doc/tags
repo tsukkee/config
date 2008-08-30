@@ -309,6 +309,16 @@ omnicpp-popup	omnicppcomplete.txt	/*omnicpp-popup*
 omnicpp-thanks	omnicppcomplete.txt	/*omnicpp-thanks*
 omnicppcomplete	omnicppcomplete.txt	/*omnicppcomplete*
 omnicppcomplete.txt	omnicppcomplete.txt	/*omnicppcomplete.txt*
+smartchr	smartchr.txt	/*smartchr*
+smartchr#loop()	smartchr.txt	/*smartchr#loop()*
+smartchr#one_of()	smartchr.txt	/*smartchr#one_of()*
+smartchr-bugs	smartchr.txt	/*smartchr-bugs*
+smartchr-changelog	smartchr.txt	/*smartchr-changelog*
+smartchr-contents	smartchr.txt	/*smartchr-contents*
+smartchr-functions	smartchr.txt	/*smartchr-functions*
+smartchr-interface	smartchr.txt	/*smartchr-interface*
+smartchr-introduction	smartchr.txt	/*smartchr-introduction*
+smartchr.txt	smartchr.txt	/*smartchr.txt*
 surround	surround.txt	/*surround*
 surround-author	surround.txt	/*surround-author*
 surround-customizing	surround.txt	/*surround-customizing*
