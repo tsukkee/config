@@ -74,14 +74,15 @@ set laststatus=2
 set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%4v(ASCII=%03.3b,HEX=%02.2B)\ %l/%L(%P)%m
 
 " File encoding
-set ffs=unix,dos,mac " 改行文字
-
 if has('mac')
-    set termencoding=utf-8
+    set encoding=utf-8
 elseif has('win32')
-    set termencoding=cp932
+    set encoding=japan
 endif
-set fileencodings=iso-2022-jp,utf-8,cp932,euc-jp
+set fileencodings=utf-8,cp932,euc-jp
+
+" File Formats
+set ffs=unix,dos,mac
 
 " For multibyte characters, such as □, ○
 set ambiwidth=double
@@ -98,8 +99,11 @@ filetype indent on " to use filetype indent
 filetype plugin on " to use filetype plugin
 
 " Dictionary
-autocmd FileType javascript setlocal dictionary+=~/.vim/dict/javascript.dict
-autocmd FileType php setlocal dictionary+=~/.vim/dict/php.dict
+augroup Dictionary
+    autocmd! Dictionary
+    autocmd FileType javascript setlocal dictionary+=~/.vim/dict/javascript.dict
+    autocmd FileType php setlocal dictionary+=~/.vim/dict/php.dict
+augroup END
 
 " Omni completion
 set completeopt+=menuone " 補完表示設定
@@ -114,7 +118,7 @@ highlight PmenuSel ctermbg=blue ctermfg=black
 highlight PmenuSbar ctermbg=darkgray 
 highlight PmenuThumb ctermbg=lightgray
 
-" imを無効にする
+" Disable input methods
 set iminsert=0
 set imsearch=0
 
@@ -179,7 +183,7 @@ endif
 " vim -b :edit binary using xxd-format!
 " reference: http://jarp.does.notwork.org/diary/200606a.html#200606021
 augroup Binary
-    autocmd!
+    autocmd! Binary
     autocmd BufReadPre   *.bin,*.swf let &bin=1
     autocmd BufReadPost  *.bin,*.swf if &bin | silent %!xxd -g 1
     autocmd BufReadPost  *.bin,*.swf set ft=xxd | endif
@@ -204,7 +208,10 @@ if has('win32')
 endif
 
 " Ruby
-autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
+augroup Ruby
+    autocmd! Ruby
+    autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
+augroup END
 
 " CakePHP
 au BufNewFile,BufRead *.thtml setfiletype php
@@ -292,7 +299,10 @@ nnoremap <silent> <Space>rs :<C-u>call ReloadSafari()<CR>
 
 " git
 let git_diff_spawn_mode = 1
-autocmd BufNewFile,BufRead COMMIT_EDITMSG setlocal filetype=git
+augroup git
+    autocmd! git
+    autocmd BufNewFile,BufRead COMMIT_EDITMSG setlocal filetype=git
+augroup END
 
 " TeXShop {{{
 " Need RubyOSA and +ruby
@@ -312,8 +322,11 @@ EOF
     endif
 endfunction
 
-autocmd FileType tex noremap <buffer> <silent> ,t :<C-u>call TexShop_TypeSet()<CR>
-autocmd FileType tex setlocal spell spelllang=en_us
+augroup tex
+    autocmd! tex
+    autocmd FileType tex noremap <buffer> <silent> ,t :<C-u>call TexShop_TypeSet()<CR>
+    autocmd FileType tex setlocal spell spelllang=en_us
+augroup END
 " }}}
 
 " Utility command for Mac
