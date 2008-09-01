@@ -75,14 +75,12 @@ EOF
 " feedSomeKey
 autocmd LocationChange .* :fmapc
 javascript <<EOF
-// Gmail
 autocommands.add('LocationChange', /mail\.google\.com\/(mail|a)\//, [
     'js plugins.feedKey.setup(',
     '"c / y j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc".split(/ +/).map(function(i) [i, "4" + i])',
     ');'
 ].join(''));
 
-// livedoor Reader, Fastladder
 autocommands.add('LocationChange', /reader\.livedoor\.com\/reader\//,
     'js plugins.feedKey.setup("j k s a p v V c <Space> <S-Space> z Z < > q w b i r g ?".split(/ +/));');
 
