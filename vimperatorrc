@@ -36,28 +36,10 @@ noremap gh :nohl<CR>
 noremap s :open tsukkee<Space>
 noremap S :tabopen tsukkee<Space>
 
-" Windows環境のCtrl+cでコピーを殺すのを回避
-javascript <<EOF
-liberator.mappings.addUserMap([liberator.modes.NORMAL], ['<C-c>'],
-    'Copy selected text or Stop',
-    function() {
-        var sel = liberator.buffer.getCurrentWord();
-        if(sel) {
-            liberator.util.copyToClipboard(sel, true);
-            echo('Yanked: ' + liberator.util.escapeHTML(sel));
-        }
-        else {
-            BrowserStop();
-            liberator.echo('Stopped loading !');
-        }
-    }, {}
-);
-EOF
-
 
 " ==================== plugin options ==================== "
 " migemo_hint
-set hintmatching=custom
+" set hintmatching=custom
 
 " feedSomeKey
 autocmd LocationChange .* :fmapc
@@ -69,10 +51,10 @@ autocommands.add('LocationChange', /mail\.google\.com\/(mail|a)\//, [
 ].join(''));
 
 autocommands.add('LocationChange', /reader\.livedoor\.com\/reader\//,
-    'js plugins.feedKey.setup("j k s a p v V c <Space> <S-Space> z Z < > q w b i r g ?".split(/ +/));');
+    'js plugins.feedKey.setup("j k s a p v V o c <Space> <S-Space> z Z < > q w b i r g ?".split(/ +/));');
 
 autocommands.add('LocationChange', /fastladder\.com\/reader\//,
-    'js plugins.feedKey.setup("j k s a p v V c <Space> <S-Space> z Z < > q w b i r g ?".split(/ +/));');
+    'js plugins.feedKey.setup("j k s a p v V o c <Space> <S-Space> z Z < > q w b i r g ?".split(/ +/));');
 EOF
 
 " ==================== others ==================== "
