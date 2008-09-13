@@ -79,7 +79,7 @@ if has('mac')
 elseif has('win32')
     set encoding=japan
 endif
-set fileencodings=utf-8,cp932,euc-jp
+set fileencodings=utf-8,euc-jp,cp932
 
 " File Formats
 set ffs=unix,dos,mac
