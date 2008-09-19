@@ -33,28 +33,65 @@ noremap l 3l
 noremap gh :nohl<CR>
 
 " sでStartCommand検索
-noremap s :open tsukkee<Space>
+" noremap s :open tsukkee<Space>
 noremap S :tabopen tsukkee<Space>
 
 " ==================== plugin options ==================== "
 " migemo_hint
 set hintmatching=custom
 
+" browser_object
+let g:browser_object_prefix = "s"
+
 " feedSomeKey
 autocmd LocationChange .* :fmapc
 javascript <<EOF
+// Gmail
 autocommands.add('LocationChange', /mail\.google\.com\/(mail|a)\//, [
     'js plugins.feedKey.setup(',
     '"c / y j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc".split(/ +/).map(function(i) [i, "4" + i])',
     ');'
 ].join(''));
 
+// livedoor Reader
 autocommands.add('LocationChange', /reader\.livedoor\.com\/reader\//,
     'js plugins.feedKey.setup("j k s a p v V o c <Space> <S-Space> z Z < > q w b i r g ?".split(/ +/));');
 
+// fastladder
 autocommands.add('LocationChange', /fastladder\.com\/reader\//,
     'js plugins.feedKey.setup("j k s a p v V o c <Space> <S-Space> z Z < > q w b i r g ?".split(/ +/));');
 EOF
+
+" nicontroller
+javascript <<EOM
+// [N],n-
+// N 秒前にシークする。
+// 指定なしの場合 10 秒前。
+liberator.mappings.addUserMap(
+    [liberator.modes.NORMAL],
+    [',n-'],
+    'seek by count backward',
+    function(count) {
+        if(count === -1) count = 10;
+        liberator.execute(':nicoseek! ' + '-' + count);
+    },
+    { flags: liberator.Mappings.flags.COUNT }
+);
+
+// [N],n+
+// N 秒後にシークする。
+// 指定なしの場合 10 秒後。
+liberator.mappings.addUserMap(
+    [liberator.modes.NORMAL],
+    [',n+'],
+    'seek by count forward',
+    function(count) {
+        if(count === -1) count = 10;
+        liberator.execute(':nicoseek! ' + count);
+    },
+    { flags: liberator.Mappings.flags.COUNT }
+);
+EOM
 
 " ==================== others ==================== "
 echo ".vimperatorrc sourced"
