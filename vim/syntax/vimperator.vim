@@ -1,7 +1,7 @@
 " Vim syntax file
-" Language:	    VIMperator configuration file
-" Maintainer:	    Doug Kearns <dougkearns@gmail.com>
-" Latest Revision:  2008 June 13
+" Language:         VIMperator configuration file
+" Maintainer:       Doug Kearns <dougkearns@gmail.com>
+" Last Change:      2008 Sep 21
 
 if exists("b:current_syntax")
   finish
@@ -13,48 +13,85 @@ set cpo&vim
 syn include @javascriptTop syntax/javascript.vim
 unlet b:current_syntax
 
-syn keyword vimperatorTodo    FIXME NOTE TODO XXX contained
-syn match   vimperatorComment +".*$+ contains=vimperatorTodo,@Spell
+syn region  vimperatorString start="\z(["']\)" end="\z1" skip="\\\\\|\\\z1" oneline
 
-syn keyword vimperatorCommand addo[ns] b[uffer] ba[ck] bd[elete] beep bma[rk] bmarks buffers bun[load] bw[ipeout] delbm[arks]
-	\ delm[arks] delqm[arks] dl downl[oads] e[dit] ec[ho] echoe[rr] exe[cute] exu[sage] files fo[rward] fw h[elp] ha[rdcopy]
-	\ hist[ory] hs javas[cript] js ls ma[rk] map mapc[lear] marks no[remap] noh[lsearch] norm[al] o[pen] pc[lose]
-	\ let pref[erences] prefs q[uit] qa[ll] qma[rk] qmarks quita[ll] re[load] reloada[ll] res[tart] sav[eas] sideb[ar] sb[ar]
-	\ sbcl[ose] sb[open] se[t] so[urce] st[op] time tN[ext] t[open] tab tabN[ext] tabc[lose] tabe[dit] tabfir[st] tabl[ast]
-	\ tabm[ove] tabn[ext] tabnew tabo[nly] tabopen tabp[revious] tabr[ewind] tabs tn[ext] tp[revious] u[ndo] unl[et] unm[ap]
-	\ ve[rsion] viu[sage] w[rite] win[open] wine[dit] wo[pen] wq wqa[ll] xa[ll] zo[om] run
+syn match vimperatorCommandStart "\%(^\s*:\=\)\@<=" nextgroup=vimperatorCommand,vimperatorAutoCmd
+
+syn keyword vimperatorCommand ab[breviate] ab[clear] addo[ns] b[uffer] ba[ck] bd[elete] beep bf[irst] bl[ast] bma[rk] bmarks
+    \ bn[ext] bN[ext] bp[revious] br[ewind] buffers bun[load] bw[ipeout] ca[bbrev] cabc[lear] cd chd[ir] cuna[bbrev] cm[ap]
+    \ cmapc[lear] cno[remap] comc[lear] com[mand] cu[nmap] delbm[arks] delc[ommand] delmac[ros] delm[arks] delqm[arks] dia[log] dl
+    \ downl[oads] e[dit] ec[ho] echoe[rr] em[enu] exe[cute] exu[sage] fini[sh] files fo[rward] fw h[elp] ha[rdcopy] hist[ory] hs
+    \ ia[bbrev] iabc[lear] im[ap] imapc[lear] ino[remap] iuna[bbrev] iu[nmap] javas[cript] ju[mps] js let ls macros ma[rk] map
+    \ mapc[lear] marks mkv[imperatorrc] no[remap] noh[lsearch] norm[al] o[pen] pa[geinfo] pagest[yle] pc[lose] pl[ay]
+    \ pref[erences] prefs pw[d] q[uit] qa[ll] qma[rk] qmarks quita[ll] re[draw] re[load] reloada[ll] res[tart] run ru[ntime]
+    \ sav[eas] sb[ar] sb[open] sbcl[ose] scrip[tnames] se[t] setg[lobal] setl[ocal] sideb[ar] so[urce] st[op] tN[ext] t[open] tab
+    \ tabde[tach] tabd[uplicate] tabN[ext] tabc[lose] tabe[dit] tabfir[st] tabl[ast] tabm[ove] tabn[ext] tabnew tabo[nly] tabopen
+    \ tabp[revious] tabr[ewind] tabs time tn[ext] tp[revious] u[ndo] una[bbreviate] undoa[ll] unl[et] unm[ap] ve[rsion]
+    \ vie[wsource] viu[sage] w[rite] wc[lose] win[open] winc[lose] wine[dit] wo[pen] wqa[ll] wq xa[ll] zo[om]
 	\ contained
 
 syn match vimperatorCommand "!" contained
 
-" FIXME
-syn match vimperatorCommandWrapper "\%(!\|\<\h\w*\>\)" contains=vimperatorCommand
+syn keyword vimperatorAutoCmd au[tocmd] contained nextgroup=vimperatorAutoEventList skipwhite
 
-syn region vimperatorSet matchgroup=vimperatorCommand start="\<set\=\>" end="$" keepend oneline contains=vimperatorOption
-syn keyword vimperatorOption activate act activelinkfgcolor alfc activelinkbgcolor albc complete cpt defsearch ds editor extendedhinttags eht
-        \ focuscontent fc nofocuscontent nofc fullscreen fs nofullscreen nofs guioptions go hintmatching hm hintstyle hs hinttags ht hinttimeout hto history hi
-        \ hlsearch hls nohlsearch nohls hlsearchstyle hlss incsearch is noincsearch nois ignorecase ic
-        \ noignorecase noic insertmode im noinsertmode noim laststatus ls linkbgcolor lbc linkfgcolor lfc linksearch lks
-        \ nolinksearch nolks more nomore nextpattern newtab online noonline pageinfo pa popups pps preload nopreload
-        \ previewheight pvh previouspattern scroll scr showmode smd noshowmode nosmd showstatuslinks ssli showtabline stal
-        \ smartcase scs nosmartcase noscs suggestengines titlestring usermode um nousermode noum verbose vbs visualbell vb novisualbell novb
-	\ visualbellstyle t_vb wildmode wim wildoptions wop wordseparators wsp
-	\ contained
+syn keyword vimperatorAutoEvent BookmarkAdd LocationChange PageLoadPre PageLoad ShellCmdPost VimperatorEnter VimperatorLeavePre
+    \ VimperatorLeave
+    \ contained
+
+syn match vimperatorAutoEventList "\(\a\+,\)*\a\+" contained contains=vimperatorAutoEvent
+
+syn region vimperatorSet matchgroup=vimperatorCommand start="\%(^\s*:\=\)\@<=\<\%(setl\%[ocal]\|setg\%[lobal]\|set\=\)\=\>"
+    \ end="$" keepend oneline contains=vimperatorOption
+
+syn keyword vimperatorOption activate act activelinkfgcolor alfc activelinkbgcolor albc cdpath cd complete cpt defsearch ds editor
+    \ extendedhinttags eht eventignore ei guioptions go helpfile hf hintmatching hm hintstyle hs hinttags ht hinttimeout hto
+    \ history hi hlsearchstyle hlss laststatus ls linkbgcolor lbc linkfgcolor lfc newtab nextpattern pageinfo pa
+    \ popups pps previewheight pvh previouspattern runtimepath rtp scroll scr shell sh shellcmdflag shcf showstatuslinks ssli
+    \ showtabline stal suggestengines titlestring urlseparator verbose vbs visualbellstyle t_vb wildignore wig wildmode wim
+    \ wildoptions wop wordseparators wsp
+    \ contained nextgroup=vimperatorSetMod
+
+" toggle options
+syn match vimperatorOption "\<\%(no\|inv\)\=\%(focuscontent\|fc\|fullscreen\|fs\|ignorecase\|ic\|incsearch\|is\)\>!\="
+    \ contained nextgroup=vimperatorSetMod
+syn match vimperatorOption "\<\%(no\|inv\)\=\%(insertmode\|im\|hlsearch\|hls\|linksearch\|lks\|loadplugins\|lpl\|more\)\>!\="
+    \ contained nextgroup=vimperatorSetMod
+syn match vimperatorOption "\<\%(no\|inv\)\=\%(online\|preload\|showmode\|smd\|smartcase\|scs\|online \|visualbell\|vb\)\>!\="
+    \ contained nextgroup=vimperatorSetMod
+syn match vimperatorOption "\<\%(no\|inv\)\=\%(usermode\|um\)\>!\="
+    \ contained nextgroup=vimperatorSetMod
+
+syn match vimperatorSetMod "\%(\<[a-z_]\+\)\@<=&" contained
 
 syn region vimperatorJavascript start="\%(^\s*\%(javascript\|js\)\s\+\)\@<=" end="$" contains=@javascriptTop keepend oneline
 syn region vimperatorJavascript matchgroup=vimperatorJavascriptDelimiter
-	\ start="\%(^\s*\%(javascript\|js\)\s\+\)\@<=<<\z(\h\w*\)"hs=s+2 end="^\z1$" contains=@javascriptTop fold
+	\ start="\%(^\s*\%(javascript\|js\)\s\+\)\@<=<<\s*\z(\h\w*\)"hs=s+2 end="^\z1$" contains=@javascriptTop fold
 
-" Note: match vim.vim highlighting groups
-hi def link vimperatorCommand			Statement
-hi def link vimperatorTodo			Todo
-hi def link vimperatorComment			Comment
+syn region vimperatorMap matchgroup=vimperatorCommand start="\%(^\s*:\=\)\@<=\<map\>" end="$" keepend oneline
+    \ contains=vimperatorNotation
+
+syn match vimperatorNotation "<[0-9A-Za-z-]\+>"
+
+syn match   vimperatorLineComment +^\s*".*$+ contains=vimperatorTodo,@Spell
+syn match   vimperatorComment +".*$+ contains=vimperatorTodo,@Spell
+syn keyword vimperatorTodo FIXME NOTE TODO XXX contained
+
+" NOTE: match vim.vim highlighting group names
+hi def link vimperatorAutoCmd               vimperatorCommand
+hi def link vimperatorAutoEvent             Type
+hi def link vimperatorCommand			    Statement
+hi def link vimperatorComment			    Comment
 hi def link vimperatorJavascriptDelimiter	Delimiter
-hi def link vimperatorOption			PreProc
+hi def link vimperatorNotation			    Special
+hi def link vimperatorLineComment		    Comment
+hi def link vimperatorOption			    PreProc
+hi def link vimperatorSetMod                vimperatorOption
+hi def link vimperatorString			    String
+hi def link vimperatorTodo                  Todo
 
 let b:current_syntax = "vimperator"
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
 
-" vim: tw=130:
+" vim: tw=130 et ts=4 sw=4:
