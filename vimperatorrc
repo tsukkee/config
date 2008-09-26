@@ -37,6 +37,9 @@ noremap gh :nohl<CR>
 noremap S :tabopen tsukkee<Space>
 
 " ==================== plugin options ==================== "
+" lookupDictionay
+g:lookupDictionary_dictionary = "en-US"
+
 " migemo_hint
 set hintmatching=custom
 
