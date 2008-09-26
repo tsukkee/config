@@ -17,10 +17,15 @@ set previouspattern+=前(の)?ページ,\b前.*,\b↓
  
 " ==================== Firefox options ==================== "
 " disable accesskey
-javascript <<EOF
-liberator.options.setPref('ui.key.generalAccessKey', 0);
-EOF
-
+set! ui.key.generalAccessKey=0
+" hide close button
+set! browser.tabs.closeButtons=2
+" open bookmarks in background
+set! browser.tabs.loadBookmarksInBackground=true
+" open tabs by javascript in background
+set! browser.tabs.loadDivertedInBackground=true
+" allow lots of popups for ldr
+set! dom.popup_maximum=9999 
 
 " ==================== key mappings ==================== "
 " 多めにスクロールするようにする
@@ -33,15 +38,12 @@ noremap l 3l
 noremap gh :nohl<CR>
 
 " sでStartCommand検索
-" noremap s :open tsukkee<Space>
+noremap s :open tsukkee<Space>
 noremap S :tabopen tsukkee<Space>
 
 " ==================== plugin options ==================== "
 " migemo_hint
 set hintmatching=custom
-
-" browser_object
-let g:browser_object_prefix = "s"
 
 " feedSomeKey
 autocmd LocationChange .* :fmapc
