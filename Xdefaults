@@ -1,0 +1,27 @@
+URxvt.termName: rxvt-256color
+URxvt.foreground: White
+URxvt.background: Gray10
+URxvt.saveLines: 20000
+URxvt.scrollstyle: rxvt
+URxvt.scrollBar_right: true
+URxvt.geometry: 100x35
+URxvt.shading: 10
+
+URxvt.font:\
+    xft:M+2VM+IPAG circle:size=14:antialias=true, \
+    xft:Hiragino Maru Gothic Pro, \
+    xft:Monaco
+URxvt.boldFont:\
+    xft:M+2VM+IPAG circle:bold, \
+    xft:Hiragino Maru Gothic Pro:bold, \
+    xft:Monaco:bold
+URxvt.italicFont:\
+    xft:M+2VM+IPAG circle:italic, \
+    xft:Hiragino Maru Gothic Pro:italic, \
+    xft:Monaco:italic
+URxvt.boldItalicFont:\
+    xft:M+2VM+IPAG circle:italic, \
+    xft:Hiragino Maru Gothic Pro:italic, \
+    xft:Monaco:italic
+
+Xft*antialias: true

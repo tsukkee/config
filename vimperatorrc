@@ -42,8 +42,6 @@ noremap s :open tsukkee<Space>
 noremap S :tabopen tsukkee<Space>
 
 " ==================== plugin options ==================== "
-" lookupDictionay
-g:lookupDictionary_dictionary = "en-US"
 
 " migemo_hint
 set hintmatching=custom

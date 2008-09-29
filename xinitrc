@@ -43,6 +43,7 @@ fi
 # start some nice programs
 
 test -x /opt/local/bin/kinput2 && /opt/local/bin/kinput2 &
+# test -x /opt/local/bin/kinput2.macim && /opt/local/bin/kinput2.macim &
 
 
 if [ -d /usr/X11/lib/X11/xinit/xinitrc.d ] ; then

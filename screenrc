@@ -1,39 +1,34 @@
-# エンコーディング
-defencoding UTF-8
-
-# スタートアップ画面オフ
-startup_message off
-
-# プレフックス
-escape ^y^y
-
-# ディタッチ
 autodetach on
-
-# ビジュアルベル
+zombie "q^M"
+startup_message off
 vbell off
+escape ^Jj
+defscrollback 10000
 
-# bind w windowlist -b
+defutf8 on
+defkanji utf-8
+encoding utf-8 utf-8
+defencoding utf-8
 
-# 出るらしい
-bell "Bell in window %."
+# 表示
+bell_msg "Bell in window %."
 activity "Activity in window %."
 
 # タブっぽい表示
 # hardstatus alwayslastline "%{= wk}%-Lw%n%f* %t%{= wk}%+Lw %= %y/%m/%d %c "
-hardstatus alwayslastline "%-w%{=b}%n %t%{-}%+w"
-
-# 戻る行数
-scrollback 100000
+hardstatus on
+hardstatus alwayslastline
+hardstatus string "%-w%{=b}%n %t%{-}%+w"
 
 # ターミナルのサイズ変わるの防止
 # Aborted because of window size chage
 # を防止できるらしい
 termcapinfo xterm* 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
 
-# あらかじめいくつかタブを開いておく
-screen -t default 0
-screen -t vim     1 vim
-screen -t synergy 2
-select 1
-select 0
+defbce "on"
+term rxvt-256color
+shell zsh
+
+bind U eval "encoding utf-8" "!!!echo 'export LANG=ja_JP.UTF-8'"
+bind E eval "encoding euc" "!!!echo 'export LANG=ja_JP.EUC-JP'"
+bind s colon "screen ssh"

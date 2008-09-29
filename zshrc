@@ -1,9 +1,6 @@
-# 基本の設定
-umask 22
-
-# キーバインド
-# bindkey -v # vi風
-bindkey -e # emacs風
+# Keybind
+# bindkey -v # like vi
+bindkey -e # like emacs
 
 # 履歴補完
 autoload history-search-end
@@ -66,9 +63,10 @@ function precmd {
 precmd
 
 # エイリアス
-alias less=lv
+test -x /opt/local/bin/lv && alias less=/opt/local/bin/lv
 alias ctags=jexctags
 alias ls="ls -GF"
+alias scr="screen -xR"
 alias -g C="| iconv -f utf-8 -t sjis | pbcopy"
 alias -g Csjis="| pbcopy"
 alias -g Ceuc="| iconv -f euc-jp -t sjis | pbcopy"
