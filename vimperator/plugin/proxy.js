@@ -88,7 +88,7 @@
 
     var proxy_settings = liberator.globalVariables.proxy_settings;
 
-    liberator.commands.addUserCommand(["proxy"], 'Proxy settings', function (args) {
+    commands.addUserCommand(["proxy"], 'Proxy settings', function (args) {
         const prefs = Components.classes["@mozilla.org/preferences-service;1"]
                                 .getService(Components.interfaces.nsIPrefService);
         var name = args;

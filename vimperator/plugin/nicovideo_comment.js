@@ -14,7 +14,7 @@
  */
 (function(){
 
-liberator.commands.addUserCommand(['nico'],'Fill comment form in nicovideo',
+commands.addUserCommand(['nico'],'Fill comment form in nicovideo',
     function(arg, special){
         var flvp = window.content.document.getElementById('flvplayer'); 
         var form = special ? 'MailInput.text' : 'ChatInput.text' ;
