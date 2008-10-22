@@ -2,7 +2,7 @@
 set activate=quickmark,paste
 set complete=sl
 set defsearch=tsukkee
-set suggestengines=tsukkee
+set suggestengines=google
 set editor=/opt/local/bin/gvim -f
 set focuscontent
 set guioptions=mTb
@@ -45,7 +45,7 @@ noremap S :tabopen tsukkee<Space>
 " ==================== plugin options ==================== "
 
 " migemo_hint
-set hintmatching=custom
+" set hintmatching=custom
 
 " feedSomeKey
 autocmd LocationChange .* :fmapc
