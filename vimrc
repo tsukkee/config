@@ -114,7 +114,7 @@ inoremap <silent> <expr> <Tab> pumvisible() ? "\<C-y>" : "\<Tab>"
 
 " ポップアップメニューの色変える
 highlight Pmenu ctermbg=lightcyan ctermfg=black 
-highlight PmenuSel ctermbg=blue ctermfg=black 
+highlight PmenuSel ctermbg=blue ctermfg=white 
 highlight PmenuSbar ctermbg=darkgray 
 highlight PmenuThumb ctermbg=lightgray
 

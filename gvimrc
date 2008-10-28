@@ -26,7 +26,6 @@ if has('gui_macvim')
     set imdisable
     map <silent> gw :macaction selectNextWindow:<CR>
     map <silent> gW :macaction selectPreviousWindow:<CR>
-    execute "AutoComplPopDisable"
 endif
 
 " Windows版GVim

@@ -26,7 +26,8 @@ hardstatus string "%-w%{=b}%n %t%{-}%+w"
 termcapinfo xterm* 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
 
 defbce "on"
-term rxvt-256color
+# term rxvt-256color
+term xterm-256color
 shell zsh
 
 bind U eval "encoding utf-8" "!!!echo 'export LANG=ja_JP.UTF-8'"
