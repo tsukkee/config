@@ -1,7 +1,7 @@
 URxvt.termName: rxvt-256color
 URxvt.foreground: White
 URxvt.background: Gray10
-URxvt.saveLines: 20000
+URxvt.saveLines: 1000
 URxvt.scrollstyle: rxvt
 URxvt.scrollBar_right: true
 URxvt.geometry: 100x35
