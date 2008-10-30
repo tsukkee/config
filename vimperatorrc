@@ -45,7 +45,7 @@ noremap S :tabopen tsukkee<Space>
 " ==================== plugin options ==================== "
 
 " migemo_hint
-" set hintmatching=custom
+set hintmatching=custom
 
 " feedSomeKey
 autocmd LocationChange .* :fmapc
