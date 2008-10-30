@@ -15,7 +15,6 @@
 'NERDTreeSortOrder'	NERD_tree.txt	/*'NERDTreeSortOrder'*
 'NERDTreeWinPos'	NERD_tree.txt	/*'NERDTreeWinPos'*
 'NERDTreeWinSize'	NERD_tree.txt	/*'NERDTreeWinSize'*
-'go'	Align.txt	/*'go'*
 'loaded_nerd_tree'	NERD_tree.txt	/*'loaded_nerd_tree'*
 :MatchDebug	matchit.txt	/*:MatchDebug*
 :NERDTree	NERD_tree.txt	/*:NERDTree*
@@ -139,6 +138,7 @@ YRClear-example	yankring.txt	/*YRClear-example*
 YRDeleteRange	yankring.txt	/*YRDeleteRange*
 YRGetElem	yankring.txt	/*YRGetElem*
 YRGetMultiple	yankring.txt	/*YRGetMultiple*
+YRGetMultiple-example	yankring.txt	/*YRGetMultiple-example*
 YRMapsCreate	yankring.txt	/*YRMapsCreate*
 YRMapsDelete	yankring.txt	/*YRMapsDelete*
 YRPaste	yankring.txt	/*YRPaste*
@@ -170,6 +170,7 @@ align-control	Align.txt	/*align-control*
 align-history	Align.txt	/*align-history*
 align-manual	Align.txt	/*align-manual*
 align-maps	Align.txt	/*align-maps*
+align-multibyte	Align.txt	/*align-multibyte*
 align-option	Align.txt	/*align-option*
 align-options	Align.txt	/*align-options*
 align-strlen	Align.txt	/*align-strlen*
