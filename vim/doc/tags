@@ -138,7 +138,6 @@ YRClear-example	yankring.txt	/*YRClear-example*
 YRDeleteRange	yankring.txt	/*YRDeleteRange*
 YRGetElem	yankring.txt	/*YRGetElem*
 YRGetMultiple	yankring.txt	/*YRGetMultiple*
-YRGetMultiple-example	yankring.txt	/*YRGetMultiple-example*
 YRMapsCreate	yankring.txt	/*YRMapsCreate*
 YRMapsDelete	yankring.txt	/*YRMapsDelete*
 YRPaste	yankring.txt	/*YRPaste*
