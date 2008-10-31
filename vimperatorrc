@@ -1,12 +1,12 @@
 " ==================== basic options ==================== "
 set activate=quickmark,paste
-set complete=sl
-set defsearch=tsukkee
-set suggestengines=google
+set complete=l
+set defsearch=google
 set editor=/opt/local/bin/gvim -f
 set focuscontent
 set guioptions=mTb
 set hlsearch
+set nopreload
 set showstatuslinks=2
 set titlestring=Firefox
 " set verbose=9
