@@ -331,6 +331,9 @@ augroup END
 
 " yankring
 let g:yankring_history_file = '.yankring_history'
+if has('win32')
+    let g:yankring_history_dir = "c:"
+endif
 
 " Utility command for Mac
 if has('mac')

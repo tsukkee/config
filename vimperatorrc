@@ -1,6 +1,6 @@
 " ==================== basic options ==================== "
 set activate=quickmark,paste
-set complete=sl
+set complete=l
 set defsearch=google
 set editor=/opt/local/bin/gvim -f
 set focuscontent
