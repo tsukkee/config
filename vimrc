@@ -329,6 +329,9 @@ augroup tex
 augroup END
 " }}}
 
+" yankring
+let g:yankring_history_file = '.yankring_history'
+
 " Utility command for Mac
 if has('mac')
     command! Here silent exe '!open ' . expand('%:p:h') . '/'
