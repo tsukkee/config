@@ -1,0 +1,6 @@
+! 円マークキー
+keycode 101 = backslash bar yen bar
+! 英数キー 
+keycode 110 = F3
+! かな/カナキー
+keycode 112 = F4

@@ -1,0 +1,59 @@
+" ==================== basic options ==================== "
+set activate=quickmark,paste
+set complete=sl
+set defsearch=google
+set editor=/opt/local/bin/gvim -f
+set focuscontent
+set guioptions=mTb
+set hlsearch
+set nopreload
+set showstatuslinks=2
+set titlestring=Firefox
+" set verbose=9
+set wildoptions=auto
+
+set nextpattern+=次(の)?ページ,\b次.*,↑\b,
+set previouspattern+=前(の)?ページ,\b前.*,\b↓
+
+ 
+" ==================== Firefox options ==================== "
+" disable accesskey
+set! ui.key.generalAccessKey=0
+" hide close button
+set! browser.tabs.closeButtons=2
+" open bookmarks in background
+set! browser.tabs.loadBookmarksInBackground=true
+" open tabs by javascript in background
+set! browser.tabs.loadDivertedInBackground=true
+" allow lots of popups for ldr
+set! dom.popup_maximum=9999 
+
+" ==================== key mappings ==================== "
+" 多めにスクロールするようにする
+noremap j 5j
+noremap k 5k
+noremap h 3h
+noremap l 3l
+
+" ghでハイライトオフ
+noremap gh :nohl<CR>
+
+" sでStartCommand検索
+noremap s :open tsukkee<Space>
+noremap S :tabopen tsukkee<Space>
+
+" ==================== plugin options ==================== "
+
+" migemo_hint
+set hintmatching=custom
+
+" feedSomeKey
+autocmd LocationChange .* fmapc
+autocmd LocationChange http://reader\\.livedoor\\.com/reader fmaps j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
+autocmd LocationChange http://fastladder\\.com/reader fmaps j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
+autocmd LocationChange mail\\.google\\.com/mail fmaps -d 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
+
+" ==================== others ==================== "
+echo ".vimperatorrc sourced"
+
+" vim: set ft=vimperator:

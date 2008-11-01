@@ -1,0 +1,4 @@
+set columns=16
+set showmode
+set igonorecase
+set wrapscan
