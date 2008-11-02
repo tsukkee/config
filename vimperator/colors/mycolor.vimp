@@ -1,0 +1,5 @@
+hi StatusLine color: black
+hi StatusLineSecure color: green
+hi StatusLineBroken color: red
+
+" vim: set ft=vimperator:

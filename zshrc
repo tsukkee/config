@@ -59,7 +59,7 @@ function _screen_dirname() {
 function _screen_cmdname() {
     # if [ $TERM = "screen" ]; then
     if [ $SHELL = "zsh" ]; then
-        echo -ne "\ek#${1%% *}\e\\"
+        echo -ne "\ek# $1\e\\"
     fi
 }
 
