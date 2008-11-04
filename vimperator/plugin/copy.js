@@ -79,15 +79,15 @@ liberator.globalVariables.copy_templates.forEach(function(template){
 // used when argument is none
 //const defaultValue = templates[0].label;
 commands.addUserCommand(['copy'],'Copy to clipboard',
-    function(arg, special){
-        liberator.plugins.exCopy.copy(arg.string, special);
+    function(args, special){
+        liberator.plugins.exCopy.copy(args, special);
     },{
         completer: function(filter, special){
             if (special){
                 return completion.javascript(filter);
             }
             var templates = liberator.globalVariables.copy_templates.map(function(template)
-                [template.label, template.value.replace("\n", "\\n")]
+                [template.label, template.value]
             );
             if (!filter){ return [0,templates]; }
             var candidates = [];
@@ -120,7 +120,7 @@ function replaceVariable(str){
     var win = new XPCNativeWrapper(window.content.window);
     var sel = '',htmlsel = '';
     if (str.indexOf('%SEL%') >= 0 || str.indexOf('%HTMLSEL%') >= 0){
-        sel = win.getSelection().getRangeAt(0);
+        sel = win.getSelection().rangeCount()>0? win.getSelection().getRangeAt(0): '';
     }
     if (str.indexOf('%HTMLSEL%') >= 0){
         var serializer = new XMLSerializer();
@@ -143,7 +143,8 @@ var exCopyManager = {
     get: function(label){
         return getCopyTemplate(label);
     },
-    copy: function(arg, special){
+    copy: function(args, special){
+        var arg = args.string == undefined ? args: args.string;
         var copyString = '';
         var isError = false;
         if (special && arg){

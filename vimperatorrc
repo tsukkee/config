@@ -1,12 +1,12 @@
 " ==================== basic options ==================== "
 set activate=quickmark,paste
-set complete=sl
-set defsearch=tsukkee
-set suggestengines=google
+set complete=l
+set defsearch=google
 set editor=/opt/local/bin/gvim -f
 set focuscontent
 set guioptions=mTb
 set hlsearch
+set nopreload
 set showstatuslinks=2
 set titlestring=Firefox
 " set verbose=9
@@ -48,23 +48,13 @@ noremap S :tabopen tsukkee<Space>
 set hintmatching=custom
 
 " feedSomeKey
-autocmd LocationChange .* :fmapc
-javascript <<EOF
-// Gmail
-autocommands.add('LocationChange', /mail\.google\.com\/(mail|a)\//, [
-    'js liberator.plugins.feedKey.setup(',
-    '"c / y j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc".split(/ +/).map(function(i) [i, "4" + i])',
-    ');'
-].join(''));
+autocmd LocationChange .* fmapc
+autocmd LocationChange http://reader\\.livedoor\\.com/reader fmaps j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
+autocmd LocationChange http://fastladder\\.com/reader fmaps j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
+autocmd LocationChange mail\\.google\\.com/mail fmaps -d 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
 
-// livedoor Reader
-autocommands.add('LocationChange', /reader\.livedoor\.com\/reader\//,
-    'js liberator.plugins.feedKey.setup("j k s a p v V o c <Space> <S-Space> z Z < > q w b i r g ?".split(/ +/));');
-
-// fastladder
-autocommands.add('LocationChange', /fastladder\.com\/reader\//,
-    'js liberator.plugins.feedKey.setup("j k s a p v V o c <Space> <S-Space> z Z < > q w b i r g ?".split(/ +/));');
-EOF
+" ==================== colorscheme ==================== "
+colorscheme mycolor
 
 " ==================== others ==================== "
 echo ".vimperatorrc sourced"
