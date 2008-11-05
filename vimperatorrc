@@ -54,7 +54,7 @@ autocmd LocationChange http://fastladder\\.com/reader fmaps j k s a p o v V c <S
 autocmd LocationChange mail\\.google\\.com/mail fmaps -d 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
 
 " ==================== colorscheme ==================== "
-colorscheme mycolor
+colorscheme mac
 
 " ==================== others ==================== "
 echo ".vimperatorrc sourced"
