@@ -1,7 +1,6 @@
 " ==================== Basic settins ==================== "
 " General
 set nocompatible     " 
-set viminfo+=!       " add '!' for YankRing plugin
 set shellslash       " to use '/' for path delimiter in Windows
 colorscheme xoria256 " colorscheme
 
@@ -328,12 +327,6 @@ augroup tex
     autocmd FileType tex setlocal spell spelllang=en_us
 augroup END
 " }}}
-
-" yankring
-let g:yankring_history_file = '.yankring_history'
-if has('win32')
-    let g:yankring_history_dir = "c:"
-endif
 
 " Utility command for Mac
 if has('mac')

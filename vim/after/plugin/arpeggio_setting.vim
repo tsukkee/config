@@ -1,18 +1,12 @@
 " settings for arpeggio.vim
 call arpeggio#load()
 
-" Esc
-Arpeggionoremap fj <Esc>
-Arpeggioinoremap fj <Esc>
-Arpeggiocnoremap fj <Esc>
-
 " NERD_tree
 Arpeggionnoremap as :NERDTreeToggle<CR>
 
 " FuzzyFinder
 Arpeggionnoremap <silent> fn :FuzzyFinderBuffer<CR>
 Arpeggionnoremap <silent> fm :FuzzyFinderMruFile<CR>
-Arpeggionnoremap <silent> f. :FuzzyFinderMruCmd<CR>
 
 " Reload brawser
 if has('ruby')
