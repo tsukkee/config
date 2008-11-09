@@ -344,5 +344,23 @@ let html_use_encoding = "utf-8"
 " Others
 command! HTMLEscape silent exe "rubydo $_ = $_.gsub('&', '&amp;').gsub('>', '&gt;').gsub('<', '&lt;').gsub('\"', '&quot;')"
 
+" settings for arpeggio.vim
+call arpeggio#load()
+
+" NERD_tree
+Arpeggionnoremap <silent> tn :NERDTreeToggle<CR>
+
+" FuzzyFinder
+Arpeggionnoremap <silent> fn :FuzzyFinderBuffer<CR>
+Arpeggionnoremap <silent> fm :FuzzyFinderMruFile<CR>
+
+" Reload brawser
+if has('ruby')
+    Arpeggionnoremap <silent> ru :<C-u>call ReloadFirefox()<CR>
+endif
+if has('mac')
+    Arpeggionnoremap <silent> ri :<C-u>call ReloadSafari()<CR>
+endif
+
 " Load private information
 source ~/.vimrc_passwords

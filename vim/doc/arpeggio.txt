@@ -1,6 +1,6 @@
 *arpeggio.txt*	Mappings for simultaneously pressed keys
 
-Version 0.0.1
+Version 0.0.3
 Script ID: 2425
 Copyright (C) 2008 kana <http://whileimautomaton.net/>
 License: MIT license  {{{
@@ -53,14 +53,16 @@ With the above definition, you can input <Esc> in Insert mode and Command-line
 mode by pressing "j" and "k" simultaneously, while solely pressed "j" are "k"
 are worked the same as the default ones.
 
-The concept of this plugin is derived from Emacs' key-chord.el (*), but there
+The concept of this plugin is derived from Emacs' key-chord.el (*1), but there
 are the following differences:
 
-- Number of keys is unlimited.
-- "One-key chord" is not supported.  Because Vim natively supports it - see
-  |map-ambiguous| for the detail.
+- Number of keys to be simultaneously pressed is unlimited.
 
-(*) http://www.emacswiki.org/cgi-bin/wiki/key-chord.el
+- Custom delay for each key is supported (see |g:arpeggio_timeoutlens|).
+  This is a generalization of space-chord.el (*2).
+
+(*1) http://www.emacswiki.org/emacs/key-chord.el
+(*2) http://www.emacswiki.org/emacs/space-chord.el
 
 
 Requirements:
@@ -78,6 +80,10 @@ INTERFACE					*arpeggio-interface*
 ------------------------------------------------------------------------------
 COMMANDS					*arpeggio-commands*
 
+:Arpeggio {command} ...				*:Arpeggio*
+			Equivalent to ":Arpeggio{command} ...".  This command
+			is just for readability.
+
 :Arpeggiomap {lhs} {rhs}			*:Arpeggiomap*
 :Arpeggiomap! {lhs} {rhs}			*:Arpeggiomap!*
 :Arpeggiocmap {lhs} {rhs}			*:Arpeggiocmap*
@@ -91,9 +97,9 @@ COMMANDS					*arpeggio-commands*
 			Like |:map| and others, but map to {rhs} if and only
 			if all keys in {lhs} are simultaneously pressed.
 
-			Available |:map-arguments| are <buffer>, <expr> and/or
-			<silent>.  See also |arpeggio#map()| for other notes
-			and limitations.
+			Available |:map-arguments| are <buffer>, <expr>,
+			<silent> and/or <unique>.  See also |arpeggio#map()|
+			for other notes and limitations.
 
 :Arpeggionoremap {lhs} {rhs}			*:Arpeggionoremap*
 :Arpeggionoremap! {lhs} {rhs}			*:Arpeggionoremap!*
@@ -152,7 +158,7 @@ arpeggio#load()					*arpeggio#load()*
 			Load this plugin if it is not loaded yet.  Otherwise,
 			does nothing.  Call this function to ensure that
 			|arpeggio-commands| are defined before you use one of
-			them.
+			them, especially, in your |vimrc|.
 
 						*arpeggio#map()*
 arpeggio#map({modes}, {options}, {remap-p}, {lhs}, {rhs})
@@ -174,9 +180,24 @@ arpeggio#map({modes}, {options}, {remap-p}, {lhs}, {rhs})
 				b	<buffer>
 				e	<expr>
 				s	<silent>
+				u	<unique>
 
 				Other |:map-arguments| are not supported for
 				arpeggio key mappings.
+
+				Note that the meaning of <unique> is a bit
+				differed as follows:
+
+				- If a key in {lhs} is already mapped to
+				  something other than a part of
+				  |arpeggio-key-mapping|, an error will be
+				  raised and defining of this mapping will be
+				  aborted.
+
+				- If {lhs} is already mapped to another
+				  |arpeggio-key-mapping|, an error will be
+				  raised and defining of this mapping will be
+				  aborted.
 
 			{remap-p}
 				Number as a boolean.  True means that rhs can
@@ -221,6 +242,12 @@ g:arpeggio_timeoutlen	number  (default 40)	*g:arpeggio_timeoutlen*
 			The time in milliseconds to determine whether typed
 			keys are simultaneously pressed or not.
 
+g:arpeggio_timeoutlens	Dictionary (default {})	*g:arpeggio_timeoutlens*
+			Each key (in this dictionary) is a string of a key (on
+			a keyboard), and each value is a number which means
+			the same as |g:arpeggio_timeoutlen| but it is used
+			only for the corresponding key.
+
 'timeout' 'ttimeout'
 			The following configuration is required to use this
 			plugin:
@@ -262,6 +289,22 @@ BUGS						*arpeggio-bugs*
 ==============================================================================
 CHANGELOG					*arpeggio-changelog*
 
+0.0.3	2008-11-09T10:37:46+09:00
+	- Add |:Arpeggio|.
+	- Support |:map-<unique>| for |arpeggio#map()| and other commands.
+	- In |arpeggio#map()| and other commands, warn if a key in {lhs} is
+	  already mapped to something other than a part of another
+	  |arpeggio-key-mapping|.
+	- Add custom 'timeoutlen' per key.  See |g:arpeggio_timeoutlens|.
+	- Add a bit of completion for |arpeggio-commands|.
+
+0.0.2	2008-11-07T22:16:51+09:00
+	- Fix |:Arpeggionoremap| that allowed remapping but it should not do
+	  so.  (Thanks for id:ampmmn)
+	- Define |arpeggio-commands| and |arpeggio-variables| automatically
+	  for interactive or other use.  (But you still have to call
+	  |arpeggio#load()| to use them in vimrc.)
+
 0.0.1	2008-11-06T09:34:19+09:00
 	- Implement |arpeggio-commands|.
 	- Add missing |arpeggio#list()|.
@@ -274,4 +317,4 @@ CHANGELOG					*arpeggio-changelog*
 
 
 ==============================================================================
-vim:tw=78:ts=8:ft=help:norl:fdm=marker:
+vim:tw=78:ts=8:ft=help:norl:fen:fdl=0:fdm=marker:
