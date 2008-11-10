@@ -1,7 +1,6 @@
 " ==================== Basic settins ==================== "
 " General
 set nocompatible     " 
-set viminfo+=!       " add '!' for YankRing plugin
 set shellslash       " to use '/' for path delimiter in Windows
 colorscheme xoria256 " colorscheme
 
@@ -329,12 +328,6 @@ augroup tex
 augroup END
 " }}}
 
-" yankring
-let g:yankring_history_file = '.yankring_history'
-if has('win32')
-    let g:yankring_history_dir = "c:"
-endif
-
 " Utility command for Mac
 if has('mac')
     command! Here silent exe '!open ' . expand('%:p:h') . '/'
@@ -350,6 +343,24 @@ let html_use_encoding = "utf-8"
 
 " Others
 command! HTMLEscape silent exe "rubydo $_ = $_.gsub('&', '&amp;').gsub('>', '&gt;').gsub('<', '&lt;').gsub('\"', '&quot;')"
+
+" settings for arpeggio.vim
+call arpeggio#load()
+
+" NERD_tree
+Arpeggionnoremap <silent> tn :NERDTreeToggle<CR>
+
+" FuzzyFinder
+Arpeggionnoremap <silent> fn :FuzzyFinderBuffer<CR>
+Arpeggionnoremap <silent> fm :FuzzyFinderMruFile<CR>
+
+" Reload brawser
+if has('ruby')
+    Arpeggionnoremap <silent> ru :<C-u>call ReloadFirefox()<CR>
+endif
+if has('mac')
+    Arpeggionnoremap <silent> ri :<C-u>call ReloadSafari()<CR>
+endif
 
 " Load private information
 source ~/.vimrc_passwords
