@@ -13,8 +13,13 @@ bindkey "^N" history-beginning-search-forward-end
 autoload -U compinit
 compinit
 
-zstyle ':completion:*' list-colors ''
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+# colorize
+zstyle ':completion:*' list-colors '' 
+# ignore case
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' 
+# sudo 
+zstyle ':completion:*:sudo:*' command-path /opt/local/bin /opt/local/sbin \
+    /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin
 
 # autoload predict-on
 # predict-on
@@ -24,8 +29,10 @@ setopt auto_pushd  # cd history
 setopt list_packed # compact list display
 setopt nolistbeep  # no beep
 setopt auto_list   # show completion list automatically
+setopt auto_menu   # completion with Tab key
 setopt brace_ccl   # expand brace such as {a-za-z}
 setopt multios     # use muliple redirect and pipe
+setopt ignore_eof  # ignore <C-d>
 
 # history
 HISTFILE=$HOME/.zsh_history
