@@ -1,3 +1,21 @@
+/**
+ * ==VimperatorPlugin==
+ * @name           arpeggio.js
+ * @description    add arpeggio.vim like function
+ * @description-ja arpeggio.vimのような機能を追加
+ * @minVersion     2.0pre
+ * @author         tsukkee takayuki0510@gmail.com
+ * @version        0.0.0
+ * ==/VimperatorPlugin==
+ *
+ * (設定例)
+ * .vimperatorrcの中で
+ * source .vimperator/plugin/arpeggio.js
+ * などとしてから
+ * liberator.plugins.arpeggioMap(modes.NORMAL, "asd", true, function() { ... });
+ * とする
+ */
+
 (function() {
 
 if(liberator.plugins.arpeggioMap) return;
