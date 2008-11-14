@@ -1,7 +1,27 @@
+/**
+ * ==VimperatorPlugin==
+ * @name           arpeggio.js
+ * @description    add arpeggio.vim like function
+ * @description-ja arpeggio.vimのような機能を追加
+ * @minVersion     2.0pre
+ * @author         tsukkee takayuki0510@gmail.com
+ * @version        0.0.0
+ * ==/VimperatorPlugin==
+ *
+ * (設定例)
+ * .vimperatorrcの中で
+ * source .vimperator/plugin/arpeggio.js
+ * などとしてから
+ * liberator.plugins.arpeggioMap(modes.NORMAL, "asd", true, function() { ... });
+ * とする
+ */
+
 (function() {
 
-// Setting
-var timeout = 40;
+if(liberator.plugins.arpeggioMap) return;
+
+// Setting 
+var timeout = liberator.globalVariables.arpeggio_timeout || 40;
 
 // Utilities
 // references:
@@ -26,19 +46,20 @@ function permutations(items) {
     return combinations(items, items.length);
 }
 
-// from feedSomeKeys.js
 function getMap(mode, origKey) {
     if(mappings.hasMap(mode, origKey)) {
         var origMap = mappings.get(mode, origKey);
 
+        /*
         var clone = new Map(
             origMap.modes.map(function(m) m),
             origMap.names.map(function(n) n),
             origMap.description,
             origMap.action,
-            { flags:origMap.flags, rhs:origMap.rhs, noremap:origMap.noremap }
+            { flags: origMap.flags, noremap: origMap.noremap, rhs: origMap.rhs }
         );
-
+        */
+        var clone = eval(uneval(origMap));
         return clone;
     }
     else {
@@ -58,18 +79,24 @@ function addUserMap(map) {
 
 // ArpeggioMap
 function ArpeggioMap(mode, noremap, keys, fn) {
-    var self = this;
-    self.arpeggioHasDone = false;
-    self.origMaps = [];
-
+    this.arpeggioHasDone = false;
     var keys = keys.split("");
+
+    // preserve original mappings
+    this.origMaps = [];
+    for(let i = 0, len = keys.length; i < len; ++i) {
+        let key = keys[i];
+        let origMap = getMap(mode, key)
+        if(origMap) {
+            this.origMaps[key] = origMap;        
+        }
+    }
     
+    // asign arpeggio mappings
+    var self = this;
     for(let i = 0, len = keys.length; i < len; ++i) {
         let remains = keys.concat([]); // clone
         let key = remains.splice(i, 1).toString();
-
-        let origMap = getMap(mode, key);
-        let newMap = null;
 
         mappings.addUserMap([mode], [key],
             "arpeggio start: " + key,
@@ -78,39 +105,53 @@ function ArpeggioMap(mode, noremap, keys, fn) {
 
                 setTimeout(function() {
                     self.removeRemainMaps(mode, remains);
+
                     if(!self.arpeggioHasDone) {
-                        if(origMap) addUserMap(origMap);
-                        events.feedkeys((count > 1 ? count : "") + key, true);
-                        if(newMap) addUserMap(newMap);
+                        // restore
+                        let origMap = self.origMaps[key];
+                        if(origMap && !/^arpeggio start:/.test(origMap.description)) {
+                            // FIXME: this doesn't work
+                            origMap.execute(null, count);
+                        }
+                        else {
+                            events.feedkeys((count > 1 ? count : "") + key, true);
+                        }
                     }
+
                     self.arpeggioHasDone = false;
                 }, timeout);
             },
-            {
-                noremap: true    
-            }
+            {}
         );
-
-        newMap = getMap(mode, key);
     }
 }
 
 ArpeggioMap.prototype = {
     addRemainMaps: function(mode, noremap, keys, fn) {
-        var self = this;
-
         for(var combo in permutations(keys)) {
             let key = combo.join("");
 
+            // preserve original mapping
+            let origMap = getMap(mode, key);
+            if(origMap) this.origMaps[key] = origMap;
+
+            var self = this;
             mappings.addUserMap([mode], [key],
-                "arpeggio: " + key,
+                "arpeggio remains: " + key,
                 function(count) {
-                    fn();
+                    alert(fn);
+                    if(typeof(fn) == "function") {
+                        fn();
+                    }
+                    else {
+                        events.feedkeys(fn, true);
+                    }
                     self.arpeggioHasDone = true;
                 },
                 {
                     noremap: true
-                });
+                }
+            );
         }
     },
 
@@ -118,13 +159,44 @@ ArpeggioMap.prototype = {
         for(var combo in permutations(keys)) {
             let key = combo.join("");
             mappings.remove(mode, key);
+
+            // restore original mapping
+            let origMap = this.origMaps[key];
+            if(origMap && !/^arpeggio/.test(origMap.description)) {
+                addUserMap(this.origMaps[key]);
+            }
         }
     }
 };
 
+// add plugins function
+liberator.plugins.arpeggioMap = function(mode, noremap, key, fn) {
+    new ArpeggioMap(mode, noremap, key, fn);
+};
 
-// new ArpeggioMap(modes.NORMAL, true, "as", function() {
-    // alert("as");    
-// });
+// TODO: 
+liberator.plugins.arpeggioUnmap = function(mode, key) {
+
+};
+
+// FIXME: this doesn't work
+// TODO: add more commands
+// add commands
+commands.addUserCommand(
+    ["Arpeggionnomap"], "add arpeggio map", 
+    function(args, bang) {
+        var keys = args.arguments.shift();
+        var command = args.arguments.join(" ");
+        if(bang) {
+            liberator.plugins.arpeggioMap(modes.NORMAL, true, keys, command);
+        }
+        else {
+            liberator.plugins.arpeggioUnmap(modes.NORMAL, keys);
+        }
+    },
+    {
+        bang: true
+    }
+);
 
 })();

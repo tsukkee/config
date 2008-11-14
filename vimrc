@@ -30,11 +30,11 @@ set autoread   " auto reload when file rewrite other application
 set noswapfile " don't use swap file
 
 " Help files
-if has('mac')
-    helptags ~/.vim/doc/
-elseif has('win32')
-    helptags ~/vimfiles/doc/
-endif
+" if has('mac')
+    " helptags ~/.vim/doc/
+" elseif has('win32')
+    " helptags ~/vimfiles/doc/
+" endif
 
 " Display
 set showmatch         " 括弧の対応をハイライト
