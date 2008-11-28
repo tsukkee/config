@@ -1,7 +1,7 @@
 " ==================== basic options ==================== "
 set activate=quickmark,paste
 set complete=l
-" set defsearch=google
+set defsearch=google
 set editor=/opt/local/bin/gvim -f
 set focuscontent
 set guioptions=mTb
@@ -26,7 +26,7 @@ set! browser.tabs.loadBookmarksInBackground=true
 " open tabs by javascript in background
 set! browser.tabs.loadDivertedInBackground=true
 " allow lots of popups for ldr
-set! dom.popup_maximum=9999 
+set! dom.popup_maximum=1000
 
 " ==================== key mappings ==================== "
 " 多めにスクロールするようにする
@@ -69,6 +69,30 @@ autocmd LocationChange .* fmapc
 autocmd LocationChange http://reader\\.livedoor\\.com/reader fmaps j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
 autocmd LocationChange http://fastladder\\.com/reader fmaps j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
 autocmd LocationChange mail\\.google\\.com/mail fmaps -d 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
+
+" migratestatusbar
+javascript <<EOM
+    liberator.globalVariables.migrate_elements = [
+//        {
+//            // star button of awesome bar
+//            id:    'star-button',
+//            dest:  'security-button',
+//            after: true,
+//        },
+//        {
+//            // icon that show the existence of RSS and Atom on current page
+//            id:    'feed-button',
+//            dest:  'security-button',
+//            after: true,
+//        },
+        {
+            // favicon of awesome bar
+            id:    'page-proxy-stack',
+            dest:  'liberator-statusline',
+            after: false,
+        },
+    ];
+EOM
 
 " arpeggio
 " load
