@@ -4,7 +4,7 @@
  * @description      request, and the result is displayed to the buffer.
  * @description-ja   リクエストの結果をバッファに出力する。
  * @author           suVene suvene@zeromemory.info
- * @version          0.2.2
+ * @version          0.2.4
  * @minVersion       2.0pre
  * @maxVersion       2.0pre
  * ==/VimperatorPlugin==
@@ -72,15 +72,21 @@ var SITEINFO = [
         description: 'SPACE ALC (\u82F1\u8F9E\u6717 on the Web)',
         url:         'http://eow.alc.co.jp/%s/UTF-8/',
         xpath:       'id("resultList")'
-     },
-     {
+    },
+    {
         name:        'goo',
         description: 'goo \u8F9E\u66F8',
         url:         'http://dictionary.goo.ne.jp/search.php?MT=%s&kind=all&mode=0&IE=UTF-8',
         xpath:       'id("incontents")/*[@class="ch04" or @class="fs14" or contains(@class, "diclst")]',
         srcEncode:   'EUC-JP',
         urlEncode:   'UTF-8'
-     },
+    },
+    {
+        name: 'metalarchive-band',
+        url: 'http://www.metal-archives.com/search.php?string=%s&type=band',
+        description: 'Metal Archive (band)',
+        xpath: '//table',
+    }
 ];
 
 var mergedSiteinfo = {};
@@ -162,13 +168,12 @@ var CommandRegister = {
             cmdClass.description,
             $U.bind(cmdClass, cmdClass.cmdAction),
             {
-                completer: cmdClass.cmdCompleter || function(filter, special) {
+                completer: cmdClass.cmdCompleter || function(context, arg, bang) {
                     var allSuggestions = siteinfo.map(function(s) [s.name, s.description]);
-                    if (!filter) return [0, allSuggestions];
-                    var suggestions = allSuggestions.filter(function(s) {
-                        return s[0].indexOf(filter) == 0;
-                    });
-                    return [0, suggestions];
+                    context.title = ['Name', 'Descprition'];
+                    context.completions =
+                        context.filter ? allSuggestions.filter(function(s) s[0].indexOf(context.filter) == 0)
+                                       : allSuggestions;
                 },
                 options: cmdClass.cmdOptions,
                 argCount: cmdClass.argCount || undefined,
@@ -470,13 +475,16 @@ var MultiRequester = {
 
         args = args.string;
         var parsedArgs = this.parseArgs(args);
-        if (!parsedArgs || !parsedArgs.siteinfo || !parsedArgs.str) { return; } // do nothing
+        if (!parsedArgs || !parsedArgs.siteinfo) { return; } // do nothing
 
         var siteinfo = parsedArgs.siteinfo;
         var url = siteinfo.url;
         // see: http://fifnel.com/2008/11/14/1980/
         var srcEncode = siteinfo.srcEncode || 'UTF-8';
         var urlEncode = siteinfo.urlEncode || srcEncode;
+
+        var idxRepStr = url.indexOf('%s');
+        if (idxRepStr > -1 && !parsedArgs.str) return;
 
         // via. lookupDictionary.js
         var ttbu = Components.classes['@mozilla.org/intl/texttosuburi;1']
@@ -512,7 +520,7 @@ var MultiRequester = {
         var arguments = args.split(/ +/);
         var sel = $U.getSelectedString();
 
-        if ((sel && arguments.length < 1) || (!sel && arguments.length < 2)) return null;
+        if (arguments.length < 1) return null;
 
         var siteName = arguments.shift();
         var str = (arguments.length < 1 ? sel : arguments.join()).replace(/[\n\r]+/g, '');
@@ -569,3 +577,4 @@ return MultiRequester;
 
 })();
 // vim: set fdm=marker sw=4 ts=4 sts=0 et:
+

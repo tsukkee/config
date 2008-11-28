@@ -26,7 +26,7 @@ set! browser.tabs.loadBookmarksInBackground=true
 " open tabs by javascript in background
 set! browser.tabs.loadDivertedInBackground=true
 " allow lots of popups for ldr
-set! dom.popup_maximum=9999 
+set! dom.popup_maximum=1000
 
 " ==================== key mappings ==================== "
 " 多めにスクロールするようにする
@@ -36,8 +36,8 @@ noremap h 3h
 noremap l 3l
 
 " 上下で候補移動
-cnoremap <Up> <S-Tab>
-cnoremap <Down> <Tab>
+" cnoremap <Up> <S-Tab>
+" cnoremap <Down> <Tab>
 
 " ペーストが暴発しないように
 " gPだけを使うことにする
@@ -48,8 +48,16 @@ noremap P <Nop>
 noremap gh :nohl<CR>
 
 " sでStartCommand検索
-noremap s :open tsukkee<Space>
-noremap S :tabopen tsukkee<Space>
+noremap s :open stand<Space>
+noremap S :tabopen stand<Space>
+
+" ==================== hints ==================== "
+js <<EOF
+hints.addMode("i", "Focus to textbox",
+    function(element) element.focus(),
+    function() "//input[not(@type='hidden')] | //textarea | //xhtml:input[not(@type='hidden')] | //xhtml:textarea"
+    );
+EOF
 
 " ==================== plugin options ==================== "
 
@@ -62,13 +70,39 @@ autocmd LocationChange http://reader\\.livedoor\\.com/reader fmaps j k s a p o v
 autocmd LocationChange http://fastladder\\.com/reader fmaps j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
 autocmd LocationChange mail\\.google\\.com/mail fmaps -d 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
 
+" migratestatusbar
+javascript <<EOM
+    liberator.globalVariables.migrate_elements = [
+//        {
+//            // star button of awesome bar
+//            id:    'star-button',
+//            dest:  'security-button',
+//            after: true,
+//        },
+//        {
+//            // icon that show the existence of RSS and Atom on current page
+//            id:    'feed-button',
+//            dest:  'security-button',
+//            after: true,
+//        },
+        {
+            // favicon of awesome bar
+            id:    'page-proxy-stack',
+            dest:  'liberator-statusline',
+            after: false,
+        },
+    ];
+EOM
+
 " arpeggio
 " load
-source "~/.vimperator/plugin/arpeggio.js"
+" source "~/.vimperator/plugin/arpeggio.js"
 js <<EOF
+/*
 liberator.plugins.arpeggioMap(modes.NORMAL, true, "asd", function() {
     alert("asd");    
 });
+*/
 EOF
 
 " ==================== colorscheme ==================== "

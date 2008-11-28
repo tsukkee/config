@@ -4,10 +4,8 @@ hi StatusLineBroken color: red
 
 hi CompItem[selected] background: #1e46f3 ;color: white
 
-hi Hint -append background: #1e46f3; color: white;
-set linkbgcolor = #eeeeff
-set linkfgcolor = #000000
-set activelinkbgcolor =  #aaaaff
-set activelinkfgcolor =  #000000
+hi Hint -append background-color: #1e46f3; color: white
+hi HintElem -append background-color: #eeeeff; color: black
+hi HintActive -append background-color: #aaaaff; color: black
 
 " vim: set ft=vimperator:
