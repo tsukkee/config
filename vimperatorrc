@@ -65,10 +65,37 @@ EOF
 set hintmatching=custom
 
 " feedSomeKey
-autocmd LocationChange .* fmapc
-autocmd LocationChange http://reader\\.livedoor\\.com/reader fmaps j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
-autocmd LocationChange http://fastladder\\.com/reader fmaps j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
-autocmd LocationChange mail\\.google\\.com/mail fmaps -d 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
+" autocmd LocationChange .* fmapc
+" autocmd LocationChange http://reader\.livedoor\.com/reader fmaps j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
+" autocmd LocationChange http://fastladder\.com/reader fmaps j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
+" autocmd LocationChange mail\.google\.com/mail fmaps -d 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
+javascript <<EOM
+// var timer = setInterval(function() {
+//     if(plugins.feedKey) {
+//         autocommands.add('LocationChange', /.*/, ':js plugins.feedKey.reset()');
+// 
+//         autocommands.add('LocationChange', /reader\.livedoor\.com\/reader/, [
+//           ':js plugins.feedKey.setup(',
+//           '"j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?".split(/ +/)',
+//           ');'
+//         ].join(''));
+// 
+//         autocommands.add('LocationChange', /fastladder\.com\/reader/, [
+//           ':js plugins.feedKey.setup(',
+//           '"j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?".split(/ +/)',
+//           ');'
+//         ].join(''));
+// 
+//         autocommands.add('LocationChange', /mail\.google\.com\/mail/, [
+//           ':js plugins.feedKey.setup(',
+//           '"c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc".split(/ +/).map(function(i) [i, "4" + i])',
+//           ');'
+//         ].join(''));
+// 
+//         clearInterval(timer);
+//     }
+// }, 10);
+EOM
 
 " migratestatusbar
 javascript <<EOM

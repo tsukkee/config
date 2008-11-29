@@ -2,7 +2,9 @@ hi StatusLine color: black
 hi StatusLineSecure color: green
 hi StatusLineBroken color: red
 
-hi CompItem[selected] background: #1e46f3 ;color: white
+hi CompTitle color: #1e46f3; background: white
+hi CompTitle>* border-bottom: 1px dashed #1e46f3
+hi CompItem[selected] background: #1e46f3; color: white
 
 hi Hint -append background-color: #1e46f3; color: white
 hi HintElem -append background-color: #eeeeff; color: black
