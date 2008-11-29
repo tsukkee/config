@@ -1,55 +1,55 @@
 /**
  * ==VimperatorPlugin==
- * @name           feedSomeKeys
+ * @name           feedSomeKeys 2
  * @description    feed some defined key events into the Web content
  * @description-ja 定義したkeyイベントをWebページ側へ送ってあげます
  * @author         teramako teramako@gmail.com
- * @version        0.1b
+ * @version        2.0a
  * ==/VimperatorPlugin==
  *
  * 英語での説明を放棄する
+ *
+ * XXX: feedSomeKeys.js の改良版仕様を変更したのでフォーク
  *
  * keyイベント(正確にはkepressイベント)をWebコンテンツ側へ送る事を可能にするプラグイン
  * Gmailとかlivedoor ReaderとかGreasemonkeyでキーを割り当てている場合に活躍するでしょう。
  * それ以外の場面ではむしろ邪魔になる諸刃の剣
  *
- * :f[eed]map lhs           -> lhsのキーマップをそのままWebコンテンツへ
- * :f[eed]map lhs [num]rhs  -> lhsのキーマップをrhsへ変換してWebコンテンツへ
- *                             [num]はフレームの番号(省略時はトップウィンドウへイベントが送られる)
+ * :f[eed]map lhs [...]             -> lhsのキーマップをそのままWebコンテンツへ
+ * :f[eed]map lhs,[num]rhs [...]    -> lhsのキーマップをrhsへ変換してWebコンテンツへ
+ *                                     [num]はフレームの番号(省略時はトップウィンドウへイベントが送られる)
+ * :f[eed]map -d[epth] {num} ...    -> {num}はフレームの番号で :fmap lhs1,{num}rhs1 lhs2,{num}rhs2 ... と同等
+ *                                     Gmailの例を参照
+ * :f[eed]map -v[key] ....          -> 仮想キーコードでイベントを送るように
  *
  * :fmapc
  * :feedmapclear            -> 全てを無に帰して元に戻す
  *
- * :f[eed]map! lhs          -> "!" をつけると、仮想キーコードでイベントを送るように
+ * :f[eed]map! lhs ...      -> "!" をつけると、一旦すべてのfeedKeysを元に戻しての再定義
+ *
+ * autocmdと組み合わせる場合は
+ * :autocmd LocationChange .* :fmapc
+ * を最初に登録してください。でないと対象外のページに移ったときに設定が前のものを引きずることになります。
+ *
+ * また、下記設定例はvimperator 2.0pre用で1.2の場合は\を一つに削ってください。
  *
  * == LDR の場合 ==
-js <<EOF
-autocommands.add('PageLoad,TabSelect',/reader\.livedoor\.com\/reader\//,
-  'js plugins.feedKey.setup("j k s a p o v c <Space> <S-Space> z b < >".split(/ +/));');
-EOF
+ * :autocmd LocationChange .* :fmapc
+ * :autocmd LocationChange reader\\.livedoor\\.com/reader :fmap j k s a p o v c <Space> <S-Space> z b < >
+ *
  * とかやると幸せになれるかも。
  *
  * == Gmail の場合 ==
-js <<EOF
-autocommands.add('PageLoad,TabSelect',/mail\.google\.com\/mail/,[
-  'js plugins.feedKey.setup(',
-  '"c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc".split(/ +/).map(function(i) [i, "3" + i])',
-  ');'
-].join(''));
-EOF
+ * :autocmd LocationChange .* :fmapc
+ * :autocmd LocationChange mail\\.google\\.com/mail :fmap -depth 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
+ *
  * とかやると幸せになれるかもしれません。
- * 頭についている3の意味は3番目のフレームの意味。通常のmapと違い3回の意味ではないので注意
+ *
+ * == Google Reader の場合 ==
+ * :autocmd LocationChange .* :fmapc
+ * :autocmd LocationChange www\\.google\\.co\\.jp/reader :fmap! -vkey j k n p m s t v A r S N P X O gh ga gs gt gu u / ?
  *
  * Greasemonkey LDRizeの場合などにも使用可
- *
- * ※ 2008/11/1 に fmaps コマンドを追加
- *
- * .vimperatorrc に以下を追加することで、上記と同様のことができます。
- * == LDR の場合 ==
-autocmd LocationChange http://reader\\.livedoor\\.com/reader fmaps j k s a p o v c <Space> <S-Space> z b < >
- * == Gmail の場合 ==
-autocmd LocationChange mail\\.google\\.com/mail fmaps -d 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
- *
  */
 
 liberator.plugins.feedKey = (function(){
@@ -257,7 +257,7 @@ function feedKeyIntoContent(keys, useVkey){
             var charCode = keys.charCodeAt(i);
             keyCode = 0;
         }
-        if (keys[i] == '<'){
+        if (keys[i] == '<'){ 
             var matches = keys.substr(i + 1).match(/^((?:[ACMSacms]-)*)([^>]+)/);
             if (matches) {
                 if (matches[1]) {
@@ -304,19 +304,26 @@ function feedKeyIntoContent(keys, useVkey){
 // --------------------------
 commands.addUserCommand(['feedmap','fmap'],'Feed Map a key sequence',
     function(args){
-        var arg = args.string;
-        if(!arg){
-            liberator.echo(feedMaps.map(function(map) map.description.replace(/</g,'&lt;').replace(/>/g,'&gt;')),true);
+        if(!args.string){
+            liberator.echo(template.table("feedmap list",feedMaps.map(function(map) [map.names[0], map.rhs])), true);
             return;
         }
-        var [ ,lhs,rhs] = arg.match(/(\S+)(?:\s+(.+))?/);
-        if (!rhs){
-            replaceUserMap(lhs,lhs,args.bang);
-        } else {
-            replaceUserMap(lhs,rhs,args.bang);
-        }
+        if (args.bang) destroy();
+        var depth = args["-depth"] ? args["-depth"] : "";
+        var useVkey = "-vkey" in args;
+
+        args.forEach(function(keypair){
+            var [lhs, rhs] = keypair.split(",");
+            if (!rhs) rhs = lhs;
+            replaceUserMap(lhs, depth + rhs, useVkey);
+        });
     },{
-        bang: true
+        bang: true,
+        argCount: "*",
+        options: [
+            [["-depth","-d"], commands.OPTION_INT],
+            [["-vkey","-v"], commands.OPTION_NOARG]
+        ]
     }
 );
 commands.addUserCommand(['feedmapclear','fmapc'],'Clear Feed Maps',destroy);
@@ -326,24 +333,6 @@ var converter = {
     setup: init,
     reset: destroy
 };
-commands.addUserCommand(['feedmaps','fmaps'], '',
-  function(args){
-    var feedkey = args["-depth"];
-    var vkey = '-vkey' in args;
-    var keys = args;
-    if ('-' in args) keys.push('-');
-
-    if (feedkey) keys = keys.map( function(i) [i, (feedkey+"")+i] );
-    liberator.plugins.feedKey.setup(keys, vkey);
-  }, {
-    bang : true,
-    argCount : "*",
-    options : [ [['-depth', '-d'], commands.OPTION_INT],
-                [['-vkey', '-v'], commands.OPTION_NOARG],
-                [['-'], commands.OPTION_NOARG ]
-              ]
-  }
-);
 return converter;
 })();
 // vim: fdm=marker sw=4 ts=4 et:

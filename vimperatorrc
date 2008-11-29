@@ -1,7 +1,7 @@
 " ==================== basic options ==================== "
 set activate=quickmark,paste
 set complete=l
-set defsearch=google
+" set defsearch=google
 set editor=/opt/local/bin/gvim -f
 set focuscontent
 set guioptions=mTb
@@ -15,7 +15,7 @@ set wildoptions=auto
 set nextpattern+=次(の)?ページ,\b次.*,↑\b,
 set previouspattern+=前(の)?ページ,\b前.*,\b↓
 
- 
+
 " ==================== Firefox options ==================== "
 " disable accesskey
 set! ui.key.generalAccessKey=0
@@ -27,6 +27,7 @@ set! browser.tabs.loadBookmarksInBackground=true
 set! browser.tabs.loadDivertedInBackground=true
 " allow lots of popups for ldr
 set! dom.popup_maximum=1000
+
 
 " ==================== key mappings ==================== "
 " 多めにスクロールするようにする
@@ -51,6 +52,7 @@ noremap gh :nohl<CR>
 noremap s :open stand<Space>
 noremap S :tabopen stand<Space>
 
+
 " ==================== hints ==================== "
 js <<EOF
 hints.addMode("i", "Focus to textbox",
@@ -59,45 +61,20 @@ hints.addMode("i", "Focus to textbox",
     );
 EOF
 
+
 " ==================== plugin options ==================== "
 
 " migemo_hint
 set hintmatching=custom
 
 " feedSomeKey
-" autocmd LocationChange .* fmapc
-" autocmd LocationChange http://reader\.livedoor\.com/reader fmaps j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
-" autocmd LocationChange http://fastladder\.com/reader fmaps j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
-" autocmd LocationChange mail\.google\.com/mail fmaps -d 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
-javascript <<EOM
-// var timer = setInterval(function() {
-//     if(plugins.feedKey) {
-//         autocommands.add('LocationChange', /.*/, ':js plugins.feedKey.reset()');
-// 
-//         autocommands.add('LocationChange', /reader\.livedoor\.com\/reader/, [
-//           ':js plugins.feedKey.setup(',
-//           '"j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?".split(/ +/)',
-//           ');'
-//         ].join(''));
-// 
-//         autocommands.add('LocationChange', /fastladder\.com\/reader/, [
-//           ':js plugins.feedKey.setup(',
-//           '"j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?".split(/ +/)',
-//           ');'
-//         ].join(''));
-// 
-//         autocommands.add('LocationChange', /mail\.google\.com\/mail/, [
-//           ':js plugins.feedKey.setup(',
-//           '"c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc".split(/ +/).map(function(i) [i, "4" + i])',
-//           ');'
-//         ].join(''));
-// 
-//         clearInterval(timer);
-//     }
-// }, 10);
-EOM
+autocmd LocationChange .* :fmapc
+autocmd LocationChange reader\\.livedoor\\.com/reader :fmap j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
+autocmd LocationChange fastladder\\.com/reader :fmap j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
+autocmd LocationChange mail\\.google\\.com/mail :fmap -d 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
 
-" migratestatusbar
+
+" migratestatusbar {{{
 javascript <<EOM
     liberator.globalVariables.migrate_elements = [
 //        {
@@ -112,16 +89,17 @@ javascript <<EOM
 //            dest:  'security-button',
 //            after: true,
 //        },
-        {
-            // favicon of awesome bar
-            id:    'page-proxy-stack',
-            dest:  'liberator-statusline',
-            after: false,
-        },
+//        {
+//            // favicon of awesome bar
+//            id:    'page-proxy-stack',
+//            dest:  'liberator-statusline',
+//            after: false,
+//        },
     ];
 EOM
+" }}}
 
-" arpeggio
+" arpeggio {{{
 " load
 " source "~/.vimperator/plugin/arpeggio.js"
 js <<EOF
@@ -131,11 +109,14 @@ liberator.plugins.arpeggioMap(modes.NORMAL, true, "asd", function() {
 });
 */
 EOF
+" }}}
 
 " ==================== colorscheme ==================== "
 colorscheme mac
 
+
 " ==================== others ==================== "
 echo ".vimperatorrc sourced"
 
-" vim: set ft=vimperator:
+
+" vim: set ft=vimperator foldmethod=marker:
