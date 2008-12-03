@@ -4,12 +4,13 @@
  * @description      request, and the result is displayed to the buffer.
  * @description-ja   リクエストの結果をバッファに出力する。
  * @author           suVene suvene@zeromemory.info
- * @version          0.3.0
+ * @version          0.4.1
  * @minVersion       2.0pre
  * @maxVersion       2.0pre
- * Last Change:      29-Nov-2008.
+ * Last Change:      02-Dec-2008.
  * ==/VimperatorPlugin==
  *
+ * HEAD COMMENT {{{
  * Usage:
  *   command[!] subcommand [ANY_TEXT]
  *
@@ -34,13 +35,17 @@
  *   javascript <<EOM
  *   liberator.globalVariables.multi_requester_siteinfo = [
  *       {
- *           name:        'ex',                             // required
- *           description: 'example',                        // required
- *           url:         'http://example.com/?%s',         // required, %s <-- replace string
- *           xpath:       '//*',                            // optional(default all)
- *           srcEncode:   'SHIFT_JIS',                      // optional(default UTF-8)
- *           urlEncode:   'SHIFT_JIS',                      // optional(default srcEncode)
- *           ignoreTags:  'img'                             // optional(default script), syntax 'tag1,tag2,……'
+ *           map:           ',me',                          // optional: keymap for this siteinfo call
+ *           bang:          true,                           // optional:
+ *           args:          'any'                           // optional:
+ *           name:          'ex',                           // required: subcommand name
+ *           description:   'example',                      // required: commandline short help
+ *           url:           'http://example.com/?%s',       // required: %s <-- replace string
+ *           xpath:         '//*',                          // optional: default all
+ *           srcEncode:     'SHIFT_JIS',                    // optional: default UTF-8
+ *           urlEncode:     'SHIFT_JIS',                    // optional: default srcEncode
+ *           ignoreTags:    'img',                          // optional: default script, syntax 'tag1,tag2,……'
+ *           extractLink:   '//xpath'                       // optional: extract permalink
  *       },
  *   ];
  *   EOM
@@ -61,9 +66,11 @@
  *
  * TODO:
  *    - wedata local cache.
+ *  }}}
  */
 (function() {
 
+// global variables {{{
 var DEFAULT_COMMAND = ['mr'];
 var SITEINFO = [
     {
@@ -79,19 +86,15 @@ var SITEINFO = [
         xpath:       'id("incontents")/*[@class="ch04" or @class="fs14" or contains(@class, "diclst")]',
         srcEncode:   'EUC-JP',
         urlEncode:   'UTF-8'
-    }
+    },
 ];
-
 var mergedSiteinfo = {};
+//}}}
 
-// utilities
+// utility class {{{
 var $U = {
     log: function(msg, level) {
-        liberator.log(msg, (level || 8));
-    },
-    debug: function(msg) {
-        this.log(msg, 8);
-        liberator.echo(msg);
+        liberator.log(msg, (level || 0));
     },
     echo: function(msg, flg) {
         flg = flg || commandline.FORCE_MULTILINE
@@ -108,7 +111,7 @@ var $U = {
     },
     A: function(hash) {
         var ret = [];
-        for (let v in hash) ret.push(hash[v]);
+        for each (let item in hash) ret.push(item);
         return ret;
     },
     bind: function(obj, func) {
@@ -121,15 +124,12 @@ var $U = {
         ignoreTags = '(?:' + ignoreTags.join('|') + ')';
         return str.replace(new RegExp('<' + ignoreTags + '(?:[ \\t\\n\\r][^>]*|/)?>([\\S\\s]*?)<\/' + ignoreTags + '[ \\t\\r\\n]*>', 'ig'), '');
     },
-    stripScripts: function(str) {
-        return this.stripScripts(str, 'script');
-    },
     eval: function(text) {
         var fnc = window.eval;
         var sandbox;
         try {
             sandbox = new Components.utils.Sandbox(window);
-            if (Components.utils.evalInSandbox("true", sandbox) === true) {
+            if (Components.utils.evalInSandbox('true', sandbox) === true) {
                 fnc = function(text) { return Components.utils.evalInSandbox(text, sandbox); };
             }
         } catch (e) { $U.log('warning: multi_requester.js is working with unsafe sandbox.'); }
@@ -146,12 +146,18 @@ var $U = {
         } catch (e) { return null; }
     },
     getSelectedString: function() {
-         var sel = (new XPCNativeWrapper(window.content.window)).getSelection();
-         return sel.toString();
+         return (new XPCNativeWrapper(window.content.window)).getSelection().toString();
+    },
+    pathToURL: function(path) {
+        if (/^https?:\/\//.test(path)) return path;
+        var link = document.createElement('a');
+        link.href= path;
+        return link.href;
     }
 };
+//}}}
 
-// vimperator plugin command register
+// Vimperator plugin command register {{{
 var CommandRegister = {
     register: function(cmdClass, siteinfo) {
         cmdClass.siteinfo = siteinfo;
@@ -163,10 +169,10 @@ var CommandRegister = {
             {
                 completer: cmdClass.cmdCompleter || function(context, arg) {
                     context.title = ['Name', 'Descprition'];
-                    let filters = context.filter.split(',');
-                    let prefilters = filters.slice(0, filters.length - 1);
-                    let prefilter = !prefilters.length ? '' : prefilters.join(',') + ',';
-                    let subfilters = siteinfo.filter(function(s) prefilters.every(function(p) s.name != p));
+                    var filters = context.filter.split(',');
+                    var prefilters = filters.slice(0, filters.length - 1);
+                    var prefilter = !prefilters.length ? '' : prefilters.join(',') + ',';
+                    var subfilters = siteinfo.filter(function(s) prefilters.every(function(p) s.name != p));
                     var allSuggestions = subfilters.map(function(s) [prefilter + s.name, s.description]);
                     context.completions = context.filter
                         ? allSuggestions.filter(function(s) s[0].indexOf(context.filter) == 0)
@@ -182,12 +188,12 @@ var CommandRegister = {
 
     },
     addUserMaps: function(prefix, mapdef) {
-        mapdef.forEach(function([key, command, special, args]) {
-            var cmd = prefix + (special ? '! ' : ' ') + command + ' ';
+        mapdef.forEach(function([key, command, bang, args]) {
+            var cmd = prefix + (bang ? '! ' : ' ') + command + ' ';
             mappings.addUserMap(
                 [modes.NORMAL, modes.VISUAL],
                 [key],
-                "user defined mapping",
+                'user defined mapping',
                 function() {
                     if (args) {
                         liberator.execute(cmd + args);
@@ -208,9 +214,9 @@ var CommandRegister = {
         });
     }
 };
+//}}}
 
-
-// like the Prototype JavaScript framework
+// Request and Response class. like the Prototype JavaScript framework {{{
 var Request = function() {
     this.initialize.apply(this, arguments);
 };
@@ -327,10 +333,10 @@ var Response = function() {
     this.initialize.apply(this, arguments);
 };
 Response.prototype = {
-    initialize: function(request) {
-        this.request = request;
-        this.transport = request.transport;
-        this.isSuccess = request.isSuccess();
+    initialize: function(req) {
+        this.req = req;
+        this.transport = req.transport;
+        this.isSuccess = req.isSuccess();
         this.readyState = this.transport.readyState;
 
         if (this.readyState == 4) {
@@ -354,8 +360,8 @@ Response.prototype = {
         if (!this.doc) {
             this.htmlFragmentstr = this.responseText.replace(/^[\s\S]*?<html(?:[ \t\n\r][^>]*)?>|<\/html[ \t\r\n]*>[\S\s]*$/ig, '').replace(/[\r\n]+/g, ' ');
             let ignoreTags = ['script'];
-            if (this.request.options.siteinfo.ignoreTags) {
-                ignoreTags.concat(this.request.options.siteinfo.ignoreTags.split(','));
+            if (this.req.options.siteinfo.ignoreTags) {
+                ignoreTags.concat(this.req.options.siteinfo.ignoreTags.split(','));
             }
             this.htmlStripScriptFragmentstr = $U.stripTags(this.htmlFragmentstr, 'script');
             this.doc = this._createHTMLDocument(this.htmlStripScriptFragmentstr, xmlns);
@@ -367,25 +373,7 @@ Response.prototype = {
         }
         return ret;
     },
-    _createHTMLDocument: function(str, xmlns) {
-        //str = '<html><title>hoge</title><body><span id="resultList">fuga</span></body></html>';
-        var doc = (new DOMParser).parseFromString(
-            '<root' + (xmlns ? ' xmlns="' + xmlns + '"' : '') + '>' + str + '</root>',
-            'application/xml');
-        var imported = document.importNode(doc.documentElement, true);
-        var range = document.createRange();
-        range.selectNodeContents(imported);
-        var fragment = range.extractContents();
-        range.detach();
-        var dom = fragment.lastChild;
-        if (dom.tagName == 'parserError' || dom.namespaceURI == 'http://www.mozilla.org/newlayout/xml/parsererror.xml') {
-            $U.log('retry parsing.');
-            return this._createHTMLDocument2(str);
-        } else {
-            return fragment.childNodes.length > 1 ? fragment : fragment.firstChild;
-        }
-    },
-    _createHTMLDocument2: function(str) {
+    _createHTMLDocument: function(str) {
         var htmlFragment = document.implementation.createDocument(null, 'html', null);
         var range = document.createRange();
         range.setStartAfter(window.content.document.body);
@@ -403,8 +391,9 @@ Response.prototype = {
         return parentNode;
     }
 };
+//}}}
 
-// initial data access.
+// initial data access class {{{
 var DataAccess = {
     getCommand: function() {
         var c = liberator.globalVariables.multi_requester_command;
@@ -420,8 +409,29 @@ var DataAccess = {
     },
     getSiteInfo: function() {
 
+        var self = this;
         var useWedata = typeof liberator.globalVariables.multi_requester_use_wedata == 'undefined' ?
                         true : $U.eval(liberator.globalVariables.multi_requester_use_wedata);
+
+        if (liberator.globalVariables.multi_requester_siteinfo) {
+            liberator.globalVariables.multi_requester_siteinfo.forEach(function(site) {
+                if (!mergedSiteinfo[site.name]) mergedSiteinfo[site.name] = {};
+                $U.extend(mergedSiteinfo[site.name], site);
+                if (site.map) {
+                    CommandRegister.addUserMaps(MultiRequester.name[0],
+                        [[site.map, site.name, site.bang, site.args]]);
+                }
+            });
+        }
+
+        SITEINFO.forEach(function(site) {
+            if (!mergedSiteinfo[site.name]) mergedSiteinfo[site.name] = {};
+            $U.extend(mergedSiteinfo[site.name], site);
+            if (site.map) {
+                CommandRegister.addUserMaps(MultiRequester.name[0],
+                    [[site.map, site.name, site.bang, site.args]]);
+            }
+        });
 
         if (useWedata) {
             $U.log('use Wedata');
@@ -431,18 +441,6 @@ var DataAccess = {
                 $U.extend(mergedSiteinfo[site.name], site);
             });
         }
-
-        if (liberator.globalVariables.multi_requester_siteinfo) {
-            liberator.globalVariables.multi_requester_siteinfo.forEach(function(site) {
-                if (!mergedSiteinfo[site.name]) mergedSiteinfo[site.name] = {};
-                $U.extend(mergedSiteinfo[site.name], site);
-            });
-        }
-
-        SITEINFO.forEach(function(site) {
-            if (!mergedSiteinfo[site.name]) mergedSiteinfo[site.name] = {};
-            $U.extend(mergedSiteinfo[site.name], site);
-        });
 
         return $U.A(mergedSiteinfo);
     },
@@ -463,12 +461,19 @@ var DataAccess = {
         req.get();
     }
 };
+//}}}
 
-// main controller.
+// main controller {{{
 var MultiRequester = {
     name: DataAccess.getCommand(),
     description: 'request, and display to the buffer',
-    cmdAction: function(args) {
+    doProcess: false,
+    requestNames: '',
+    requestCount: 0,
+    echoHash: {},
+    cmdAction: function(args) { //{{{
+
+        if (MultiRequester.doProcess) return;
 
         var argstr = args.string;
         var bang = args.bang;
@@ -477,20 +482,24 @@ var MultiRequester = {
         var parsedArgs = this.parseArgs(argstr);
         if (parsedArgs.count == 0) { return; } // do nothing
 
+        MultiRequester.doProcess = true;
+        MultiRequester.requestNames = parsedArgs.names;
+        MultiRequester.requestCount = 0;
+        MultiRequester.echoHash = {};
         var siteinfo = parsedArgs.siteinfo;
         for (let i = 0, len = parsedArgs.count; i < len; i++) {
 
             let info = siteinfo[i];
-            var url = info.url;
+            let url = info.url;
             // see: http://fifnel.com/2008/11/14/1980/
-            var srcEncode = info.srcEncode || 'UTF-8';
-            var urlEncode = info.urlEncode || srcEncode;
+            let srcEncode = info.srcEncode || 'UTF-8';
+            let urlEncode = info.urlEncode || srcEncode;
 
-            var idxRepStr = url.indexOf('%s');
+            let idxRepStr = url.indexOf('%s');
             if (idxRepStr > -1 && !parsedArgs.str) continue;
 
             // via. lookupDictionary.js
-            var ttbu = Components.classes['@mozilla.org/intl/texttosuburi;1']
+            let ttbu = Components.classes['@mozilla.org/intl/texttosuburi;1']
                                  .getService(Components.interfaces.nsITextToSubURI);
             url = url.replace(/%s/g, ttbu.ConvertAndEscape(urlEncode, parsedArgs.str));
             $U.log(url + '[' + srcEncode + '][' + urlEncode + ']::' + info.xpath);
@@ -511,9 +520,15 @@ var MultiRequester = {
                 req.addEventListener('onSuccess', $U.bind(this, this.onSuccess));
                 req.addEventListener('onFailure', $U.bind(this, this.onFailure));
                 req.get();
+                MultiRequester.requestCount++;
             }
+        }
+
+        if (MultiRequester.requestCount) {
             $U.echo('Loading ' + parsedArgs.names + ' ...', commandline.FORCE_SINGLELINE);
-         }
+        } else {
+            MultiRequester.doProcess = false;
+        }
     },
     // return {names: '', str: '', count: 0, siteinfo: [{}]}
     parseArgs: function(args) {
@@ -536,7 +551,7 @@ var MultiRequester = {
         ret.str = (arguments.length < 1 ? sel : arguments.join()).replace(/[\n\r]+/g, '');
 
         ret.names.split(',').forEach(function(name) {
-            let site = self.getSite(name);
+            var site = self.getSite(name);
             if (site) {
                 ret.count++;
                 ret.siteinfo.push(site);
@@ -552,44 +567,97 @@ var MultiRequester = {
             if (s.name == name) ret = s;
         });
         return ret;
-    },
-    onSuccess: function(res) {
+    },//}}}
+    extractLink: function(res, extractLink) { //{{{
 
-        var url, escapedUrl, xpath, doc, html;
-        $U.debug('success!!!' + res.request.url);
+        var el = res.getHTMLDocument(extractLink);
+        if (!el) throw 'extract link failed.: extractLink -> ' + extractLink;
+        var a = el.firstChild;
+        var url = $U.pathToURL((a.href || a.action || a.value));
+        var req = new Request(url, null, $U.extend(res.req.options, {extractLink: true}));
+        req.addEventListener('onException', $U.bind(this, this.onException));
+        req.addEventListener('onSuccess', $U.bind(this, this.onSuccess));
+        req.addEventListener('onFailure', $U.bind(this, this.onFailure));
+        req.get();
+        MultiRequester.requestCount++;
+        MultiRequester.doProcess = true;
+
+    },//}}}
+    onSuccess: function(res) { //{{{
+
+        if (!MultiRequester.doProcess) {
+            MultiRequester.requestCount = 0;
+            return;
+        }
+
+        $U.log('success!!!:' + res.req.url);
+        MultiRequester.requestCount--;
+        if (MultiRequester.requestCount == 0) {
+            MultiRequester.doProcess = false;
+        }
+
+        var url, escapedUrl, xpath, doc, html, extractLink;
 
         try {
 
             if (!res.isSuccess || res.responseText == '') throw 'response is fail or null';
 
-            url = res.request.url;
+            url = res.req.url;
             escapedUrl = util.escapeHTML(url);
-            xpath = res.request.options.siteinfo.xpath;
+            xpath = res.req.options.siteinfo.xpath;
+            extractLink = res.req.options.siteinfo.extractLink;
+
+            if (extractLink && !res.req.options.extractLink) {
+                this.extractLink(res, extractLink);
+                return;
+            }
+
             doc = res.getHTMLDocument(xpath);
             if (!doc) throw 'XPath result is undefined or null.: XPath -> ' + xpath;
 
-            html = '<div style="white-space:normal;"><base href="' + escapedUrl + '"/>' +
-                   '<a href="' + escapedUrl + '" class="hl-Title" target="_self">' + escapedUrl + '</a>' +
-                   (new XMLSerializer()).serializeToString(doc).replace(/<[^>]+>/g, function(all) all.toLowerCase()) +
-                   '</div>';
-            try { $U.echo(new XMLList(html)); } catch (e) { $U.echo(html); }
+            html = '<a href="' + escapedUrl + '" class="hl-Title" target="_self">' + escapedUrl + '</a>' +
+                   (new XMLSerializer()).serializeToString(doc)
+                            .replace(/<[^>]+>/g, function(all) all.toLowerCase())
+                            .replace(/<!--(?:[^-]|-(?!->))*-->/g, ''); // actually
+                            //.replace(/<!--(?:[^-]|-(?!-))*-->/g, ''); // strictly
+
+            MultiRequester.echoHash[res.req.options.siteinfo.name] = html;
 
         } catch (e) {
-            $U.echoerr('error!!: ' + e);
+            $U.log('error!!: ' + e);
+            MultiRequester.echoHash[res.req.options.siteinfo.name] =
+                            '<span style="color: red;">error!!: ' + e + '</span>';
         }
+
+        if (MultiRequester.requestCount == 0) {
+            let echoList = [];
+            MultiRequester.requestNames.split(',').forEach(function(name) {
+                echoList.push(MultiRequester.echoHash[name])
+            });
+            html = '<div style="white-space:normal;"><base href="' + escapedUrl + '"/>' +
+                   echoList.join('') +
+                   '</div>';
+            try { $U.echo(new XMLList(html)); } catch (e) { $U.log(e); $U.echo(html); }
+        }
+
     },
     onFailure: function(res) {
+        MultiRequester.doProcess = false;
         $U.echoerr('request failure!!: ' + res.statusText);
     },
     onException: function(e) {
+        MultiRequester.doProcess = false;
         $U.echoerr('exception!!: ' + e);
-    }
+    }//}}}
 };
+//}}}
 
+// boot strap {{{
 CommandRegister.register(MultiRequester, DataAccess.getSiteInfo());
 if (liberator.globalVariables.multi_requester_mappings) {
     CommandRegister.addUserMaps(MultiRequester.name[0], liberator.globalVariables.multi_requester_mappings);
 }
+//}}}
 
 return MultiRequester;
 
