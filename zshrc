@@ -53,19 +53,15 @@ typeset -ga precmd_functions
 typeset -ga preexec_functions
 
 # set directory name to screen
-# need "shell zsh" in .screenrc
 function _screen_dirname() {
-    # if [ $TERM = "screen" ]; then
-    if [ $SHELL = "zsh" ]; then
+    if [ $WINDOW ]; then
         echo -ne "\ek$(basename $(pwd))\e\\"
     fi
 }
 
 # set command name to screen
-# need "shell zsh" in .screenrc
 function _screen_cmdname() {
-    # if [ $TERM = "screen" ]; then
-    if [ $SHELL = "zsh" ]; then
+    if [ $WINDOW ]; then
         echo -ne "\ek# $1\e\\"
     fi
 }
