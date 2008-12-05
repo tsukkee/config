@@ -2,9 +2,9 @@
 set activate=quickmark,paste
 set complete=l
 " set defsearch=google
-set editor=/opt/local/bin/gvim -f
+set editor=/opt/local/bin/gvim\ -f
 set focuscontent
-set guioptions=mTb
+set guioptions=mTbr
 set hlsearch
 set nopreload
 set showstatuslinks=2
@@ -75,7 +75,7 @@ autocmd LocationChange mail\\.google\\.com/mail :fmap -d 4 c / j k n p o u e x s
 
 
 " migratestatusbar {{{
-javascript <<EOM
+javascript <<EOF
     liberator.globalVariables.migrate_elements = [
 //        {
 //            // star button of awesome bar
@@ -96,7 +96,7 @@ javascript <<EOM
 //            after: false,
 //        },
     ];
-EOM
+EOF
 " }}}
 
 " arpeggio {{{
@@ -117,6 +117,11 @@ colorscheme mac
 
 
 " ==================== others ==================== "
+js <<EOF
+if(liberator.has("MacUnix"))
+    io.source("~/.vimperatorrc_passwords", true);
+EOF
+
 echo ".vimperatorrc sourced"
 
 

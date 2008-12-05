@@ -128,22 +128,22 @@ commands.addUserCommand(['addref'], 'add referrer control setting', function(arg
   var domain = args[0];
   var perf = args[1] || '';
   if (!domain || /[:\/]/.test(domain)) {
-    liberator.echo(dump(sites)+'usage: addref [domain] [@NORMAL or @FORGE or empty]');
+    liberator.echo(dump(sites)+'usage: addref [domain] [@normal or @forge or empty]');
     return;
   }
   sites[domain] = perf;
   }, {
     completer: function(context, args, special) {
-      //var last = context.contextList.slice(-1)[0];
+      //var last = context.contextlist.slice(-1)[0];
       var list;
       var pos = 0;
       if (args.length == 2) {
-        context.title = ['Params', 'Description'];
+        context.title = ['params', 'description'];
         list = completer_params;
         //pos = 1;
       } else if (args.length <= 1) {
-        context.title = ['URL', 'Description'];
-        list = [['@DEFAULT', 'default preference'], [window.content.location.host, '']];
+        context.title = ['url', 'description'];
+        list = [['@default', 'default preference'], [window.content.location.host, '']];
       }
       context.completions = list;
       context.advance(pos);
@@ -154,6 +154,18 @@ commands.addUserCommand(['addref'], 'add referrer control setting', function(arg
 commands.addUserCommand(['togglerefcontrol'], 'toggle referrer control on/off',
   function() {
     manager.isEnable = !manager.isEnable;
+  }, {}
+);
+
+commands.addUserCommand(['enablerefcontrol'], 'enable referrer control',
+  function() {
+    manager.isEnable = true;
+  }, {}
+);
+
+commands.addUserCommand(['disablerefcontrol'], 'enable referrer control',
+  function() {
+    manager.isEnable = false;
   }, {}
 );
 
