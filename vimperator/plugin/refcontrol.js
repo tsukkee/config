@@ -173,7 +173,16 @@ commands.addUserCommand(['disablerefcontrol'], 'enable referrer control',
 var adjustRef = function(http, site) {
   var sRef, refAction;
   try {
-    refAction = sites[site];
+    for(var s in sites) {
+      if(
+        (typeof(s) == "string" && s == site) ||
+        (s instanceof RegExp && s.test(site))
+      ) {
+        refAction = sites[s];
+        break;
+      }
+    }
+    // refAction = sites[site];
     if (refAction == undefined) return false;
     if (refAction.charAt(0) == '@') {
       switch (refAction) {

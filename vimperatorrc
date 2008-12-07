@@ -4,7 +4,7 @@ set complete=l
 " set defsearch=google
 set editor=/opt/local/bin/gvim\ -f
 set focuscontent
-set guioptions=mTbr
+set guioptions=mTBr
 set hlsearch
 set nopreload
 set showstatuslinks=2

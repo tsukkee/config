@@ -1,5 +1,5 @@
 " arpeggio - Mappings for simultaneously pressed keys
-" Version: 0.0.4
+" Version: 0.0.5
 " Copyright (C) 2008 kana <http://whileimautomaton.net/>
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -64,7 +64,9 @@
 
 " See s:set_up_options() and s:restore_options().
 let s:original_showcmd = &showcmd
+let s:original_timeout = &timeout
 let s:original_timeoutlen = &timeoutlen
+let s:original_ttimeoutlen = &ttimeoutlen
 
 
 
@@ -349,7 +351,9 @@ endfunction
 
 function! s:restore_options()  "{{{2
   let &showcmd = s:original_showcmd
+  let &timeout = s:original_timeout
   let &timeoutlen = s:original_timeoutlen
+  let &ttimeoutlen = s:original_ttimeoutlen
   return
 endfunction
 
@@ -358,10 +362,16 @@ endfunction
 
 function! s:set_up_options(key)  "{{{2
   let s:original_showcmd = &showcmd
+  let s:original_timeout = &timeout
   let s:original_timeoutlen = &timeoutlen
+  let s:original_ttimeoutlen = &ttimeoutlen
 
   set noshowcmd  " To avoid flickering in the bottom line.
+  set timeout  " To ensure time out on :mappings
   let &timeoutlen = get(g:arpeggio_timeoutlens, a:key, g:arpeggio_timeoutlen)
+  let &ttimeoutlen = (0 <= s:original_ttimeoutlen
+  \                   ? s:original_ttimeoutlen
+  \                   : s:original_timeoutlen)
   return
 endfunction
 
