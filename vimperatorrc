@@ -15,6 +15,7 @@ set wildoptions=auto
 set nextpattern+=次(の)?ページ,\b次.*,↑\b,
 set previouspattern+=前(の)?ページ,\b前.*,\b↓
 
+let mapleader=","
 
 " ==================== Firefox options ==================== "
 " disable accesskey
@@ -27,7 +28,8 @@ set! browser.tabs.loadBookmarksInBackground=true
 set! browser.tabs.loadDivertedInBackground=true
 " allow lots of popups for ldr
 set! dom.popup_maximum=1000
-
+" allow control sidebar position
+set! layout.scrollbar.side=1
 
 " ==================== key mappings ==================== "
 " 多めにスクロールするようにする
@@ -59,6 +61,21 @@ hints.addMode("i", "Focus to textbox",
     function(element) element.focus(),
     function() "//input[not(@type='hidden')] | //textarea | //xhtml:input[not(@type='hidden')] | //xhtml:textarea"
     );
+
+hints.addMode("h", "Hide element",
+    function(element) {
+        element.style.display = "none";
+    },
+    function() "//*");
+
+// needs FireBug
+hints.addMode("x", "copy XPath",
+    function(element) {
+        let xpath = FBL.getElementXPath(element);
+        liberator.echo(xpath);
+        util.copyToClipboard(xpath);
+    },
+    function() "//*");
 EOF
 
 
