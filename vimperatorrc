@@ -3,12 +3,12 @@ set activate=quickmark,paste
 set complete=Sl
 set editor="/opt/local/bin/gvim.mac -f"
 set defsearch=stand
-" set focuscontent
+set focuscontent
 set guioptions=mTBr
 set hlsearch
 set nopreload
 set showstatuslinks=2
-set suggestengines=stand,google
+set suggestengines=stand
 set titlestring=Firefox
 " set verbose=9
 set wildoptions=auto
