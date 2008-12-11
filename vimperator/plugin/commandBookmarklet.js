@@ -2,49 +2,86 @@
  * bookmarklet wo command ni suru plugin
  *
  * @author halt feits <halt.feits@gmail.com>
- * @version 0.6.0
+ * @version 0.6.3
  */
 
-(function(){
-  var filter = "javascript:";
-  var items  = bookmarks.get(filter);
+let PLUGIN_INFO =
+<VimperatorPlugin>
+<name>{NAME}</name>
+<description>convert bookmarklets to commands</description>
+<description lang="ja">ブックマークレットをコマンドにする</description>
+<author mail="halt.feits@gmail.com">halt feits</author>
+<version>0.6.3</version>
+<minVersion>2.0pre</minVersion>
+<maxVersion>2.0pre</maxVersion>
+<detail><![CDATA[
+== SYNOPSIS ==
+This plugin automatically converts bookmarklets to valid commands for Vimperator.
 
-  if (items.length == 0) {
-    if (filter.length > 0) {
-      liberator.echoerr('E283: No bookmarks matching "' + filter + '"');
-    } else {
-      liberator.echoerr("No bookmarks set");
-    }
-  }
+== COMMAND ==
+Nothing built-in command, but each bookmarklets convert to commands that start with "bml".
 
-  const regex = /[^a-zA-Z]/;
-  items.forEach(function(item) {
-    var [url, title] = [item.url, item.title];
-    var desc = title;
-    title = escape( title.replace(/ +/g,'').toLowerCase() );
-    if (regex.test(title)) {
-        title = "bm"+title.replace(/[^a-zA-Z]+/g,'');
-        title = title.substr(0, title.length>50?50:title.length);
-    }
-    if (width(title) > 50) {
-      while (width(title) > 47) {
-        title = title.slice(0, -2);
-      }
-      title += "...";
-    }
-    title = util.escapeHTML(title);
+== EXAMPLE ==
+"Hatena-Bookmark" -> bmlhatena-bookmark
 
-    var command = function () { liberator.open(url); };
+== GLOBAL VARIABLES ==
+command_bookmarklet_prefix:
+This variable determines the prefix of a command name.
+
+== KNOWN ISSUES ==
+When title has non-ASCII characters, it converts to unaccountable command.
+You should rewrite title of bookmarklet to ASCII characters, to escape this issue.
+
+]]></detail>
+<detail lang="ja"><![CDATA[
+== SYNOPSIS ==
+このプラグインはブックマークレットを Vimperator で実行可能なコマンドに自動的に変換します。
+
+== COMMAND ==
+固有のコマンドはありませんが、それぞれのブックマークレットは "bml" ではじまるコマンドに変換されます。
+
+== EXAMPLE ==
+"Hatena-Bookmark" -> bmlhatena-bookmark
+
+== GLOBAL VARIABLES ==
+command_bookmarklet_prefix:
+コマンドの先頭に付加される文字列を規定します。
+デフォルトは "bml"
+
+== KNOWN ISSUES ==
+タイトルに ASCII 文字以外が含まれている場合、わけのわからないコマンドになります。
+この問題を避けるためにブックマークレットのタイトルを ASCII 文字のみに書き換えることをおすすめします。
+
+]]></detail>
+</VimperatorPlugin>;
+
+( function () {
+
+let prefix = liberator.globalVariables.command_bookmarklet_prefix;
+if (prefix === undefined)
+  prefix = 'bml';
+
+let items = bookmarks.get('javascript:');
+if (!items.length) {
+    liberator.echoerr('No bookmarks set');
+    return;
+}
+
+for (let it in util.Array.iterator(items)) {
+    let item = it;
     commands.addUserCommand(
-      [title],
-      "bookmarklet : "+desc,
-      command,
-      {
-        shortHelp: "Bookmarklet",
-      }
+        [toValidCommandName(item.title)],
+        'bookmarklet : ' + item.title,
+        function () { liberator.open(item.url); },
+        { shortHelp: 'Bookmarklet' },
+        false
     );
-  });
+}
 
-  function width(str) str.replace(/[^\x20-\xFF]/g, "  ").length;
-})();
+function toValidCommandName(str) {
+    str = prefix + escape(str.replace(/ +/g, '').toLowerCase()).replace(/[^a-zA-Z]+/g,'');
+    return str.substr(0, str.length > 50 ? 50 : str.length);
+}
+
+} )();
 // vim:sw=2 ts=2 et:

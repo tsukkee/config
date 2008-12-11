@@ -1,9 +1,8 @@
 " ==================== basic options ==================== "
 set activate=quickmark,paste
-set complete=l
-" set defsearch=google
-set editor=/opt/local/bin/gvim\ -f
-set focuscontent
+set complete=Sl
+set editor="/opt/local/bin/gvim.mac -f"
+" set focuscontent
 set guioptions=mTBr
 set hlsearch
 set nopreload
@@ -14,6 +13,13 @@ set wildoptions=auto
 
 set nextpattern+=次(の)?ページ,\b次.*,↑\b,
 set previouspattern+=前(の)?ページ,\b前.*,\b↓
+
+js <<EOF
+if(liberator.has("MacUnix"))
+    options.runtimepath = "~/.vimperator,~/.vimperator/after"
+if(liberator.has("Win32"))
+    options.runtimepath = "~/vimperator,~/vimperator/after"
+EOF
 
 let mapleader=","
 
@@ -84,49 +90,8 @@ EOF
 " migemo_hint
 set hintmatching=custom
 
-" feedSomeKey
-autocmd LocationChange .* :fmapc
-autocmd LocationChange reader\\.livedoor\\.com/reader :fmap j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
-autocmd LocationChange fastladder\\.com/reader :fmap j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
-autocmd LocationChange mail\\.google\\.com/mail :fmap -d 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
-
-
-" migratestatusbar {{{
-javascript <<EOF
-    liberator.globalVariables.migrate_elements = [
-//        {
-//            // star button of awesome bar
-//            id:    'star-button',
-//            dest:  'security-button',
-//            after: true,
-//        },
-//        {
-//            // icon that show the existence of RSS and Atom on current page
-//            id:    'feed-button',
-//            dest:  'security-button',
-//            after: true,
-//        },
-//        {
-//            // favicon of awesome bar
-//            id:    'page-proxy-stack',
-//            dest:  'liberator-statusline',
-//            after: false,
-//        },
-    ];
-EOF
-" }}}
-
-" arpeggio {{{
-" load
-" source "~/.vimperator/plugin/arpeggio.js"
-js <<EOF
-/*
-liberator.plugins.arpeggioMap(modes.NORMAL, true, "asd", function() {
-    alert("asd");    
-});
-*/
-EOF
-" }}}
+" commandBookmarklet
+let command_bookmarklet_prefix=""
 
 " ==================== colorscheme ==================== "
 colorscheme mac
@@ -138,8 +103,5 @@ js <<EOF
 if(liberator.has("MacUnix"))
     io.source("~/.vimperatorrc_passwords", true);
 EOF
-
-echo ".vimperatorrc sourced"
-
 
 " vim: set ft=vimperator foldmethod=marker:
