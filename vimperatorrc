@@ -2,11 +2,13 @@
 set activate=quickmark,paste
 set complete=Sl
 set editor="/opt/local/bin/gvim.mac -f"
+set defsearch=stand
 " set focuscontent
 set guioptions=mTBr
 set hlsearch
 set nopreload
 set showstatuslinks=2
+set suggestengines=stand,google
 set titlestring=Firefox
 " set verbose=9
 set wildoptions=auto
@@ -92,6 +94,13 @@ set hintmatching=custom
 
 " commandBookmarklet
 let command_bookmarklet_prefix=""
+
+" feedSomeKey
+autocmd LocationChange .* :fmapc
+autocmd LocationChange reader\\.livedoor\\.com/reader :fmap j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
+autocmd LocationChange fastladder\\.com/reader :fmap j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
+autocmd LocationChange mail\\.google\\.com/mail :fmap -d 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
+
 
 " ==================== colorscheme ==================== "
 colorscheme mac
