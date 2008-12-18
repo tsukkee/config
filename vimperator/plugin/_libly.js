@@ -5,7 +5,7 @@ var PLUGIN_INFO =
     <description>vimperator plugins library?</description>
     <description lang="ja">適当なライブラリっぽいものたち。</description>
     <author mail="suvene@zeromemory.info" homepage="http://zeromemory.sblo.jp/">suVene</author>
-    <version>0.1.5</version>
+    <version>0.1.10</version>
     <minVersion>1.2</minVersion>
     <maxVersion>2.0pre</maxVersion>
     <detail><![CDATA[
@@ -16,56 +16,66 @@ var PLUGIN_INFO =
 
 == Logger ==
 getLogger(prefix):
-  log(msg, level), echo(msg, flg), echoerr(msg)
-  のメソッドを持つ logger インスタンスを取得します。
-  ログの書式は prefix + ': ' + yyyy/MM/dd + msg となります。
+    log(msg, level), echo(msg, flg), echoerr(msg)
+    のメソッドを持つ logger インスタンスを取得します。
+    ログの書式は prefix + ': ' + yyyy/MM/dd + msg となります。
 
 == Object Utility ==
 extend(dst, src):
-  オブジェクトを拡張します。
-A(hash):
-  オブジェクトを配列にします。
+    オブジェクトを拡張します。
+A(iterable):
+    オブジェクトを配列にします。
 bind(obj, func):
-  func に obj を bind します。
-  func内からは this で obj が参照できるようになります。
+    func に obj を bind します。
+    func内からは this で obj が参照できるようになります。
 eval(text):
-  Sandbox による、window.eval を極力利用するようにします。
-  Snadbox が利用できない場合は、unsafe な window の eval が直接利用されます。
+    Sandbox による、window.eval を極力利用するようにします。
+    Snadbox が利用できない場合は、unsafe な window の eval が直接利用されます。
 evalJson(str, toRemove):
-  str を decode します。
-  toRemove が true の場合、文字列の前後を1文字削除します。
-  "(key:value)" 形式の場合などに true を指定して下さい。
+    str を decode します。
+    toRemove が true の場合、文字列の前後を1文字削除します。
+    "(key:value)" 形式の場合などに true を指定して下さい。
 deteFormat(dtm, fmt):
-  Date型インスタンスを、指定されたフォーマットで文字列に変換します。
-  fmt を省略した場合、"%y/%M/%d %h:%m:%s" となります。
+    Date型インスタンスを、指定されたフォーマットで文字列に変換します。
+    fmt を省略した場合、"%y/%M/%d %h:%m:%s" となります。
 
 ==  Browser ==
 getSelectedString:
-  window の選択文字列を返却します。
+    window の選択文字列を返却します。
 getUserAndPassword(hostname, formSubmitURL, username):
-  login-manager から [username, password] を取得します。
-  引数の username が省略された場合、検索された 1件目を返却します。
-  データが存在しない場合は、null を返却します。
+    login-manager から [username, password] を取得します。
+    引数の username が省略された場合、検索された 1件目を返却します。
+    データが存在しない場合は、null を返却します。
 
 == System ==
 readDirectory(path, fileter, func):
-  path で指定したディレクトリから、filter で指定された正規表現に match する場合、
-  func をファイル名を引数にコールバックします。
-  filter は Function を指定することも可能です。
+    path で指定したディレクトリから、filter で指定された正規表現に match する場合、
+    func をファイル名を引数にコールバックします。
+    filter は Function を指定することも可能です。
 
 == HTML, XML, DOM, E4X ==
 pathToURL(path):
-  相対パスを絶対パスに変換します。
+    相対パスを絶対パスに変換します。
 getHTMLFragment(html):
-  <html>※1</html>
-  ※1 の文字列を取得します。
+    <html>※1</html>
+    ※1 の文字列を取得します。
 stripTags(str, tags):
-  str から tags で指定されたタグを取り除いて返却します。
-  tags は文字列、または配列で指定して下さい。
+    str から tags で指定されたタグを取り除いて返却します。
+    tags は文字列、または配列で指定して下さい。
 createHTMLDocument(str):
-  引数 str より、HTMLFragment を作成します。
-getNodesFromXPath(xpath, doc, callback, obj):
-  xpath を評価し snapshot の配列を返却します。
+    引数 str より、HTMLFragment を作成します。
+getFirstNodeFromXPath(xpath, context):
+    xpath を評価しオブジェクトをを返却します。
+getNodesFromXPath(xpath, context, callback, obj):
+    xpath を評価し snapshot の配列を返却します。
+xmlSerialize(xml):
+    xml を文字列化します。
+xmlToDom(node, doc, nodes):
+    for vimperator1.2.
+    @see vimperator2.0pre util.
+getElementPosition(elem):
+    elem の offset を返却します。
+    return {top: 0, left: 0}
     ]]></detail>
 </VimperatorPlugin>;
 //}}}
@@ -102,11 +112,15 @@ libly.$U = {//{{{
     },
     A: function(iterable) {
         var ret = [];
-        if (typeof iterable == 'undefined') return ret;
+        if (!iterable) return ret;
         if (typeof iterable == 'string') return [iterable];
         if (!(typeof iterable == 'function' && iterable == '[object NodeList]') &&
             iterable.toArray) return iterable.toArray();
-        for (let i = 0, len = iterable.length || 0; i < len; ret.push(iterable++));
+        if (typeof iterable.length != 'undefined') {
+            for (let i = 0, len = iterable.length; i < len; ret.push(iterable[i++]));
+        } else {
+            for each (let item in iterable) ret.push(item);
+        }
         return ret;
     },
     bind: function(obj, func) {
@@ -156,9 +170,10 @@ libly.$U = {//{{{
          return (new XPCNativeWrapper(window.content.window)).getSelection().toString();
     },
     getUserAndPassword: function(hostname, formSubmitURL, username) {
+        var passwordManager, logins;
         try {
-            var passwordManager = Cc["@mozilla.org/login-manager;1"].getService(Ci.nsILoginManager);
-            var logins = passwordManager.findLogins({}, hostname, formSubmitURL, null);
+            passwordManager = Cc["@mozilla.org/login-manager;1"].getService(Ci.nsILoginManager);
+            logins = passwordManager.findLogins({}, hostname, formSubmitURL, null);
             if (logins.length) {
                 if (username) {
                     for (let i = 0, len = logins.lengh; i < len; i++) {
@@ -199,10 +214,11 @@ libly.$U = {//{{{
     },
     // }}}
     // HTML, XML, DOM, E4X {{{
-    pathToURL: function(a) {
+    pathToURL: function(a, doc) {
+        if (!a) return '';
         var path = (a.href || a.action || a.value || a);
         if (/^https?:\/\//.test(path)) return path;
-        var link = document.createElement('a');
+        var link = (doc || window.content.documtent).createElement('a');
         link.href = path;
         return link.href;
     },
@@ -214,18 +230,25 @@ libly.$U = {//{{{
         var ignoreTags = '(?:' + [].concat(tags).join('|') + ')';
         return str.replace(new RegExp('<' + ignoreTags + '(?:[ \\t\\n\\r][^>]*|/)?>([\\S\\s]*?)<\/' + ignoreTags + '[ \\t\\r\\n]*>', 'ig'), '');
     },
-    createHTMLDocument: function(str) {
-        var htmlFragment = document.implementation.createDocument(null, 'html', null);
-        var range = document.createRange();
-        range.setStartAfter(window.content.document.body);
+    createHTMLDocument: function(str, doc) {
+        doc = doc || window.content.document;
+        var htmlFragment = doc.implementation.createDocument(null, 'html', null);
+        var range = doc.createRange();
+        range.setStartAfter(doc.body);
         htmlFragment.documentElement.appendChild(htmlFragment.importNode(range.createContextualFragment(str), true));
         return htmlFragment;
     },
-    getNodesFromXPath: function(xpath, doc, callback, obj) {
+    getFirstNodeFromXPath: function(xpath, context) {
+        if (!xpath) return null;
+        context = context || window.content.document;
+        var result = (context.ownerDocument || context).evaluate(xpath, context, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+        return result.singleNodeValue ? result.singleNodeValue : null;
+    },
+    getNodesFromXPath: function(xpath, context, callback, obj) {
         var ret = [];
-        if (!xpath || !doc) return ret;
-        var node = doc || document;
-        var nodesSnapshot = (node.ownerDocument || node).evaluate(xpath, node, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+        if (!xpath) return ret;
+        context = context || window.content.document;
+        var nodesSnapshot = (context.ownerDocument || context).evaluate(xpath, context, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
         for (let i = 0, l = nodesSnapshot.snapshotLength; i < l; i++) {
             if (typeof callback == 'function') callback.call(obj, nodesSnapshot.snapshotItem(i), i);
             ret.push(nodesSnapshot.snapshotItem(i));
@@ -238,6 +261,37 @@ libly.$U = {//{{{
                                         .replace(/<!--(?:[^-]|-(?!->))*-->/g, '')
                                         .replace(/<[^>]+>/g, function(all) all.toLowerCase());
         } catch (e) { return '' }
+    },
+    xmlToDom: function xmlToDom(node, doc, nodes)
+    {
+        XML.prettyPrinting = false;
+        switch (node.nodeKind())
+        {
+            case "text":
+                return doc.createTextNode(node);
+            case "element":
+                let domnode = doc.createElementNS(node.namespace(), node.localName());
+                for each (let attr in node.@*)
+                    domnode.setAttributeNS(attr.name() == "highlight" ? NS.uri : attr.namespace(), attr.name(), String(attr));
+                for each (let child in node.*)
+                    domnode.appendChild(arguments.callee(child, doc, nodes));
+                if (nodes && node.@key)
+                    nodes[node.@key] = domnode;
+                return domnode;
+        }
+    },
+    getElementPosition: function(elem) {
+        var offsetTrail = elem;
+        var offsetLeft  = 0;
+        var offsetTop   = 0;
+        while (offsetTrail) {
+            offsetLeft += offsetTrail.offsetLeft;
+            offsetTop  += offsetTrail.offsetTop;
+            offsetTrail = offsetTrail.offsetParent;
+        }
+        offsetTop = offsetTop || null;
+        offsetLeft = offsetLeft || null;
+        return {top: offsetTop, left: offsetLeft};
     }
     // }}}
 };
@@ -263,7 +317,7 @@ libly.Request.prototype = {
             if (typeof this.observers[name] == 'undefined') this.observers[name] = [];
             this.observers[name].push(func);
         } catch (e) {
-            if (!this.fireEvent('onException', e)) throw e;
+            if (!this.fireEvent('onException', new libly.Response(this), e)) throw e;
         }
     },
     fireEvent: function(name, args, asynchronous) {
@@ -299,7 +353,7 @@ libly.Request.prototype = {
                 this._onStateChange();
 
         } catch (e) {
-            if (!this.fireEvent('onException', e, this.options.asynchronous)) throw e;
+            if (!this.fireEvent('onException', new libly.Response(this), e)) throw e;
         }
     },
     _onStateChange: function() {
@@ -326,7 +380,7 @@ libly.Request.prototype = {
                 this._complete = true;
                 this.fireEvent('on' + (this.isSuccess() ? 'Success' : 'Failure'), res, this.options.asynchronous);
             } catch (e) {
-                if (!this.fireEvent('onException', e, this.options.asynchronous)) throw e;
+                if (!this.fireEvent('onException', res, e)) throw e;
             }
         }
     },
@@ -394,7 +448,7 @@ libly.Response.prototype = {
             this.htmlStripScriptFragmentstr = libly.$U.stripTags(this.htmlFragmentstr, ignoreTags);
             this.doc = libly.$U.createHTMLDocument(this.htmlStripScriptFragmentstr, xmlns);
         }
-        if (!xpath) return this.doc;
+        if (!xpath) xpath = '//*';
         return libly.$U.getNodesFromXPath(xpath, this.doc, callback);
     }
 };

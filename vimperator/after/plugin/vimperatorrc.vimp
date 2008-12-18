@@ -4,7 +4,7 @@
 autocmd LocationChange .* :fmapc
 autocmd LocationChange reader\\.livedoor\\.com/reader :fmap j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
 autocmd LocationChange fastladder\\.com/reader :fmap j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
-autocmd LocationChange mail\\.google\\.com/mail :fmap -d 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
+autocmd LocationChange mail\\.google\\.com/mail :fmap -d 4 u k j o p n c / q ? x s y e m ! # r a f N [ ] z . I U T gi gs gt gd ga gc gk gl *a *n *r *u *s *t
 
 " arpeggio
 " load

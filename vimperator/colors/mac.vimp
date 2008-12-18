@@ -11,4 +11,6 @@ hi Hint -append background-color: #1e46f3; color: white
 hi HintElem -append background-color: #eeeeff; color: black
 hi HintActive -append background-color: #aaaaff; color: black
 
+hi Title -append color: #1e46f3
+
 " vim: set ft=vimperator:
