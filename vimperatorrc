@@ -14,17 +14,9 @@ set titlestring=Firefox
 " set verbose=9
 set wildoptions=auto
 
-set nextpattern+=次(の)?ページ,\b次.*,↑\b,
-set previouspattern+=前(の)?ページ,\b前.*,\b↓
-
-js <<EOF
-if(liberator.has("MacUnix"))
-    options.runtimepath = "~/.vimperator,~/.vimperator/after"
-if(liberator.has("Win32"))
-    options.runtimepath = "~/vimperator,~/vimperator/after"
-EOF
-
+set runtimepath+=~/.vimperator/after,~/vimperator/after
 let mapleader=","
+
 
 " ==================== Firefox options ==================== "
 " disable accesskey
@@ -39,6 +31,7 @@ set! browser.tabs.loadDivertedInBackground=true
 set! dom.popup_maximum=1000
 " allow control sidebar position
 set! layout.scrollbar.side=1
+
 
 " ==================== key mappings ==================== "
 " 多めにスクロールするようにする
@@ -59,14 +52,10 @@ noremap P <Nop>
 " ghでハイライトオフ
 noremap gh :nohl<CR>
 
-" sでStartCommand検索
-noremap s :open stand<Space>
-noremap S :tabopen stand<Space>
-
 
 " ==================== hints ==================== "
 js <<EOF
-hints.addMode("i", "Focus to textbox",
+hints.addMode("i", "Focus to input",
     function(element) element.focus(),
     function() "//input[not(@type='hidden')] | //textarea | //xhtml:input[not(@type='hidden')] | //xhtml:textarea"
     );
@@ -77,7 +66,7 @@ hints.addMode("h", "Hide element",
     },
     function() "//*");
 
-// needs FireBug
+// require FireBug
 hints.addMode("x", "copy XPath",
     function(element) {
         let xpath = FBL.getElementXPath(element);
@@ -95,12 +84,6 @@ set hintmatching=custom
 
 " commandBookmarklet
 let command_bookmarklet_prefix=""
-
-" feedSomeKey
-" autocmd LocationChange .* :fmapc
-" autocmd LocationChange reader\\.livedoor\\.com/reader :fmap j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
-" autocmd LocationChange fastladder\\.com/reader :fmap j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?
-" autocmd LocationChange mail\\.google\\.com/mail :fmap -d 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
 
 
 " ==================== colorscheme ==================== "
