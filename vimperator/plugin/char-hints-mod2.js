@@ -4,7 +4,7 @@ var PLUGIN_INFO =
     <name>{NAME}</name>
     <description>character hint mode.</description>
     <author mail="konbu.komuro@gmail.com" homepage="http://d.hatena.ne.jp/hogelog/">hogelog</author>
-    <version>0.0.2</version>
+    <version>0.1</version>
     <minVersion>2.0pre 2008/12/12</minVersion>
     <maxVersion>2.0a1</maxVersion>
     <detail><![CDATA[
@@ -24,7 +24,6 @@ set charhintshow=uppercase|lowercase:
     charhint show in uppercase|lowercase
 
 == TODO ==
- * support hinttimeout.
      ]]></detail>
     <detail lang="ja"><![CDATA[
 
@@ -42,7 +41,6 @@ set charhintshow=uppercase|lowercase:
     charhint show in uppercase|lowercase
 
 == TODO ==
- * support hinttimeout.
      ]]></detail>
 </VimperatorPlugin>;
 //}}}
@@ -50,6 +48,7 @@ set charhintshow=uppercase|lowercase:
 (function () {
 
     const DEFAULT_HINTCHARS = "HJKLASDFGYUIOPQWERTNMZXCVB";
+    const hintContext = hints.addMode;
 
     let inputCase = function(str) str.toUpperCase();
     let inputRegex = /[A-Z]/;
@@ -109,7 +108,6 @@ set charhintshow=uppercase|lowercase:
     function chars2num(chars) //{{{
     {
         let num = 0;
-        //let hintchars = options.hintchars.toUpperCase();
         let hintchars = inputCase(options.hintchars);
         let base = hintchars.length;
         for(let i=0,l=chars.length;i<l;++i) {
@@ -120,7 +118,6 @@ set charhintshow=uppercase|lowercase:
     function num2chars(num) //{{{
     {
         let chars = "";
-        //let hintchars = options.hintchars.toUpperCase();
         let hintchars = inputCase(options.hintchars);
         let base = hintchars.length;
         do {
@@ -130,28 +127,36 @@ set charhintshow=uppercase|lowercase:
 
         return chars;
     } //}}}
-    function showCharHints(win) //{{{
+    function showCharHints() //{{{
     {
-        if(!win)
-            win = window.content;
-
-        for(let elem in buffer.evaluateXPath("//*[@liberator:highlight and @number]", win.document))
+        function showHints(win)
         {
-            let num = elem.getAttribute("number");
-            let hintchar = num2chars(parseInt(num, 10));
-            //elem.setAttribute("hintchar", hintchar);
-            elem.setAttribute("hintchar", showCase(hintchar));
+            for(let elem in buffer.evaluateXPath("//*[@liberator:highlight and @number]", win.document))
+            {
+                let num = elem.getAttribute("number");
+                let hintchar = num2chars(parseInt(num, 10));
+                elem.setAttribute("hintchar", showCase(hintchar));
+                if(isValidHint(hintchar))
+                    validHints.push(elem);
+            }
+            Array.forEach(win.frames, showHints);
         }
-        Array.forEach(win.frames, showCharHints);
+
+        validHints = [];
+        showHints(window.content);
+    } //}}}
+    function isValidHint(hint) //{{{
+    {
+        return inputCase(hint).indexOf(hintInput) == 0;
     } //}}}
 
-    var hintContext = hints.addMode;
-    var hintChars = [];
+    var hintInput = "";
+    var validHints = [];
     var charhints = plugins.charhints = {
         show: function (minor, filter, win) //{{{
         {
             charhints.original.show(minor, filter, win);
-            hintChars = [];
+            hintInput = "";
             showCharHints();
         }, //}}}
         onInput: function (event) //{{{
@@ -162,17 +167,15 @@ set charhintshow=uppercase|lowercase:
             }
             let hintString = commandline.command;
             commandline.command = hintString.replace(inputRegex, "");
-            //commandline.command = hintString.replace(/[A-Z]+/g, "");
             charhints.original.onInput(event);
             showCharHints();
             for(let i=0,l=hintString.length;i<l;++i) {
-                //if(/^[A-Z]$/.test(hintString[i])) {}
                 if(inputRegex.test(hintString[i])) {
-                    hintChars.push(hintString[i]);
+                    hintInput += hintString[i];
                 }
             }
-            if(hintChars.length>0) {
-                let numstr = String(chars2num(hintChars.join("")));
+            if(hintInput.length>0) {
+                let numstr = String(chars2num(hintInput));
                 // no setTimeout, don't run nice
                 setTimeout(function () {
                     for(let i=0,l=numstr.length;i<l;++i) {
@@ -180,6 +183,11 @@ set charhintshow=uppercase|lowercase:
                         let alt = new Object;
                         alt.liberatorString = num;
                         charhints.original.onEvent(alt);
+                    }
+                    statusline.updateInputBuffer(hintInput);
+                    if(validHints.length == 1) {
+                        charhints.original.processHints(true);
+                        return true;
                     }
                 }, 10);
             }
@@ -190,6 +198,7 @@ set charhintshow=uppercase|lowercase:
                 charhints.onInput(event);
             } else {
                 charhints.original.onEvent(event);
+                statusline.updateInputBuffer(hintInput);
             }
         }, //}}}
     };
@@ -199,6 +208,7 @@ set charhintshow=uppercase|lowercase:
             show: hints.show,
             onInput: liberator.eval("onInput", hintContext),
             onEvent: hints.onEvent,
+            processHints: liberator.eval("processHints", hintContext),
         };
 
         charhints.install = function () //{{{
