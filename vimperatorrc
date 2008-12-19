@@ -4,6 +4,7 @@ set complete=lfS
 set editor="/opt/local/bin/gvim.mac -f"
 set defsearch=stand
 set focuscontent
+set followhints=1
 set guioptions=mTBr
 set hlsearch
 set nopreload
@@ -91,6 +92,9 @@ EOF
 
 " migemo_hint
 set hintmatching=custom
+
+" char-hints-mod2
+set hintchars=asdfghjkl;
 
 " commandBookmarklet
 let command_bookmarklet_prefix=""
