@@ -153,6 +153,18 @@ commands.addUserCommand(['togglerefcontrol'], 'toggle referrer control on/off',
   }, {}
 );
 
+commands.addUserCommand(['disablerefcontrol'], 'toggle referrer control on/off',
+  function() {
+    manager.isEnable = false;
+  }, {}
+);
+
+commands.addUserCommand(['enablerefcontrol'], 'toggle referrer control on/off',
+  function() {
+    manager.isEnable = true;
+  }, {}
+);
+
 // register refcontrol
 var adjustRef = function(http, site) {
   var sRef, refAction;

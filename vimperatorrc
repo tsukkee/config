@@ -93,9 +93,6 @@ EOF
 " migemo_hint
 set hintmatching=custom
 
-" char-hints-mod2
-set hintchars=asdfghjkl;
-
 " commandBookmarklet
 let command_bookmarklet_prefix=""
 
