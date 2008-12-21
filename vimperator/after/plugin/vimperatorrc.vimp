@@ -1,7 +1,7 @@
 " ==================== plugin options ==================== "
 
 " char-hints-mod2
-set hintchars=asdfghjkl;
+set hintchars=asdfghjkl
 
 " feedSomeKey
 autocmd LocationChange .* :fmapc
