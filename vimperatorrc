@@ -1,6 +1,6 @@
 " ==================== basic options ==================== "
 set activate=quickmark,paste
-set complete=lfS
+set complete=lS
 set editor="/opt/local/bin/gvim.mac -f"
 set defsearch=stand
 set focuscontent
@@ -41,8 +41,8 @@ noremap h 3h
 noremap l 3l
 
 " 上下で候補移動
-" cnoremap <Up> <S-Tab>
-" cnoremap <Down> <Tab>
+cnoremap <C-p> <S-Tab>
+cnoremap <C-n> <Tab>
 
 " ペーストが暴発しないように
 " gPだけを使うことにする
