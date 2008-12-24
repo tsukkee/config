@@ -1,8 +1,5 @@
 " ==================== plugin options ==================== "
 
-" char-hints-mod2
-set hintchars=asdfghjkl
-
 " feedSomeKey
 autocmd LocationChange .* :fmapc
 autocmd LocationChange reader\\.livedoor\\.com/reader :fmap j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ?

@@ -1,3 +1,9 @@
+/*** BEGIN LICENSE BLOCK {{{
+    Copyright (c) 2008 suVene<suvene@zeromemory.info>
+
+    distributable under the terms of an MIT-style license.
+    http://www.opensource.jp/licenses/mit-license.html
+}}}  END LICENSE BLOCK ***/
 // PLUGIN_INFO//{{{
 var PLUGIN_INFO =
 <VimperatorPlugin>
@@ -5,7 +11,8 @@ var PLUGIN_INFO =
     <description>Vimperator plugins library?</description>
     <description lang="ja">適当なライブラリっぽいものたち。</description>
     <author mail="suvene@zeromemory.info" homepage="http://zeromemory.sblo.jp/">suVene</author>
-    <version>0.1.13</version>
+    <license>MIT</license>
+    <version>0.1.14</version>
     <minVersion>1.2</minVersion>
     <maxVersion>2.0pre</maxVersion>
     <updateURL>http://svn.coderepos.org/share/lang/javascript/vimperator-plugins/trunk/_libly.js</updateURL>
@@ -47,6 +54,8 @@ evalJson(str, toRemove):
 dateFormat(dtm, fmt):
     Date型インスタンスを、指定されたフォーマットで文字列に変換します。
     fmt を省略した場合、"%y/%M/%d %h:%m:%s" となります。
+runnable(generator):
+    gererator を実行し、再帰的に resume する為の引数を渡します。
 
 ==  Browser ==
 getSelectedString:
@@ -181,6 +190,22 @@ libly.$U = {//{{{
         }
         return (fmt || '%y/%M/%d %h:%m:%s').replace(/%([yMdhms%])/g, function (_, n) d[n]);
     },
+    /**
+     * example)
+     *  $U.runnable(function(resume) {
+     *      // execute asynchronous function.
+     *      // goto next yield;
+     *      var val = yield setTimeout(function() { resume('value!'), 1000) });
+     *      alert(val);  // value!
+     *      yield;
+     *  });
+     */
+    runnable: function(generator) {
+        var it = generator(function(value) {
+                    try { it.send(value); } catch (e) {}
+                 });
+        it.next();
+    },
     // }}}
     // Browser {{{
     getSelectedString: function() {
@@ -233,8 +258,8 @@ libly.$U = {//{{{
     // HTML, XML, DOM, E4X {{{
     pathToURL: function(a, baseURL, doc) {
         if (!a) return '';
-        var XHTML_NS = "http://www.w3.org/1999/xhtml"
-        var XML_NS   = "http://www.w3.org/XML/1998/namespace"
+        var XHTML_NS = "http://www.w3.org/1999/xhtml";
+        var XML_NS   = "http://www.w3.org/XML/1998/namespace";
         //var path = (a.href || a.getAttribute('src') || a.action || a.value || a);
         var path = (a.getAttribute('href') || a.getAttribute('src') || a.action || a.value || a);
         if (/^https?:\/\//.test(path)) return path;
@@ -263,7 +288,7 @@ libly.$U = {//{{{
         if (!xpath) return null;
         context = context || window.content.document;
         var result = (context.ownerDocument || context).evaluate(xpath, context, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-        return result.singleNodeValue ? result.singleNodeValue : null;
+        return result.singleNodeValue || null;
     },
     getNodesFromXPath: function(xpath, context, callback, thisObj) {
         var ret = [];

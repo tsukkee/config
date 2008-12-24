@@ -85,6 +85,9 @@ set hintmatching=custom
 " commandBookmarklet
 let command_bookmarklet_prefix=""
 
+" char-hints-mod2
+let hintchars="asdfghjkl"
+
 
 " ==================== colorscheme ==================== "
 colorscheme mac
