@@ -11,14 +11,14 @@ var PLUGIN_INFO =
     <description>request, and the result is displayed to the buffer.</description>
     <description lang="ja">リクエストの結果をバッファに出力する。</description>
     <author mail="suvene@zeromemory.info" homepage="http://zeromemory.sblo.jp/">suVene</author>
-    <version>0.4.7</version>
+    <version>0.4.10</version>
     <license>MIT</license>
     <minVersion>2.0pre</minVersion>
     <maxVersion>2.0pre</maxVersion>
     <updateURL>http://svn.coderepos.org/share/lang/javascript/vimperator-plugins/trunk/multi_requester.js</updateURL>
     <detail><![CDATA[
 == Needs Library ==
-- _libly.js(ver.0.1.11)
+- _libly.js(ver.0.1.15)
   @see http://coderepos.org/share/browser/lang/javascript/vimperator-plugins/trunk/_libly.js
 
 == Usage ==
@@ -41,6 +41,12 @@ let g:multi_requester_command = "ANY1, ANY2, ……"
 or
 liberator.globalVariables.multi_requester_command = [ANY1, ANY2, ……];
 ||<
+
+=== Default Sites (default undefined) ===
+>||
+liberator.globalVariables.multi_requester_default_sites = "alc,goo"
+||<
+These sites(subcommands) will be used, if this variable has been defined and you do not specify subcommands.
 
 === SITEINFO ===
 e.g.)
@@ -84,8 +90,6 @@ EOM
 let g:multi_requester_use_wedata = "false"             // true by default
 ||<
 
-=== Todo ===
-- wedata local cache.
      ]]></detail>
 </VimperatorPlugin>;
 //}}}
@@ -220,30 +224,22 @@ var DataAccess = {
 
         if (useWedata) {
             logger.log('use wedata');
-            this.getWedata(function(site) {
-                if (mergedSiteinfo[site.name]) return;
-                mergedSiteinfo[site.name] = {};
-                $U.extend(mergedSiteinfo[site.name], site);
-            });
+            var wedata = new libly.Wedata('Multi%20Requester');
+            wedata.getItems(24 * 60 * 60 * 1000,
+                function(item) {
+                    var site = item.data;
+                    if (mergedSiteinfo[site.name]) return;
+                    mergedSiteinfo[site.name] = {};
+                    $U.extend(mergedSiteinfo[site.name], site);
+                },
+                function(isSuccess, data) {
+                    if (!isSuccess) return;
+                    CommandRegister.register(MultiRequester, $U.A(mergedSiteinfo));
+                }
+            );
         }
 
         return $U.A(mergedSiteinfo);
-    },
-    getWedata: function(func) {
-        var req = new libly.Request(
-            'http://wedata.net/databases/Multi%20Requester/items.json'
-        );
-        req.addEventListener('onSuccess', function(res) {
-            var text = res.responseText;
-            if (!text) return;
-            var json = $U.evalJson(text);
-            if (!json) return;
-
-            json.forEach(function(item) func(item.data));
-            CommandRegister.register(MultiRequester, $U.A(mergedSiteinfo));
-
-        });
-        req.get();
     }
 };
 //}}}
@@ -252,6 +248,7 @@ var DataAccess = {
 var MultiRequester = {
     name: DataAccess.getCommand(),
     description: 'request, and display to the buffer',
+    defaultSites: liberator.globalVariables.multi_requester_default_sites,
     doProcess: false,
     requestNames: '',
     requestCount: 0,
@@ -260,11 +257,10 @@ var MultiRequester = {
 
         if (MultiRequester.doProcess) return;
 
-        var argstr = args.string;
         var bang = args.bang;
         var count = args.count;
 
-        var parsedArgs = this.parseArgs(argstr);
+        var parsedArgs = this.parseArgs(args);
         if (parsedArgs.count == 0) { return; } // do nothing
 
         MultiRequester.doProcess = true;
@@ -281,12 +277,15 @@ var MultiRequester = {
             let urlEncode = info.urlEncode || srcEncode;
 
             let idxRepStr = url.indexOf('%s');
-            if (idxRepStr > -1 && !parsedArgs.str) continue;
+            if (idxRepStr > -1 && !parsedArgs.strs.length) continue;
 
             // via. lookupDictionary.js
             let ttbu = Components.classes['@mozilla.org/intl/texttosuburi;1']
                                  .getService(Components.interfaces.nsITextToSubURI);
-            url = url.replace(/%s/g, ttbu.ConvertAndEscape(urlEncode, parsedArgs.str));
+
+            let cnt = 0;
+            url = url.replace(/%s/g, function(m, i) ttbu.ConvertAndEscape(urlEncode, 
+                        (cnt < parsedArgs.strs.length ? parsedArgs.strs[cnt++] : parsedArgs.strs[cnt - 1])));
             logger.log(url + '[' + srcEncode + '][' + urlEncode + ']::' + info.xpath);
 
             if (bang) {
@@ -315,33 +314,37 @@ var MultiRequester = {
             MultiRequester.doProcess = false;
         }
     },
-    // return {names: '', str: '', count: 0, siteinfo: [{}]}
+    // return {names: '', strs: [''], count: 0, siteinfo: [{}]}
     parseArgs: function(args) {
 
         var self = this;
         var ret = {};
         ret.names = '';
-        ret.str = '';
+        ret.strs = [];
         ret.count = 0;
-        ret.siteinfo = [];
-
-        if (!args) return ret;
-
-        var arguments = args.split(/ +/);
         var sel = $U.getSelectedString();
 
-        if (arguments.length < 1) return ret;
+        if (args.length < 1 && !sel.length) return ret;
 
-        ret.names = arguments.shift();
-        ret.str = (arguments.length < 1 ? sel : arguments.join()).replace(/[\n\r]+/g, '');
+        function parse(args, names) {
+            args = Array.concat(args);
+            ret.siteinfo = [];
+            ret.names = names || args.shift() || '';
+            ret.strs = (args.length < 1 ? [sel.replace(/[\n\r]+/g, '')] : args);
 
-        ret.names.split(',').forEach(function(name) {
-            var site = self.getSite(name);
-            if (site) {
-                ret.count++;
-                ret.siteinfo.push(site);
-            }
-        });
+            ret.names.split(',').forEach(function(name) {
+                var site = self.getSite(name);
+                if (site) {
+                    ret.count++;
+                    ret.siteinfo.push(site);
+                }
+            });
+        }
+
+        parse(args);
+
+        if (!ret.siteinfo.length && this.defaultSites)
+            parse(args, this.defaultSites);
 
         return ret;
     },
