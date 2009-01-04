@@ -5,7 +5,7 @@ set editor="/opt/local/bin/gvim.mac -f"
 set defsearch=stand
 set focuscontent
 set followhints=1
-set guioptions=TBr
+set guioptions=TBrb
 set hlsearch
 set nopreload
 set showstatuslinks=2
@@ -30,7 +30,7 @@ set! browser.tabs.loadDivertedInBackground=true
 " allow lots of popups for ldr
 set! dom.popup_maximum=1000
 " allow control sidebar position
-set! layout.scrollbar.side=1
+" set! layout.scrollbar.side=1
 
 
 " ==================== key mappings ==================== "
