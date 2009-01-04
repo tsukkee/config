@@ -15,4 +15,9 @@ liberator.plugins.arpeggioMap(modes.NORMAL, true, "asd", function() {
 */
 EOF
 
+" colorize_url
+hi ColorizeUrlSubdomain        color: #333;
+hi ColorizeUrlPort             color: #333;
+hi ColorizeUrlFragment         color: #333;
+
 " vim: set ft=vimperator foldmethod=marker:

@@ -5,7 +5,7 @@ set editor="/opt/local/bin/gvim.mac -f"
 set defsearch=stand
 set focuscontent
 set followhints=1
-set guioptions=TBrb
+set guioptions=Brb
 set hlsearch
 set nopreload
 set showstatuslinks=2
