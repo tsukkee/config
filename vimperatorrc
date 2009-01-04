@@ -88,6 +88,29 @@ let command_bookmarklet_prefix=""
 " char-hints-mod2
 let hintchars="asdfghjkl"
 
+" migratestatusbar
+javascript <<EOM
+liberator.globalVariables.migrate_elements = [
+    {
+        // star button of awesome bar
+        id:    'star-button',
+        dest:  'liberator-statusline-field-url',
+        after: true,
+    },
+    {
+        // icon that show the existence of RSS and Atom on current page
+        id:    'feed-button',
+        dest:  'liberator-statusline-field-url',
+        after: true,
+    },
+    {
+        // favicon of awesome bar
+        id:    'page-proxy-stack',
+        dest:  'liberator-statusline',
+        after: false,
+    },
+];
+EOM
 
 " ==================== colorscheme ==================== "
 colorscheme mac
