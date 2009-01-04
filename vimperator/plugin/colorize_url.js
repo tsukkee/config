@@ -1,3 +1,8 @@
+// vimperatorのstatuslineのurl表示をlocationbar2みたいにする
+//
+// TODO: [+] とか[help]とか対応
+// 場合によってはupdateUrlをフック？
+
 liberator.plugins.colorize_url = (function() {
     // setting
     var separator_char = "/";
