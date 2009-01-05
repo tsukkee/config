@@ -63,8 +63,8 @@ liberator.plugins.colorize_url = (function() {
     colorized_field_url.addEventListener("click", function(e) {
         var target = e.target;
         
-        liberator.open(e.target.href, (e.button == 2 || e.ctrlKey || e.metaKey)
-            ? liberator.NEW_TAB : liberator.CURRENT_TAB);
+        liberator.open(e.target.href, (e.button == 1 || e.ctrlKey || e.metaKey)
+            ? liberator.NEW_BACKGROUND_TAB : liberator.CURRENT_TAB);
     }, false);
 
     // proto
