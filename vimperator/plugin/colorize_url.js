@@ -49,7 +49,7 @@
 
     statusline.insertBefore(colorized_field_url, field_url);
 
-    // clock event
+    // click event
     colorized_field_url.addEventListener("click", function(e) {
         var target = e.target;
 
