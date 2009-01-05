@@ -1,15 +1,9 @@
 // vimperatorのstatuslineのurl表示をlocationbar2みたいにする
-//
-// TODO: [+] とか[help]とか対応
-// 場合によってはupdateUrlをフック？
-
-liberator.plugins.colorize_url = (function() {
-    // setting
+(function() {
+    // setting 
+    const liberatorNS = "http://vimperator.org/namespaces/liberator";
     var separator_char = "/";
-    if(liberator.globalVariables.colorize_url_separator != undefined) {
-        separator_char = liberator.globalVariables.colorize_url_separator;
-    }
-    var liberatorNS = "http://vimperator.org/namespaces/liberator";
+    updateSeparator();
 
     // services
     let IOService = Cc["@mozilla.org/network/io-service;1"]
@@ -29,29 +23,24 @@ liberator.plugins.colorize_url = (function() {
     colorized_field_url.setAttribute("flex", 1);
     colorized_field_url.setAttribute("readonly", false);
     colorized_field_url.setAttribute("crop", "end");
-    colorized_field_url.setAttributeNS(liberatorNS, "highlight", toHi(""));
+    setupNode(colorized_field_url, "");
 
-    // create
+    // build nodes
     var nodes = {};
-    var className = "liberator-colorize_url";
-    var prefix = className + "-";
-    var hPrefix = "ColorizeUrl";
     var structure = {
         prePath:  ["protocol", "subdomain", "domain", "port"],
         dirs:    [],
-        postPath: ["separator", "file", "query", "fragment"]
+        postPath: ["separator", "file", "query", "fragment", "indicator"]
     };
     
     for(var hboxName in structure) {
         var box = nodes[hboxName] = document.createElement("hbox");
-        box.setAttribute("class", prefix + hboxName + " " + className);
-        box.setAttributeNS(liberatorNS, "highlight", toHi(hboxName));
+        setupNode(box, hboxName);
 
-        var labels = structure[hboxName];
-        labels.forEach(function(name) {
+        structure[hboxName].forEach(function(name) {
             var node = nodes[name] = document.createElement("label");
-            node.setAttribute("class", prefix + name + " " + className);
-            node.setAttributeNS(liberatorNS, "highlight", toHi(name));
+            setupNode(node, name);
+
             nodes[hboxName].appendChild(node);
         });
 
@@ -60,81 +49,112 @@ liberator.plugins.colorize_url = (function() {
 
     statusline.insertBefore(colorized_field_url, field_url);
 
+    // clock event
     colorized_field_url.addEventListener("click", function(e) {
         var target = e.target;
-        
-        liberator.open(e.target.href, (e.button == 1 || e.ctrlKey || e.metaKey)
-            ? liberator.NEW_BACKGROUND_TAB : liberator.CURRENT_TAB);
+
+        if(target.href) {
+            liberator.open(target.href, (e.button == 1 || e.ctrlKey || e.metaKey)
+                ? liberator.NEW_BACKGROUND_TAB : liberator.CURRENT_TAB);
+        }
     }, false);
 
     // proto
     var dirNodeProto = document.createElement("label");
-    dirNodeProto.setAttribute("class", prefix + "path " + className);
-    dirNodeProto.setAttributeNS(liberatorNS, "highlight", toHi("dir"))
+    setupNode(dirNodeProto, "dir");
     var separatorNodeProto = document.createElement("label");
-    separatorNodeProto.setAttribute("class", prefix + "separator " + className);
-    separatorNodeProto.setAttributeNS(liberatorNS, "highlight", toHi("separator"));
+    setupNode(separatorNodeProto, "separator");
 
     // update
     var update = function() {
         var url = buffer.URL;
+        var pathSegments = "";
+        let [, original_url, indicator] = field_url.value.match(/^\s*([^[]*)\s*(\[[^[]*\])?/);
+        var isHelp = false;
+
+        // about:*
         if(url.match(/^about:/)) {
-            return;
+            // clear
+            structure.prePath.forEach(function(name) {
+                nodes[name].value = nodes[name].href = "";
+            });
+
+            pathSegments = url;
+            separator_char = "";
+
+            indicator = "[" + url.replace(/^about:/, "") + "]";
+        }
+        
+        // help
+        else if(url.match(/^chrome:\/\/liberator\/locale\//)) {
+            // clear
+            structure.prePath.forEach(function(name) {
+                nodes[name].value = nodes[name].href = "";
+            });
+
+            pathSegments = original_url;
+            separator_char = "";
+
+            isHelp = true;
         }
 
-        // separator
-        if(liberator.globalVariables.colorize_url_separator != undefined) {
-            separator_char = liberator.globalVariables.colorize_url_separator;
-        }
+        // normal url
+        else {
+            // separator
+            updateSeparator();
 
-        // create nsIURI object
-        var uri = null;
-        try {
-            uri = IOService.newURI(buffer.URL, null, null);
-        }
-        catch(e) { }
-
-        // protocol
-        nodes["protocol"].value = uri.scheme + "://";
-
-        var host = uri.host; 
-        if(host) {
-            // subdomain
+            // create nsIURI object
+            var uri = null;
             try {
-                var baseDomain = TLDSercie.getBaseDomainFromHost(host);
-                nodes["subdomain"].value = host.substring(0, host.lastIndexOf(baseDomain));
-                host = baseDomain;
+                uri = IOService.newURI(buffer.URL, null, null);
             }
-            catch (e) {
-                nodes["subdomain"].value = "";    
+            catch(e) { 
+                liberator.echoerr("colorize_url: url parse error");
+                return;
             }
-            
-            // domain
-            nodes["domain"].value = host;
-        }
-        else {
-            nodes["subdomain"].value = "";
-            nodes["domain"].value = "";
-        }
 
-        // port
-        if (uri.port > -1) {
-            nodes["port"].value = ":" + uri.port;
+            // protocol
+            nodes["protocol"].value = uri.scheme + "://";
+
+            var host = uri.host; 
+            if(host) {
+                // subdomain
+                try {
+                    var baseDomain = TLDSercie.getBaseDomainFromHost(host);
+                    nodes["subdomain"].value = host.substring(0, host.lastIndexOf(baseDomain));
+                    host = baseDomain;
+                }
+                catch (e) {
+                    nodes["subdomain"].value = "";    
+                }
+                
+                // domain
+                nodes["domain"].value = host;
+            }
+            else {
+                nodes["subdomain"].value = "";
+                nodes["domain"].value = "";
+            }
+
+            // port
+            if (uri.port > -1) {
+                nodes["port"].value = ":" + uri.port;
+            }
+            else {
+                nodes["port"].value = "";
+            }
+
+            // prePath href
+            var prePathHref = nodes.prePath.href
+                = nodes.protocol.value + nodes.subdomain.value 
+                + nodes.domain.value + nodes.port.value + "/";
+
+            structure.prePath.forEach(function(name) {
+                nodes[name].href = prePathHref;
+            });
+
+            pathSegments = losslessDecodeURI(uri).replace(/^[^:]*:\/\/[^/]*\//, "");
         }
-        else {
-            nodes["port"].value = "";
-        }
-
-        // prePath href
-        var prePathHref = nodes.prePath.href
-            = nodes.protocol.value + nodes.subdomain.value 
-            + nodes.domain.value + nodes.port.value + "/";
-
-        structure.prePath.forEach(function(name) {
-            nodes[name].href = prePathHref;
-        });
-
-        var pathSegments = losslessDecodeURI(uri).replace(/^[^:]*:\/\/[^/]*\//, "");
 
         // fragment
         var iFragment = pathSegments.indexOf("#");
@@ -161,6 +181,9 @@ liberator.plugins.colorize_url = (function() {
         nodes["separator"].value = separator_char;
         nodes["file"].value = pathSegments.pop();
 
+        // indicator
+        nodes["indicator"].value = indicator;
+
         // dirs
         var dirs = nodes.dirs;
         while(dirs.childNodes.length > 0) {
@@ -183,21 +206,45 @@ liberator.plugins.colorize_url = (function() {
 
         // postPath href
         structure.postPath.forEach(function(name) {
-            if(name == "separator") return;
-
-            nodes[name].href = (href += nodes[name].value);
+            if(name == "separator") {
+                return;
+            }
+            else if(isHelp && name == "file") {
+                nodes[name].href = url;
+            }
+            else {
+                nodes[name].href = (href += nodes[name].value);
+            }
         });
     };
     update();
 
     autocommands.add("LocationChange", /.*/, update);
 
-    // highlight
-    // utility function
-    function toHi(name) {
-        return "ColorizeUrl" + name.charAt(0).toUpperCase() + name.substr(1);
+    // function
+    function updateSeparator() {
+        if(liberator.globalVariables.colorize_url_separator != undefined) {
+            separator_char = liberator.globalVariables.colorize_url_separator;
+        }
+        else {
+            separator_char = "/";
+        }
     }
-        
+
+    function setupNode(node, name) {
+        const className = "liberator-colorize_url";
+
+        node.setAttribute("class", (name != "" ? className + "-" + name + " " : "") + className);
+        node.setAttributeNS(liberatorNS, "highlight", toHi(name));
+    }
+
+    function toHi(name) {
+        const highlightPrefix = "ColorizeUrl";
+
+        return highlightPrefix + name.charAt(0).toUpperCase() + name.substr(1);
+    }
+    
+    // highlight
     // default highlight
     var css = <![CDATA[
         ColorizeUrl                 margin-left: 5px; font-weight: normal;
@@ -231,15 +278,11 @@ liberator.plugins.colorize_url = (function() {
         ColorizeUrlQuery:hover      text-decoration: underline
         ColorizeUrlFragment         color: #666;
         ColorizeUrlFragment:hover   text-decoration: underline
+        ColorizeUrlIndicator        margin-left: 5px; font-weight: bold; 
+        ColorizeUrlIndicator:hover  
     ]]>.toString();
 
     // append plugins style
     highlight.CSS = (Highlights.prototype.CSS += "\n" + css);
     highlight.reload();
-
-    return {
-        setSeparator: function(c) {
-            separator_char = c;
-        }
-    };
 })();
