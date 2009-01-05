@@ -182,7 +182,7 @@
         nodes["file"].value = pathSegments.pop();
 
         // indicator
-        nodes["indicator"].value = indicator;
+        nodes["indicator"].value = indicator || "[ ]";
 
         // dirs
         var dirs = nodes.dirs;
