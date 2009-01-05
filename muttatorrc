@@ -29,4 +29,4 @@ js <<EOF
 EOF
 
 
-" vim: set ft=vimperator foldmethod=marker:
+" vim: ft=vimperator foldmethod=marker

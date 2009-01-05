@@ -12,7 +12,7 @@ var PLUGIN_INFO =
     <description lang="ja">適当なライブラリっぽいものたち。</description>
     <author mail="suvene@zeromemory.info" homepage="http://zeromemory.sblo.jp/">suVene</author>
     <license>MIT</license>
-    <version>0.1.14</version>
+    <version>0.1.18</version>
     <minVersion>1.2</minVersion>
     <maxVersion>2.0pre</maxVersion>
     <updateURL>http://svn.coderepos.org/share/lang/javascript/vimperator-plugins/trunk/_libly.js</updateURL>
@@ -21,6 +21,7 @@ var PLUGIN_INFO =
 - liberator.plugins.libly.$U
 - liberator.plugins.libly.Request
 - liberator.plugins.libly.Response
+- liberator.plugins.libly.Wedata
 
 == Logger ==
 getLogger(prefix):
@@ -178,7 +179,7 @@ libly.$U = {//{{{
         var d = {
             y: dtm.getFullYear(),
             M: dtm.getMonth() + 1,
-            d: dtm.getDay(),
+            d: dtm.getDate(),
             h: dtm.getHours(),
             m: dtm.getMinutes(),
             s: dtm.getSeconds(),
@@ -222,15 +223,18 @@ libly.$U = {//{{{
                         if (logins[i].username == username)
                             return [logins[i].username, logins[i].password]
                     }
-                    throw 'username notfound.';
+                    liberator.log(this.dateFormat(new Date()) +': [getUserAndPassword] username notfound');
+                    //throw 'username notfound.';
+                    return [];
                 } else {
                     return [logins[0].username, logins[0].password];
                 }
             } else {
-                throw 'account notfound.';
+                liberator.log(this.dateFormat(new Date()) + ': [getUserAndPassword] account notfound');
+                return [];
             }
         } catch (e) {
-            liberator.log('[getUserAndPassword] error: ' + e, 0);
+            liberator.log(this.dateFormat(new Date()) + ': [getUserAndPassword] error: ' + e, 0);
             return null;
         }
     },
@@ -383,8 +387,9 @@ libly.Request.prototype = {
         try {
             libly.Request.requestCount++;
 
+            this.method = method;
             this.transport = new XMLHttpRequest();
-            this.transport.open(method, this.url, this.options.asynchronous);
+            this.transport.open(method, this.url, this.options.asynchronous, this.options.username, this.options.password);
 
             this.transport.onreadystatechange = libly.$U.bind(this, this._onStateChange);
             this.setRequestHeaders();
@@ -451,7 +456,6 @@ libly.Request.prototype = {
 
         for (let name in headers)
             this.transport.setRequestHeader(name, headers[name]);
-
     },
     get: function() {
         this._request('GET');
@@ -499,6 +503,69 @@ libly.Response.prototype = {
         }
         if (!xpath) xpath = '//*';
         return libly.$U.getNodesFromXPath(xpath, this.doc, callback, thisObj);
+    }
+};
+//}}}
+
+libly.Wedata = function(dbname) { // {{{
+    this.initialize.apply(this, arguments);
+};
+libly.Wedata.prototype = {
+    initialize: function(dbname) {
+        this.HOST_NAME = 'http://wedata.net/';
+        this.dbname = dbname;
+        this.logger = libly.$U.getLogger('libly.Wedata');
+    },
+    getItems: function(expire, itemCallback, finalCallback) {
+
+        var logger = this.logger;
+        var STORE_KEY = 'plugins-libly-wedata-' + this.dbname + '-items';
+        var store = storage.newMap(STORE_KEY, true);
+
+        if (store && store.get('data') && new Date(store.get('expire')) > new Date()) {
+            logger.log('return cache. ');
+            store.get('data').forEach(function(item) { if (typeof itemCallback == 'function') itemCallback(item); });
+            if (typeof finalCallback == 'function')
+                finalCallback(true, store.get('data'));
+            return;
+        }
+
+        expire = expire || 0;
+
+        function errDispatcher(msg, cache) {
+            if (cache) {
+                logger.log('return cache. -> ' + msg);
+                cache.forEach(function(item) { if (typeof itemCallback == 'function') itemCallback(item); });
+                if (typeof finalCallback == 'function')
+                    finalCallback(true, cache);
+            } else {
+                if (typeof finalCallback == 'function')
+                    finalCallback(false, msg);
+            }
+        }
+
+        var req = new libly.Request(this.HOST_NAME + 'databases/' + this.dbname + '/items.json');
+        req.addEventListener('onSuccess', libly.$U.bind(this, function(res) {
+            var text = res.responseText;
+            if (!text) {
+                errDispatcher('respons is null.', store.get('data'));
+                return;
+            }
+            var json = libly.$U.evalJson(text);
+            if (!json) {
+                errDispatcher('uailed eval json.', store.get('data'));
+                return;
+            }
+            store.set('expire', new Date(new Date().getTime() + expire).toString());
+            store.set('data', json);
+            store.save();
+            json.forEach(function(item) { if (typeof itemCallback == 'function') itemCallback(item); });
+            if (typeof finalCallback == 'function')
+                finalCallback(true, json);
+        }));
+        req.addEventListener('onFailure', function() errDispatcher('onFailure'));
+        req.addEventListener('onException', function() errDispatcher('onException'));
+        req.get();
     }
 };
 //}}}

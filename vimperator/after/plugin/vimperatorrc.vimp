@@ -7,8 +7,6 @@ autocmd LocationChange fastladder\\.com/reader :fmap j k s a p o v V c <Space> <
 autocmd LocationChange mail\\.google\\.com/mail :fmap -d 4 u k j o p n c / q ? x s y e m ! # r a f N [ ] z . I U T gi gs gt gd ga gc gk gl *a *n *r *u *s *t
 
 " arpeggio
-" load
-" source "~/.vimperator/plugin/arpeggio.js"
 js <<EOF
 /*
 liberator.plugins.arpeggioMap(modes.NORMAL, true, "asd", function() {
@@ -16,5 +14,10 @@ liberator.plugins.arpeggioMap(modes.NORMAL, true, "asd", function() {
 });
 */
 EOF
+
+" colorize_url
+hi ColorizeUrlSubdomain        color: #333;
+hi ColorizeUrlPort             color: #333;
+hi ColorizeUrlFragment         color: #333;
 
 " vim: set ft=vimperator foldmethod=marker:

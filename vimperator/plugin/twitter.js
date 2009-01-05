@@ -1,5 +1,5 @@
 // Vimperator plugin: "Update Twitter"
-// Last Change: 11-Nov-2008. Jan 2008
+// Last Change: 05-Jan-2009. Jan 2008
 // License: Creative Commons
 // Maintainer: Trapezoid <trapezoid.g@gmail.com> - http://unsigned.g.hatena.ne.jp/Trapezoid
 //
@@ -40,7 +40,8 @@
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "http://twitter.com/statuses/update.json", false, username, password);
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.send("status=" + encodeURIComponent(stat));
+        xhr.send("status=" + encodeURIComponent(stat) + "&source=Vimperator");
+        liberator.echo("[Twitter] Your post " + '"' + stat + '" (' + stat.length + " characters) was sent. " );
     }
     function favTwitter(username, password, user){
         var xhr = new XMLHttpRequest();
