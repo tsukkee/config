@@ -2,14 +2,14 @@
 set activate=quickmark,paste
 set complete=lS
 set editor="/opt/local/bin/gvim.mac -f"
-set defsearch=stand
+" set defsearch=stand
 set focuscontent
 set followhints=1
 set guioptions=Brb
 set hlsearch
 set nopreload
 set showstatuslinks=2
-set suggestengines=stand
+" set suggestengines=stand
 set titlestring=Firefox
 " set verbose=9
 set wildoptions=auto
@@ -109,6 +109,40 @@ liberator.globalVariables.migrate_elements = [
         dest:  'liberator-statusline',
         after: false,
     },
+];
+EOM
+
+" proxy
+js <<EOM
+liberator.globalVariables.proxy_settings = [
+    {
+        conf_name: 'disable',
+        conf_usage: 'direct connection',
+        settings: [
+            {
+                label: 'type',
+                param: 0
+            }
+        ]
+    },
+    {
+        conf_name: 'cocproxy',
+        conf_usage: 'use CocProxy',
+        settings: [
+            {
+                label: 'type',
+                param: 1
+            },
+            {
+                label: 'http',
+                param: 'localhost'
+            },
+            {
+                label: 'http_port',
+                param: 5432
+            }
+        ]
+    }
 ];
 EOM
 

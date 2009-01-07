@@ -7,9 +7,9 @@
 
     // services
     let IOService = Cc["@mozilla.org/network/io-service;1"]
-                  .getService(Components.interfaces.nsIIOService);
+        .getService(Ci.nsIIOService);
     let TLDSercie = Cc["@mozilla.org/network/effective-tld-service;1"]
-                  .getService(Components.interfaces.nsIEffectiveTLDService);
+        .getService(Ci.nsIEffectiveTLDService);
 
     // statusline
     var statusline = document.getElementById("liberator-statusline");
@@ -29,7 +29,7 @@
     var nodes = {};
     var structure = {
         prePath:  ["protocol", "subdomain", "domain", "port"],
-        dirs:    [],
+        dirs:     [],
         postPath: ["separator", "file", "query", "fragment", "indicator"]
     };
     

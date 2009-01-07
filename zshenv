@@ -38,3 +38,4 @@ export LIBRARY_PATH=/opt/local/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=/opt/local/lib:$LD_LIBRARY_PATH
 export OBJC_INCLUDE_PATH=/opt/local/include:$OBJC_INCLUDE_PATH
 export HREF_DATADIR=/usr/local/share/ref
+export GISTY_DIR="$HOME/Desktop/gisty"
