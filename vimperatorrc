@@ -1,6 +1,6 @@
 " ==================== basic options ==================== "
 set activate=quickmark,paste
-set complete=lS
+set complete=l
 set editor="/opt/local/bin/gvim.mac -f"
 " set defsearch=stand
 set focuscontent
