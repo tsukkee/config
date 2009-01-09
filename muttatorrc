@@ -2,6 +2,7 @@
 set guioptions=mTFfr
 set wildoptions=auto
 set showtabline=2
+set editor="gvim.mac -f"
 
 
 " ==================== Key mappings ==================== "

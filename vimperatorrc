@@ -17,6 +17,10 @@ set wildoptions=auto
 set runtimepath+=~/.vimperator/after,~/vimperator/after
 let mapleader=","
 
+autocmd LocationChange .* js modes.passAllKeys = false
+autocmd LocationChange reader\\.livedoor\\.com/reader js modes.passAllKeys = true
+autocmd LocationChange fastladder\\.com/reader js modes.passAllKeys = true
+autocmd LocationChange mail\\.google\\.com/mail js modes.passAllKeys = true
 
 " ==================== Firefox options ==================== "
 " disable accesskey
@@ -84,9 +88,6 @@ set hintmatching=custom
 
 " commandBookmarklet
 let command_bookmarklet_prefix=""
-
-" char-hints-mod2
-let hintchars="asdfghjkl"
 
 " migratestatusbar
 javascript <<EOM
