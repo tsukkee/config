@@ -31,11 +31,11 @@ set noswapfile " don't use swap file
 set hidden     " allow open other file without saving current file
 
 " Help files
-" if has('mac')
-    " helptags ~/.vim/doc/
-" elseif has('win32')
-    " helptags ~/vimfiles/doc/
-" endif
+if has('mac')
+    helptags ~/.vim/doc/
+elseif has('win32')
+    helptags ~/vimfiles/doc/
+endif
 
 " Display
 set showmatch         " 括弧の対応をハイライト
@@ -364,4 +364,6 @@ if has('mac')
 endif
 
 " Load private information
-source ~/.vimrc_passwords
+if filereadable("~/.vimrc.local")
+    source ~/.vimrc.local
+endif
