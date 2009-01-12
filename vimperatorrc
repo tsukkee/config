@@ -62,14 +62,15 @@ noremap gh :nohl<CR>
 " search
 js <<EOM
 (function() {
-    var defsearch = options.get("defsearch").value;
+    var defsearch = options.get("defsearch");
+
     mappings.addUserMap([modes.NORMAL], ["s"],
         "search by default search engine in current tab",
-        function() { commandline.open(":", "open " + defsearch + " ", modes.EX); });
+        function() { commandline.open(":", "open " + defsearch.value + " ", modes.EX); });
 
     mappings.addUserMap([modes.NORMAL], ["S"],
         "search by default search engine in new tab",
-        function() { commandline.open(":", "tabopen " + defsearch + " ", modes.EX); });
+        function() { commandline.open(":", "tabopen " + defsearch.value + " ", modes.EX); });
 })();
 EOM
 
