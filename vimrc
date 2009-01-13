@@ -101,7 +101,7 @@ filetype plugin on " to use filetype plugin
 " Dictionary
 augroup Dictionary
     autocmd! Dictionary
-    autocmd FileType javascript setlocal dictionary+=~/.vim/dict/javascript.dict
+    " autocmd FileType javascript setlocal dictionary+=~/.vim/dict/javascript.dict
     autocmd FileType php setlocal dictionary+=~/.vim/dict/php.dict
 augroup END
 
