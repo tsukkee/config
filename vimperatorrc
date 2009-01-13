@@ -2,7 +2,7 @@
 set activate=quickmark,paste
 set complete=l
 set editor="/opt/local/bin/gvim.mac -f"
-" set defsearch=stand
+" set defsearch=google
 set focuscontent
 set followhints=1
 set guioptions=Brb
@@ -14,9 +14,12 @@ set titlestring=Firefox
 " set verbose=9
 set wildoptions=auto
 
+" emulate vim's "after"
 set runtimepath+=~/.vimperator/after,~/vimperator/after
+
 let mapleader=","
 
+" auto pass keys
 autocmd LocationChange .* js modes.passAllKeys = false
 autocmd LocationChange reader\\.livedoor\\.com/reader js modes.passAllKeys = true
 autocmd LocationChange fastladder\\.com/reader js modes.passAllKeys = true
@@ -38,27 +41,57 @@ set! dom.popup_maximum=1000
 
 
 " ==================== key mappings ==================== "
-" 多めにスクロールするようにする
+" increase j, k, h, l
 noremap j 5j
 noremap k 5k
 noremap h 3h
 noremap l 3l
 
-" 上下で候補移動
+" enable to select completion list by <C-p> and <C-n>
 cnoremap <C-p> <S-Tab>
 cnoremap <C-n> <Tab>
 
-" ペーストが暴発しないように
-" gPだけを使うことにする
+" avoid unintended paste
+" only use "gP"
 noremap p <Nop>
 noremap P <Nop>
 
 " ghでハイライトオフ
 noremap gh :nohl<CR>
 
+" search
+js <<EOM
+(function() {
+    var defsearch = options.get("defsearch");
+
+    mappings.addUserMap([modes.NORMAL], ["s"],
+        "search by default search engine in current tab",
+        function() { commandline.open(":", "open " + defsearch.value + " ", modes.EX); });
+
+    mappings.addUserMap([modes.NORMAL], ["S"],
+        "search by default search engine in new tab",
+        function() { commandline.open(":", "tabopen " + defsearch.value + " ", modes.EX); });
+})();
+EOM
+
+" toggle guioptions
+js <<EOM
+(function() {
+    var guioptions = options.get("guioptions");
+
+    mappings.addUserMap([modes.NORMAL], ["I"],
+        "toggle guioptions",
+        function() {
+            if(guioptions.value.indexOf("T") > -1)
+                guioptions.set("Brb");
+            else
+                guioptions.set("TmBrb");
+        });
+})();
+EOM
 
 " ==================== hints ==================== "
-js <<EOF
+js <<EOM
 hints.addMode("i", "Focus to input",
     function(element) element.focus(),
     function() "//input[not(@type='hidden')] | //textarea | //xhtml:input[not(@type='hidden')] | //xhtml:textarea"
@@ -78,7 +111,7 @@ hints.addMode("x", "copy XPath",
         util.copyToClipboard(xpath);
     },
     function() "//*");
-EOF
+EOM
 
 
 " ==================== plugin options ==================== "
@@ -153,9 +186,13 @@ colorscheme mac
 
 
 " ==================== others ==================== "
-js <<EOF
-if(liberator.has("MacUnix"))
-    io.source("~/.vimperatorrc_passwords", true);
-EOF
+js <<EOM
+(function() {
+    var local = "~/.vimperatorrc.local";
+    if(io.getFile(local).isReadable()) {
+        io.source(local, true);
+    }
+})();
+EOM
 
 " vim: set ft=vimperator foldmethod=marker:

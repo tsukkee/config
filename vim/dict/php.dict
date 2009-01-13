@@ -1,3 +1,4 @@
+_
 abs
 acos
 acosh
@@ -433,6 +434,7 @@ image2wbmp
 image_type_to_extension
 image_type_to_mime_type
 imagealphablending
+imageantialias
 imagearc
 imagechar
 imagecharup
@@ -445,12 +447,14 @@ imagecolorclosesthwb
 imagecolordeallocate
 imagecolorexact
 imagecolorexactalpha
+imagecolormatch
 imagecolorresolve
 imagecolorresolvealpha
 imagecolorset
 imagecolorsforindex
 imagecolorstotal
 imagecolortransparent
+imageconvolution
 imagecopy
 imagecopymerge
 imagecopymergegray
@@ -465,6 +469,7 @@ imagecreatefromjpeg
 imagecreatefrompng
 imagecreatefromstring
 imagecreatefromwbmp
+imagecreatefromxbm
 imagecreatetruecolor
 imagedashedline
 imagedestroy
@@ -475,6 +480,7 @@ imagefilledellipse
 imagefilledpolygon
 imagefilledrectangle
 imagefilltoborder
+imagefilter
 imagefontheight
 imagefontwidth
 imageftbbox
@@ -486,12 +492,14 @@ imagegif
 imageinterlace
 imageistruecolor
 imagejpeg
+imagelayereffect
 imageline
 imageloadfont
 imagepalettecopy
 imagepng
 imagepolygon
 imagerectangle
+imagerotate
 imagesavealpha
 imagesetbrush
 imagesetpixel
@@ -507,6 +515,7 @@ imagettfbbox
 imagettftext
 imagetypes
 imagewbmp
+imagexbm
 imap_8bit
 imap_alerts
 imap_append
@@ -819,6 +828,7 @@ mhash_get_block_size
 mhash_get_hash_name
 mhash_keygen_s2k
 microtime
+mime_content_type
 min
 mkdir
 mktime
@@ -1037,7 +1047,9 @@ odbc_error
 odbc_errormsg
 odbc_exec
 odbc_execute
+odbc_fetch_array
 odbc_fetch_into
+odbc_fetch_object
 odbc_fetch_row
 odbc_field_len
 odbc_field_name
