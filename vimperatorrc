@@ -22,6 +22,7 @@ let mapleader=","
 " auto pass keys
 autocmd LocationChange .* js modes.passAllKeys = false
 autocmd LocationChange reader\\.livedoor\\.com/reader js modes.passAllKeys = true
+autocmd LocationChange reader\\.livedoor\\.com/public js modes.passAllKeys = true
 autocmd LocationChange fastladder\\.com/reader js modes.passAllKeys = true
 autocmd LocationChange mail\\.google\\.com/mail js modes.passAllKeys = true
 
@@ -88,6 +89,27 @@ js <<EOM
                 guioptions.set("TmBrb");
         });
 })();
+EOM
+
+js <<EOM
+commands.addUserCommand(["wrappedjavascript", "wjs"],
+    "Run a JavaScript command in wrappedJSObject context",
+    function (args)
+    {
+        try
+        {
+            liberator.eval("with(window.content.wrappedJSObject) {" + args.string + "}");
+        }
+        catch (e)
+        {
+            liberator.echoerr(e);
+        }
+    },
+    {
+        completer: function (context) completion.javascript(context),
+        hereDoc: true,
+        literal: 0
+    });
 EOM
 
 " ==================== hints ==================== "
