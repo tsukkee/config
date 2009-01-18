@@ -2,6 +2,7 @@
 " General
 set nocompatible     " 
 set shellslash       " to use '/' for path delimiter in Windows
+set timeoutlen=500   " timeout
 colorscheme xoria256 " colorscheme
 
 " Tab character
@@ -193,6 +194,26 @@ augroup Binary
     autocmd BufWritePost *.bin,*.swf set nomod | endif
 augroup END
 
+" cabbrev cd TabpageCD
+command! -complete=customlist,s:complete_cdpath -nargs=? TabpageCD
+\   execute 'cd' fnameescape(<q-args>)
+\ | let t:cwd = getcwd()
+
+command! CD silent exe "TabpageCD " . expand('%:p:h')
+
+function! s:complete_cdpath(arglead, cmdline, cursorpos)
+return split(globpath(&cdpath,
+            \ join(split(a:cmdline, '\s', 1)[1:], ' ') . '*/'),
+            \ "\n")
+endfunction
+
+autocmd TabEnter *
+\   if !exists('t:cwd')
+\ |   let t:cwd = getcwd()
+\ | endif
+\ | execute 'cd' fnameescape(t:cwd)
+
+
 " ==================== プラグインの設定 ==================== "
 " 基本的に<Space>に割り当てとけばかぶらない？
 
@@ -200,17 +221,17 @@ augroup END
 " MacPortsのPrivatePortsで入るのはjexctags
 set tags=./tags,./TAGS,tags,TAGS
 if has('mac')
-    command! CtagsR !jexctags -R --tag-relative=no --fields=+iaS --extra=+q
+command! CtagsR !jexctags -R --tag-relative=no --fields=+iaS --extra=+q
 endif
 
 if has('win32')
-    command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
+command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
 endif
 
 " Ruby
 augroup Ruby
-    autocmd! Ruby
-    autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
+autocmd! Ruby
+autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
 augroup END
 
 " CakePHP
@@ -346,21 +367,27 @@ let html_use_encoding = "utf-8"
 command! HTMLEscape silent exe "rubydo $_ = $_.gsub('&', '&amp;').gsub('>', '&gt;').gsub('<', '&lt;').gsub('\"', '&quot;')"
 
 " settings for arpeggio.vim
+nnoremap M <nop>
 call arpeggio#load()
 
 " NERD_tree
 Arpeggionnoremap <silent> tn :NERDTreeToggle<CR>
+nnoremap <silent> MT :NERDTreeToggle<CR>
 
 " FuzzyFinder
 Arpeggionnoremap <silent> fn :FuzzyFinderBuffer<CR>
 Arpeggionnoremap <silent> fm :FuzzyFinderMruFile<CR>
+nnoremap <silent> MB :FuzzyFinderBuffer<CR>
+nnoremap <silent> MM :FuzzyFinderMruFile<CR>
 
 " Reload brawser
 if has('ruby')
     Arpeggionnoremap <silent> ru :<C-u>call ReloadFirefox()<CR>
+    nnoremap <silent> MF :<C-u>call ReloadFirefox()<CR>
 endif
 if has('mac')
     Arpeggionnoremap <silent> ri :<C-u>call ReloadSafari()<CR>
+    nnoremap <silent> MS :<C-u>call ReloadSafari()<CR>
 endif
 
 " Load private information
