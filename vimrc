@@ -1,6 +1,6 @@
 " ==================== Basic settins ==================== "
 " General
-set nocompatible     " 
+set nocompatible     "
 set shellslash       " to use '/' for path delimiter in Windows
 set timeoutlen=500   " timeout
 colorscheme xoria256 " colorscheme

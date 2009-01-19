@@ -123,5 +123,4 @@ alias -g Ceuc="| iconv -f euc-jp -t sjis | pbcopy"
 alias -g EU="| iconv -f euc-jp -t utf-8"
 alias -g SU="| iconv -f sjis -t utf-8"
 
-# yet another rm
-# source ~/.zsh.d/yarm.sh
+source ~/.zshrc.local

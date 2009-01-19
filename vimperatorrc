@@ -139,10 +139,13 @@ EOM
 " ==================== plugin options ==================== "
 
 " migemo_hint
-set hintmatching=custom
+set hintmatching="custom"
 
 " commandBookmarklet
 let command_bookmarklet_prefix=""
+
+" appendAnchor
+let auto_append_anchor="true"
 
 " migratestatusbar
 javascript <<EOM
