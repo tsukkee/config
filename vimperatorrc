@@ -214,7 +214,8 @@ colorscheme mac
 js <<EOM
 (function() {
     var local = "~/.vimperatorrc.local";
-    if(io.getFile(local).isReadable()) {
+    var file = io.getFile(local);
+    if(file.exists() && file.isReadable()) {
         io.source(local, true);
     }
 })();

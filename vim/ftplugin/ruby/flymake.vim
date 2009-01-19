@@ -1,2 +1,2 @@
 compiler ruby
-autocmd BufWritePost <buffer> silent make % | cwin
+" autocmd BufWritePost <buffer> silent make % | cwin

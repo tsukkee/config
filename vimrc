@@ -72,7 +72,8 @@ vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 
 " Status line
 set laststatus=2
-set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%4v(ASCII=%03.3b,HEX=%02.2B)\ %l/%L(%P)%m
+" set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%4v(ASCII=%03.3b,HEX=%02.2B)\ %l/%L(%P)%m
+set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%m%v,%l/%L(%P:%n)
 
 " File encoding
 if has('mac')
@@ -367,27 +368,31 @@ let html_use_encoding = "utf-8"
 command! HTMLEscape silent exe "rubydo $_ = $_.gsub('&', '&amp;').gsub('>', '&gt;').gsub('<', '&lt;').gsub('\"', '&quot;')"
 
 " settings for arpeggio.vim
-nnoremap M <nop>
 call arpeggio#load()
 
 " NERD_tree
 Arpeggionnoremap <silent> tn :NERDTreeToggle<CR>
-nnoremap <silent> MT :NERDTreeToggle<CR>
+nnoremap <silent> <C-m><C-t> :NERDTreeToggle<CR>
+nnoremap <silent> <C-m>t :NERDTreeToggle<CR>
 
 " FuzzyFinder
 Arpeggionnoremap <silent> fn :FuzzyFinderBuffer<CR>
 Arpeggionnoremap <silent> fm :FuzzyFinderMruFile<CR>
-nnoremap <silent> MB :FuzzyFinderBuffer<CR>
-nnoremap <silent> MM :FuzzyFinderMruFile<CR>
+nnoremap <silent> <C-m><C-b> :FuzzyFinderBuffer<CR>
+nnoremap <silent> <C-m>b :FuzzyFinderBuffer<CR>
+nnoremap <silent> <C-m><C-m> :FuzzyFinderMruFile<CR>
+nnoremap <silent> <C-m>m :FuzzyFinderMruFile<CR>
 
 " Reload brawser
 if has('ruby')
     Arpeggionnoremap <silent> ru :<C-u>call ReloadFirefox()<CR>
-    nnoremap <silent> MF :<C-u>call ReloadFirefox()<CR>
+    nnoremap <silent> <C-m><C-f> :<C-u>call ReloadFirefox()<CR>
+    nnoremap <silent> <C-m>f :<C-u>call ReloadFirefox()<CR>
 endif
 if has('mac')
     Arpeggionnoremap <silent> ri :<C-u>call ReloadSafari()<CR>
-    nnoremap <silent> MS :<C-u>call ReloadSafari()<CR>
+    nnoremap <silent> <C-m><C-s> :<C-u>call ReloadSafari()<CR>
+    nnoremap <silent> <C-m>s :<C-u>call ReloadSafari()<CR>
 endif
 
 " Load private information
