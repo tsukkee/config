@@ -70,8 +70,8 @@ be treated as warnings can be set by >
         let errormarker_warningtypes = "wWiI"
 
 For example, the severity of error messages from gcc
-        averagergui.cpp|18 warning| unused parameter efilef ~
-        averagergui.cpp|33 error| expected class-name before eIf ~
+        averagergui.cpp|18 warning| unused parameter â€˜fileâ€™ ~
+        averagergui.cpp|33 error| expected class-name before â€˜Iâ€™ ~
 can be parsed by adding the following lines to your .vimrc >
         let &errorformat="%f:%l: %t%*[^:]:%m," . &errorformat
         let &errorformat="%f:%l:%c: %t%*[^:]:%m," . &errorformat
