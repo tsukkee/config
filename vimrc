@@ -239,6 +239,12 @@ augroup END
 au BufNewFile,BufRead *.thtml setfiletype php
 au BufNewFile,BufRead *.ctp setfiletype php
 
+" smartword
+map W <Plug>(smartword-w)
+map B <Plug>(smartword-b)
+map E <Plug>(smartword-e)
+map gE <Plug>(smartword-ge)
+
 " NERD_comments
 let NERDSpaceDelims = 1
 let NERDShutUp = 1

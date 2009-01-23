@@ -1,3 +1,2 @@
-" Muttator
 " TODO: what's the Muttator filename extension?
-au BufNewFile,BufRead *muttatororrc*,*.muttator set filetype=muttator
+au BufNewFile,BufRead *muttatorrc*,*.muttator set filetype=muttator
