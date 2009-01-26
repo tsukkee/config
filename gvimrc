@@ -57,7 +57,7 @@ highlight ZenkakuSpace guibg=#3333ff guifg=#3333ff
 match ZenkakuSpace /　/
 
 " ポップアップメニューの色変える
-highlight Pmenu guibg=#3333ff guifg=#000000
-highlight PmenuSel guibg=#0000dd guifg=#000000
-highlight PmenuSbar guibg=#333333
-highlight PmenuThumb guibg=#aaaaaa
+" highlight Pmenu guibg=#3333ff guifg=#000000
+" highlight PmenuSel guibg=#0000dd guifg=#000000
+" highlight PmenuSbar guibg=#333333
+" highlight PmenuThumb guibg=#aaaaaa

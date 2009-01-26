@@ -112,6 +112,7 @@ commands.addUserCommand(["wrappedjavascript", "wjs"],
     });
 EOM
 
+
 " ==================== hints ==================== "
 js <<EOM
 hints.addMode("i", "Focus to input",
@@ -220,5 +221,3 @@ js <<EOM
     }
 })();
 EOM
-
-" vim: set ft=vimperator foldmethod=marker:

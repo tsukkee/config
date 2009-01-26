@@ -28,6 +28,3 @@ noremap L zo
 " ==================== autocmd ==================== "
 js <<EOF
 EOF
-
-
-" vim: ft=vimperator foldmethod=marker
