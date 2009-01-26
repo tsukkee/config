@@ -81,7 +81,7 @@ if has('mac')
 elseif has('win32')
     set encoding=japan
 endif
-set fileencodings=utf-8,euc-jp,cp932
+set fileencodings=euc-jp,cp932
 
 " File Formats
 set ffs=unix,dos,mac
@@ -115,10 +115,10 @@ inoremap <silent> <expr> <CR> (pumvisible() ? "\<C-e>" : "") . "\<CR>"
 inoremap <silent> <expr> <Tab> pumvisible() ? "\<C-y>" : "\<Tab>"
 
 " ポップアップメニューの色変える
-highlight Pmenu ctermbg=lightcyan ctermfg=black 
-highlight PmenuSel ctermbg=blue ctermfg=white 
-highlight PmenuSbar ctermbg=darkgray 
-highlight PmenuThumb ctermbg=lightgray
+" highlight Pmenu ctermbg=lightcyan ctermfg=black 
+" highlight PmenuSel ctermbg=blue ctermfg=white 
+" highlight PmenuSbar ctermbg=darkgray 
+" highlight PmenuThumb ctermbg=lightgray
 
 " Disable input methods
 set iminsert=0

@@ -1,6 +1,6 @@
 *smartword.txt*	Smart motions on words
 
-Version 0.0.1
+Version 0.0.2
 Script ID: 2470
 Copyright (C) 2008 kana <http://whileimautomaton.net/>
 License: MIT license  {{{
@@ -41,26 +41,29 @@ INTRODUCTION					*smartword-introduction*
 
 *smartword* is a Vim plugin to provide {motion}s on |word|s which are smarter
 than the built-in ones in some sense.  For example, |w| moves the cursor to
-the next word as follows (here "|" means a cursor position whenever |w| is
-executed):
+the next word as follows (here "#" means a position to which |w| moves the
+cursor for each time):
 
 	<a href="http://www.vim.org/">www.vim.org</a>
-	 | |   | |   |  |  ||  ||  |  |  ||  ||  | |
+	 # #   # #   #  #  ##  ##  #  #  ##  ##  # #
 
 Because there are two types of words and |w| moves to the next word which can
 be the both types.  Let's call "L" for a type of words and "P" for another
 type of words, where "L" means a word which consists of a sequence of letters
-(which can be changed with the 'iskeyword' option) and "P" means a word which
-consists of a sequence of other non-blank characters.
+(which are defined by 'iskeyword' option) and "P" means a word which consists
+of a sequence of other non-blank characters.
 
 In many cases, you might want to move to the next "L", not "P".  This plugin
-provides {motion}s to behave so.  For example, |<Plug>(smartword-w)| moves the
-cursor as follows:
+provides {motion}s to behave so.  For example, |<Plug>(smartword-w)| which is
+corresponding to |w| moves the cursor as follows:
 
 	<a href="http://www.vim.org/">www.vim.org</a>
-	 | |     |      |   |   |     |   |   |    |
+	 # #     #      #   #   #     #   #   #    #
 
 See also |smartword-examples| for customization.
+
+See also the following image if the above figures aren't correctly displayed:
+http://gyazo.com/bc7887d9bb0f6aa3eee1e67b0d756b2e.png
 
 
 Requirements:
@@ -136,6 +139,12 @@ BUGS						*smartword-bugs*
 
 ==============================================================================
 CHANGELOG					*smartword-changelog*
+
+0.0.2	2009-01-23T19:13:29+09:00
+	- Fix the document a bit.
+	- Revise the treatment on 'iskeyword'.
+	- Fix 2 bugs on |<Plug>(smartword-e)| and |<Plug>(smartword-ge)| with
+	  |o_v|.  These bugs are appeared only in Vim with the patch (*).
 
 0.0.1	2008-12-06T01:21:37+09:00
 	- Fix |<Plug>(smartword-e)| and |<Plug>(smartword-ge)| to be
