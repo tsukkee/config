@@ -114,7 +114,7 @@ preexec_functions+=_screen_cmdname
 # aliases
 set complete_aliases
 test -x /opt/local/bin/lv && alias less=/opt/local/bin/lv
-test -x /opt/local/bin/jexctags && alias ctags=jexctags
+# test -x /opt/local/bin/jexctags && alias ctags=jexctags
 alias ls="ls -GF"
 alias scr="screen -xR"
 alias -g C="| iconv -f utf-8 -t sjis | pbcopy"

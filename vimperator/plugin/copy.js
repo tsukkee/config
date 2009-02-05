@@ -3,12 +3,12 @@ var PLUGIN_INFO =
 <name>{NAME}</name>
 <description>enable to copy strings from a template (like CopyURL+)</description>
 <description lang="ja">テンプレートから文字列のコピーを可能にします（CopyURL+みたいなもの）</description>
-<minVersion>1.1</minVersion>
+<minVersion>2.0</minVersion>
 <maxVersion>2.0pre</maxVersion>
 <updateURL>http://svn.coderepos.org/share/lang/javascript/vimperator-plugins/trunk/copy.js</updateURL>
 <author mail="teramako@gmail.com" homepage="http://vimperator.g.hatena.ne.jp/teramako/">teramako</author>
 <license>MPL 1.1/GPL 2.0/LGPL 2.1</license>
-<version>0.5</version>
+<version>0.6</version>
 <detail><![CDATA[
 == Command ==
 :copy {copyString}:
@@ -67,10 +67,31 @@ custom:
         {Array}[1]:
             String or Function
         see http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:String:replace
+
+== Options ==
+>||
+liberator.globalVariables.copy_use_wedata = false; // false by default
+||<
+true に設定すると wedata からテンプレートを読込みます。
+>||
+liberator.globalVariables.copy_wedata_include_custom = true; // false by default
+||<
+custom が設定された wedata を読込みます。
+SandBox でなく、window.eval を利用してオブジェクトする為、
+セキュリティ上の理由で初期設定は false になっています。
+true に設定する場合は、動作を理解したうえ自己責任でご利用ください。
+>||
+liberator.globalVariables.copy_wedata_exclude_labels = [
+    'pathtraqnormalize',
+];
+||<
+wedata から読込まない label のリストを定義します。
 ]]></detail>
 </VimperatorPlugin>;
 
 liberator.plugins.exCopy = (function(){
+var excludeLabelsMap = {};
+var copy_templates = [];
 if (!liberator.globalVariables.copy_templates){
     liberator.globalVariables.copy_templates = [
         { label: 'titleAndURL',    value: '%TITLE%\n%URL%' },
@@ -81,7 +102,11 @@ if (!liberator.globalVariables.copy_templates){
     ];
 }
 
-liberator.globalVariables.copy_templates.forEach(function(template){
+copy_templates = liberator.globalVariables.copy_templates.map(function(t){
+    return { label: t.label, value: t.value, custom: t.custom, map: t.map }
+});
+
+copy_templates.forEach(function(template){
     if (typeof template.map == 'string')
         addUserMap(template.label, [template.map]);
     else if (template.map instanceof Array)
@@ -100,7 +125,7 @@ commands.addUserCommand(['copy'],'Copy to clipboard',
                 return;
             }
             context.title = ['Template','Value'];
-            var templates = liberator.globalVariables.copy_templates.map(function(template)
+            var templates = copy_templates.map(function(template)
                 [template.label, liberator.modules.util.escapeString(template.value, '"')]
             );
             if (!context.filter){ context.completions = templates; return; }
@@ -109,7 +134,8 @@ commands.addUserCommand(['copy'],'Copy to clipboard',
             context.completions = templates.filter(function(template) template[0].toLowerCase().indexOf(filter) == 0);
         },
         bang: true
-    }
+    },
+    true
 );
 
 function addUserMap(label, map){
@@ -121,14 +147,14 @@ function addUserMap(label, map){
 }
 function getCopyTemplate(label){
     var ret = null;
-    liberator.globalVariables.copy_templates.some(function(template)
+    copy_templates.some(function(template)
         template.label == label ? (ret = template) && true : false);
     return ret;
 }
 function replaceVariable(str){
     if (!str) return '';
     var win = new XPCNativeWrapper(window.content.window);
-    var sel = '',htmlsel = '';
+    var sel = '', htmlsel = '';
     var selection =  win.getSelection();
     function replacer(value){ //{{{
         switch(value){
@@ -163,10 +189,78 @@ function replaceVariable(str){
     return str.replace(/%(TITLE|URL|SEL|HTMLSEL)%/g, replacer);
 }
 
+function wedataRegister(item){
+    var libly = liberator.plugins.libly;
+    var logger = libly.$U.getLogger("copy");
+    item = item.data;
+    if (excludeLabelsMap[item.label]) return;
+
+    if (item.custom && item.custom.toLowerCase().indexOf('function') != -1) {
+        if (!liberator.globalVariables.copy_wedata_include_custom ||
+             item.label == 'test') {
+            logger.log('skip: ' + item.label);
+            return;
+        }
+
+        let custom = (function(item){
+
+            return function(value, value2){
+                var STORE_KEY = 'plugins-copy-ok-func';
+                var store = storage.newMap(STORE_KEY, true);
+                var check = store.get(item.label);
+                var ans;
+
+                if (!check){
+                    ans = window.confirm(
+                        'warning!!!: execute "' + item.label + '" ok ?\n' +
+                        '(this function is working with unsafe sandbox.)\n\n' +
+                        '----- execute code -----\n\n' +
+                        'value: ' + item.value + '\n' +
+                        'function: ' +
+                        item.custom
+                    );
+                } else {
+                    if (item.value == check.value &&
+                        item.custom == check.custom &&
+                        item.map == check.map){
+                        ans = true;
+                    } else {
+                        ans = window.confirm(
+                            'warning!!!: "' + item.label + '" was changed when you registered the function.\n' +
+                            '(this function is working with unsafe sandbox.)\n\n' +
+                            '----- execute code -----\n\n' +
+                            'value: ' + item.value + '\n' +
+                            'function: ' +
+                            item.custom
+                        );
+                    }
+                }
+
+                if (!ans) return;
+                store.set(item.label, item);
+                store.save();
+
+                var func;
+                try{
+                    func = window.eval('(' + item.custom + ')');
+                } catch (e){
+                    logger.echoerr(e);
+                    logger.log(item.custom);
+                    return;
+                }
+                return func(value, value2);
+            };
+        })(item);
+
+        exCopyManager.add(item.label, item.value, custom, item.map);
+    } else {
+        exCopyManager.add(item.label, item.value, null, item.map);
+    }
+}
 var exCopyManager = {
     add: function(label, value, custom, map){
         var template = {label: label, value: value, custom: custom, map: map};
-        liberator.globalVariables.copy_templates.unshift(template);
+        copy_templates.unshift(template);
         if (map) addUserMap(label, map);
 
         return template;
@@ -179,7 +273,7 @@ var exCopyManager = {
         var isError = false;
         if (special && arg){
             try {
-                copyString = liberator.eval( arg);
+                copyString = liberator.eval(arg);
                 switch (typeof copyString){
                     case 'object':
                         copyString = copyString === null ? 'null' : copyString.toSource();
@@ -200,25 +294,47 @@ var exCopyManager = {
                 copyString = e.toString();
             }
         } else {
-            if (!arg) arg = liberator.globalVariables.copy_templates[0];
+            if (!arg) arg = copy_templates[0].label;
+
             var template = getCopyTemplate(arg) || {value: arg};
             if (typeof template.custom == 'function'){
-                copyString = template.custom.call(this, template.value);
+                copyString = template.custom.call(this, template.value, replaceVariable(template.value));
             } else if (template.custom instanceof Array){
                 copyString = replaceVariable(template.value).replace(template.custom[0], template.custom[1]);
             } else {
                 copyString = replaceVariable(template.value);
             }
         }
-        util.copyToClipboard(copyString);
+
+        if (copyString)
+            util.copyToClipboard(copyString);
         if (isError){
             liberator.echoerr('CopiedErrorString: `' + copyString + "'");
         } else {
-            liberator.echo('CopiedString: `' + util.escapeHTML(copyString) + "'");
+            liberator.echo('CopiedString: `' + util.escapeHTML(copyString || '') + "'");
         }
     }
 };
+
+if (liberator.globalVariables.copy_use_wedata){
+    function loadWedata(){
+        if (!liberator.plugins.libly){
+            liberator.echomsg("need a _libly.js when use wedata.");
+            return;
+        }
+
+        var libly = liberator.plugins.libly;
+        copy_templates.forEach(function(item) excludeLabelsMap[item.label] = item.value);
+        if (liberator.globalVariables.copy_wedata_exclude_labels)
+            liberator.globalVariables.copy_wedata_exclude_labels.forEach(function(item) excludeLabelsMap[item] = 1);
+        var wedata = new libly.Wedata("vimp%20copy");
+        wedata.getItems(24 * 60 * 60 * 1000, wedataRegister);
+    }
+    loadWedata();
+}
+
 return exCopyManager;
 })();
 
 // vim: set fdm=marker sw=4 ts=4 et:
+

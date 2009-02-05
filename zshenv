@@ -12,7 +12,24 @@ test -d /usr/X11   && PATH=$PATH:/usr/X11/bin &&
 test -d /opt       && PATH=/opt/local/bin:/opt/local/sbin:$PATH &&
                       MANPATH=/opt/local/share/man:/opt/local/man:$MANPATH
 test -d /Developer/SDKs/Flex2 && PATH=/Developer/SDKs/Flex2/bin:$PATH
+test -d $HOME/.cabal && PATH=$HOME/.cabal/bin:$PATH
 export PATH MANPATH
+
+# Library
+C_INCLUDE_PATH=$C_INCLUDE_PATH
+CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH
+OBJC_INCLUDE_PATH=$OBJC_INCLUDE_PATH
+LIBRARY_PATH=$LIBRARY_PATH
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+test -d /opt && C_INCLUDE_PATH=/opt/local/include:$C_INCLUDE_PATH &&
+                CPLUS_INCLUDE_PATH=/opt/local/include:$CPLUS_INCLUDE_PATH &&
+                OBJC_INCLUDE_PATH=/opt/local/include:$OBJC_INCLUDE_PATH &&
+                LIBRARY_PATH=/opt/local/lib:$LIBRARY_PATH &&
+                LD_LIBRARY_PATH=/opt/local/lib:$LD_LIBRARY_PATH
+test -d $HOME/.cabal && LIBRARY_PATH=$HOME/.cabal/lib:$LIBRARY_PATH &&
+                        LD_LIBRARY_PATH=$HOME/.cabal/lib:$LD_LIBRARY_PATH
+export C_INCLUDE_PATH CPLUS_INCLUDE_PATH OBJC_INCLUDE_PATH
+export LIBRARY_PATH LD_LIBRARY_PATH
 
 # Editor
 if test -x /opt/local/bin/vim; then
@@ -31,11 +48,5 @@ fi
 
 # Others
 BLOCKSIZE=k; export BLOCKSIZE
-
-export C_INCLUDE_PATH=/opt/local/include:$C_INCLUDE_PATH
-export CPLUS_INCLUDE_PATH=/opt/local/include:$CPLUS_INCLUDE_PATH
-export LIBRARY_PATH=/opt/local/lib:$LIBRARY_PATH
-export LD_LIBRARY_PATH=/opt/local/lib:$LD_LIBRARY_PATH
-export OBJC_INCLUDE_PATH=/opt/local/include:$OBJC_INCLUDE_PATH
-export HREF_DATADIR=/usr/local/share/ref
-export GISTY_DIR="$HOME/Desktop/gisty"
+HREF_DATADIR=/usr/local/share/ref; export HREF_DATADIR
+GISTY_DIR="$HOME/Desktop/gisty"; export GISTY_DIR
