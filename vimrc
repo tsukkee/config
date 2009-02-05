@@ -222,7 +222,8 @@ autocmd TabEnter *
 " MacPortsのPrivatePortsで入るのはjexctags
 set tags=./tags,./TAGS,tags,TAGS
 if has('mac')
-command! CtagsR !jexctags -R --tag-relative=no --fields=+iaS --extra=+q
+" command! CtagsR !jexctags -R --tag-relative=no --fields=+iaS --extra=+q
+command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
 endif
 
 if has('win32')
