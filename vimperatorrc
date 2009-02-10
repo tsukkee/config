@@ -148,6 +148,13 @@ let command_bookmarklet_prefix=""
 " appendAnchor
 let auto_append_anchor="true"
 
+" hatena-bookmark-search
+let hatena_bookmark_no_migemo="true"
+
+" ime_controller
+let ex_ime_mode="inactive"
+let textarea_ime_mode="auto"
+
 " migratestatusbar
 javascript <<EOM
 liberator.globalVariables.migrate_elements = [
