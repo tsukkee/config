@@ -4,7 +4,7 @@ var PLUGIN_INFO =
 <description>Manage Vimperator Plugins</description>
 <description lang="ja">Vimpeatorプラグインの管理</description>
 <author mail="teramako@gmail.com" homepage="http://d.hatena.ne.jp/teramako/">teramako</author>
-<version>0.5</version>
+<version>0.6.2</version>
 <minVersion>2.0pre</minVersion>
 <maxVersion>2.0pre</maxVersion>
 <updateURL>http://svn.coderepos.org/share/lang/javascript/vimperator-plugins/trunk/pluginManager.js</updateURL>
@@ -123,7 +123,7 @@ var tags = { // {{{
             return info.*;
 
         var text = fromUTF8Octets(info.*.toString());
-        var xml = WikiParser(text);
+        var xml = WikiParser.parse(text);
         return xml;
     }
 }; // }}}
@@ -197,7 +197,7 @@ Plugin.prototype = { // {{{
     getDetail: function(){
         if (this.detail)
             return this.detail;
-        else if (!this.info || !this.info.detail)
+        if (!this.info || !this.info.detail)
             return null;
 
         return this.detail = tags['detail'](this.info);
@@ -241,7 +241,7 @@ Plugin.prototype = { // {{{
             data.Information = 'up to date.';
         } else if (this.compVersion(this.info.version, serverResource.version) > 0 ||
                    localDate > serverDate){
-            data.information = '<span highlight="WarningMsg">local version is newest.</span>';
+            data.Information = '<span highlight="WarningMsg">local version is newest.</span>';
         } else {
             data.Information = this.overwritePlugin(serverResource);
             localResource = {}; // cleanup pref.
@@ -273,7 +273,7 @@ Plugin.prototype = { // {{{
                         headers[pair.shift()] = pair.join('');
                     }
                 });
-            } catch(e){}
+            } catch (e){}
             let m = /\bPLUGIN_INFO[ \t\r\n]*=[ \t\r\n]*<VimperatorPlugin(?:[ \t\r\n][^>]*)?>([\s\S]+?)<\/VimperatorPlugin[ \t\r\n]*>/(source);
             if (m){
                 m = m[1].replace(/(?:<!(?:\[CDATA\[(?:[^\]]|\](?!\]>))*\]\]|--(?:[^-]|-(?!-))*--)>)+/g, '');
@@ -330,23 +330,37 @@ Plugin.prototype = { // {{{
 // WikiParser
 // -----------------------------------------------------{{{
 var WikiParser = (function () {
-
-  function cloneArray (ary)
-    Array.concat(ary);
-
-  function State (lines, result) {
+  function State (lines, result, indents) {
     if (!(this instanceof arguments.callee))
-        return new arguments.callee(lines, result);
+        return new arguments.callee(lines, result, indents);
 
     this.lines = lines;
     this.result = result || <></>;
+    this.indents = indents || [];
   }
   State.prototype = {
-    get end () !this.lines.length,
+    get end () !(this.lines.length && let (i = this.indents[this.indents.length - 1])
+                                             /^\s*$/.test(this.head) || !i || i.test(this.head)),
+    get realEnd () !this.lines.length,
     get head () this.lines[0],
     set head (value) this.lines[0] = value,
-    get clone () State(cloneArray(this.lines), this.result),
-    get next () State(this.lines.slice(1), this.result),
+    get clone () State(cloneArray(this.lines), this.result, cloneArray(this.indents)),
+    get next () {
+      let result = this.clone;
+      result.lines = this.lines.slice(1);
+      return result;
+    },
+    indent: function (indent, more) {
+      let result = this.clone;
+      let re = RegExp('^' + indent.replace(/\S/g, ' ') + (more ? '\\s+' : '') + '(.*)$');
+      result.indents.push(re);
+      return result;
+    },
+    indentBack: function () {
+      let result = this.clone;
+      result.indents.pop();
+      return result;
+    },
     wrap: function (name) {
       let result = this.clone;
       result.result = <{name}>{this.result}</{name}>;
@@ -363,13 +377,15 @@ var WikiParser = (function () {
     if (!(this instanceof arguments.callee))
         return new arguments.callee(name, state);
 
-    this.__ok = false;
     this.name = name;
-    this.state = state; //TODO clone
+    this.state = state;
   }
 
   function ok (v)
     v instanceof State;
+
+  function cloneArray (ary)
+    Array.concat(ary);
 
   function xmlJoin (xs, init) {
     let result = init || <></>;
@@ -380,6 +396,25 @@ var WikiParser = (function () {
 
   function strip (s)
     s.replace(/^\s+|\s+$/g, '');
+
+  function trimAll (lines) {
+    let min = null;
+    lines.forEach(function (line) {
+      let s = line.match(/^\s*/).toString();
+      if (min) {
+        if (min.indexOf(s) == 0)
+          min = s;
+      } else {
+        min = s;
+      }
+    });
+    if (min) {
+      let spre = RegExp('^' + min);
+      liberator.log(min.length)
+      return lines.map(function (line) line.replace(spre, ''));
+    }
+    return lines;
+  }
 
   // FIXME
   function link (s) {
@@ -397,245 +432,247 @@ var WikiParser = (function () {
   function stripAndLink (s)
     link(strip(s));
 
+  function isEmptyLine (s)
+    /^\s*$/.test(s);
+
 
   ////////////////////////////////////////////////////////////////////////////////
 
-  // [Parser] -> OKError Parser
-  function or () {
-    let as = [];
-    for (let i = 0, l = arguments.length; i < l; i++)
-      as.push(arguments[i]);
-    return function (st) {
-      let a;
-      for each (let a in as) {
-        let r = a(st);
-        if (ok(r))
-          return r;
-      }
-      return Error('or-end', st);
-    };
-  }
+  let C = {
+    // [Parser a] -> Parser b
+    or: function or () {
+      let as = [];
+      for (let i = 0, l = arguments.length; i < l; i++)
+        as.push(arguments[i]);
+      return function (st) {
+        for each (let a in as) {
+          let r = a(st);
+          if (ok(r))
+            return r;
+        }
+        return Error('or-end', st);
+      };
+    },
 
-  function map (p) {
-    return function (st) {
-      let result = [];
-      let cnt = 0;
-      while (!st.end) {
-        st = p(st);
+    // Parser a -> Parser a
+    many: function many (p) {
+      return function (st) {
+        let result = [];
+        let cnt = 0;
+        while (!st.end) {
+          let r = p(st);
+          if (ok(r))
+            result.push(r.result);
+          else
+            break;
+          st = r;
+          if (cnt++ > 100) { liberator.log('force break: many-while'); break; }
+        }
         if (ok(st))
-          result.push(st.result);
-        else
-          break;
-        if (cnt++ > 100) {
-          liberator.log('100 break: map')
-          break;
-        }
+          return st.set(result);
+        return Error('many', st);
       }
-      return st.set(result);
+    },
+
+    // Parser a -> Parser a
+    many1: function many1 (p) {
+      return function (st) {
+        let result = [];
+        let cnt = 0;
+        while (!st.end) {
+          let r = p(st);
+          if (ok(r))
+            result.push(r.result);
+          else
+            break;
+          st = r;
+          if (cnt++ > 100) { liberator.log('force break: many1-while'); break; }
+        }
+        if (result.length) {
+          return st.set(result);
+        }
+        return Error('many1', st);
+      };
+    },
+
+    // Parser a -> Parser a
+    indent: function indent (p) {
+      return function (st) {
+        if (st.end)
+          return Error('EOL', 'st');
+        return p(st);
+      };
     }
-  }
-
-  function whileMap (p) {
-    return function (st) {
-      let result = [];
-      let next;
-      let cnt = 0;
-      while (!st.end) {
-        next = p(st);
-        if (ok(next))
-          result.push(next.result);
-        else
-          break;
-        st = next;
-        if (cnt++ > 100) {
-          liberator.log('100 break: whileMap')
-          break;
-        }
-      }
-      if (result.length)
-        return st.set(result);
-      else
-        return Error('whileMap', st);
-    }
-  }
-
-  function lv_map (lv, more, p) {
-    let re = RegExp('^' + lv.replace(/[^\s]/g, ' ') + (more ? '\\s+' : '') + '(.*)$');
-    return function (st) {
-      let result = [];
-      let cnt = 0;
-      while (!st.end) {
-        if (!re.test(st.head))
-          break;
-        st = p(st);
-        if (!ok(st))
-          return st;
-        result.push(st.result);
-        if (cnt++ > 100) {
-          liberator.log('100 break')
-          break;
-        }
-      }
-      return st.set(result);
-    };
-  }
-
+  };
 
   ////////////////////////////////////////////////////////////////////////////////
 
-  function wiki (st) {
-    let r = wikiLines(st);
-    if (ok(r)) {
-      let xs = r.result;
-      return r.set(xmlJoin(xs)).wrap('div');
-    } else {
-      return Error('wiki', st);
-    }
-  }
-
-  // St -> St XML
-  function plain (st) {
-    let text = st.head;
-    return st.next.set(<>{stripAndLink(text)}<br /></>);
-  }
-
-  // St -> St XML
-  function hn (n) {
-    let re = RegExp('^\\s*=={' + n + '}\\s+(.*)\\s*=={' + n + '}\\s*$');
-    return function (st) {
-      let m = st.head.match(re);
-      if (m) {
-        let hn = 'h' + n;
-        return st.next.set(<{hn} style={'font-size:'+(0.75+1/n)+'em'}>{stripAndLink(m[1])}</{hn}>)
-      } else {
+  let P = (function () {
+    // Int -> Parser XML
+    function hn (n) {
+      let re = RegExp('^\\s*=={' + n + '}\\s+(.*)\\s*=={' + n + '}\\s*$');
+      return function (st) {
+        let m = st.head.match(re);
+        if (m) {
+          let hn = 'h' + n;
+          return st.next.set(<{hn} style={'font-size:'+(0.75+1/n)+'em'}>{stripAndLink(m[1])}</{hn}>)
+        }
         return Error('not head1', st);
-      }
+      };
+    }
+
+    // String -> Parser XML
+    function list (name) {
+      return function (st) {
+        let lis = C.many1(self[name + 'i'])(st);
+        if (ok(lis)) {
+          return lis.set(xmlJoin(lis.result)).wrap(name);
+        }
+        return Error(name, st);
+      };
+    }
+
+    // String -> Parser XML
+    function listItem (c) {
+      let re = RegExp('^(\\s*\\' + c + ' )(.*)$');
+      return function li (st) {
+        let m = st.head.match(re);
+        if (m) {
+          let h = m[2];
+          let next = C.many(self.wikiLine)(st.next.indent(m[1]));
+          return next.indentBack().set(xmlJoin([<>{h}<br/></>].concat(next.result))).wrap('li');
+        }
+        return Error(c, st);
+      };
+    }
+
+    let self = {
+      // St -> St
+      debug: function debug (st) {
+        //liberator.log({ head: st.head, indent: st.indents[st.indents.length - 1] });
+        return Error('debug', st);
+      },
+
+      emptyLine: function emptyLine (st) {
+        if (/^\s*$/.test(st.head)) {
+          return st.next.set(<></>);
+        }
+        return Error('spaces', st);
+      },
+
+      // St -> St XML
+      plain: function plain (st) {
+        let text = st.head;
+        return st.next.set(<>{stripAndLink(text)}<br/></>);
+      },
+
+      // St -> St XML
+      h1: hn(1),
+      h2: hn(2),
+      h3: hn(3),
+      h4: hn(4),
+
+      // St -> St XML
+      pre: function pre (st) {
+        let m = st.head.match(/^(\s*)>\|\|\s*$/);
+        if (m) {
+          let result = [];
+          let cnt = 0;
+          while (!st.realEnd) {
+            st = st.next;
+            if (/^(\s*)\|\|<\s*$/.test(st.head)){
+              st = st.next;
+              break;
+            }
+            result.push(st.head);
+            if (cnt++ > 100) { liberator.log('force break: pre-while'); break; }
+          }
+          return st.set(<pre>{trimAll(result).join('\n')}</pre>);
+        }
+        return Error('pre', st);
+      },
+
+      // St -> St XML
+      ul: list('ul'),
+
+      // St -> St XML
+      uli: listItem('-'),
+
+      // St -> St XML
+      ol: list('ol'),
+
+      // St -> St XML
+      oli: listItem('+'),
+
+      // St -> St XML
+      dl: function dl (st) {
+        let r = C.many1(self.dtdd)(st);
+        if (ok(r)) {
+          let body = xmlJoin(r.result);
+          return r.set(body).wrap('dl');
+        }
+        return Error('dl', st);
+      },
+
+      // St -> St XML
+      dtdd: function dtdd (st) {
+        let r = self.dt(st);
+        if (ok(r)) {
+          let [indent, dt] = r.result;
+          let dd = C.many(self.wikiLine)(r.indent(indent, true));
+          return dd.indentBack().set(dt + <dd>{xmlJoin(dd.result)}</dd>);
+        }
+        return r;
+      },
+
+      // St -> St (lv, XML)
+      dt: function dt (st) {
+        let m = st.head.match(/^(\s*)(.+):\s*$/);
+        if (m) {
+          return st.next.set([m[1], <dt style="font-weight:bold;">{m[2]}</dt>]);
+        }
+        return Error('not dt', st);
+      },
     };
-  }
 
-  let h1 = hn(1);
-  let h2 = hn(2);
-  let h3 = hn(3);
-  let h4 = hn(4);
+    // St -> St XML
+    with (self) {
+      self.wikiLine = C.or(debug, emptyLine, h1, h2, h3, h4, dl, ol, ul, pre, plain);
 
-  // St -> St XML
-  function dl (st) {
-    let r = whileMap(dtdd)(st);
-    if (ok(r)) {
-      let body = xmlJoin(r.result);
-      return r.set(body).wrap('dl');
-    } else {
-      return Error('dl', st);
-    }
-  }
+      // St -> St [XML]
+      self.wikiLines = C.many(wikiLine);
 
-  // St -> St XML
-  function dtdd (st) {
-    let r = dt(st);
-    if (ok(r)) {
-      let [lv, _dt] = r.result;
-      let _dd = lv_dd(lv, wikiLine)(r);
-      return _dd.set(_dt + <dd>{xmlJoin(_dd.result)}</dd>);
-    } else {
-      return r;
-    }
-  }
-
-  // St -> St (lv, XML)
-  function dt (st) {
-    let m = st.head.match(/^(\s*)(.+):\s*$/);
-    if (m) {
-      return st.next.set([m[1], <dt style="font-weight:bold;">{m[2]}</dt>]);
-    } else {
-      return Error('not dt', st);
-    }
-  }
-
-  // lv -> (St -> St [XML])
-  function lv_dd (lv) {
-    return lv_map(lv, true, wikiLine);
-  }
-
-  // St -> St XML
-  function ul (st) {
-    let lis = whileMap(li)(st);
-    if (ok(lis)) {
-      return lis.set(xmlJoin(lis.result)).wrap('ul');
-    } else {
-      return Error('ul', st);
-    }
-  }
-
-  // St -> St XML
-  function li (st) {
-    let m = st.head.match(/^(\s*- )(.*)$/);
-    if (m) {
-      st.head = st.head.replace(/- /, '  ');
-      let r = lv_map(m[1], false, wikiLine)(st);
-      return r.set(xmlJoin(r.result)).wrap('li');
-    } else {
-      return Error('li', st);
-    }
-  }
-
-  // St -> St XML
-  function ol (st) {
-    let lis = whileMap(oli)(st);
-    if (ok(lis)) {
-      return lis.set(xmlJoin(lis.result)).wrap('ol');
-    } else {
-      return Error('ol', st);
-    }
-  }
-
-  // St -> St XML
-  function oli (st) {
-    let m = st.head.match(/^(\s*\+ )(.*)$/);
-    if (m) {
-      st.head = st.head.replace(/\+ /, '  ');
-      let r = lv_map(m[1], false, wikiLine)(st);
-      return r.set(xmlJoin(r.result)).wrap('li');
-    } else {
-      return Error('li', st);
-    }
-  }
-
-  // St -> St XML
-  function pre (st) {
-    let m = st.head.match(/^(\s*)>\|\|\s*$/);
-    if (m) {
-      let result = '';
-      let cnt = 0;
-      while (!st.end) {
-        st = st.next;
-        if (/^(\s*)\|\|<\s*$/.test(st.head)){
-          st = st.next;
-          break;
+      self.wiki = function (st) {
+        let r = wikiLines(st);
+        if (ok(r)) {
+          let xs = r.result;
+          return r.set(xmlJoin(xs)).wrap('div');
         }
-        result += st.head.replace(m[1], '') + '\n';
-        if (cnt++ > 100) {
-          liberator.log('br')
-          break;
-        }
+        return Error('wiki', st);
       }
-      return st.set(<pre>{result}</pre>);
-    } else {
-      return Error('pre', st);
     }
-  }
 
-  // St -> St XML
-  let wikiLine = or(h1, h2, h3, h4, dl, ul, ol, pre, plain);
+    for (let [name, p] in Iterator(self)) {
+      self[name] = C.indent(p);
+    }
 
-  // St -> St [XML]
-  let wikiLines = map(wikiLine);
+    return self;
+  })();
 
-  return liberator.plugins.PMWikiParser = function (src) {
-    let r = wiki(State(src.split(/\n/)));
-    if (ok(r))
-      return r.result;
-    else
-      liberator.echoerr(r.name);
+
+  return liberator.plugins.PMWikiParser = {
+    parsers: P,
+    combs: C,
+    classes: {
+      State: State,
+    },
+    parse: function (src) {
+      let r = P.wiki(State(src.split(/\r\n|[\r\n]/)));
+      if (ok(r))
+        return r.result;
+      else
+        liberator.echoerr(r.name);
+    }
   };
 
 })();
@@ -731,6 +768,35 @@ HTMLStack.prototype = { // {{{
 // }}}
 
 // --------------------------------------------------------
+// CODEREPOS_PLUGINS
+// -----------------------------------------------------{{{
+var CODEREPOS = (function(){
+    const indexURL = 'http://vimperator.kurinton.net/plugins/info.xml';
+    var public = {
+        plugins: [],
+        init: function(){
+            this.plugins = [];
+            util.httpGet(indexURL, function(xhr){
+                let xml = new XMLList(xhr.responseText);
+                let plugins = xml.plugin;
+                for (let i=0, length = plugins.length(); i < length; i++){
+                    public.plugins.push(new CodeReposPlugin(plugins[i]));
+                }
+            });
+        }
+    };
+    function CodeReposPlugin(xml){
+        this.name = tags.name(xml);
+        this.URL = tags.updateURL(xml);
+        this.description = tags.description(xml);
+        this.version = tags.version(xml);
+    }
+    public.init();
+    return public;
+})();
+// }}}
+
+// --------------------------------------------------------
 // Vimperator Command
 // -----------------------------------------------------{{{
 commands.addUserCommand(['plugin[help]'], 'list Vimperator plugins',
@@ -764,6 +830,75 @@ commands.addUserCommand(['plugin[help]'], 'list Vimperator plugins',
                 (plugin.items.description || '-')
             ]).filter(function(row)
                 row[0].toLowerCase().indexOf(context.filter.toLowerCase()) >= 0);
+        }
+    }, true);
+
+commands.addUserCommand(['pluginmanager', 'pm'], 'Manage Vimperator plugins',
+    function(args){
+        if (args.length < 1)
+            liberator.echoerr('Not enough arguments. Sub-command required.');
+
+        var xml;
+        var sub = args[0];
+        var subArgs = args.slice(1);
+
+        function s2b (s, d) (!/^(\d+|false)$/i.test(s)|parseInt(s)|!!d*2)&1<<!s;
+
+        if (sub == 'source') {
+            if (subArgs.length < 1)
+                return liberator.echoerr('Argument(plugin name) required');
+            return liberator.plugins.pluginManager.source(subArgs);
+        } else if (sub == 'install') {
+            if (s2b(liberator.globalVariables.plugin_manager_installer, false))
+                return liberator.plugins.pluginManager.install(subArgs);
+            return liberator.echoerr('This function(sub-command) is invalid now.');
+        } else {
+            if (sub == 'check') {
+                xml = liberator.plugins.pluginManager.checkVersion(subArgs);
+            } else if (sub == 'update') {
+                xml = liberator.plugins.pluginManager.update(subArgs);
+            } else if (sub == 'help' ) {
+                xml = liberator.plugins.pluginManager.list(subArgs, true);
+            } else if (sub == 'list') {
+                xml = liberator.plugins.pluginManager.list(subArgs, false);
+            }
+            return liberator.echo(xml, true);
+        }
+
+        liberator.echoerr('Unknown sub-command: ' + sub)
+    }, {
+        argCount: '*',
+        completer: function(context, args){
+            context.ignoreCase = true;
+            if (args.length <= 1) { // for sub-command
+                context.title = ['Sub-command', 'Description'];
+                context.completions = [
+                    ['check', 'Check the versions of plugins'],
+                    ['help', 'Show plugin help'],
+                    ['install', 'Install the plugin of (current page or specified URL).'],
+                    ['list', 'List plugin information'],
+                    ['update', 'Update plugins'],
+                    ['source', 'Show the source code'],
+                ];
+            } else { // for sub-arguments
+                if (/^(update|check|help|list|source)$/.test(args[0])) {
+                    context.title = ['PluginName', '[Version]Description'];
+                    context.completions = getPlugins().map(function(plugin) [
+                        plugin.name,
+                        '[' + (plugin.items.version || 'unknown') + ']' +
+                        (plugin.items.description || '-')
+                    ]).filter(function(row)
+                        row[0].toLowerCase().indexOf(context.filter.toLowerCase()) >= 0);
+                } else if (args[0] == "install"){
+                    context.anchored = false;
+                    context.title = ["PluginName", "Name: Description"];
+                    context.completions = CODEREPOS.plugins.filter(function($_){
+                        return !getPlugins().some(function(installed){
+                            return installed.items.updateURL ? installed.items.updateURL == $_.URL : false;
+                        });
+                    }).map(function(plugin) [plugin.URL, plugin.name + ": " + plugin.description]);
+                }
+            }
         }
     }, true); // }}}
 
@@ -805,6 +940,78 @@ var public = {
             xml += plugin.itemFormatter(verbose);
         });
         return xml;
+    },
+    install: function(urls){
+        function makeURL(s){
+            let url = Cc["@mozilla.org/network/standard-url;1"].createInstance(Ci.nsIURL);
+            url.spec = s;
+            return url;
+        }
+
+        function fixURL(url){
+            const cr = RegExp('^http://coderepos\\.org/share/browser/lang/javascript/vimperator-plugins/trunk/[^/]+\\.js$');
+            const pi = RegExp('^http://vimperator\\.kurinton\\.net/plugins/');
+            const npi = /\/(all|index)\.html/;
+            const js = /\.js$/i;
+            function xe(xpath){
+                let ss = buffer.evaluateXPath(xpath);
+                return (ss.snapshotLength > 0) && ss.snapshotItem(0).href;
+            }
+            if (cr.test(url)) {
+                return url.replace(/(?=coderepos\.org\/)/, 'svn.').replace(/browser\//, '');
+            }
+            if (pi.test(url) && !npi.test(url)) {
+                return xe('//a[@id="file-link"]');
+            }
+            if (js.test(url)) {
+                return url;
+            }
+            throw 'Current URL is not a pluginFile';
+        }
+
+        function download(url){
+            let wbp = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Ci.nsIWebBrowserPersist);
+
+            let progressListener = {
+                onStateChange: function (_webProgress, _request, _stateFlags, _status) {
+                    if (_stateFlags & Ci.nsIWebProgressListener.STATE_STOP) {
+                        if (file.exists()) {
+                            io.source(file.path);
+                            liberator.echo('Executed: ' + file.path)
+                        } else {
+                            return liberator.echoerr('Download error!');
+                        }
+                    }
+                },
+                onProgressChange: function () undefined,
+                onLocationChange: function () undefined,
+                onStatusChange: function () undefined,
+                onSecurityChange: function () undefined,
+            };
+
+            let filename = url.match(/[^\/]+$/).toString();
+            let file = io.getRuntimeDirectories('plugin')[0];
+            file.append(filename);
+
+            if (file.exists())
+                return liberator.echoerr('Already exists: ' + file.path);
+
+            let fileuri = makeFileURI(file);
+
+            wbp.progressListener = progressListener;
+            wbp.persistFlags |= wbp.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION;
+            wbp.saveURI(makeURL(url), null, null, null, null, fileuri);
+        }
+
+        var url = urls.length ? urls[0] : buffer.URL;
+        var sourceURL = fixURL(url);
+        if (sourceURL == url) {
+            liberator.log(url);
+            download(url);
+        } else {
+            liberator.open(sourceURL);
+            liberator.echoerr('Please check the source code of plugin, and retry ":pluginmanager install"');
+        }
     }
 };
 return public;
