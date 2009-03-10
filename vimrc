@@ -1,6 +1,6 @@
 " ==================== Basic settins ==================== "
 " General
-set nocompatible     "
+set nocompatible     " 
 set shellslash       " to use '/' for path delimiter in Windows
 set timeoutlen=500   " timeout
 colorscheme xoria256 " colorscheme
@@ -78,10 +78,11 @@ set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%m%v,%l
 " File encoding
 if has('mac')
     set encoding=utf-8
+    set fileencodings=euc-jp,cp932
 elseif has('win32')
     set encoding=japan
+    set fileencodings=utf-8,euc-jp,cp932
 endif
-set fileencodings=euc-jp,cp932
 
 " File Formats
 set ffs=unix,dos,mac
@@ -104,7 +105,7 @@ filetype plugin on " to use filetype plugin
 augroup Dictionary
     autocmd! Dictionary
     " autocmd FileType javascript setlocal dictionary+=~/.vim/dict/javascript.dict
-    autocmd FileType php setlocal dictionary+=~/.vim/dict/php.dict
+    " autocmd FileType php setlocal dictionary+=~/.vim/dict/php.dict
 augroup END
 
 " Omni completion
@@ -195,7 +196,10 @@ augroup Binary
     autocmd BufWritePost *.bin,*.swf set nomod | endif
 augroup END
 
+" TabpageCD
+
 " cabbrev cd TabpageCD
+
 command! -complete=customlist,s:complete_cdpath -nargs=? TabpageCD
 \   execute 'cd' fnameescape(<q-args>)
 \ | let t:cwd = getcwd()
@@ -203,7 +207,7 @@ command! -complete=customlist,s:complete_cdpath -nargs=? TabpageCD
 command! CD silent exe "TabpageCD " . expand('%:p:h')
 
 function! s:complete_cdpath(arglead, cmdline, cursorpos)
-return split(globpath(&cdpath,
+    return split(globpath(&cdpath,
             \ join(split(a:cmdline, '\s', 1)[1:], ' ') . '*/'),
             \ "\n")
 endfunction
@@ -216,24 +220,28 @@ autocmd TabEnter *
 
 
 " ==================== プラグインの設定 ==================== "
-" 基本的に<Space>に割り当てとけばかぶらない？
+nnoremap [Prefix] <Nop>
+nmap <Cr> [Prefix]
 
 " ctags
-" MacPortsのPrivatePortsで入るのはjexctags
-set tags=./tags,./TAGS,tags,TAGS
 if has('mac')
-" command! CtagsR !jexctags -R --tag-relative=no --fields=+iaS --extra=+q
-command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
+    command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
 endif
-
 if has('win32')
-command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
+    command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
 endif
 
 " Ruby
 augroup Ruby
-autocmd! Ruby
-autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
+    autocmd! Ruby
+    autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
+augroup END
+
+" git
+let git_diff_spawn_mode = 1
+augroup git
+    autocmd! git
+    autocmd BufNewFile,BufRead COMMIT_EDITMSG setlocal filetype=git
 augroup END
 
 " CakePHP
@@ -250,17 +258,8 @@ map gE <Plug>(smartword-ge)
 let NERDSpaceDelims = 1
 let NERDShutUp = 1
 
-" NERD_tree
-nnoremap <silent> <Space>t :NERDTreeToggle<CR>
-
-" FuzzyFinder
-nnoremap <silent> <Space>fb :FuzzyFinderBuffer<CR>
-nnoremap <silent> <Space>ff :FuzzyFinderFile<CR>
-nnoremap <silent> <Space>fm :FuzzyFinderMruFile<CR>
-nnoremap <silent> <Space>fc :FuzzyFinderMruCmd<CR>
-nnoremap <silent> <C-]> :FuzzyFinderTag! <C-r>=expand('<cword>')<CR><CR>
-
-" AutoComplPop
+" AutoComplPop {{{
+let g:AutoComplPop_NotEnableAtStartup = 1
 let g:AutoComplPop_IgnoreCaseOption = 0
 let g:AutoComplPop_CompleteoptPreview = 1
 let g:AutoComplPop_Behavior = {
@@ -285,6 +284,12 @@ let g:AutoComplPop_Behavior = {
     \       },
     \   ],
     \   }
+"}}}
+
+" neocomplcache
+let g:NeoComplCache_EnableAtStartup = 1
+let g:NeoComplCache_SmartCase = 1
+let g:NeoComplCache_EnableMFU = 1
 
 " Reload Firefox {{{
 " Need MozRepl and +ruby
@@ -321,18 +326,6 @@ EOF
 endfunction
 nnoremap <silent> <Space>rs :<C-u>call ReloadSafari()<CR>
 " }}}
-
-" visual studio
-" if has('win32')
-    " let g:visual_studio_python_exe = "C:/Python25/python.exe"
-" endif
-
-" git
-let git_diff_spawn_mode = 1
-augroup git
-    autocmd! git
-    autocmd BufNewFile,BufRead COMMIT_EDITMSG setlocal filetype=git
-augroup END
 
 " TeXShop {{{
 " Need RubyOSA and +ruby
@@ -380,27 +373,22 @@ call arpeggio#load()
 
 " NERD_tree
 Arpeggionnoremap <silent> tn :NERDTreeToggle<CR>
-nnoremap <silent> <C-m><C-t> :NERDTreeToggle<CR>
-nnoremap <silent> <C-m>t :NERDTreeToggle<CR>
+nnoremap <silent> [Prefix]t :NERDTreeToggle<CR>
 
 " FuzzyFinder
 Arpeggionnoremap <silent> fn :FuzzyFinderBuffer<CR>
 Arpeggionnoremap <silent> fm :FuzzyFinderMruFile<CR>
-nnoremap <silent> <C-m><C-b> :FuzzyFinderBuffer<CR>
-nnoremap <silent> <C-m>b :FuzzyFinderBuffer<CR>
-nnoremap <silent> <C-m><C-m> :FuzzyFinderMruFile<CR>
-nnoremap <silent> <C-m>m :FuzzyFinderMruFile<CR>
+nnoremap <silent> [Prefix]b :FuzzyFinderBuffer<CR>
+nnoremap <silent> [Prefix]m :FuzzyFinderMruFile<CR>
 
 " Reload brawser
 if has('ruby')
     Arpeggionnoremap <silent> ru :<C-u>call ReloadFirefox()<CR>
-    nnoremap <silent> <C-m><C-f> :<C-u>call ReloadFirefox()<CR>
-    nnoremap <silent> <C-m>f :<C-u>call ReloadFirefox()<CR>
+    nnoremap <silent> [Prefix]f :<C-u>call ReloadFirefox()<CR>
 endif
 if has('mac')
     Arpeggionnoremap <silent> ri :<C-u>call ReloadSafari()<CR>
-    nnoremap <silent> <C-m><C-s> :<C-u>call ReloadSafari()<CR>
-    nnoremap <silent> <C-m>s :<C-u>call ReloadSafari()<CR>
+    nnoremap <silent> [Prefix]s :<C-u>call ReloadSafari()<CR>
 endif
 
 " Load private information
