@@ -260,6 +260,7 @@ nnoremap <silent> <Space>fm :FuzzyFinderMruFile<CR>
 nnoremap <silent> <Space>fc :FuzzyFinderMruCmd<CR>
 nnoremap <silent> <C-]> :FuzzyFinderTag! <C-r>=expand('<cword>')<CR><CR>
 
+" AutoComplPop
 let g:AutoComplPop_IgnoreCaseOption = 0
 let g:AutoComplPop_CompleteoptPreview = 1
 let g:AutoComplPop_Behavior = {
