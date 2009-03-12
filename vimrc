@@ -221,7 +221,7 @@ autocmd TabEnter *
 
 " ==================== プラグインの設定 ==================== "
 nnoremap [Prefix] <Nop>
-nmap <Cr> [Prefix]
+nmap <Space> [Prefix]
 
 " ctags
 if has('mac')
