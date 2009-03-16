@@ -29,7 +29,7 @@ set hlsearch   " highlight searched words
 set nobackup   " don't backup
 set autoread   " auto reload when file rewrite other application
 set noswapfile " don't use swap file
-set hidden     " allow open other file without saving current file
+" set hidden     " allow open other file without saving current file
 
 " Help files
 if has('mac')
@@ -197,13 +197,11 @@ augroup Binary
 augroup END
 
 " TabpageCD
-
-" cabbrev cd TabpageCD
-
 command! -complete=customlist,s:complete_cdpath -nargs=? TabpageCD
 \   execute 'cd' fnameescape(<q-args>)
 \ | let t:cwd = getcwd()
 
+cabbrev cd TabpageCD
 command! CD silent exe "TabpageCD " . expand('%:p:h')
 
 function! s:complete_cdpath(arglead, cmdline, cursorpos)
@@ -212,11 +210,14 @@ function! s:complete_cdpath(arglead, cmdline, cursorpos)
             \ "\n")
 endfunction
 
-autocmd TabEnter *
-\   if !exists('t:cwd')
-\ |   let t:cwd = getcwd()
-\ | endif
-\ | execute 'cd' fnameescape(t:cwd)
+augroup TabpageCD
+    autocmd! TabpageCD
+    autocmd TabEnter *
+    \   if !exists('t:cwd')
+    \ |   let t:cwd = getcwd()
+    \ | endif
+    \ | execute 'cd' fnameescape(t:cwd)
+augroup END
 
 
 " ==================== プラグインの設定 ==================== "
@@ -374,6 +375,16 @@ call arpeggio#load()
 " NERD_tree
 Arpeggionnoremap <silent> tn :NERDTreeToggle<CR>
 nnoremap <silent> [Prefix]t :NERDTreeToggle<CR>
+
+augroup NERDTreeCustomCommand
+    autocmd! NERDTreeCustomCommand
+
+    autocmd FileType nerdtree command! -buffer NERDTreeTabpageCd
+                \ let b:currentDir = NERDTreeGetCurrentPath().getDir().strForCd()
+                \ | echo 'TabpageCD to ' . b:currentDir
+                \ | execute 'TabpageCD ' . b:currentDir
+    autocmd FileType nerdtree nnoremap <buffer> ct :NERDTreeTabpageCd<CR>
+augroup END
 
 " FuzzyFinder
 Arpeggionnoremap <silent> fn :FuzzyFinderBuffer<CR>
