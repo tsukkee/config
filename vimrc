@@ -29,7 +29,7 @@ set hlsearch   " highlight searched words
 set nobackup   " don't backup
 set autoread   " auto reload when file rewrite other application
 set noswapfile " don't use swap file
-" set hidden     " allow open other file without saving current file
+set hidden     " allow open other file without saving current file
 
 " Help files
 if has('mac')
