@@ -1,16 +1,11 @@
-" ==================== Basic settins ==================== "
-" General
-set nocompatible     " 
-set shellslash       " to use '/' for path delimiter in Windows
-set timeoutlen=500   " timeout
-colorscheme xoria256 " colorscheme
-
+" ==================== Basic settings ==================== "
 " Tab character
-set tabstop=4 shiftwidth=4 softtabstop=0
+set tabstop=4 shiftwidth=4 softtabstop=0 " set tab width
 set expandtab   " use space instead of tab
-set smartindent " smart indent
+set smartindent " use smart indent
 
 " Input support
+set timeoutlen=500             " timeout for key mappings
 set backspace=indent,eol,start " to delete everything with backspace key
 set formatoptions+=m           " add multibyte support
 
@@ -20,18 +15,18 @@ set wildmode=list:longest,full " first 'list:lingest' and second 'full'
 
 " Searching
 set wrapscan   " search wrap around the end of the file
-set ignorecase " ignore case
+set ignorecase " ignore case search
 set smartcase  " override 'ignorecase' if the search pattern contains upper case
 set incsearch  " incremental search
 set hlsearch   " highlight searched words
 
 " Reading and writing file
 set nobackup   " don't backup
-set autoread   " auto reload when file rewrite other application
 set noswapfile " don't use swap file
+set autoread   " auto reload when file rewrite other application
 set hidden     " allow open other file without saving current file
 
-" Help files
+" generate help tags
 if has('mac')
     helptags ~/.vim/doc/
 elseif has('win32')
@@ -39,20 +34,21 @@ elseif has('win32')
 endif
 
 " Display
-set showmatch         " 括弧の対応をハイライト
-set showcmd           " 入力中のコマンドを表示
-set number            " 行番号表示
-set wrap              " 画面幅で折り返す
-set list              " 不可視文字表示
-set listchars=tab:>\  " 不可視文字の表示方法
-set notitle           " タイトル書き換えない
-set scrolloff=5       " 行送り
-set nolinebreak       " 改行しない
-set textwidth=0       " 改行しない
+set showmatch         " highlight correspods character
+set showcmd           " show input command
+set number            " show row number
+set wrap              " wrap each lines
+set list              " show unprintable characters
+set listchars=tab:>\  " strings to user in 'list'
+set notitle           " don't rewrite title string
+set scrolloff=5       " minimal number of screen lines to keep above and below the cursor.
+set nolinebreak       " don't auto line break
+set textwidth=0       " don't auto line break
 
-" カレントウィンドウのみラインを引く
-augroup cch
-    autocmd! cch
+" display cursorline only in active window
+" reference: http://nanabit.net/blog/2007/11/03/vim-cursorline/
+augroup CursorLine
+    autocmd! CursorLine
     " autocmd WinLeave * set nocursorcolumn nocursorline
     " autocmd WinEnter,BufRead * set cursorcolumn cursorline
     autocmd WinLeave * set nocursorline
@@ -60,6 +56,7 @@ augroup cch
 augroup END
 
 " Folding
+" reference: http://d.hatena.ne.jp/ns9tks/20080318/1205851539
 set foldmethod=marker
 " 行頭でhを押すと折りたたみを閉じる
 nnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zc' : 'h'
@@ -72,17 +69,62 @@ vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 
 " Status line
 set laststatus=2
-" set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%4v(ASCII=%03.3b,HEX=%02.2B)\ %l/%L(%P)%m
 set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%m%v,%l/%L(%P:%n)
 
-" File encoding
-if has('mac')
-    set encoding=utf-8
-    set fileencodings=euc-jp,cp932
-elseif has('win32')
-    set encoding=japan
-    set fileencodings=utf-8,euc-jp,cp932
+" autodetect charset
+" reference: http://www.kawaz.jp/pukiwiki/?vim#cb691f26
+if &encoding !=# 'utf-8'
+  set encoding=japan
+  set fileencoding=japan
 endif
+if has('iconv')
+  let s:enc_euc = 'euc-jp'
+  let s:enc_jis = 'iso-2022-jp'
+  " iconvがeucJP-msに対応しているかをチェック
+  if iconv("\x87\x64\x87\x6a", 'cp932', 'eucjp-ms') ==# "\xad\xc5\xad\xcb"
+    let s:enc_euc = 'eucjp-ms'
+    let s:enc_jis = 'iso-2022-jp-3'
+  " iconvがJISX0213に対応しているかをチェック
+  elseif iconv("\x87\x64\x87\x6a", 'cp932', 'euc-jisx0213') ==# "\xad\xc5\xad\xcb"
+    let s:enc_euc = 'euc-jisx0213'
+    let s:enc_jis = 'iso-2022-jp-3'
+  endif
+  " fileencodingsを構築
+  if &encoding ==# 'utf-8'
+    let s:fileencodings_default = &fileencodings
+    let &fileencodings = s:enc_jis .','. s:enc_euc .',cp932'
+    let &fileencodings = &fileencodings .','. s:fileencodings_default
+    unlet s:fileencodings_default
+  else
+    let &fileencodings = &fileencodings .','. s:enc_jis
+    set fileencodings+=utf-8,ucs-2le,ucs-2
+    if &encoding =~# '^\(euc-jp\|euc-jisx0213\|eucjp-ms\)$'
+      set fileencodings+=cp932
+      set fileencodings-=euc-jp
+      set fileencodings-=euc-jisx0213
+      set fileencodings-=eucjp-ms
+      let &encoding = s:enc_euc
+      let &fileencoding = s:enc_euc
+    else
+      let &fileencodings = &fileencodings .','. s:enc_euc
+    endif
+  endif
+  " 定数を処分
+  unlet s:enc_euc
+  unlet s:enc_jis
+endif
+
+" 日本語を含まない場合は fileencoding に utf-8 を使うようにする
+function! AU_ReCheck_FENC()
+if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n') == 0
+  " let &fileencoding=&encoding
+  set fenc=utf-8
+endif
+endfunction
+augroup RECHECK_FENC
+    autocmd! RECHECK_FENC
+    autocmd BufReadPost * call AU_ReCheck_FENC()
+augroup END
 
 " File Formats
 set ffs=unix,dos,mac
@@ -92,6 +134,7 @@ set ambiwidth=double
 
 " File type
 syntax on " syntax coloring
+colorscheme xoria256 " colorscheme
 
 " Hightlight Zenkaku space
 highlight ZenkakuSpace ctermbg=darkcyan ctermfg=darkcyan
@@ -102,11 +145,11 @@ filetype indent on " to use filetype indent
 filetype plugin on " to use filetype plugin
 
 " Dictionary
-augroup Dictionary
-    autocmd! Dictionary
+" augroup Dictionary
+    " autocmd! Dictionary
     " autocmd FileType javascript setlocal dictionary+=~/.vim/dict/javascript.dict
     " autocmd FileType php setlocal dictionary+=~/.vim/dict/php.dict
-augroup END
+" augroup END
 
 " Omni completion
 set completeopt+=menuone " 補完表示設定
@@ -197,6 +240,7 @@ augroup Binary
 augroup END
 
 " TabpageCD
+" reference: http://ujihisa.nowa.jp/entry/91395f3003
 command! -complete=customlist,s:complete_cdpath -nargs=? TabpageCD
 \   execute 'cd' fnameescape(<q-args>)
 \ | let t:cwd = getcwd()
@@ -221,16 +265,12 @@ augroup END
 
 
 " ==================== プラグインの設定 ==================== "
+" reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
 nnoremap [Prefix] <Nop>
 nmap <Space> [Prefix]
 
 " ctags
-if has('mac')
-    command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
-endif
-if has('win32')
-    command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
-endif
+command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
 
 " Ruby
 augroup Ruby
@@ -240,8 +280,8 @@ augroup END
 
 " git
 let git_diff_spawn_mode = 1
-augroup git
-    autocmd! git
+augroup Git
+    autocmd! Git
     autocmd BufNewFile,BufRead COMMIT_EDITMSG setlocal filetype=git
 augroup END
 
