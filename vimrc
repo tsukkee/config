@@ -278,13 +278,6 @@ augroup Ruby
     autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
 augroup END
 
-" git
-let git_diff_spawn_mode = 1
-augroup Git
-    autocmd! Git
-    autocmd BufNewFile,BufRead COMMIT_EDITMSG setlocal filetype=git
-augroup END
-
 " CakePHP
 au BufNewFile,BufRead *.thtml setfiletype php
 au BufNewFile,BufRead *.ctp setfiletype php

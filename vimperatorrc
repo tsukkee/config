@@ -217,6 +217,10 @@ style -name commandline-ime chrome://* #liberator-commandline-command input { im
 
 
 " ==================== others ==================== "
+" Flashblock
+noremap <C-f> :js Flashblock.toggleSiteWhitelisted();<CR>r
+
+" load local file
 js <<EOM
 (function() {
     var local = "~/.vimperatorrc.local";
