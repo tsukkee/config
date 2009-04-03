@@ -156,7 +156,7 @@ set completeopt+=menuone " 補完表示設定
 
 " TabでOmni補完及びポップアップメニューの選択
 inoremap <silent> <expr> <CR> (pumvisible() ? "\<C-e>" : "") . "\<CR>"
-inoremap <silent> <expr> <Tab> pumvisible() ? "\<C-y>" : "\<Tab>"
+inoremap <silent> <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 
 " ポップアップメニューの色変える
 " highlight Pmenu ctermbg=lightcyan ctermfg=black 
@@ -324,6 +324,7 @@ let g:AutoComplPop_Behavior = {
 let g:NeoComplCache_EnableAtStartup = 1
 let g:NeoComplCache_SmartCase = 1
 let g:NeoComplCache_EnableMFU = 1
+let g:NeoComplCache_TagsAutoUpdate = 1
 
 " Reload Firefox {{{
 " Need MozRepl and +ruby
