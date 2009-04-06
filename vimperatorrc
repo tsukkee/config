@@ -1,23 +1,15 @@
 " ==================== basic options ==================== "
 set activate=quickmark,paste
 set complete=l
-set editor="/opt/local/bin/gvim.mac -f"
-" set defsearch=google
 set focuscontent
 set followhints=1
 set guioptions=Brb
 set hlsearch
-set nopreload
 set showstatuslinks=2
-" set suggestengines=stand
-set titlestring=Firefox
-" set verbose=9
 set wildoptions=auto
 
 " emulate vim's "after"
 set runtimepath+=~/.vimperator/after,~/vimperator/after
-
-let mapleader=","
 
 " auto pass keys
 autocmd LocationChange .* js modes.passAllKeys = false
@@ -59,6 +51,9 @@ noremap P <Nop>
 
 " ghでハイライトオフ
 noremap gh :nohl<CR>
+
+" Flashblock
+noremap <C-f> :js Flashblock.toggleSiteWhitelisted();<CR>r
 
 " search
 js <<EOM
@@ -145,12 +140,6 @@ set hintmatching="custom"
 " commandBookmarklet
 let command_bookmarklet_prefix=""
 
-" appendAnchor
-let auto_append_anchor="true"
-
-" hatena-bookmark-search
-let hatena_bookmark_no_migemo="true"
-
 " migratestatusbar
 javascript <<EOM
 liberator.globalVariables.migrate_elements = [
@@ -211,15 +200,11 @@ EOM
 
 " ==================== colorscheme ==================== "
 colorscheme mac
-" colorscheme evening
 
 style -name commandline-ime chrome://* #liberator-commandline-command input { ime-mode: inactive; }
 
 
 " ==================== others ==================== "
-" Flashblock
-noremap <C-f> :js Flashblock.toggleSiteWhitelisted();<CR>r
-
 " load local file
 js <<EOM
 (function() {
