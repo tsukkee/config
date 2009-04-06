@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: neocomplcache.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 01 Apr 2009
+" Last Modified: 04 Apr 2009
 " Usage: Just source this file.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -23,10 +23,22 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 2.16, for Vim 7.0
+" Version: 2.19, for Vim 7.0
 "-----------------------------------------------------------------------------
 " ChangeLog: "{{{
 " ChangeLog NeoCompleCache2: "{{{
+"   2.19:
+"     - Plugin interface changed.
+"     - Patterns use very magic.
+"   2.18:
+"     - Implemented tags_complete plugin.
+"     - Fixed default completion bug.
+"     - Extend complete length when consecutive skipped.
+"     - Auto complete on CursorMovedI.
+"     - Deleted similar match.
+"   2.17:
+"     - Loadable autoload/neocomplcache/*.vim plugin.
+"     - Implemented syntax_complete plugin.
 "   2.16:
 "     - Fixed caching initialize bug.
 "     - Supported vim help file.
@@ -329,7 +341,7 @@
 " }}}
 "-----------------------------------------------------------------------------
 " TODO: "{{{
-"     - Syntax complete.
+"     - Nothing.
 ""}}}
 " Bugs"{{{
 "     - Nothing.
@@ -357,17 +369,11 @@ endif
 if !exists('g:NeoComplCache_PartialMatch')
     let g:NeoComplCache_PartialMatch = 1
 endif
-if !exists('g:NeoComplCache_SimilarMatch')
-    let g:NeoComplCache_SimilarMatch = 0
-endif
 if !exists('g:NeoComplCache_KeywordCompletionStartLength')
     let g:NeoComplCache_KeywordCompletionStartLength = 2
 endif
 if !exists('g:NeoComplCache_PartialCompletionStartLength')
     let g:NeoComplCache_PartialCompletionStartLength = 3
-endif
-if !exists('g:NeoComplCache_SimilarCompletionStartLength')
-    let g:NeoComplCache_SimilarCompletionStartLength = 4
 endif
 if !exists('g:NeoComplCache_MinKeywordLength')
     let g:NeoComplCache_MinKeywordLength = 4
@@ -413,6 +419,9 @@ if !exists('g:NeoComplCache_TagsAutoUpdate')
 endif
 if !exists('g:NeoComplCache_TryKeywordCompletion')
     let g:NeoComplCache_TryKeywordCompletion = 0
+endif
+if !exists('g:NeoComplCache_TryDefaultCompletion')
+    let g:NeoComplCache_TryDefaultCompletion = 0
 endif
 if !exists('g:NeoComplCache_MaxTryKeywordLength')
     let g:NeoComplCache_MaxTryKeywordLength = 5

@@ -155,8 +155,10 @@ filetype plugin on " to use filetype plugin
 set completeopt+=menuone " 補完表示設定
 
 " TabでOmni補完及びポップアップメニューの選択
-inoremap <silent> <expr> <CR> (pumvisible() ? "\<C-e>" : "") . "\<CR>"
+inoremap <silent> <expr> <CR> (pumvisible() ? "\<C-y>" : "") . "\<CR>X\<BS>"
 inoremap <silent> <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <silent> <expr> <C-h> (pumvisible() ? "\<C-y>" : "") . "\<C-h>"
+inoremap <silent> <expr> <C-n> pumvisible() ? "\<C-n>" : "\<C-x>\<C-u>\<C-p>"
 
 " ポップアップメニューの色変える
 " highlight Pmenu ctermbg=lightcyan ctermfg=black 
