@@ -3,7 +3,7 @@ set activate=quickmark,paste
 set complete=l
 set focuscontent
 set followhints=1
-set guioptions=Brb
+set guioptions=Brbm
 set hlsearch
 set showstatuslinks=2
 set wildoptions=auto
@@ -12,11 +12,11 @@ set wildoptions=auto
 set runtimepath+=~/.vimperator/after,~/vimperator/after
 
 " auto pass keys
-autocmd LocationChange .* js modes.passAllKeys = false
-autocmd LocationChange reader\\.livedoor\\.com/reader js modes.passAllKeys = true
-autocmd LocationChange reader\\.livedoor\\.com/public js modes.passAllKeys = true
-autocmd LocationChange fastladder\\.com/reader js modes.passAllKeys = true
-autocmd LocationChange mail\\.google\\.com/mail js modes.passAllKeys = true
+autocmd LocationChange .* js modes.passAllKeys=false
+autocmd LocationChange reader\\.livedoor\\.com/reader js modes.passAllKeys=true
+autocmd LocationChange reader\\.livedoor\\.com/public js modes.passAllKeys=true
+autocmd LocationChange fastladder\\.com/reader js modes.passAllKeys=true
+autocmd LocationChange mail\\.google\\.com/mail js modes.passAllKeys=true
 
 " ==================== Firefox options ==================== "
 " disable accesskey
@@ -74,12 +74,13 @@ EOM
 js <<EOM
 (function() {
     var guioptions = options.get("guioptions");
+    var original = guioptions.value;
 
     mappings.addUserMap([modes.NORMAL], ["I"],
         "toggle guioptions",
         function() {
-            if(guioptions.value.indexOf("T") > -1)
-                guioptions.set("Brb");
+            if(guioptions.value != original)
+                guioptions.set(original);
             else
                 guioptions.set("TmBrb");
         });
@@ -201,6 +202,7 @@ EOM
 " ==================== colorscheme ==================== "
 colorscheme mac
 
+" force disable ime in commandline
 style -name commandline-ime chrome://* #liberator-commandline-command input { ime-mode: inactive; }
 
 
