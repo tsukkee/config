@@ -64,6 +64,12 @@ COMMANDS 					*neocomplcache-commands*
 :NeoCompleCacheUnLock					*:NeoComplCacheUnLock*
 		自動補完にかけたロックを解除する。
 
+:NeoCompleCacheAutoCompletionLength			*:NeoCompleCacheAutoCompletionLength*
+		自動補完する文字数を変更する。
+
+:NeoCompleCachePartialCompletionLength			*:NeoCompleCachePartialCompletionLength*
+		部分マッチ補完する文字数を変更する。
+
 :NeoCompleCacheCachingBuffer [bufnr]			*:NeoComplCacheCachingBuffer*
 		[bufnr]で示されるバッファを完全にキャッシュする。
 		大きなバッファに対しては、かなり時間がかかるので注意。
@@ -289,12 +295,14 @@ g:NeoComplCache_MFUThreshold				*g:NeoComplCache_MFUThreshold*
 g:NeoComplCache_KeywordPatterns				*g:NeoComplCache_KeywordPatterns*
 		補完するためのキーワードパターンを記録する。
 		これはファイルタイプ毎に正規表現で指定されている。
+		カスタマイズする場合は、パターンに\vを使用しなければならない。
 		
 		初期値はautoload/neocomplcache.vimを参照せよ。
 
 g:NeoComplCache_OmniPatterns				*g:NeoComplCache_OmniPatterns*
 		オムニ補完するためのキーワードパターンを記録する。
 		これはファイルタイプ毎に正規表現で指定されている。
+		カスタマイズする場合は、パターンに\vを使用しなければならない。
 		
 		初期値はautoload/neocomplcache.vimを参照せよ。
 

@@ -327,6 +327,8 @@ let g:NeoComplCache_EnableAtStartup = 1
 let g:NeoComplCache_SmartCase = 1
 let g:NeoComplCache_EnableMFU = 1
 let g:NeoComplCache_TagsAutoUpdate = 1
+let g:NeoComplCache_EnableInfo = 0
+
 
 " Reload Firefox {{{
 " Need MozRepl and +ruby
