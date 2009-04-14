@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: neocomplcache.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 10 Apr 2009
+" Last Modified: 14 Apr 2009
 " Usage: Just source this file.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -23,10 +23,21 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 2.23, for Vim 7.0
+" Version: 2.25, for Vim 7.0
 "-----------------------------------------------------------------------------
 " ChangeLog: "{{{
 " ChangeLog NeoCompleCache2: "{{{
+"   2.25:
+"     - Optimized syntax caching.
+"     - Fixed ruby and ocaml syntax.
+"     - Fixed error when g:NeoComplCache_AlphabeticalOrder is set.
+"     - Improved syntax_complete caching event.
+"   2.24:
+"     - Optimized calc rank.
+"     - Optimized keyword pattern.
+"     - Implemented operator completion.
+"     - Don't use include completion.
+"     - Fixed next keyword bug.
 "   2.23:
 "     - Fixed compound keyword pattern.
 "     - Optimized keyword pattern.

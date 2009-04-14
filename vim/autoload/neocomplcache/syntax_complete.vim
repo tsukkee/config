@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: syntax_complete.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 10 Apr 2009
+" Last Modified: 14 Apr 2009
 " Usage: Just source this file.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -23,9 +23,14 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 1.10, for Vim 7.0
+" Version: 1.12, for Vim 7.0
 "-----------------------------------------------------------------------------
 " ChangeLog: "{{{
+"   1.12:
+"    - Optimized caching.
+"    - Caching event changed.
+"   1.11:
+"    - Optimized.
 "   1.10:
 "    - Caching when set filetype.
 "    - Analyze match.
@@ -48,12 +53,8 @@
 "=============================================================================
 
 function! neocomplcache#syntax_complete#get_keyword_list(cur_keyword_str)"{{{
-    if empty(&filetype)
+    if empty(&filetype) || !has_key(s:syntax_list, &filetype)
         return []
-    endif
-
-    if !has_key(s:syntax_list, &filetype)
-        let s:syntax_list[&filetype] = s:initialize_syntax()
     endif
 
     return s:syntax_list[&filetype]
@@ -114,7 +115,7 @@ function! s:initialize_syntax()
             " Ignore too short keyword.
             if len(l:match_str) >= g:NeoComplCache_MinKeywordLength && !has_key(l:dup_check, l:match_str)
                 let l:keyword = {
-                            \ 'word' : l:match_str, 'menu' : l:group_name, 'dup' : 0,
+                            \ 'word' : l:match_str, 'menu' : l:group_name,
                             \ 'rank' : 1, 'prev_rank' : 0, 'prepre_rank' : 0
                             \}
                 let l:keyword.abbr = 
@@ -135,70 +136,29 @@ endfunction
 
 function! s:substitute_candidate(candidate)"{{{
     let l:candidate = a:candidate
+
+    " Collection.
+    let l:candidate = substitute(l:candidate,
+                \'\%(\\\\\|[^\\]\)\zs\[.*\]', ' ', 'g')
     if l:candidate =~ '\\v'
         " Delete.
         let l:candidate = substitute(l:candidate,
-                    \'[^\\]\zs[=?+]\|[^\\]\zs%[\|\\s\*\|[^\\]\zs[*]', '', 'g')
+                    \'\%(\\\\\|[^\\]\)\zs\%([=?+*]\|%[\|\\s\*\)', '', 'g')
         " Space.
         let l:candidate = substitute(l:candidate,
-                    \'[^\\]\zs[<>(){|]\|[^\\]\zs\\\%(z\a\|\a\)\|[^\\]\zs%(\|\[$^]\|[*.]', ' ', 'g')
+                    \'\%(\\\\\|[^\\]\)\zs\%([<>{()|$^]\|\\z\?\a\)', ' ', 'g')
     else
-        " Parenthesis.
-        if l:candidate =~ '\\%\?(.*\\)'
-            let l:candidate = s:substitute_parenthesis(l:candidate)
-        endif
         " Delete.
         let l:candidate = substitute(l:candidate,
-                    \'\\[=?+]\|\\%[\|\\s\*\|[^\\]\zs[*]', '', 'g')
+                    \'\%(\\\\\|[^\\]\)\zs\%(\\[=?+]\|\\%[\|\\s\*\|\*\)', '', 'g')
         " Space.
         let l:candidate = substitute(l:candidate,
-                    \'\\[<>(){|]\|[^\\]\zs\\\%(z\a\|\a\)\|\\%(\|\[$^]\|[*.]', ' ', 'g')
+                    \'\%(\\\\\|[^\\]\)\zs\%(\\[<>{()|]\|[$^]\|\\z\?\a\)', ' ', 'g')
     endif
-    " Collection.
-    let l:candidate = substitute(l:candidate,
-                \'[^\\]\zs\[.*\]\ze[^\\]', ' ', 'g')
 
     " \
     let l:candidate = substitute(l:candidate, '\\\\', '\\', 'g')
     return l:candidate
-endfunction"}}}
-
-function! s:substitute_parenthesis(candidate)"{{{
-    let l:head = matchstr(a:candidate, '.*\ze\\%\?(')
-    if l:head =~ '\\%\?(.*\\)'
-        "let l:head = s:substitute_parenthesis(l:head)
-    endif
-
-    "let l:start = matchend(a:candidate, '\\%\?(')
-    "let l:paren_cnt = 0
-    "let l:paren_match = l:start
-    "let l:paren_str = a:candidate[l:start : match(a:candidate, '\\)', l:start)]
-    "while l:paren_match >= 0
-        "let l:paren_cnt += 1
-        "let l:paren_match = matchend(l:paren_str, '\\%\?(', l:paren_match)
-    "endwhile
-    "let l:end = match(a:candidate, '\\)', l:paren_match, l:paren_cnt)
-    "let l:match = split(a:candidate[l:start : l:end], '\\|')
-    let l:match = split(matchstr(a:candidate, '\\%\?(\zs.*\ze\\)'), '\\|')
-    for l:m in l:match
-        if l:m =~ '\\%\?(.*\\)'
-           " let l:m = s:substitute_parenthesis(l:m)
-        endif
-    endfor
-
-    "let l:tail = a:candidate[l:end+2 :]
-    let l:tail = matchstr(a:candidate, '\\)\zs.*')
-    if l:tail =~ '\\%\?(.*\\)'
-        "let l:tail = s:substitute_parenthesis(l:tail)
-    endif
-
-    let l:result = ''
-    for l:m in l:match
-        let l:result .= l:head . l:m . l:tail . ' '
-    endfor
-    "echo l:result
-
-    return l:result
 endfunction"}}}
 
 " Dummy function.
@@ -218,7 +178,7 @@ function! neocomplcache#syntax_complete#initialize()"{{{
     augroup neocomplecache_syntax_complete"{{{
         autocmd!
         " Caching events
-        autocmd FileType * call s:caching_event() 
+        autocmd CursorHold * call s:caching_event() 
     augroup END"}}}
 
 endfunction"}}}
