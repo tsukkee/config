@@ -5,8 +5,8 @@ if exists('s:did_snips_mappings') || &cp || version < 700
 endif
 let s:did_snips_mappings = 1
 
-ino <silent> <tab> <c-r>=TriggerSnippet()<cr>
-snor <silent> <tab> <esc>i<right><c-r>=TriggerSnippet()<cr>
+ino <silent> <c-l> <c-r>=TriggerSnippet()<cr>
+snor <silent> <c-l> <esc>i<right><c-r>=TriggerSnippet()<cr>
 snor <bs> b<bs>
 snor ' b<bs>'
 snor <right> <esc>a
