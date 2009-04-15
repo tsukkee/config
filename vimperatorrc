@@ -3,7 +3,8 @@ set activate=quickmark,paste
 set complete=l
 set focuscontent
 set followhints=1
-set guioptions=Brbm
+" set guioptions=Brbm
+set guioptions=BrbmNn
 set hlsearch
 set showstatuslinks=2
 set wildoptions=auto
