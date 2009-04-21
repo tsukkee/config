@@ -82,7 +82,7 @@ js <<EOM
             if(guioptions.value != original)
                 guioptions.set(original);
             else
-                guioptions.set("TmBrb");
+                guioptions.set("TmBrbN");
         });
 })();
 EOM

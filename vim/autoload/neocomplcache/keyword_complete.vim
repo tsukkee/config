@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: keyword_complete.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 19 Apr 2009
+" Last Modified: 21 Apr 2009
 " Usage: Just source this file.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -23,7 +23,7 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 2.32, for Vim 7.0
+" Version: 2.33, for Vim 7.0
 "=============================================================================
 
 function! neocomplcache#keyword_complete#initialize()"{{{
@@ -405,8 +405,8 @@ function! s:caching(srcname, start_line, end_cache_cnt)"{{{
                     if !has_key(l:source.keyword_cache, l:match_str)
                         " Append list.
                         let l:source.keyword_cache[l:match_str] = {
-                                    \'word' : l:match_str, 'menu' : l:menu,  'info' : l:info_line,
-                                    \'filename' : l:filename, 'srcname' : a:srcname, 'info_list' : []
+                                    \'word' : l:match_str, 'menu' : l:menu,
+                                    \'filename' : l:filename, 'srcname' : a:srcname, 'info_list' : [l:info_line]
                                     \}
 
                         let l:source.keyword_cache[l:match_str].abbr_save = 

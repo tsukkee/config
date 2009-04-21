@@ -69,7 +69,7 @@ vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 
 " Status line
 set laststatus=2
-set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%m%v,%l/%L(%P:%n)
+set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%{'['.neocomplcache#keyword_complete#caching_percent('').'%]'}%m%v,%l/%L(%P:%n)
 
 " autodetect charset
 " reference: http://www.kawaz.jp/pukiwiki/?vim#cb691f26
@@ -327,8 +327,7 @@ let g:NeoComplCache_EnableAtStartup = 1
 let g:NeoComplCache_SmartCase = 1
 let g:NeoComplCache_EnableMFU = 1
 let g:NeoComplCache_TagsAutoUpdate = 1
-let g:NeoComplCache_EnableInfo = 0
-
+imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
 
 " Reload Firefox {{{
 " Need MozRepl and +ruby
