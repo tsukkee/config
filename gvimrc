@@ -1,8 +1,8 @@
 " ==================== 画面表示設定 ==================== "
 set title       " タイトル表示
 set linespace=0 " 行間
-set columns=155 " 幅
-set lines=50    " 高さ
+set columns=140 " 幅
+set lines=45    " 高さ
 set nolinebreak " 改行しない
 set textwidth=0 " 改行しない
 
@@ -10,14 +10,14 @@ set textwidth=0 " 改行しない
 gui
 
 " ==================== フォント設定 ==================== "
-" 普通のMac版GVim
+" Mac版GVim
 if has('gui_mac')
     set guifont=Osaka-Mono:h14
     " set guifont=mplus-1mn-regular:h14
     set transparency=240
 endif
 
-" 実験版MacVim
+" MacVim
 if has('gui_macvim')
     " set guifont=Osaka-Mono:h14
     " set guifont=mplus-1mn-regular:h14
