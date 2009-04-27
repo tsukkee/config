@@ -58,13 +58,13 @@ augroup END
 " Folding
 " reference: http://d.hatena.ne.jp/ns9tks/20080318/1205851539
 set foldmethod=marker
-" 行頭でhを押すと折りたたみを閉じる
+" hold with 'h' if the cursor is on the head of line
 nnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zc' : 'h'
-" 折りたたみ上でlを押すと折りたたみを開く
+" expand with 'l' if the cursor on the holded text
 nnoremap <expr> l foldclosed(line('.')) != -1 ? 'zo' : 'l'
-" 行頭でhを押すと選択範囲に含まれる折りたたみを閉じる
+" hold with 'h' if the cursor is on the head of line in visual mode
 vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
-" 折りたたみ上でlを押すと選択範囲に含まれる折りたたみを開く
+" expand with 'l' if the cursor on the holded text in visual mode
 vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 
 " Status line
@@ -114,11 +114,11 @@ if has('iconv')
   unlet s:enc_jis
 endif
 
-" 日本語を含まない場合は fileencoding に utf-8 を使うようにする
+" 日本語を含まない場合は fileencoding にencodingを使うようにする
 function! AU_ReCheck_FENC()
 if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n') == 0
-  " let &fileencoding=&encoding
-  set fenc=utf-8
+  let &fileencoding=&encoding
+  " set fenc=utf-8
 endif
 endfunction
 augroup RECHECK_FENC
@@ -152,15 +152,15 @@ filetype plugin on " to use filetype plugin
 " augroup END
 
 " Omni completion
-set completeopt+=menuone " 補完表示設定
+set completeopt+=menuone " Display menu
 
-" TabでOmni補完及びポップアップメニューの選択
+" keybind for completing and selecting popup menu
 inoremap <silent> <expr> <CR> (pumvisible() ? "\<C-y>" : "") . "\<CR>X\<BS>"
 inoremap <silent> <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <silent> <expr> <C-h> (pumvisible() ? "\<C-y>" : "") . "\<C-h>"
 inoremap <silent> <expr> <C-n> pumvisible() ? "\<C-n>" : "\<C-x>\<C-u>\<C-p>"
 
-" ポップアップメニューの色変える
+" Change popup menu colors
 " highlight Pmenu ctermbg=lightcyan ctermfg=black 
 " highlight PmenuSel ctermbg=blue ctermfg=white 
 " highlight PmenuSbar ctermbg=darkgray 
@@ -170,8 +170,8 @@ inoremap <silent> <expr> <C-n> pumvisible() ? "\<C-n>" : "\<C-x>\<C-u>\<C-p>"
 set iminsert=0
 set imsearch=0
 
-" ==================== キーマップ ==================== "
-" 表示行単位で移動
+" ==================== Keybind ==================== "
+" Move the cursor according to visual line and row
 nnoremap j  gj
 nnoremap k  gk
 nnoremap gj j
@@ -266,7 +266,7 @@ augroup TabpageCD
 augroup END
 
 
-" ==================== プラグインの設定 ==================== "
+" ==================== plugins setting ==================== "
 " reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
 nnoremap [Prefix] <Nop>
 nmap <Space> [Prefix]
@@ -285,42 +285,18 @@ au BufNewFile,BufRead *.thtml setfiletype php
 au BufNewFile,BufRead *.ctp setfiletype php
 
 " smartword
-map W <Plug>(smartword-w)
-map B <Plug>(smartword-b)
-map E <Plug>(smartword-e)
-map gE <Plug>(smartword-ge)
+map w <Plug>(smartword-w)
+map b <Plug>(smartword-b)
+map e <Plug>(smartword-e)
+map ge <Plug>(smartword-ge)
+noremap W w
+noremap B b
+noremap E e
+noremap gE ge
 
 " NERD_comments
 let NERDSpaceDelims = 1
 let NERDShutUp = 1
-
-" AutoComplPop {{{
-let g:AutoComplPop_NotEnableAtStartup = 1
-let g:AutoComplPop_IgnoreCaseOption = 0
-let g:AutoComplPop_CompleteoptPreview = 1
-let g:AutoComplPop_Behavior = {
-    \   'javascript' : [
-    \       {
-    \           'command'  : "\<C-n>",
-    \           'pattern'  : '\k\k$',
-    \           'excluded' : '^$',
-    \           'repeat'   : 0,
-    \       },
-    \       {
-    \           'command'  : "\<C-x>\<C-f>",
-    \           'pattern'  : (has('win32') || has('win64') ? '\f[/\\]\f*$' : '\f[/]\f*$'),
-    \           'excluded' : '[*/\\][/\\]\f*$\|[^[:print:]]\f*$',
-    \           'repeat'   : 1,
-    \       },
-    \       {
-    \           'command'  : "\<C-x>\<C-o>",
-    \           'pattern'  : '\k\.$',
-    \           'excluded' : '^$',
-    \           'repeat'   : 0,
-    \       },
-    \   ],
-    \   }
-"}}}
 
 " neocomplcache
 let g:NeoComplCache_EnableAtStartup = 1
@@ -328,6 +304,11 @@ let g:NeoComplCache_SmartCase = 1
 let g:NeoComplCache_EnableMFU = 1
 let g:NeoComplCache_TagsAutoUpdate = 1
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
+
+augroup KuSetting
+    autocmd!
+    autocmd FileType ku call ku#default_key_mappings(1)
+augroup END
 
 " Reload Firefox {{{
 " Need MozRepl and +ruby
@@ -406,11 +387,7 @@ let html_use_encoding = "utf-8"
 " Others
 command! HTMLEscape silent exe "rubydo $_ = $_.gsub('&', '&amp;').gsub('>', '&gt;').gsub('<', '&lt;').gsub('\"', '&quot;')"
 
-" settings for arpeggio.vim
-call arpeggio#load()
-
 " NERD_tree
-Arpeggionnoremap <silent> tn :NERDTreeToggle<CR>
 nnoremap <silent> [Prefix]t :NERDTreeToggle<CR>
 
 augroup NERDTreeCustomCommand
@@ -424,18 +401,14 @@ augroup NERDTreeCustomCommand
 augroup END
 
 " FuzzyFinder
-Arpeggionnoremap <silent> fn :FuzzyFinderBuffer<CR>
-Arpeggionnoremap <silent> fm :FuzzyFinderMruFile<CR>
 nnoremap <silent> [Prefix]b :FuzzyFinderBuffer<CR>
 nnoremap <silent> [Prefix]m :FuzzyFinderMruFile<CR>
 
 " Reload brawser
 if has('ruby')
-    Arpeggionnoremap <silent> ru :<C-u>call ReloadFirefox()<CR>
     nnoremap <silent> [Prefix]f :<C-u>call ReloadFirefox()<CR>
 endif
 if has('mac')
-    Arpeggionnoremap <silent> ri :<C-u>call ReloadSafari()<CR>
     nnoremap <silent> [Prefix]s :<C-u>call ReloadSafari()<CR>
 endif
 

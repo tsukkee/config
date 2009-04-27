@@ -1,5 +1,5 @@
-" Vim additional syntax: vim/arpeggio - highlight :Arpeggio commands
-" Version: 0.0.5
+" Vim syntax: ku
+" Version: 0.1.9
 " Copyright (C) 2008 kana <http://whileimautomaton.net/>
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -22,28 +22,47 @@
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
 
-syntax keyword vimArpeggioCommand
-\      Arpeggio
-\      skipwhite nextgroup=vimMap
-
-syntax match vimArpeggioCommand
-\      /\<Arpeggio[cilnosvx]\(\|nore\|un\)map\>/
-\      contains=vimArpeggioCommandInside
-\      skipwhite nextgroup=vimMapBang,vimMapMod,vimMapLhs
-
-syntax match vimArpeggioCommand
-\      /\<Arpeggio\%(\|nore\|un\)map\>!\?/
-\      contains=vimArpeggioCommandInside
-\      skipwhite nextgroup=vimMapMod,vimMapLhs
-
-syntax match vimArpeggioCommandInside /\<Arpeggio\zs\l*map!\?/
-\      contained
+if exists('b:current_syntax')
+  finish
+endif
 
 
 
 
-highlight default link vimArpeggioCommand  NONE
-highlight default link vimArpeggioCommandInside  vimCommand
+syntax case match
+
+syntax match kuStatusLine /\%1l.*/
+\            contains=kuSourcePrompt,kuSourceName,kuHistoryInfo
+syntax match kuSourcePrompt /^Source/ contained
+syntax match kuSourceName /: \zs[a-zA-Z-]*/ contained
+syntax match kuHistoryInfo ! (\zs\d+/\d+\ze)$! contained
+
+syntax match kuInputLine /\%2l.*/ contains=kuInputPrompt
+syntax match kuInputPrompt /^>/ contained nextgroup=kuInputPattern
+syntax match kuInputPattern /.*/ contained
+
+
+
+
+highlight default link kuSourcePrompt  Statement
+highlight default link kuSourceName  Type
+highlight default link kuHistoryInfo  NONE
+highlight default link kuInputPrompt  Statement
+highlight default link kuInputPattern  NONE
+
+" The following definitions are for <Plug>(ku-choose-an-action).  See
+" s:choose_action() in autoload/ku.vim for the details.
+highlight default link kuChooseAction  NONE
+highlight default link kuChooseItem  NONE
+highlight default link kuChooseKey  SpecialKey
+highlight default link kuChooseMessage  NONE
+highlight default link kuChoosePrompt  kuSourcePrompt
+highlight default link kuChooseSource  kuSourceName
+
+
+
+
+let b:current_syntax = 'ku'
 
 " __END__
 " vim: foldmethod=marker

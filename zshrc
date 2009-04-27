@@ -24,7 +24,9 @@ zstyle ':completion:*:sudo:*' command-path /opt/local/bin /opt/local/sbin \
 # autoload predict-on
 # predict-on
 
+setopt print_eight_bit
 setopt auto_pushd  # cd history
+setopt pushd_ignore_dups
 # setopt correct     # correct command
 setopt list_packed # compact list display
 setopt nolistbeep  # no beep
