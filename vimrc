@@ -247,7 +247,7 @@ command! -complete=customlist,s:complete_cdpath -nargs=? TabpageCD
 \   execute 'cd' fnameescape(<q-args>)
 \ | let t:cwd = getcwd()
 
-cabbrev cd TabpageCD
+cnoreabbrev cd TabpageCD
 command! CD silent exe "TabpageCD " . expand('%:p:h')
 
 function! s:complete_cdpath(arglead, cmdline, cursorpos)
@@ -305,10 +305,27 @@ let g:NeoComplCache_EnableMFU = 1
 let g:NeoComplCache_TagsAutoUpdate = 1
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
 
+" ku
 augroup KuSetting
     autocmd!
     autocmd FileType ku call ku#default_key_mappings(1)
 augroup END
+call ku#custom_action('common', 'cd', 'Ku_common_action_my_cd')
+
+function! Ku_common_action_my_cd(item)
+    if isdirectory(a:item.word)
+        execute 'TabpageCD' a:item.word
+    else
+        execute 'TabpageCD' fnamemodify(a:item.word, ':h')
+    endif
+endfunction
+
+call ku#custom_prefix('common', '.vim', $HOME.'/.vim')
+call ku#custom_prefix('common', '~', $HOME)
+
+noremap <silent> [Prefix]kb :<C-u>Ku buffer<Cr>
+noremap <silent> [Prefix]kf :<C-u>Ku file<Cr>
+noremap <silent> [Prefix]kh :<C-u>Ku history<Cr>
 
 " Reload Firefox {{{
 " Need MozRepl and +ruby
