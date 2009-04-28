@@ -269,7 +269,8 @@ augroup END
 " ==================== plugins setting ==================== "
 " reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
 nnoremap [Prefix] <Nop>
-nmap <Space> [Prefix]
+nmap K [Prefix]
+nnoremap KK K
 
 " ctags
 command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
@@ -285,14 +286,10 @@ au BufNewFile,BufRead *.thtml setfiletype php
 au BufNewFile,BufRead *.ctp setfiletype php
 
 " smartword
-map w <Plug>(smartword-w)
-map b <Plug>(smartword-b)
-map e <Plug>(smartword-e)
-map ge <Plug>(smartword-ge)
-noremap W w
-noremap B b
-noremap E e
-noremap gE ge
+map W <Plug>(smartword-w)
+map B <Plug>(smartword-b)
+map E <Plug>(smartword-e)
+map gE <Plug>(smartword-ge)
 
 " NERD_comments
 let NERDSpaceDelims = 1
@@ -306,9 +303,17 @@ let g:NeoComplCache_TagsAutoUpdate = 1
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
 
 " ku
+function! Ku_my_keymappings()
+    imap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
+    nmap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
+    imap <buffer> <silent> <Space> <Plug>(ku-choose-an-action)
+    nmap <buffer> <silent> <Space> <Plug>(ku-choose-an-action)
+    inoremap <buffer> <silent> <Tab> <C-n>
+endfunction
 augroup KuSetting
     autocmd!
     autocmd FileType ku call ku#default_key_mappings(1)
+                \ | call Ku_my_keymappings()
 augroup END
 call ku#custom_action('common', 'cd', 'Ku_common_action_my_cd')
 
@@ -323,9 +328,9 @@ endfunction
 call ku#custom_prefix('common', '.vim', $HOME.'/.vim')
 call ku#custom_prefix('common', '~', $HOME)
 
-noremap <silent> [Prefix]kb :<C-u>Ku buffer<Cr>
-noremap <silent> [Prefix]kf :<C-u>Ku file<Cr>
-noremap <silent> [Prefix]kh :<C-u>Ku history<Cr>
+nnoremap <silent> [Prefix]kb :<C-u>Ku buffer<Cr>
+nnoremap <silent> [Prefix]kf :<C-u>Ku file<Cr>
+nnoremap <silent> [Prefix]kh :<C-u>Ku history<Cr>
 
 " Reload Firefox {{{
 " Need MozRepl and +ruby
@@ -417,16 +422,12 @@ augroup NERDTreeCustomCommand
     autocmd FileType nerdtree nnoremap <buffer> ct :NERDTreeTabpageCd<CR>
 augroup END
 
-" FuzzyFinder
-nnoremap <silent> [Prefix]b :FuzzyFinderBuffer<CR>
-nnoremap <silent> [Prefix]m :FuzzyFinderMruFile<CR>
-
 " Reload brawser
 if has('ruby')
-    nnoremap <silent> [Prefix]f :<C-u>call ReloadFirefox()<CR>
+    nnoremap <silent> [Prefix]rf :<C-u>call ReloadFirefox()<CR>
 endif
 if has('mac')
-    nnoremap <silent> [Prefix]s :<C-u>call ReloadSafari()<CR>
+    nnoremap <silent> [Prefix]rs :<C-u>call ReloadSafari()<CR>
 endif
 
 " Load private information

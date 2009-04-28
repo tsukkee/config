@@ -1,26 +1,20 @@
-" ==================== 画面表示設定 ==================== "
-set title       " タイトル表示
-set linespace=0 " 行間
-set columns=140 " 幅
-set lines=45    " 高さ
-set nolinebreak " 改行しない
-set textwidth=0 " 改行しない
+" ==================== Display setting ==================== "
+set title       " 
+set linespace=0 " 
+set columns=140 " 
+set lines=45    " 
+set nolinebreak " no line break
+set textwidth=0 " no line break
 
 " 先にしとかないとWindowsでTransparencyが有効にならないっぽい
 gui
 
-" ==================== フォント設定 ==================== "
-" Mac版GVim
-if has('gui_mac')
-    set guifont=Osaka-Mono:h14
-    " set guifont=mplus-1mn-regular:h14
-    set transparency=240
-endif
-
+" ==================== Platform setting ==================== "
 " MacVim
 if has('gui_macvim')
     " set guifont=Osaka-Mono:h14
     " set guifont=mplus-1mn-regular:h14
+    colorscheme xoria256
     set transparency=5
     set showtabline=2
     set imdisable
@@ -28,7 +22,7 @@ if has('gui_macvim')
     map <silent> gW :macaction selectPreviousWindow:<CR>
 endif
 
-" Windows版GVim
+" GVim(Windows)
 if has('win32')
     set guifont=M+2VM+IPAG_circle:h10:cSHIFTJIS
     colorscheme xoria256
@@ -36,8 +30,8 @@ if has('win32')
 endif
 
 
-" ==================== その他 ==================== "
-" imを無効にする
+" ==================== Others ==================== "
+" disable im
 set iminsert=0
 set imsearch=0
 
@@ -55,9 +49,3 @@ endif
 " highlight系は最後にしないとWindowsで有効にならないっぽい
 highlight ZenkakuSpace guibg=#3333ff guifg=#3333ff
 match ZenkakuSpace /　/
-
-" ポップアップメニューの色変える
-" highlight Pmenu guibg=#3333ff guifg=#000000
-" highlight PmenuSel guibg=#0000dd guifg=#000000
-" highlight PmenuSbar guibg=#333333
-" highlight PmenuThumb guibg=#aaaaaa

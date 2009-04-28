@@ -88,13 +88,16 @@ js <<EOM
 EOM
 
 js <<EOM
-commands.addUserCommand(["wrappedjavascript", "wjs"],
-    "Run a JavaScript command in wrappedJSObject context",
+commands.addUserCommand(["sandboxjavascript", "sjs"],
+    "Run a JavaScript command in Sandbox",
     function (args)
     {
         try
         {
-            liberator.eval("with(window.content.wrappedJSObject) {" + args.string + "}");
+            let s = new Components.utils.Sandbox(buffer.URL);
+            s.window = content.window;
+            s.document = content.document;
+            return Components.utils.evalInSandbox(args.string, s);
         }
         catch (e)
         {
