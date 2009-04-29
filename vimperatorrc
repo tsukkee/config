@@ -111,6 +111,20 @@ commands.addUserCommand(["sandboxjavascript", "sjs"],
     });
 EOM
 
+js <<EOM
+commands.addUserCommand(["toggleautopagerize"],
+    "toggle on/off autopagerize",
+    function(args)
+    {
+        let d = window.getBrowser().contentDocument;
+        let elements = d.evaluate('id("autopagerize_help")//a[@class="autopagerize_link"]', d, null, 7, null);
+        if(elements.snapshotLength) {
+            let e = d.createEvent('MouseEvents');
+            e.initEvent('click', true, true);
+            elements.snapshotItem(0).dispatchEvent(e);
+        }
+    });
+EOM
 
 " ==================== hints ==================== "
 js <<EOM

@@ -247,7 +247,10 @@ command! -complete=customlist,s:complete_cdpath -nargs=? TabpageCD
 \   execute 'cd' fnameescape(<q-args>)
 \ | let t:cwd = getcwd()
 
-cnoreabbrev cd TabpageCD
+cnoreabbrev <expr> cd
+            \ (getcmdtype() == ":" && getcmdline() ==# "cd")
+            \ ? "TabpageCD"
+            \ : "cd"
 command! CD silent exe "TabpageCD " . expand('%:p:h')
 
 function! s:complete_cdpath(arglead, cmdline, cursorpos)
@@ -269,8 +272,7 @@ augroup END
 " ==================== plugins setting ==================== "
 " reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
 nnoremap [Prefix] <Nop>
-nmap K [Prefix]
-nnoremap KK K
+nmap <Space> [Prefix]
 
 " ctags
 command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
