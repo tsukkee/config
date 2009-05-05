@@ -1,6 +1,6 @@
 *ku.txt*	An interface for anything
 
-Version 0.2.0
+Version 0.2.1
 Script ID: 2337
 Copyright (C) 2008-2009 kana <http://whileimautomaton.net/>
 License: MIT license  {{{
@@ -48,36 +48,69 @@ Changelog		|ku-changelog|
 ==============================================================================
 INTRODUCTION					*ku-introduction*
 
-*ku* is a Vim plugin to provide new interface to choose many items from
-various sources with automatic and fuzzy completion and to do some action on
-a selected item.
+*ku* is a Vim plugin to provide new interface for Vim.  With ku,
 
-For example, with |ku-buffer|, you can choose a buffer from many buffers and
-do some action on it -- open it in the current window, open it in a new window
-which is created at the left side, delete it, and so on.  Some useful sources
-are included with a package of this plugin (see |ku-default-sources|).
-Other sources may be available at www.vim.org.  See the following URI:
-http://www.vim.org/scripts/script_search_results.php?keywords=ku
+- You can choose many items from various sources such as buffers, files and
+  others.  This selection is very efficient, because ku supports it by
+  automatic and elegant completion, so that you don't have to type much.
 
-To start a selection, use |:Ku| or |ku#start()|.
-They will open |the-ku-window| to take your input.
-- As you input some characters, |ins-completion-menu| will be automatically
-  appeared and updated to show the proper candidates for the given input (see
-  |ku-pattern| for the details of how items are filtered).
-- Then you can choose and execute an action on the selected item with
-  |<Plug>(ku-choose-an-action)|.
-- Some action is marked as the default action.  You can also execute the
-  default action without choosing by |<Plug>(ku-do-the-default-action)|.
-  See also |ku#default_key_table()| and |ku-key-mappings| for other operations
-  available in |the-ku-window|.
+- Then you can take an action on the selected item.  Various actions are
+  available for each kind of items.
 
-See also a demonstration movie: http://www.screencast.com/t/P6nJkJ0DE
 
-You can also write your own sources.  See |ku-sources| for the details.
+To start a selection, execute |:Ku| or |ku#start()|.  |the-ku-window| will be
+opened at the top of the current tabpage.  The window is to select items and
+to do an action on a selected item.  In the window,
+
+- |ins-completion-menu| is automatically appeared to show available items.
+  As you input a character, the menu is updated to show more proper items for
+  the given input.
+
+  If you want to know how ku interpret what you input,
+  see |ku-pattern|, |ku-auto-component-completion| and |ku-prefix-expansion|.
+
+- If you find what you want in the menu, select it with <C-n> or <C-p>.  If
+  the first item in the menu is what you want, you don't have to select it.
+
+- Then you can take an action on the selected item with <Enter> or <Tab>.
+
+  - With <Enter>, ku executes the default action for the item.
+
+  - With <Tab>, ku shows a list of available actions for the item.  Each
+    action is labeled with a key to execute it.  If you type one of the keys,
+    the corresponding action will be executed.
+
+  <Enter> and <Tab> are just the default key bindings.  You can customize
+  them, of course.  See |ku-key-mappings| and |ku#default_key_mappings()|.
+  If you want to customize key bindings in a list of actions by <Tab>, see
+  |ku#custom_key()|, |ku-default-key-table| and |ku-key-table|.
+
+- If you don't want to take any action and stop to select, type <C-c> in any
+  mode.  The window is closed and the current tabpage is restored to the
+  previous state.
+
+
+In ku, a kind of items is called "source".  Some sources are available by
+default.  See |ku-default-sources| for the details.  You can write your own
+sources if you want to select and to take action on something which is not
+provided by the default sources.  To add sources, put the corresponding
+scripts into "autoload/ku/" directories in 'runtimepath'.  As scripts are put,
+ku recognizes them automatically, so that you don't have to reboot Vim.  See
+alsso |ku-sources| for the details.
+
+
+Screenshots:
+http://www.flickr.com/photos/whileimautomaton/tags/vim-ku/
+
+Demonstration movie:
+http://www.screencast.com/t/P6nJkJ0DE
 
 
 Requirements:
 - Vim 7.1.299 or later
+
+Sources and related scripts:
+http://www.vim.org/scripts/script_search_results.php?keywords=ku
 
 Latest version:
 http://github.com/kana/config/commits/vim-ku
@@ -122,8 +155,8 @@ ku#available_source_p({source})			*ku#available_source_p()*
 			Otherwise, return false.
 
 ku#available_sources()				*ku#available_sources()*
-			Return a list of strings
-			which represents the names of available sources.
+			Return a list of strings.  This list represents the
+			names of available sources.
 
 ku#custom_action({source}, {action}, {function})	*ku#custom_action()*
 ku#custom_action({source}, {action}, {source2}, {action2})
@@ -233,6 +266,13 @@ ku#input_history()				*ku#input_history()*
 				The name of the source for which the pattern
 				was inputted.
 
+ku#restart()					*ku#restart()*
+			Call |ku#start()| with the last inputted pattern and
+			the last active source.
+
+			This is useful if you cancel a selection once,
+			but you want to continue the selection later.
+
 ku#set_the_current_input_pattern({s})	  *ku#set_the_current_input_pattern()*
 			Set the current input pattern in |the-ku-buffer| to
 			{s}, then return it.
@@ -247,13 +287,6 @@ ku#start({source}, [{initial-pattern}])		*ku#start()*
 ku#switch_source({source})			*ku#switch_source()*
 			Change the current source to {source}.  This function
 			works only while ku is active.  Otherwise, do nothing.
-
-ku#restart()					*ku#restart()*
-			Call |ku#start()| with the last inputted pattern and
-			the last active source.
-
-			This is useful if you cancel a selection once,
-			but you want to continue the selection later.
 
 
 ------------------------------------------------------------------------------
@@ -868,7 +901,7 @@ g:ku_history_reloading_style			*g:ku_history_reloading_style*
 		- Loading: After first activating ku for each Vim process.
 		- Saving: Before exiting Vim.
 
-	Default value is "once".
+	Default value is "idle".
 
 g:ku_history_size				*g:ku_history_size*
 	A number which is the maximum size of input history.
@@ -895,6 +928,11 @@ action						*ku-action*
 			  It should consist of only alphabets and hyphens.
 			- The name of the "function"
 			  which is called whenever the action is executed.
+			  - This function must take 1 argument which is
+			    a dictionary as an item.
+			  - This function must return 0 if it succeeds, or
+			    a string which represents an error message if it
+			    fails.
 			- The list of the names of "sources"
 			  to which the action can be applied.
 
@@ -998,6 +1036,33 @@ BUGS						*ku-bugs*
 
 ==============================================================================
 CHANGELOG					*ku-changelog*
+
+0.2.1	2009-05-01T01:40:08+09:00
+	Bug fixes:
+	- |<Plug>(ku-choose-action)|: Fix a bug that an error message is
+	  displayed unexpectedly, whenever a key which is not associated with
+	  any action is pressed.
+	- Fix a bug that the current source name in |the-ku-buffer| is not
+	  highlighted correctly in some cases.
+	- Document: Fix a wrong description on the default value of
+	  |g:ku_history_reloading_style|.  It is "idle", not "once".
+	- |ku__source|: Fix a bug that it doesn't exist for items which are
+	  not completed by ku.
+	- |ku-action-left| and other actions: Fix a bug that they don't close
+	  a window or a tab page created by them even if |ku-action-default|
+	  is failed.
+
+	Incompatible changes:
+	- Change the behavior not to take any action if an input pattern is
+	  empty and there is no item, because there is nothing to do in such
+	  case.
+	- Change the specification on |ku-action|.  Now the function
+	  corresponding to an action must return 0 if it succeeds, or a string
+	  which represents an error message if it fails.  Old versions don't
+	  touch on return values.
+
+	Misc.:
+	- Refactor the core.
 
 0.2.0	2008-12-31T22:06:44+09:00/2009-04-28T01:45:50+09:00
 	- Add |ku__source|.

@@ -1,5 +1,5 @@
 " ku - An interface for anything
-" Version: 0.2.0
+" Version: 0.2.1
 " Copyright (C) 2008-2009 kana <http://whileimautomaton.net/>
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -21,6 +21,24 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
+" Coding Guidelines  "{{{1
+" Naming Guidelines  "{{{2
+"
+" - Use the prefix "original_" and include the namaes of options/functions for
+"   variables which hold values from options/functions to restore the states
+"   of Vim before a ku session.
+"
+"   For example, 'completeopt' is changed while a ku session, so that the
+"   original value of 'completeopt' must be saved and restored.  To keep the
+"   original value of 'completeopt', use "original_completeopt".
+
+
+
+
+
+
+
+
 " Variables  "{{{1
 " Global  "{{{2
 
@@ -129,10 +147,10 @@ let s:last_user_input_raw = ''
 
 
 " Information to restore several stuffs after a ku session.
-let s:completeopt = ''
-let s:curwinnr = 0
-let s:ignorecase = ''
-let s:winrestcmd = ''
+let s:original_completeopt = ''
+let s:original_curwinnr = 0
+let s:original_ignorecase = ''
+let s:original_winrestcmd = ''
 
 
 " User defined action tables, key tables and prefix table for sources.
@@ -390,10 +408,10 @@ function! ku#start(source, ...)  "{{{2
   let s:current_hisotry_index = -1
 
   " Save some values to restore the original state.
-  let s:completeopt = &completeopt
-  let s:ignorecase = &ignorecase
-  let s:curwinnr = winnr()
-  let s:winrestcmd = winrestcmd()
+  let s:original_completeopt = &completeopt
+  let s:original_ignorecase = &ignorecase
+  let s:original_curwinnr = winnr()
+  let s:original_winrestcmd = winrestcmd()
 
   " Open or create the ku buffer.
   let v:errmsg = ''
@@ -705,11 +723,15 @@ function! s:do(action_name)  "{{{2
       " there's no item -- user seems to take action on current_user_input_raw.
       let item = {'word':
       \             s:expand_prefix(s:remove_prompt(current_user_input_raw)),
-      \           'ku__completed_p': s:FALSE}
+      \           'ku__completed_p': s:FALSE,
+      \           'ku__source': s:current_source}
     endif
   endif
 
-  if a:action_name ==# '*choose*' || a:action_name ==# '*persistent*'
+  let nothing_to_do_p = item.word ==# '' && !(item.ku__completed_p)
+  if nothing_to_do_p
+    " Ignore.
+  elseif a:action_name ==# '*choose*' || a:action_name ==# '*persistent*'
     let action = s:choose_action(item, a:action_name ==# '*persistent*')
   else
     let action = a:action_name
@@ -719,7 +741,9 @@ function! s:do(action_name)  "{{{2
   " ku window.
   call s:end()
 
-  if action ==# 'cancel'
+  if nothing_to_do_p
+    echo 'Nothing to do, because you gave empty pattern and there is no item.'
+  elseif action ==# 'cancel' || action ==# 'nop'
     " Ignore.
   elseif action ==# 'selection'
     call ku#restart()  " Emulate to return to the previous selection.
@@ -762,10 +786,10 @@ function! s:end()  "{{{2
   call s:api_on_source_leave(s:current_source)
   close
 
-  let &completeopt = s:completeopt
-  let &ignorecase = s:ignorecase
-  execute s:curwinnr 'wincmd w'
-  execute s:winrestcmd
+  let &completeopt = s:original_completeopt
+  let &ignorecase = s:original_ignorecase
+  execute s:original_curwinnr 'wincmd w'
+  execute s:original_winrestcmd
 
   let s:_end_locked_p = s:FALSE
   return s:TRUE
@@ -1271,8 +1295,14 @@ endfunction
 function! s:do_action(action, item, ...)  "{{{3
   " Assumption: BeforeAction is already applied for a:item.
   let composite_p = 1 <= a:0 ? a:1 : s:TRUE
-  call function(s:get_action_function(a:action, composite_p))(a:item)
-  return s:TRUE
+  let _ = function(s:get_action_function(a:action, composite_p))(a:item)
+
+  if _ isnot 0
+    echohl ErrorMsg
+    echomsg _
+    echohl NONE
+  endif
+  return _
 endfunction
 
 
@@ -1390,16 +1420,30 @@ endfunction
 " Default actions  "{{{2
 " "default" variants with :split "{{{3
 function! s:with_split(direction_modifier, item)
+  let original_tabpagenr = tabpagenr()
+  let original_curwinnr = winnr()
+  let original_winrestcmd = winrestcmd()
+
   let v:errmsg = ''
-  execute a:direction_modifier 'split'
-  if v:errmsg == ''
-    " Here we have to do "default" action of the default action table for the
-    " current source instead of composite action table - because the latter
-    " may cause infinitely recursive loop if "default" action is overriden by
-    " other action which refers "default" action, such as "tab-Right".
-    call s:do_action('default', a:item, s:FALSE)
+  silent! execute a:direction_modifier 'split'
+  if v:errmsg != ''
+    return v:errmsg
   endif
-  return
+
+  " Here we have to do "default" action of the default action table for the
+  " current source instead of composite action table - because the latter
+  " may cause infinitely recursive loop if "default" action is overriden by
+  " other action which refers "default" action, such as "tab-Right".
+  let _ = s:do_action('default', a:item, s:FALSE)
+
+  if _ isnot 0
+    " Undo the last :split.
+    close
+    execute 'tabnext' original_tabpagenr
+    execute original_curwinnr 'wincmd w'
+    execute original_winrestcmd
+  endif
+  return _
 endfunction
 
 function! s:_default_action_Bottom(item)
@@ -1441,34 +1485,35 @@ endfunction
 
 
 function! s:_default_action_cd(item)  "{{{3
-  cd `=fnamemodify(a:item.word, ':p:h')`
-  return
+  let v:errmsg = ''
+  silent! cd `=fnamemodify(a:item.word, ':p:h')`
+  return v:errmsg == '' ? 0 : v:errmsg
 endfunction
 
 
 function! s:_default_action_default(item)  "{{{3
-  echoerr 'ku: Source' string(a:item.ku__source)
-  \       'does not have the "default" action'
-  return
+  return 'ku: Source ' . string(a:item.ku__source)
+  \      . ' does not have the "default" action'
 endfunction
 
 
 function! s:_default_action_ex(item)  "{{{3
   " Support to execute an Ex command on a:item.word (as path).
   call feedkeys(printf(": %s\<C-b>", fnameescape(a:item.word)), 'n')
-  return
+  return 0
 endfunction
 
 
 function! s:_default_action_lcd(item)  "{{{3
-  lcd `=fnamemodify(a:item.word, ':p:h')`
-  return
+  let v:errmsg = ''
+  silent! lcd `=fnamemodify(a:item.word, ':p:h')`
+  return v:errmsg == '' ? 0 : v:errmsg
 endfunction
 
 
 function! s:_default_action_nop(item)  "{{{3
   " NOP
-  return
+  return 0
 endfunction
 
 

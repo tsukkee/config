@@ -1,5 +1,5 @@
 " ku source: file
-" Version: 0.1.0
+" Version: 0.1.1
 " Copyright (C) 2008-2009 kana <http://whileimautomaton.net/>
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -129,7 +129,11 @@ endfunction
 
 " Misc.  "{{{1
 function! s:open(bang, item)  "{{{2
+  " BUGS: ":silent! edit {file with swp owned by another Vim process}" causes
+  " some strange behavior - there is no message but Vim waits for a key input.
+  " It makes users confusing, so here :silent!/v:errmsg are not used.
   execute 'edit'.a:bang fnameescape(a:item.word)
+  return 0
 endfunction
 
 
@@ -137,14 +141,12 @@ endfunction
 
 " Actions  "{{{2
 function! ku#file#action_open(item)  "{{{3
-  call s:open('', a:item)
-  return
+  return s:open('', a:item)
 endfunction
 
 
 function! ku#file#action_open_x(item)  "{{{3
-  call s:open('!', a:item)
-  return
+  return s:open('!', a:item)
 endfunction
 
 

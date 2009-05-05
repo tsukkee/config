@@ -1,5 +1,5 @@
 " ku source: history
-" Version: 0.1.0
+" Version: 0.1.1
 " Copyright (C) 2008-2009 kana <http://whileimautomaton.net/>
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -116,6 +116,10 @@ endfunction
 " Misc.  "{{{1
 " Actions  "{{{2
 function! ku#history#action_open(item)  "{{{3
+  if !a:item.ku__completed_p
+    return 'No such entry in the input history: ' . string(a:item.word)
+  endif
+
   let pattern = a:item.word
   let source = a:item.menu
 
@@ -124,7 +128,7 @@ function! ku#history#action_open(item)  "{{{3
   endif
 
   call ku#start(source, pattern)
-  return
+  return 0  " FIXME: action: How about the result of ku#start()?
 endfunction
 
 
