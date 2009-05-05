@@ -9,9 +9,34 @@ zle -N history-beginning-search-forward-end history-search-end
 bindkey "^P" history-beginning-search-backward-end
 bindkey "^N" history-beginning-search-forward-end
 
+# smart insert last word
+autoload smart-insert-last-word
+zle -N insert-last-word smart-insert-last-word
+zstyle :insert-last-word match \
+    '*([^[:space:]][:alpha:]/\\]|[[:alpha:]/\\][^[:space:]])*'
+bindkey '^]' insert-last-word
+
 # completion setting
 autoload -U compinit
 compinit
+
+# zstyle ':completion:*:default' menu select=1
+
+# quote previous word in single or double quote
+autoload -U modify-current-argument
+_quote-previous-word-in-single() {
+    modify-current-argument '${(qq)${(Q)ARG}}'
+    zle vi-forward-blank-word
+}
+zle -N _quote-previous-word-in-single
+bindkey '^[s' _quote-previous-word-in-single
+
+_quote-previous-word-in-double() {
+    modify-current-argument '${(qqq)${(Q)ARG}}'
+    zle vi-forward-blank-word
+}
+zle -N _quote-previous-word-in-double
+bindkey '^[d' _quote-previous-word-in-double
 
 # colorize
 zstyle ':completion:*' list-colors '' 
@@ -115,7 +140,7 @@ preexec_functions+=_screen_cmdname
 
 # aliases
 set complete_aliases
-test -x /opt/local/bin/lv && alias less=/opt/local/bin/lv
+# test -x /opt/local/bin/lv && alias less=/opt/local/bin/lv
 # test -x /opt/local/bin/jexctags && alias ctags=jexctags
 alias ls="ls -GF"
 alias scr="screen -xR"
