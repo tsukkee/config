@@ -190,7 +190,6 @@ vnoremap g0 0
 vnoremap $  g$
 vnoremap g$ $
 
-
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
 cnoremap <Up> <C-p>
@@ -309,6 +308,8 @@ let g:NeoComplCache_SmartCase = 1
 let g:NeoComplCache_EnableMFU = 1
 let g:NeoComplCache_TagsAutoUpdate = 1
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
+nmap <silent><C-e> <Plug>(neocomplcache_keyword_caching)
+imap <expr><silent><C-e> pumvisible() ? "\<C-e>" : "\<Plug>(neocomplcache_keyword_caching)"
 
 " ku
 function! Ku_my_keymappings()
@@ -339,6 +340,7 @@ call ku#custom_prefix('common', '~', $HOME)
 nnoremap <silent> [Prefix]kb :<C-u>Ku buffer<Cr>
 nnoremap <silent> [Prefix]kf :<C-u>Ku file<Cr>
 nnoremap <silent> [Prefix]kh :<C-u>Ku history<Cr>
+
 
 " Reload Firefox {{{
 " Need MozRepl and +ruby
