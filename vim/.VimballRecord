@@ -1,3 +1,3 @@
-muttator.vba: call delete('/Users/tsukkee/.vim/syntax/muttator.vim')|call delete('/Users/tsukkee/.vim/ftdetect/muttator.vim')
-vimperator.vba: call delete('/Users/tsukkee/.vim/syntax/vimperator.vim')|call delete('/Users/tsukkee/.vim/ftdetect/vimperator.vim')
 Align.vba: call delete('/Users/tsukkee/.vim/plugin/AlignPlugin.vim')|call delete('/Users/tsukkee/.vim/plugin/AlignMapsPlugin.vim')|call delete('/Users/tsukkee/.vim/plugin/cecutil.vim')|call delete('/Users/tsukkee/.vim/doc/Align.txt')|call delete('/Users/tsukkee/.vim/autoload/Align.vim')|call delete('/Users/tsukkee/.vim/autoload/AlignMaps.vim')
+vimperator.vba: call delete('/Users/tsukkee/.vim/syntax/vimperator.vim')|call delete('/Users/tsukkee/.vim/ftdetect/vimperator.vim')
+muttator.vba: call delete('/Users/tsukkee/.vim/syntax/muttator.vim')|call delete('/Users/tsukkee/.vim/ftdetect/muttator.vim')

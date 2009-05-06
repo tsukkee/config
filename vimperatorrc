@@ -35,10 +35,10 @@ set! dom.popup_maximum=1000
 
 " ==================== key mappings ==================== "
 " increase j, k, h, l
-noremap j 5j
-noremap k 5k
-noremap h 3h
-noremap l 3l
+nnoremap j 5j
+nnoremap k 5k
+nnoremap h 3h
+nnoremap l 3l
 
 " enable to select completion list by <C-p> and <C-n>
 cnoremap <C-p> <S-Tab>
@@ -46,14 +46,14 @@ cnoremap <C-n> <Tab>
 
 " avoid unintended paste
 " only use "gP"
-noremap p <Nop>
-noremap P <Nop>
+nnoremap p <Nop>
+nnoremap P <Nop>
 
 " ghでハイライトオフ
-noremap gh :nohl<CR>
+nnoremap gh :nohl<CR>
 
 " Flashblock
-noremap <C-f> :js Flashblock.toggleSiteWhitelisted();<CR>r
+nnoremap <C-f> :js Flashblock.toggleSiteWhitelisted();<CR>r
 
 " search
 js <<EOM
