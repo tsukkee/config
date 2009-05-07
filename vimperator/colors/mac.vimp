@@ -13,4 +13,9 @@ hi HintActive -append background-color: #aaaaff; color: black
 
 hi Title -append color: #1e46f3
 
+style -name statusbar chrome://* <<EOM
+  #status-bar statusbarpanel { padding: 0 1px !important; }
+  statusbarpanel > * { margin: 0 !important; padding: 0 !important; }
+EOM
+
 " vim: set ft=vimperator:

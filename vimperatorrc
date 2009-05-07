@@ -162,15 +162,15 @@ let command_bookmarklet_prefix=""
 javascript <<EOM
 liberator.globalVariables.migrate_elements = [
     {
-        // star button of awesome bar
-        id:    'star-button',
-        dest:  'liberator-statusline-field-url',
+        // icon that show the existence of RSS and Atom on current page
+        id:    'feed-button',
+        dest:  'security-button',
         after: true,
     },
     {
-        // icon that show the existence of RSS and Atom on current page
-        id:    'feed-button',
-        dest:  'liberator-statusline-field-url',
+        // star button of awesome bar
+        id:    'star-button',
+        dest:  'security-button',
         after: true,
     },
     {

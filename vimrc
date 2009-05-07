@@ -3,6 +3,7 @@
 set tabstop=4 shiftwidth=4 softtabstop=0 " set tab width
 set expandtab   " use space instead of tab
 set smartindent " use smart indent
+set history=100 " number of command history
 
 " Input support
 set timeoutlen=500             " timeout for key mappings
@@ -154,23 +155,16 @@ filetype plugin on " to use filetype plugin
 " Omni completion
 set completeopt+=menuone " Display menu
 
-" keybind for completing and selecting popup menu
-inoremap <silent> <expr> <CR> (pumvisible() ? "\<C-y>" : "") . "\<CR>X\<BS>"
-inoremap <silent> <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <silent> <expr> <C-h> (pumvisible() ? "\<C-y>" : "") . "\<C-h>"
-inoremap <silent> <expr> <C-n> pumvisible() ? "\<C-n>" : "\<C-x>\<C-u>\<C-p>"
-
-" Change popup menu colors
-" highlight Pmenu ctermbg=lightcyan ctermfg=black 
-" highlight PmenuSel ctermbg=blue ctermfg=white 
-" highlight PmenuSbar ctermbg=darkgray 
-" highlight PmenuThumb ctermbg=lightgray
-
 " Disable input methods
 set iminsert=0
 set imsearch=0
 
 " ==================== Keybind ==================== "
+
+" reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
+nnoremap [Prefix] <Nop>
+nmap <Space> [Prefix]
+
 " Move the cursor according to visual line and row
 nnoremap j  gj
 nnoremap k  gk
@@ -195,6 +189,12 @@ cnoremap <C-n> <Down>
 cnoremap <Up> <C-p>
 cnoremap <Down> <C-n>
 
+" keybind for completing and selecting popup menu
+inoremap <silent> <expr> <CR> (pumvisible() ? "\<C-y>" : "") . "\<CR>X\<BS>"
+inoremap <silent> <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <silent> <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <silent> <expr> <C-h> (pumvisible() ? "\<C-y>" : "") . "\<C-h>"
+inoremap <silent> <expr> <C-n> pumvisible() ? "\<C-n>" : "\<C-x>\<C-u>\<C-p>"
 
 " Delete highlight
 nnoremap <silent> gh :nohlsearch<CR>
@@ -215,14 +215,14 @@ cnoremap <expr> <C-z> expand('%:p:r')
 "
 " Vim(Mac)
 if has('mac') && !has('gui')
-    nnoremap <silent> <Space>y :.w !pbcopy<CR><CR>
-    vnoremap <silent> <Space>y :w !pbcopy<CR><CR>
-    nnoremap <silent> <Space>p :r !pbpaste<CR>
-    vnoremap <silent> <Space>p :r !pbpaste<CR>
+    nnoremap <silent> [Prefix]y :.w !pbcopy<CR><CR>
+    vnoremap <silent> [Prefix]y :w !pbcopy<CR><CR>
+    nnoremap <silent> [Prefix]p :r !pbpaste<CR>
+    vnoremap <silent> [Prefix]p :r !pbpaste<CR>
 " GVim(Mac & Win)
 else
-    noremap <Space>y "+y
-    noremap <Space>p "+p
+    noremap [Prefix]y "+y
+    noremap [Prefix]p "+p
 endif
 
 " Enable mouse wheel
@@ -275,9 +275,6 @@ augroup END
 
 
 " ==================== plugins setting ==================== "
-" reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
-nnoremap [Prefix] <Nop>
-nmap <Space> [Prefix]
 
 " ctags
 command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
@@ -308,16 +305,17 @@ let g:NeoComplCache_SmartCase = 1
 let g:NeoComplCache_EnableMFU = 1
 let g:NeoComplCache_TagsAutoUpdate = 1
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
-nmap <silent><C-e> <Plug>(neocomplcache_keyword_caching)
-imap <expr><silent><C-e> pumvisible() ? "\<C-e>" : "\<Plug>(neocomplcache_keyword_caching)"
+nmap <silent> <C-e> <Plug>(neocomplcache_keyword_caching)
+imap <expr> <silent> <C-e> pumvisible() ? "\<C-e>" : "\<Plug>(neocomplcache_keyword_caching)"
 
 " ku
 function! Ku_my_keymappings()
     imap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
     nmap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
-    imap <buffer> <silent> <Space> <Plug>(ku-choose-an-action)
-    nmap <buffer> <silent> <Space> <Plug>(ku-choose-an-action)
+    imap <buffer> <silent> ; <Plug>(ku-choose-an-action)
+    nmap <buffer> <silent> ; <Plug>(ku-choose-an-action)
     inoremap <buffer> <silent> <Tab> <C-n>
+    inoremap <buffer> <silent> <S-Tab> <C-p>
 endfunction
 augroup KuSetting
     autocmd!
@@ -340,6 +338,7 @@ call ku#custom_prefix('common', '~', $HOME)
 nnoremap <silent> [Prefix]kb :<C-u>Ku buffer<Cr>
 nnoremap <silent> [Prefix]kf :<C-u>Ku file<Cr>
 nnoremap <silent> [Prefix]kh :<C-u>Ku history<Cr>
+nnoremap <silent> [Prefix]kc :<C-u>Ku cmdhistory<Cr>
 
 
 " Reload Firefox {{{
