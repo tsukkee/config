@@ -310,12 +310,17 @@ imap <expr> <silent> <C-e> pumvisible() ? "\<C-e>" : "\<Plug>(neocomplcache_keyw
 
 " ku
 function! Ku_my_keymappings()
-    imap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
-    nmap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
-    imap <buffer> <silent> ; <Plug>(ku-choose-an-action)
-    nmap <buffer> <silent> ; <Plug>(ku-choose-an-action)
     inoremap <buffer> <silent> <Tab> <C-n>
     inoremap <buffer> <silent> <S-Tab> <C-p>
+    imap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
+    nmap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
+    imap <buffer> <silent> <Esc><Cr> <Plug>(ku-choose-an-action)
+    nmap <buffer> <silent> <Esc><Cr> <Plug>(ku-choose-an-action)
+    " for GVim, MacVim
+    imap <buffer> <silent> <A-Esc> <Plug>(ku-cancel)
+    nmap <buffer> <silent> <A-Esc> <Plug>(ku-cancel)
+    imap <buffer> <silent> <A-Cr> <Plug>(ku-choose-an-action)
+    nmap <buffer> <silent> <A-Cr> <Plug>(ku-choose-an-action)
 endfunction
 augroup KuSetting
     autocmd!
