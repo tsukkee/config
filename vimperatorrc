@@ -50,10 +50,13 @@ nnoremap p <Nop>
 nnoremap P <Nop>
 
 " ghでハイライトオフ
-nnoremap gh :nohl<CR>
+nnoremap gh :nohl<CR>:offwordhighlight<CR>
 
 " Flashblock
 nnoremap <C-f> :js Flashblock.toggleSiteWhitelisted();<CR>r
+
+" toggle autopagerize
+nnoremap <C-a> :toggleautopagerize<CR>
 
 " search
 js <<EOM
@@ -112,18 +115,34 @@ commands.addUserCommand(["sandboxjavascript", "sjs"],
 EOM
 
 js <<EOM
+(function() {
+function dispatchMouseClickByXPath(xpath) {
+    let d = window.getBrowser().contentDocument;
+    let elements = d.evaluate(xpath ,d, null, 7, null);
+    if(elements.snapshotLength) {
+        let e = d.createEvent('MouseEvents');
+        e.initEvent('click', true, true);
+        elements.snapshotItem(0).dispatchEvent(e);
+    }
+    else {
+        liberator.echoerr("not found: " + xpath);
+    }
+}
+
 commands.addUserCommand(["toggleautopagerize"],
     "toggle on/off autopagerize",
     function(args)
     {
-        let d = window.getBrowser().contentDocument;
-        let elements = d.evaluate('id("autopagerize_help")//a[@class="autopagerize_link"]', d, null, 7, null);
-        if(elements.snapshotLength) {
-            let e = d.createEvent('MouseEvents');
-            e.initEvent('click', true, true);
-            elements.snapshotItem(0).dispatchEvent(e);
-        }
+        dispatchMouseClickByXPath('id("autopagerize_help")//a[@class="autopagerize_link"]');
     });
+
+commands.addUserCommand(["offwordhighlight"],
+    "off wordhighlight",
+    function(args)
+    {
+        dispatchMouseClickByXPath('id("wordhighlight_words")//*[@value="off"]');
+    });
+})();
 EOM
 
 " ==================== hints ==================== "
