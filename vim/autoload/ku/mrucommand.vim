@@ -2,12 +2,12 @@ let s:cached_items = []
 let s:types = {'cmd': ':', 'search': '/'}
 
 
-function! ku#cmdhistory#available_sources()
-    return ['cmdhistory']
+function! ku#mrucommand#available_sources()
+    return ['mrucommand']
 endfunction
 
 
-function! ku#cmdhistory#on_source_enter(source_name_ext)
+function! ku#mrucommand#on_source_enter(source_name_ext)
     let _ = []
     let l = len(max(map(copy(s:types), 'histnr(v:key)')))
     for [type, prefix] in items(s:types)
@@ -17,10 +17,8 @@ function! ku#cmdhistory#on_source_enter(source_name_ext)
             if(cmd != "")
                 call add(_, {
                 \      'word': prefix . cmd,
-                \      'menu': printf('cmd history %*d', l, i),
-                \      'dup': 1,
-                \      'ku_buffer_nr': i,
-                \      'ku__sort_priority': 0
+                \      'menu': type,
+                \      'ku__sort_priority': &history - i
                 \    })
             endif
         endfor
@@ -29,38 +27,38 @@ function! ku#cmdhistory#on_source_enter(source_name_ext)
 endfunction
 
 
-function! ku#cmdhistory#action_table(source_name_ext)
+function! ku#mrucommand#action_table(source_name_ext)
     return {
-    \   'default': 'ku#cmdhistory#execute',
-    \   'input': 'ku#cmdhistory#input',
+    \   'default': 'ku#mrucommand#execute',
+    \   'input': 'ku#mrucommand#input',
     \ }
 endfunction
 
 
-function! ku#cmdhistory#key_table(source_name_ext)
+function! ku#mrucommand#key_table(source_name_ext)
     return {
     \   'i': 'input',
     \ }
 endfunction
 
 
-function! ku#cmdhistory#gather_items(source_name_ext, pattern)
+function! ku#mrucommand#gather_items(source_name_ext, pattern)
     return s:cached_items
 endfunction
 
 
-function! ku#cmdhistory#special_char_p(source_name_ext, character)
+function! ku#mrucommand#special_char_p(source_name_ext, character)
     return 0
 endfunction
 
 
-function! ku#cmdhistory#execute(item)
+function! ku#mrucommand#execute(item)
     " execute a:item.word
     call feedkeys(a:item.word . "\<CR>")
 endfunction
 
 
-function! ku#cmdhistory#input(item)
+function! ku#mrucommand#input(item)
     call feedkeys(a:item.word)
 endfunction
 

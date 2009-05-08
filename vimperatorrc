@@ -1,6 +1,6 @@
 " ==================== basic options ==================== "
 set activate=quickmark,paste
-set complete=l
+set complete=sl
 set focuscontent
 set followhints=1
 set guioptions=BrbmN

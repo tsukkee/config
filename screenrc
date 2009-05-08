@@ -25,7 +25,7 @@ hardstatus string "%-w%{=b}%n %t%{-}%+w"
 termcapinfo xterm* 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
 
 # term
-defbce "on"
+defbce on
 term xterm-256color
 # term rxvt-256color
 

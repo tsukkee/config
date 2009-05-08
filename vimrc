@@ -338,7 +338,8 @@ call ku#custom_prefix('common', '~', $HOME)
 nnoremap <silent> [Prefix]kb :<C-u>Ku buffer<Cr>
 nnoremap <silent> [Prefix]kf :<C-u>Ku file<Cr>
 nnoremap <silent> [Prefix]kh :<C-u>Ku history<Cr>
-nnoremap <silent> [Prefix]kc :<C-u>Ku cmdhistory<Cr>
+nnoremap <silent> [Prefix]kc :<C-u>Ku mrucommand<Cr>
+nnoremap <silent> [Prefix]km :<C-u>Ku mrufile<Cr>
 
 
 " Reload Firefox {{{
