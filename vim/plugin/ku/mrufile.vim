@@ -1,4 +1,4 @@
-" ku source: mrucommand
+" ku source: mrufile
 " Version: 0.0.1
 " Copyright (C) 2009 tsukkee <http://relaxedcolumn.blog8.fc2.com/>
 " License: MIT license  {{{
@@ -21,86 +21,24 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Variables  "{{{1
 
-let s:cached_items = []
-let s:TYPES = {'cmd': ':', 'search': '/'}
-
-
-
-
-
-
-
-
-" Interface  "{{{1
-function! ku#mrucommand#available_sources() "{{{2
-  return ['mrucommand']
-endfunction
-
-
-
-
-
-
-
-
-function! ku#mrucommand#action_table(source_name_ext) "{{{2
-  return {
-  \   'default': 'ku#mrucommand#execute',
-  \   'input': 'ku#mrucommand#input',
-  \ }
-endfunction
-
-
-
-
-function! ku#mrucommand#key_table(source_name_ext) "{{{2
-  return {
-  \   'i': 'input',
-  \ }
-endfunction
-
-
-
-
-function! ku#mrucommand#gather_items(source_name_ext, pattern) "{{{2
-  let _ = []
-  for [type, prefix] in items(s:TYPES)
-    let n = histnr(type)
-    for i in range(0, n)
-      let cmd = histget(type, i)
-      if(cmd != "")
-        call add(_, {
-        \      'word': prefix . cmd,
-        \      'menu': type,
-        \      'ku__sort_priority': - i
-        \    })
-      endif
-    endfor
-  endfor
-  return _
-endfunction
-
-
-
-
+if exists('g:loaded_ku_mrufile') || v:version < 700
+  finish
+endif
+let g:loaded_ku_mrufile = 1
 
 
 
 
 " Misc {{{1
-" Actions {{{2
-function! ku#mrucommand#execute(item) "{{{3
-  call feedkeys(a:item.word . "\<CR>")
-endfunction
+" AutoCommands {{{2
+augroup plugin-ku-mrufile
+  autocmd!
+  autocmd BufEnter     * call ku#mrufile#add()
+  autocmd BufWritePost * call ku#mrufile#add()
+  autocmd BufFilePost  * call ku#mrufile#add()
+augroup END
 
-
-
-
-function! ku#mrucommand#input(item) "{{{3
-  call feedkeys(a:item.word)
-endfunction
 
 
 

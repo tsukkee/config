@@ -1,5 +1,5 @@
 " ku source: mrufile
-" Version: 0.0.0
+" Version: 0.0.1
 " Copyright (C) 2009 tsukkee <http://relaxedcolumn.blog8.fc2.com/>
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -21,27 +21,9 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Variables  "{{{1
-
-let s:cached_items = []
-
-
-
-
-
-
-
-
 " Interface  "{{{1
 function! ku#mrufile#available_sources() "{{{2
   return ['mrufile']
-endfunction
-
-
-
-
-function! ku#mrufile#on_source_enter(source_name_ext) "{{{2
-  let s:cached_items = s:mrufile_load()
 endfunction
 
 
@@ -62,14 +44,7 @@ endfunction
 
 
 function! ku#mrufile#gather_items(source_name_ext, pattern) "{{{2
-  return s:cached_items
-endfunction
-
-
-
-
-function! ku#mrufile#special_char_p(source_name_ext, character) "{{{2
-  return 0
+  return s:mrufile_load()
 endfunction
 
 
@@ -80,12 +55,9 @@ endfunction
 
 
 " Misc {{{1
-" AutoCommands {{{2
-augroup ku-mrufile
-  autocmd!
-  autocmd BufEnter * call s:mrufile_add()
-  autocmd BufWritePost * call s:mrufile_add()
-augroup END
+function! ku#mrufile#add()
+  call s:mrufile_add()
+endfunction
 
 
 
@@ -111,15 +83,19 @@ endfunction
 
 function! s:mrufile_load() "{{{3
   let _ = []
-  if filereadable(s:mrufile_file())
-    for line in readfile(s:mrufile_file(), '', g:ku_mrufile_size)
-      let columns = split(line, '\t')
-      call add(_, {
-      \      'word': columns[0],
-      \      'time': str2nr(columns[1]),
-      \      'menu': isdirectory(columns[0]) ? "dir" : "file",
-      \      'ku__sort_priorities': - str2nr(columns[1]),
-      \    })
+  let file = s:mrufile_file()
+  if filereadable(file)
+    for line in readfile(file, '', g:ku_mrufile_size)
+      let [word, _time] = split(line, '\t')
+      if filereadable(word) || isdirectory(word)
+        call add(_, {
+        \      'word': word,
+        \      'abbr': fnamemodify(word, ':~:.'), 
+        \      'menu': getftype(word),
+        \      '_time': _time,
+        \      'ku__sort_priority': - str2nr(_time),
+        \    })
+      endif
     endfor
   endif
   return _
@@ -135,23 +111,24 @@ function! s:mrufile_save(list) "{{{3
     call mkdir(directory, 'p')
   endif
 
-  call writefile(map(a:list, 'v:val.word ."\t". v:val.time'), file)
+  call writefile(map(a:list, 'v:val.word ."\t". v:val._time'), file)
 endfunction
 
 
 
 
 function! s:mrufile_add() "{{{3
+  let new_word = expand("%:p")
+
   if !empty(&buftype) || expand('%') !~ '\S'
     return
   endif
 
   let _ = s:mrufile_load()
-  let new_word = expand("%:p")
   let _ = filter(_, 'v:val.word != new_word')
   call insert(_, {
   \      'word': new_word,
-  \      'time': localtime(),
+  \      '_time': localtime(),
   \    })
   call s:mrufile_save(_)
 endfunction
