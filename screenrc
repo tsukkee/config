@@ -3,7 +3,7 @@ autodetach on
 zombie "q^M"
 startup_message off
 vbell off
-escape ^Jj
+escape ^Ff
 defscrollback 10000
 
 # encoding

@@ -340,7 +340,7 @@ endfunction
 call ku#custom_prefix('common', '.vim', $HOME.'/.vim')
 call ku#custom_prefix('common', '~', $HOME)
 
-nnoremap <silent> [Prefix]kb :<C-u>Ku buffer<Cr>
+nnoremap <silent> [Prefix]b :<C-u>Ku buffer<Cr>
 nnoremap <silent> [Prefix]kf :<C-u>Ku file<Cr>
 nnoremap <silent> [Prefix]kh :<C-u>Ku history<Cr>
 nnoremap <silent> [Prefix]kc :<C-u>Ku mrucommand<Cr>
@@ -425,7 +425,9 @@ let html_use_encoding = "utf-8"
 command! HTMLEscape silent exe "rubydo $_ = $_.gsub('&', '&amp;').gsub('>', '&gt;').gsub('<', '&lt;').gsub('\"', '&quot;')"
 
 " NERD_tree
-nnoremap <silent> [Prefix]t :NERDTreeToggle<CR>
+let g:NERDTreeHijackNetrw = 0
+nnoremap <silent> [Prefix]t :NERDTree<CR>
+nnoremap <silent> [Prefix]T :NERDTreeClose<CR>
 
 augroup NERDTreeCustomCommand
     autocmd! NERDTreeCustomCommand

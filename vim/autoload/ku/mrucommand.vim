@@ -23,7 +23,6 @@
 " }}}
 " Variables  "{{{1
 
-let s:cached_items = []
 let s:TYPES = {'cmd': ':', 'search': '/'}
 
 
