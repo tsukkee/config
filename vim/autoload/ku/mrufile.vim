@@ -125,7 +125,7 @@ function! s:mrufile_add() "{{{3
   endif
 
   let _ = s:mrufile_load()
-  let _ = filter(_, 'v:val.word != new_word')
+  call filter(_, 'v:val.word != new_word')
   call insert(_, {
   \      'word': new_word,
   \      '_time': localtime(),

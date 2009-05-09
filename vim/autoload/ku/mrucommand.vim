@@ -91,14 +91,14 @@ endfunction
 " Misc {{{1
 " Actions {{{2
 function! ku#mrucommand#execute(item) "{{{3
-  call feedkeys(a:item.word . "\<CR>")
+  call feedkeys(a:item.word . "\<CR>", 'n')
 endfunction
 
 
 
 
 function! ku#mrucommand#input(item) "{{{3
-  call feedkeys(a:item.word)
+  call feedkeys(a:item.word, 'n')
 endfunction
 
 
