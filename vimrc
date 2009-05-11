@@ -345,6 +345,8 @@ nnoremap <silent> [Prefix]kf :<C-u>Ku file<Cr>
 nnoremap <silent> [Prefix]kh :<C-u>Ku history<Cr>
 nnoremap <silent> [Prefix]kc :<C-u>Ku mrucommand<Cr>
 nnoremap <silent> [Prefix]km :<C-u>Ku mrufile<Cr>
+nnoremap <silent> [Prefix]kt :<C-u>Ku tags<Cr>
+nnoremap <silent> [Prefix]h :<C-u>Ku tags/help<Cr>
 
 
 " Reload Firefox {{{

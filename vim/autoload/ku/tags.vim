@@ -50,10 +50,14 @@ function! ku#tags#on_source_enter(source_name_ext)  "{{{2
   for tagfile in s:Unique(tagfiles())
     for line in readfile(tagfile)
       let [word, file] = split(line, "\t")[0:1]
-      call add(_, {
-      \      'word': word,
-      \      'menu': file,
-      \    })
+      if stridx(word, "!") != 0
+        call add(_, {
+        \      'word': word,
+        \      'menu': file,
+        \      'dup': 1,
+        \      '_ext': a:source_name_ext,
+        \    })
+      endif
     endfor
   endfor
   let s:cached_items = _
@@ -96,7 +100,7 @@ function! ku#tags#gather_items(source_name_ext, pattern) "{{{2
       
     let pattern = filter(split(a:pattern, " "), "!empty(v:val)")[0]
     " heading matching for short word
-    if len(pattern) < g:ku_tags_start_length
+    if len(pattern) < g:ku_tags_matching_threshold
       return filter(copy(s:cached_items), "v:val.word =~# '^'.pattern")
 
     " global matching for long word
@@ -121,6 +125,7 @@ endfunction
 
 
 " Misc {{{1
+" from fuzzyfinder.vim
 function! s:Unique(in)
   let sorted = sort(a:in)
   if len(sorted) < 2
@@ -141,12 +146,12 @@ endfunction
 
 
 " Variables {{{2
-if !exists('g:ku_tags_start_length')
-  let g:ku_tags_start_length = 2
+if !exists('g:ku_tags_matching_threshold')
+  let g:ku_tags_matching_threshold = 2
 endif
 
 if !exists('g:ku_tags_limit_for_filtering')
-  let g:ku_tags_limit_for_filtering = 200
+  let g:ku_tags_limit_for_filtering = 1000
 endif
 
 
@@ -155,14 +160,16 @@ endif
 " Actions {{{2
 " TODO: help!, tjump, stjump etc..
 function! ku#tags#lookup(item) "{{{3
-  execute "help " . a:item.word
+  let command = a:item._ext == "help" ? "help " : "tjump "
+  execute command . a:item.word
 endfunction
 
 
 
 
 function! ku#tags#input(item) "{{{3
-  call feedkeys(":help " . a:item.word, 'n')
+  let command = a:item._ext == "help" ? ":help " : ":tjump "
+  call feedkeys(command . a:item.word, 'n')
 endfunction
 
 

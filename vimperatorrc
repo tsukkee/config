@@ -91,8 +91,8 @@ js <<EOM
 EOM
 
 js <<EOM
-commands.addUserCommand(["sandboxjavascript", "sjs"],
-    "Run a JavaScript command in Sandbox",
+commands.addUserCommand(["javascriptincontent", "jsc"],
+    "Run a JavaScript command in content context",
     function (args)
     {
         try
@@ -100,6 +100,7 @@ commands.addUserCommand(["sandboxjavascript", "sjs"],
             let s = new Components.utils.Sandbox(buffer.URL);
             s.window = content.window;
             s.document = content.document;
+            // s.__proto__ = content.window.wrappedJSObject;
             return Components.utils.evalInSandbox(args.string, s);
         }
         catch (e)
