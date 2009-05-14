@@ -19,7 +19,7 @@
 --langmap=ruby:.rb.rhtml
 --ruby-kinds=+c+f+m+F
 
---langmap=c++:.cc.cpp.h
+--langmap=c++:.cc.cpp.h.hpp
 --c++-kinds=+p
 
 --langdef=tex

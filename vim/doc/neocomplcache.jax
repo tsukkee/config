@@ -1,6 +1,6 @@
 *neocomplcache.txt*	究極の自動補完環境
 
-Version: 2.16
+Version: 2.50
 Author : Shougo <Shougo.Matsu@gmail.com>
 License: MIT license  {{{
     Permission is hereby granted, free of charge, to any person obtaining
@@ -153,7 +153,7 @@ g:NeoComplCache_KeywordCompletionStartLength		*g:NeoComplCache_KeywordCompletion
 		
 		初期値は2である。
 
-g:NeoComplCache_PartialCompletionStartLength		*g:NeoComplCache_PartialCompletion*
+g:NeoComplCache_PartialCompletionStartLength		*g:NeoComplCache_PartialCompletionStartLength*
 		補完時に部分マッチを行う入力数を制御する。
 		
 		初期値は3である。
@@ -194,12 +194,6 @@ g:NeoComplCache_CacheLineCount				*g:NeoComplCache_CacheLineCount*
 		
 		初期値は70である。
 
-g:NeoComplCache_DeleteRank0				*g:NeoComplCache_DeleteRank0*
-		一度キャッシュされたが、その後削除された候補を除外するかどうか制御する。
-		1ならば有効。
-		
-		初期値は0である。
-
 g:NeoComplCache_DisableAutoComplete			*g:NeoComplCache_DisableAutoComplete*
 		自動補完を無効にするかどうかを制御する。
 		1ならば自動補完が無効になる。手動補完は使用できる。
@@ -230,19 +224,19 @@ g:NeoComplCache_QuickMatchMaxLists			*g:NeoComplCache_QuickMatchMaxLists*
 		
 		初期値は100である。
 
-g:NeoComplCache_EnableCompletionSkip			*g:NeoComplCache_EnableCompletionSkip*
+g:NeoComplCache_EnableSkipCompletion			*g:NeoComplCache_EnableSkipCompletion*
 		自動補完時、候補の計算に時間がかかりすぎると補完を中止するかどうか制御する。
 		1ならば有効になる。
 		
 		初期値は+reltimeの時に1となる。
 
-g:NeoComplCache_SkipCompleteTime			*g:NeoComplCache_EnableCompleteTime*
+g:NeoComplCache_SkipCompletionTime			*g:NeoComplCache_SkipCompletionTime*
 		自動補完時、補完を中止するための計算時間を定義する。
 		このオプションの値は文字列でなければならない。
 		
 		初期値は'0.2'である。
 
-g:NeoComplCache_SkipInputTime				*g:NeoComplCache_EnableInputTime*
+g:NeoComplCache_SkipInputTime				*g:NeoComplCache_SkipInputTime*
 		自動補完時、補完を中止するための入力時間を定義する。
 		このオプションの値は文字列でなければならない。
 		
@@ -259,17 +253,11 @@ g:NeoComplCache_TagsAutoUpdate				*g:NeoComplCache_TagsAutoUpdate*
 		
 		初期値は0である。
 
-g:NeoComplCache_TryKeywordCompletion			*g:NeoComplCache_TryKeywordCompletion*
-		補完候補が見つからなかったとき、通常のキーワード補完を行うかどうかを制御する。
+g:NeoComplCache_TryFilenameCompletion			*g:NeoComplCache_TryFilenameCompletion*
+		ファイルパスとなる文字列を入力したとき、自動でファイル名補完を行うかどうかを制御する。
 		1ならば有効になる。
 		
-		初期値は0である。
-
-g:NeoComplCache_TryDefaultCompletion			*g:NeoComplCache_TryDefaultCompletion*
-		補完候補が見つからなかったとき、通常のキーワード補完を行うかどうかを制御する。
-		1ならば有効になる。
-		
-		初期値は0である。
+		初期値は1である。
 
 g:NeoComplCache_MaxTryKeywordLength			*g:NeoComplCache_MaxTryKeywordLength*
 		キーワード補完を行う入力文字数を制御する。
@@ -302,6 +290,12 @@ g:NeoComplCache_EnableCamelCaseCompletion		*g:NeoComplCache_EnableCamelCaseCompl
 		
 		副作用があるので、初期値は0となっている。
 
+g:NeoComplCache_EnableUnderbarCompletion		*g:NeoComplCache_EnableUnderbarCompletion*
+		_を入力したときに、それを単語の区切りとしてあいまい検索を行うかどうか制御する。
+		1ならば有効になる。
+		
+		副作用があるので、初期値は0となっている。
+
 g:NeoComplCache_KeywordPatterns				*g:NeoComplCache_KeywordPatterns*
 		補完するためのキーワードパターンを記録する。
 		これはファイルタイプ毎に正規表現で指定されている。
@@ -328,6 +322,12 @@ g:NeoComplCache_NonBufferFileTypeDetect			*g:NeoComplCache_NonBufferFileTypeDete
 		
 		初期値はautoload/neocomplcache.vimを参照せよ。
 
+g:NeoComplCache_DictionaryFileTypeLists			*g:NeoComplCache_DictionaryFileTypeLists*
+		ファイルタイプに辞書ファイルを関連づけるためのディクショナリ。
+		キーにファイルタイプ、値に辞書ファイルへのパスを指定する。
+		
+		初期値は空である。
+
 ------------------------------------------------------------------------------
 KEY MAPPINGS 					*neocomplcache-key-mappings*
 
@@ -350,14 +350,14 @@ EXAMPLES					*neocomplcache-examples*
 	let g:NeoComplCache_SmartCase = 1
 	" Use previous keyword completion.
 	let g:NeoComplCache_PreviousKeywordCompletion = 1
-	" Try keyword completion.
-	let g:NeoComplCache_TryKeywordCompletion = 1
 	" Use preview window.
 	let g:NeoComplCache_EnableInfo = 1
 	" Delete keyword when rank is 0.
 	let g:NeoComplCache_DeleteRank0 = 1
 	" Use camel case completion.
 	let g:NeoComplCache_EnableCamelCaseCompletion = 1
+	" Use underbar completion.
+	let g:NeoComplCache_EnableUnderbarCompletion = 1
 	" Set minimum syntax keyword length.
 	let g:NeoComplCache_MinSyntaxLength = 3
 	" Set skip input time.
@@ -381,6 +381,7 @@ EXAMPLES					*neocomplcache-examples*
 	smap <silent><C-l>     <Plug>(neocomplcache_snippets_expand)
 	nmap <silent><C-e>     <Plug>(neocomplcache_keyword_caching)
 	imap <expr><silent><C-e>     pumvisible() ? "\<C-e>" : "\<Plug>(neocomplcache_keyword_caching)"
+	inoremap <expr><C-h> pumvisible() ? "\<C-y>\<C-h>" : "\<C-h>"
 <
 ==============================================================================
 BUGS						*neocomplcache-bugs*
