@@ -67,15 +67,12 @@ if !exists('g:ku_mrufile_size')
   let g:ku_mrufile_size = 100
 endif
 
-let s:PATH_SEP = exists('+shellslash') && &shellslash ? '\' : '/'
-let s:MRUFILE_FILE = 'info/ku/mrufile'
-
 
 
 
 " Utilities {{{2
 function! s:mrufile_file() "{{{3
-  return split(&runtimepath, ',')[0] . s:PATH_SEP . s:MRUFILE_FILE
+  return ku#make_path(split(&runtimepath, ',')[0], 'info', 'ku', 'mrufile')
 endfunction
 
 

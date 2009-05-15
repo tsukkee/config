@@ -47,6 +47,7 @@ endfunction
 function! ku#mrucommand#action_table(source_name_ext) "{{{2
   return {
   \   'default': 'ku#mrucommand#execute',
+  \   'execute': 'ku#mrucommand#execute',
   \   'input': 'ku#mrucommand#input',
   \ }
 endfunction

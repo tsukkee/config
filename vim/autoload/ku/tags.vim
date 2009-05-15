@@ -71,6 +71,7 @@ endfunction
 function! ku#tags#action_table(source_name_ext) "{{{2
   return {
   \   'default': 'ku#tags#lookup',
+  \   'lookup': 'ku#tags#lookup',
   \   'input': 'ku#tags#input',
   \ }
 endfunction
