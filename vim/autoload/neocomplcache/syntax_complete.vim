@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: syntax_complete.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 14 May 2009
+" Last Modified: 15 May 2009
 " Usage: Just source this file.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -28,6 +28,7 @@
 " ChangeLog: "{{{
 "   1.19:
 "    - Ignore case.
+"    - Echo on caching.
 "   1.18:
 "    - Improved empty check.
 "    - Fixed for neocomplcache 2.43.
@@ -101,8 +102,10 @@ endfunction"}}}
 function! s:caching()"{{{
     " Caching.
     if &filetype != '' && !has_key(s:syntax_list, &filetype)
+        redraw
         echo 'Caching syntax... please wait.'
         let s:syntax_list[&filetype] = s:initialize_syntax()
+        echo 'Caching done.'
     endif
 endfunction"}}}
 

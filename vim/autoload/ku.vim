@@ -1,5 +1,5 @@
 " ku - An interface for anything
-" Version: 0.2.1
+" Version: 0.2.2
 " Copyright (C) 2008-2009 kana <http://whileimautomaton.net/>
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -100,7 +100,7 @@ let s:LNUM_STATUS = 1
 let s:LNUM_INPUT = 2
 
   " Path separator.
-let s:PATH_SEP = exists('+shellslash') && &shellslash ? '\' : '/'
+let s:PATH_SEP = (exists('+shellslash') && !&shellslash) ? '\' : '/'
 
 
 " The buffer number of the ku buffer.
@@ -221,8 +221,9 @@ let s:_session_id_source_cache = 0
 
 function! s:calculate_available_sources()
   let _ = []
-  for source_name_base in map(s:runtime_files('autoload/ku/*.vim'),
-  \                           'fnamemodify(v:val, ":t:r")')
+  for source_name_base
+  \ in map(s:runtime_files(ku#make_path('autoload', 'ku', '*.vim')),
+  \                        'fnamemodify(v:val, ":t:r")')
     call extend(_, s:api_available_sources(source_name_base))
   endfor
   return _
@@ -366,6 +367,24 @@ endfunction
 
 function! ku#input_history()  "{{{2
   return s:history_list()
+endfunction
+
+
+
+
+function! ku#make_path(...)  "{{{2
+  if a:0 == 1 && type(a:1) is type([])
+    return join(a:1, s:PATH_SEP)
+  else
+    return join(a:000, s:PATH_SEP)
+  endif
+endfunction
+
+
+
+
+function! ku#path_separator()  "{{{2
+  return s:PATH_SEP
 endfunction
 
 
@@ -1663,7 +1682,7 @@ let s:after_idle_p = s:FALSE  " to reload the history file after idle.
 " s:history_changed_p = s:FALSE
 " s:history_file_mtime = 0  " the last modified time of the history file.
 " s:inputted_patterns = []  " the first item is the newest inputted pattern.
-let s:HISTORY_FILE = 'info/ku/history'
+let s:HISTORY_FILE = ku#make_path('info', 'ku', 'history')
 
 " The format of history file is:
 " - Each line is corresponding to an inputted pattern.
@@ -1859,6 +1878,19 @@ function! s:api_special_char_p(source_name, character)  "{{{3
   else
     return 0 <= stridx(g:ku_component_separators, a:character)
   endif
+endfunction
+
+
+
+
+" For tests  "{{{2
+function! ku#_local_variables()
+  return s:
+endfunction
+
+
+function! ku#_sid()
+  return matchstr(expand('<sfile>'), '^<SNR>\d\+_')
 endfunction
 
 
