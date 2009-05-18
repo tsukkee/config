@@ -1,3 +1,5 @@
+(function() {
+
 mappings.addUserMap([modes.NORMAL], ["<Leader>m"],
     "Multiple Tab Handler - toggle selection",
     function(count) {
@@ -45,6 +47,19 @@ mappings.addUserMap([modes.NORMAL], ["d"],
     },
     {});
 
+mappings.addUserMap([modes.NORMAL], ["A"],
+    "Multiple Tab Handler - add bookmark",
+    function(count) {
+        if(window.MultipleTabService && MultipleTabService.hasSelection()) {
+            let tabs = MultipleTabService.getSelectedTabs();
+            MultipleTabService.addBookmarkFor(tabs);
+        }
+        else {
+            events.feedkeys("A", true, false);
+        }
+    },
+    {});
+
 commands.addUserCommand(["multitabduplicate"],
     "Multiple Tab Handler - duplicate",
     function(args) {
@@ -65,3 +80,4 @@ commands.addUserCommand(["multitabdetach"],
     },
     {});
 
+})();
