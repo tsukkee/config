@@ -427,9 +427,10 @@ let html_use_encoding = "utf-8"
 command! HTMLEscape silent exe "rubydo $_ = $_.gsub('&', '&amp;').gsub('>', '&gt;').gsub('<', '&lt;').gsub('\"', '&quot;')"
 
 " NERD_tree
-let g:NERDTreeHijackNetrw = 0
-nnoremap <silent> [Prefix]t :NERDTree<CR>
-nnoremap <silent> [Prefix]T :NERDTreeClose<CR>
+" let g:NERDTreeHijackNetrw = 0
+nnoremap <silent> [Prefix]t :<C-u>NERDTree<CR>
+nnoremap <silent> [Prefix]T :<C-u>NERDTreeClose<CR>
+nnoremap <silent> [Prefix]<C-t> :<C-u>execute 'NERDTree ' . expand('%:p:h')<CR>
 
 augroup NERDTreeCustomCommand
     autocmd! NERDTreeCustomCommand
