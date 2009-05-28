@@ -150,4 +150,4 @@ alias -g Ceuc="| iconv -f euc-jp -t sjis | pbcopy"
 alias -g EU="| iconv -f euc-jp -t utf-8"
 alias -g SU="| iconv -f sjis -t utf-8"
 
-source ~/.zshrc.local
+test -f $HOME/.zshrc.local && source $HOME/.zshrc.local

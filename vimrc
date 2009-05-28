@@ -273,6 +273,8 @@ augroup TabpageCD
     \ | execute 'cd' fnameescape(t:cwd)
 augroup END
 
+" Rename
+command! -nargs=1 -complete=file Rename saveas <args> | call delete(expand('#'))
 
 " ==================== plugins setting ==================== "
 
@@ -288,6 +290,11 @@ augroup END
 " CakePHP
 au BufNewFile,BufRead *.thtml setfiletype php
 au BufNewFile,BufRead *.ctp setfiletype php
+
+" gist
+let g:gist_clip_command = 'pbcopy'
+let g:gist_detect_filetype = 1
+let g:gist_open_browser_after_post = 1
 
 " smartword
 map W <Plug>(smartword-w)
