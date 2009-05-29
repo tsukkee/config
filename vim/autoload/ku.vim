@@ -1,5 +1,5 @@
 " ku - An interface for anything
-" Version: 0.2.3
+" Version: 0.2.4.1
 " Copyright (C) 2008-2009 kana <http://whileimautomaton.net/>
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -837,14 +837,14 @@ function! s:end()  "{{{2
     "
     " - Return value from getline(s:LNUM_INPUT) may be an item which was
     "   selected from the completion menu if s:last_user_input_raw and
-    "   getline(s:LNUM_INPUT) are the same value.
+    "   getline(s:LNUM_INPUT) are different.
     " - Users don't want to continue a selection with such completed value by
     "   ku#start() and <Plug>(ku-do-persistent-action), because typical usage
     "   of them is to do some action for several items which are matched to
     "   a pattern.
     "
     " So here we have to use s:last_user_input_raw instead.
-  let s:last_used_input_pattern = s:last_user_input_raw
+  let s:last_used_input_pattern = s:remove_prompt(s:last_user_input_raw)
   let s:last_used_source = s:current_source
 
   call s:api_on_source_leave(s:current_source)
@@ -975,7 +975,7 @@ function! s:initialize_ku_buffer()  "{{{2
   " User's initialization.
   setfiletype ku
   if !(exists('#FileType#ku') || exists('b:did_ftplugin'))
-    call ku#default_key_mappings(s:FALSE)
+    call ku#default_key_mappings(s:TRUE)
   endif
 
   return

@@ -332,9 +332,8 @@ endfunction
 augroup KuSetting
     autocmd!
     autocmd FileType ku call ku#default_key_mappings(1)
-                \ | call Ku_my_keymappings()
+            \ | call Ku_my_keymappings()
 augroup END
-call ku#custom_action('common', 'cd', 'Ku_common_action_my_cd')
 
 function! Ku_common_action_my_cd(item)
     if isdirectory(a:item.word)
@@ -343,6 +342,7 @@ function! Ku_common_action_my_cd(item)
         execute 'TabpageCD' fnamemodify(a:item.word, ':h')
     endif
 endfunction
+call ku#custom_action('common', 'cd', 'Ku_common_action_my_cd')
 
 call ku#custom_prefix('common', '.vim', $HOME.'/.vim')
 call ku#custom_prefix('common', '~', $HOME)
