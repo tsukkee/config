@@ -48,13 +48,13 @@ set textwidth=0       " don't auto line break
 
 " display cursorline only in active window
 " reference: http://nanabit.net/blog/2007/11/03/vim-cursorline/
-augroup CursorLine
-    autocmd! CursorLine
+" augroup CursorLine
+    " autocmd! CursorLine
     " autocmd WinLeave * set nocursorcolumn nocursorline
     " autocmd WinEnter,BufRead * set cursorcolumn cursorline
-    autocmd WinLeave * set nocursorline
-    autocmd WinEnter,BufRead * set cursorline
-augroup END
+    " autocmd WinLeave * set nocursorline
+    " autocmd WinEnter,BufRead * set cursorline
+" augroup END
 
 " Folding
 " reference: http://d.hatena.ne.jp/ns9tks/20080318/1205851539
@@ -70,7 +70,8 @@ vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 
 " Status line
 set laststatus=2
-set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%{'['.neocomplcache#keyword_complete#caching_percent('').'%]'}%m%v,%l/%L(%P:%n)
+" set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%{'['.neocomplcache#keyword_complete#caching_percent('').'%]'}%m%v,%l/%L(%P:%n)
+set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%m%v,%l/%L(%P:%n)
 
 " autodetect charset
 " reference: http://www.kawaz.jp/pukiwiki/?vim#cb691f26
@@ -166,23 +167,23 @@ nnoremap [Prefix] <Nop>
 nmap <Space> [Prefix]
 
 " Move the cursor according to visual line and row
-nnoremap j  gj
-nnoremap k  gk
-nnoremap gj j
-nnoremap gk k
-nnoremap 0  g0
-nnoremap g0 0
-nnoremap $  g$
-nnoremap g$ $
+" nnoremap j  gj
+" nnoremap k  gk
+" nnoremap gj j
+" nnoremap gk k
+" nnoremap 0  g0
+" nnoremap g0 0
+" nnoremap $  g$
+" nnoremap g$ $
 
-vnoremap j  gj
-vnoremap k  gk
-vnoremap gj j
-vnoremap gk k
-vnoremap 0  g0
-vnoremap g0 0
-vnoremap $  g$
-vnoremap g$ $
+" vnoremap j  gj
+" vnoremap k  gk
+" vnoremap gj j
+" vnoremap gk k
+" vnoremap 0  g0
+" vnoremap g0 0
+" vnoremap $  g$
+" vnoremap g$ $
 
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
