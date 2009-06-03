@@ -137,12 +137,13 @@ set ambiwidth=double
 " File type
 syntax on " syntax coloring
 colorscheme xoria256 " colorscheme
+" colorscheme desert " colorscheme
 
 " Hightlight Zenkaku space
 highlight ZenkakuSpace ctermbg=darkcyan ctermfg=darkcyan
 match ZenkakuSpace /　/
 
-set complete+=k    " to use dictionary for completion
+" set complete+=k    " to use dictionary for completion
 filetype indent on " to use filetype indent
 filetype plugin on " to use filetype plugin
 
@@ -189,6 +190,8 @@ cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
 cnoremap <Up> <C-p>
 cnoremap <Down> <C-n>
+
+nnoremap gc `[v`]
 
 " keybind for completing and selecting popup menu
 inoremap <silent> <expr> <CR> (pumvisible() ? "\<C-y>" : "") . "\<CR>X\<BS>"

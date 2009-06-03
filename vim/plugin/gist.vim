@@ -311,8 +311,7 @@ function! s:GistPost(user, token, content, private)
 
   let file = tempname()
   exec 'redir! > '.file 
-  " silent echo squery
-  echoerr squery
+  silent echo squery
   redir END
   echon " Posting it to gist... "
   let quote = &shellxquote == '"' ?  "'" : '"'
