@@ -1,10 +1,10 @@
-" ==================== Basic settings ==================== "
+" ==================== Settings ==================== "
 " Tab character
-set tabstop=4 shiftwidth=4 softtabstop=0 " set tab width
+set tabstop=4 shiftwidth=4 softtabstop=4 " set tab width
 set expandtab   " use space instead of tab
 set smartindent " use smart indent
 set history=100 " number of command history
-
+ 
 " Input support
 set timeoutlen=500             " timeout for key mappings
 set backspace=indent,eol,start " to delete everything with backspace key
@@ -14,7 +14,7 @@ set formatoptions+=m           " add multibyte support
 set wildmenu                   " enhance command completion
 set wildmode=list:longest,full " first 'list:lingest' and second 'full'
 
-" Searching
+" Search
 set wrapscan   " search wrap around the end of the file
 set ignorecase " ignore case search
 set smartcase  " override 'ignorecase' if the search pattern contains upper case
@@ -27,13 +27,6 @@ set noswapfile " don't use swap file
 set autoread   " auto reload when file rewrite other application
 set hidden     " allow open other file without saving current file
 
-" generate help tags
-if has('mac')
-    helptags ~/.vim/doc/
-elseif has('win32')
-    helptags ~/vimfiles/doc/
-endif
-
 " Display
 set showmatch         " highlight correspods character
 set showcmd           " show input command
@@ -45,8 +38,12 @@ set notitle           " don't rewrite title string
 set scrolloff=5       " minimal number of screen lines to keep above and below the cursor.
 set nolinebreak       " don't auto line break
 set textwidth=0       " don't auto line break
+set foldmethod=marker " folding
+set laststatus=2      " always show statusine
+set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%m%v,%l/%L(%P:%n)
+" set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%{'['.neocomplcache#keyword_complete#caching_percent('').'%]'}%m%v,%l/%L(%P:%n)
 
-" display cursorline only in active window
+" Display cursorline only in active window
 " reference: http://nanabit.net/blog/2007/11/03/vim-cursorline/
 " augroup CursorLine
     " autocmd! CursorLine
@@ -56,72 +53,61 @@ set textwidth=0       " don't auto line break
     " autocmd WinEnter,BufRead * set cursorline
 " augroup END
 
-" Folding
-" reference: http://d.hatena.ne.jp/ns9tks/20080318/1205851539
-set foldmethod=marker
-" hold with 'h' if the cursor is on the head of line
-nnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zc' : 'h'
-" expand with 'l' if the cursor on the holded text
-nnoremap <expr> l foldclosed(line('.')) != -1 ? 'zo' : 'l'
-" hold with 'h' if the cursor is on the head of line in visual mode
-vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
-" expand with 'l' if the cursor on the holded text in visual mode
-vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
+" Generate help tags
+if has('mac')
+    helptags ~/.vim/doc/
+elseif has('win32')
+    helptags ~/vimfiles/doc/
+endif
 
-" Status line
-set laststatus=2
-" set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%{'['.neocomplcache#keyword_complete#caching_percent('').'%]'}%m%v,%l/%L(%P:%n)
-set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%m%v,%l/%L(%P:%n)
-
-" autodetect charset
+" Autodetect charset
 " reference: http://www.kawaz.jp/pukiwiki/?vim#cb691f26
 if &encoding !=# 'utf-8'
-  set encoding=japan
-  set fileencoding=japan
+    set encoding=japan
+    set fileencoding=japan
 endif
 if has('iconv')
-  let s:enc_euc = 'euc-jp'
-  let s:enc_jis = 'iso-2022-jp'
-  " iconvがeucJP-msに対応しているかをチェック
-  if iconv("\x87\x64\x87\x6a", 'cp932', 'eucjp-ms') ==# "\xad\xc5\xad\xcb"
-    let s:enc_euc = 'eucjp-ms'
-    let s:enc_jis = 'iso-2022-jp-3'
-  " iconvがJISX0213に対応しているかをチェック
-  elseif iconv("\x87\x64\x87\x6a", 'cp932', 'euc-jisx0213') ==# "\xad\xc5\xad\xcb"
-    let s:enc_euc = 'euc-jisx0213'
-    let s:enc_jis = 'iso-2022-jp-3'
-  endif
-  " fileencodingsを構築
-  if &encoding ==# 'utf-8'
-    let s:fileencodings_default = &fileencodings
-    let &fileencodings = s:enc_jis .','. s:enc_euc .',cp932'
-    let &fileencodings = &fileencodings .','. s:fileencodings_default
-    unlet s:fileencodings_default
-  else
-    let &fileencodings = &fileencodings .','. s:enc_jis
-    set fileencodings+=utf-8,ucs-2le,ucs-2
-    if &encoding =~# '^\(euc-jp\|euc-jisx0213\|eucjp-ms\)$'
-      set fileencodings+=cp932
-      set fileencodings-=euc-jp
-      set fileencodings-=euc-jisx0213
-      set fileencodings-=eucjp-ms
-      let &encoding = s:enc_euc
-      let &fileencoding = s:enc_euc
-    else
-      let &fileencodings = &fileencodings .','. s:enc_euc
+    let s:enc_euc = 'euc-jp'
+    let s:enc_jis = 'iso-2022-jp'
+    " iconvがeucJP-msに対応しているかをチェック
+    if iconv("\x87\x64\x87\x6a", 'cp932', 'eucjp-ms') ==# "\xad\xc5\xad\xcb"
+        let s:enc_euc = 'eucjp-ms'
+        let s:enc_jis = 'iso-2022-jp-3'
+        " iconvがJISX0213に対応しているかをチェック
+    elseif iconv("\x87\x64\x87\x6a", 'cp932', 'euc-jisx0213') ==# "\xad\xc5\xad\xcb"
+        let s:enc_euc = 'euc-jisx0213'
+        let s:enc_jis = 'iso-2022-jp-3'
     endif
-  endif
-  " 定数を処分
-  unlet s:enc_euc
-  unlet s:enc_jis
+    " fileencodingsを構築
+    if &encoding ==# 'utf-8'
+        let s:fileencodings_default = &fileencodings
+        let &fileencodings = s:enc_jis .','. s:enc_euc .',cp932'
+        let &fileencodings = &fileencodings .','. s:fileencodings_default
+        unlet s:fileencodings_default
+    else
+        let &fileencodings = &fileencodings .','. s:enc_jis
+        set fileencodings+=utf-8,ucs-2le,ucs-2
+        if &encoding =~# '^\(euc-jp\|euc-jisx0213\|eucjp-ms\)$'
+            set fileencodings+=cp932
+            set fileencodings-=euc-jp
+            set fileencodings-=euc-jisx0213
+            set fileencodings-=eucjp-ms
+            let &encoding = s:enc_euc
+            let &fileencoding = s:enc_euc
+        else
+            let &fileencodings = &fileencodings .','. s:enc_euc
+        endif
+    endif
+    " 定数を処分
+    unlet s:enc_euc
+    unlet s:enc_jis
 endif
 
 " 日本語を含まない場合は fileencoding にencodingを使うようにする
 function! AU_ReCheck_FENC()
-if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n') == 0
-  let &fileencoding=&encoding
-  " set fenc=utf-8
-endif
+    if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n') == 0
+        let &fileencoding=&encoding
+    endif
 endfunction
 augroup RECHECK_FENC
     autocmd! RECHECK_FENC
@@ -137,7 +123,6 @@ set ambiwidth=double
 " File type
 syntax on " syntax coloring
 colorscheme xoria256 " colorscheme
-" colorscheme desert " colorscheme
 
 " Hightlight Zenkaku space
 highlight ZenkakuSpace ctermbg=darkcyan ctermfg=darkcyan
@@ -162,10 +147,21 @@ set iminsert=0
 set imsearch=0
 
 " ==================== Keybind ==================== "
-
+" Prefix
 " reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
 nnoremap [Prefix] <Nop>
 nmap <Space> [Prefix]
+
+" Folding
+" reference: http://d.hatena.ne.jp/ns9tks/20080318/1205851539
+" hold with 'h' if the cursor is on the head of line
+nnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zc' : 'h'
+" expand with 'l' if the cursor on the holded text
+nnoremap <expr> l foldclosed(line('.')) != -1 ? 'zo' : 'l'
+" hold with 'h' if the cursor is on the head of line in visual mode
+vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
+" expand with 'l' if the cursor on the holded text in visual mode
+vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 
 " Move the cursor according to visual line and row
 " nnoremap j  gj
@@ -186,14 +182,18 @@ nmap <Space> [Prefix]
 " vnoremap $  g$
 " vnoremap g$ $
 
+" Use beginning matches on command-line history
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
 cnoremap <Up> <C-p>
 cnoremap <Down> <C-n>
 
+" Re-select last yanked word
+" reference: 
 nnoremap gc `[v`]
 
-" keybind for completing and selecting popup menu
+" Keybind for completing and selecting popup menu
+" reference:
 inoremap <silent> <expr> <CR> (pumvisible() ? "\<C-y>" : "") . "\<CR>X\<BS>"
 inoremap <silent> <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <silent> <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
@@ -280,7 +280,7 @@ augroup END
 " Rename
 command! -nargs=1 -complete=file Rename saveas <args> | call delete(expand('#'))
 
-" ==================== plugins setting ==================== "
+" ==================== Plugins settings ==================== "
 
 " ctags
 command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
@@ -375,9 +375,11 @@ function! ReloadFirefox()
         telnet.puts("content.location.reload(true)")
         telnet.close
 EOF
+    else
+        echoerr 'need has("ruby")'
     endif
 endfunction
-nnoremap <silent> <Space>rf :<C-u>call ReloadFirefox()<CR>
+nnoremap <silent> [Prefix]rf :<C-u>call ReloadFirefox()<CR>
 " }}}
 
 " Reload Safari {{{
@@ -391,9 +393,11 @@ function! ReloadSafari()
         safari = OSA.app("Safari")
         safari.do_javascript("location.reload(true)", safari.documents[0])
 EOF
+    else
+        echoerr 'need has("mac") and has("ruby")'
     endif
 endfunction
-nnoremap <silent> <Space>rs :<C-u>call ReloadSafari()<CR>
+nnoremap <silent> [Prefix]rs :<C-u>call ReloadSafari()<CR>
 " }}}
 
 " TeXShop {{{
@@ -411,13 +415,15 @@ function! TexShop_TypeSet()
             $texshop.typesetinteractive(d)
         }
 EOF
+    else
+        echoerr 'need has("mac") and has("ruby")'
     endif
 endfunction
 
 augroup tex
     autocmd! tex
-    autocmd FileType tex noremap <buffer> <silent> ,t :<C-u>call TexShop_TypeSet()<CR>
-    autocmd FileType tex setlocal spell spelllang=en_us
+    autocmd FileType plaintex noremap <buffer> <silent> [Prefix]pt :<C-u>call TexShop_TypeSet()<CR>
+    autocmd FileType plaintex setlocal spell spelllang=en_us
 augroup END
 " }}}
 
@@ -434,7 +440,7 @@ let html_use_css = 1
 let use_xhtml = 1
 let html_use_encoding = "utf-8"
 
-" Others
+" Escape
 command! HTMLEscape silent exe "rubydo $_ = $_.gsub('&', '&amp;').gsub('>', '&gt;').gsub('<', '&lt;').gsub('\"', '&quot;')"
 
 " NERD_tree
@@ -443,6 +449,7 @@ nnoremap <silent> [Prefix]t :<C-u>NERDTree<CR>
 nnoremap <silent> [Prefix]T :<C-u>NERDTreeClose<CR>
 nnoremap <silent> [Prefix]<C-t> :<C-u>execute 'NERDTree ' . expand('%:p:h')<CR>
 
+" add Tabpaged CD command to NERDTree
 augroup NERDTreeCustomCommand
     autocmd! NERDTreeCustomCommand
 
@@ -452,14 +459,6 @@ augroup NERDTreeCustomCommand
                 \ | execute 'TabpageCD ' . b:currentDir
     autocmd FileType nerdtree nnoremap <buffer> ct :NERDTreeTabpageCd<CR>
 augroup END
-
-" Reload brawser
-if has('ruby')
-    nnoremap <silent> [Prefix]rf :<C-u>call ReloadFirefox()<CR>
-endif
-if has('mac')
-    nnoremap <silent> [Prefix]rs :<C-u>call ReloadSafari()<CR>
-endif
 
 " Load private information
 if filereadable("~/.vimrc.local")
