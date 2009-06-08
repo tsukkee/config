@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 13-Mar-2009. Jan 2008
-" Version: 2.3
+" Last Change: 04-Jun-2009.
+" Version: 2.5
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
 "
@@ -153,7 +153,16 @@ function! s:GistList(user, token, gistls)
   else
     let url = 'http://gist.github.com/'.a:gistls
   endif
-  exec 'silent split gist:'.a:gistls
+  let winnum = bufwinnr(bufnr('gist:'.a:gistls))
+  if winnum != -1
+    if winnum != bufwinnr('%')
+      exe "normal \<c-w>".winnum."w"
+    endif
+    setlocal modifiable
+    silent %d _
+  else
+    exec 'silent split gist:'.a:gistls
+  endif
   exec 'silent 0r! curl -s '.url
   silent! %s/>/>\r/g
   silent! %s/</\r</g
@@ -204,7 +213,16 @@ endfunction
 
 function! s:GistGet(user, token, gistid, clipboard)
   let url = 'http://gist.github.com/'.a:gistid.'.txt'
-  exec 'silent split gist:'.a:gistid
+  let winnum = bufwinnr(bufnr('gist:'.a:gistid))
+  if winnum != -1
+    if winnum != bufwinnr('%')
+      exe "normal \<c-w>".winnum."w"
+    endif
+    setlocal modifiable
+    silent %d _
+  else
+    exec 'silent split gist:'.a:gistid
+  endif
   filetype detect
   exec '%d _'
   exec 'silent 0r! curl -s '.url
@@ -335,6 +353,15 @@ function! Gist(line1, line2, ...)
   if !exists('g:github_token')
     let g:github_token = substitute(system('git config --global github.token'), "\n", '', '')
   endif
+  if strlen(g:github_user) == 0 || strlen(g:github_token) == 0
+    echoerr "You have no setting for github."
+    echohl WarningMsg
+    echo "git config --global github.user  your-name"
+    echo "git config --global github.token your-token"
+    echo "or set g:github_user and g:github_token in your vimrc"
+    echohl None
+    return 0
+  end
 
   let bufname = bufname("%")
   let user = g:github_user
