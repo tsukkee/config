@@ -4,7 +4,7 @@ set tabstop=4 shiftwidth=4 softtabstop=4 " set tab width
 set expandtab   " use space instead of tab
 set smartindent " use smart indent
 set history=100 " number of command history
- 
+
 " Input support
 set timeoutlen=500             " timeout for key mappings
 set backspace=indent,eol,start " to delete everything with backspace key
@@ -32,26 +32,29 @@ set showmatch         " highlight correspods character
 set showcmd           " show input command
 set number            " show row number
 set wrap              " wrap each lines
-set list              " show unprintable characters
-set listchars=tab:>\  " strings to user in 'list'
+set iskeyword+=-      " added '-'
 set notitle           " don't rewrite title string
 set scrolloff=5       " minimal number of screen lines to keep above and below the cursor.
 set nolinebreak       " don't auto line break
 set textwidth=0       " don't auto line break
 set foldmethod=marker " folding
-set laststatus=2      " always show statusine
+
+set list                      " show unprintable characters
+set listchars=tab:>\ ,trail:- " strings to use in 'list'
+
+set laststatus=2 " always show statusine
 set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%m%v,%l/%L(%P:%n)
 " set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%{'['.neocomplcache#keyword_complete#caching_percent('').'%]'}%m%v,%l/%L(%P:%n)
 
 " Display cursorline only in active window
 " reference: http://nanabit.net/blog/2007/11/03/vim-cursorline/
-" augroup CursorLine
-    " autocmd! CursorLine
+augroup CursorLine
+    autocmd! CursorLine
     " autocmd WinLeave * set nocursorcolumn nocursorline
     " autocmd WinEnter,BufRead * set cursorcolumn cursorline
-    " autocmd WinLeave * set nocursorline
-    " autocmd WinEnter,BufRead * set cursorline
-" augroup END
+    autocmd WinLeave * set nocursorline
+    autocmd WinEnter,BufRead * set cursorline
+augroup END
 
 " Generate help tags
 if has('mac')
@@ -143,6 +146,7 @@ filetype plugin on " to use filetype plugin
 set completeopt+=menuone " Display menu
 
 " Disable input methods
+set imdisable
 set iminsert=0
 set imsearch=0
 
@@ -162,25 +166,6 @@ nnoremap <expr> l foldclosed(line('.')) != -1 ? 'zo' : 'l'
 vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
 " expand with 'l' if the cursor on the holded text in visual mode
 vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
-
-" Move the cursor according to visual line and row
-" nnoremap j  gj
-" nnoremap k  gk
-" nnoremap gj j
-" nnoremap gk k
-" nnoremap 0  g0
-" nnoremap g0 0
-" nnoremap $  g$
-" nnoremap g$ $
-
-" vnoremap j  gj
-" vnoremap k  gk
-" vnoremap gj j
-" vnoremap gk k
-" vnoremap 0  g0
-" vnoremap g0 0
-" vnoremap $  g$
-" vnoremap g$ $
 
 " Use beginning matches on command-line history
 cnoremap <C-p> <Up>
@@ -316,8 +301,8 @@ let g:NeoComplCache_SmartCase = 1
 let g:NeoComplCache_EnableMFU = 1
 let g:NeoComplCache_TagsAutoUpdate = 1
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
-nmap <silent> <C-e> <Plug>(neocomplcache_keyword_caching)
-imap <expr> <silent> <C-e> pumvisible() ? "\<C-e>" : "\<Plug>(neocomplcache_keyword_caching)"
+imap <silent> <C-@> <Plug>(neocomplcache_keyword_caching)
+nmap <silent> <C-@> <Plug>(neocomplcache_keyword_caching)
 
 " ku
 function! Ku_my_keymappings()
