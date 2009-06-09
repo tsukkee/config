@@ -1,5 +1,17 @@
 " ==================== Settings ==================== "
-" Tab character
+" Define and reset augroup using in vimrc
+augroup vimrc-autocmd
+    autocmd!
+augroup END
+
+" Generate help tags
+if has('mac')
+    helptags ~/.vim/doc/
+elseif has('win32')
+    helptags ~/vimfiles/doc/
+endif
+
+" Tab
 set tabstop=4 shiftwidth=4 softtabstop=4 " set tab width
 set expandtab   " use space instead of tab
 set smartindent " use smart indent
@@ -9,6 +21,11 @@ set history=100 " number of command history
 set timeoutlen=500             " timeout for key mappings
 set backspace=indent,eol,start " to delete everything with backspace key
 set formatoptions+=m           " add multibyte support
+set iskeyword+=-               " add keyword to '-'
+set nolinebreak                " don't auto line break
+set textwidth=0                " don't auto line break
+set iminsert=0                 " Disable input methods in insert mode
+set imsearch=0                 " Disable input methods in search mode
 
 " Command completion
 set wildmenu                   " enhance command completion
@@ -28,43 +45,32 @@ set autoread   " auto reload when file rewrite other application
 set hidden     " allow open other file without saving current file
 
 " Display
-set showmatch         " highlight correspods character
-set showcmd           " show input command
-set number            " show row number
-set wrap              " wrap each lines
-set iskeyword+=-      " added '-'
-set notitle           " don't rewrite title string
-set scrolloff=5       " minimal number of screen lines to keep above and below the cursor.
-set nolinebreak       " don't auto line break
-set textwidth=0       " don't auto line break
-set foldmethod=marker " folding
-
+set notitle                   " don't rewrite title string
+set showmatch                 " highlight correspods character
+set showcmd                   " show input command
+set number                    " show row number
+set wrap                      " wrap each lines
+set scrolloff=5               " minimal number of screen lines to keep above and below the cursor.
+set foldmethod=marker         " folding
 set list                      " show unprintable characters
 set listchars=tab:>\ ,trail:- " strings to use in 'list'
+set ambiwidth=double          " For multibyte characters, such as □, ○
 
+" Status line
 set laststatus=2 " always show statusine
 set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%m%v,%l/%L(%P:%n)
-" set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%{'['.neocomplcache#keyword_complete#caching_percent('').'%]'}%m%v,%l/%L(%P:%n)
 
 " Display cursorline only in active window
-" reference: http://nanabit.net/blog/2007/11/03/vim-cursorline/
-augroup CursorLine
-    autocmd! CursorLine
+" Reference: http://nanabit.net/blog/2007/11/03/vim-cursorline/
+augroup vimrc-autocmd
     " autocmd WinLeave * set nocursorcolumn nocursorline
     " autocmd WinEnter,BufRead * set cursorcolumn cursorline
     autocmd WinLeave * set nocursorline
     autocmd WinEnter,BufRead * set cursorline
 augroup END
 
-" Generate help tags
-if has('mac')
-    helptags ~/.vim/doc/
-elseif has('win32')
-    helptags ~/vimfiles/doc/
-endif
-
 " Autodetect charset
-" reference: http://www.kawaz.jp/pukiwiki/?vim#cb691f26
+" Reference: http://www.kawaz.jp/pukiwiki/?vim#cb691f26
 if &encoding !=# 'utf-8'
     set encoding=japan
     set fileencoding=japan
@@ -106,37 +112,27 @@ if has('iconv')
     unlet s:enc_jis
 endif
 
-" 日本語を含まない場合は fileencoding にencodingを使うようにする
-function! AU_ReCheck_FENC()
-    if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n') == 0
-        let &fileencoding=&encoding
-    endif
-endfunction
-augroup RECHECK_FENC
-    autocmd! RECHECK_FENC
-    autocmd BufReadPost * call AU_ReCheck_FENC()
+" 日本語を含まない場合は'fileencoding'に'encoding'を使うようにする
+augroup vimrc-autocmd
+    autocmd BufReadPost *
+    \   if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n') == 0
+    \|      let &fileencoding=&encoding
+    \|  endif
 augroup END
 
-" File Formats
+" line feed character
 set ffs=unix,dos,mac
-
-" For multibyte characters, such as □, ○
-set ambiwidth=double
 
 " File type
 syntax on " syntax coloring
 colorscheme xoria256 " colorscheme
-
-" Hightlight Zenkaku space
-highlight ZenkakuSpace ctermbg=darkcyan ctermfg=darkcyan
-match ZenkakuSpace /　/
 
 " set complete+=k    " to use dictionary for completion
 filetype indent on " to use filetype indent
 filetype plugin on " to use filetype plugin
 
 " Dictionary
-" augroup Dictionary
+" augroup vimrc-autocmd
     " autocmd! Dictionary
     " autocmd FileType javascript setlocal dictionary+=~/.vim/dict/javascript.dict
     " autocmd FileType php setlocal dictionary+=~/.vim/dict/php.dict
@@ -145,19 +141,18 @@ filetype plugin on " to use filetype plugin
 " Omni completion
 set completeopt+=menuone " Display menu
 
-" Disable input methods
-set imdisable
-set iminsert=0
-set imsearch=0
+" Hightlight Zenkaku space
+highlight ZenkakuSpace ctermbg=darkcyan ctermfg=darkcyan
+match ZenkakuSpace /　/
 
 " ==================== Keybind ==================== "
 " Prefix
-" reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
+" Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
 nnoremap [Prefix] <Nop>
 nmap <Space> [Prefix]
 
 " Folding
-" reference: http://d.hatena.ne.jp/ns9tks/20080318/1205851539
+" Reference: http://d.hatena.ne.jp/ns9tks/20080318/1205851539
 " hold with 'h' if the cursor is on the head of line
 nnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zc' : 'h'
 " expand with 'l' if the cursor on the holded text
@@ -174,23 +169,23 @@ cnoremap <Up> <C-p>
 cnoremap <Down> <C-n>
 
 " Re-select last yanked word
-" reference: 
+" Reference: kana's vimrc
 nnoremap gc `[v`]
 
 " Keybind for completing and selecting popup menu
-" reference:
-inoremap <silent> <expr> <CR> (pumvisible() ? "\<C-y>" : "") . "\<CR>X\<BS>"
-inoremap <silent> <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <silent> <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-inoremap <silent> <expr> <C-h> (pumvisible() ? "\<C-y>" : "") . "\<C-h>"
-inoremap <silent> <expr> <C-n> pumvisible() ? "\<C-n>" : "\<C-x>\<C-u>\<C-p>"
+" Reference: :h neocomplcache
+inoremap <silent> <expr> <CR>    pumvisible() ? "\<C-y>\<CR>X\<BS>" : "\<CR>X\<BS>"
+inoremap <silent> <expr> <Tab>   pumvisible() ? "\<C-n>"            : "\<Tab>"
+inoremap <silent> <expr> <S-Tab> pumvisible() ? "\<C-p>"            : "\<S-Tab>"
+inoremap <silent> <expr> <C-h>   pumvisible() ? "\<C-y>\<C-h>"      : "\<C-h>"
+inoremap <silent> <expr> <C-n>   pumvisible() ? "\<C-n>"            : "\<C-x>\<C-u>\<C-p>"
 
 " Delete highlight
 nnoremap <silent> gh :nohlsearch<CR>
 
-" Expand path
+" Input path in command mode
 cnoremap <expr> <C-x> expand('%:p:h') . "/"
-cnoremap <expr> <C-z> expand('%:p:r') 
+cnoremap <expr> <C-z> expand('%:p:r')
 
 " Copy and paste
 " Command-C and Command-V are also available in MacVim
@@ -223,9 +218,8 @@ endif
 
 " Binary (see :h xxd)
 " vim -b :edit binary using xxd-format!
-" reference: http://jarp.does.notwork.org/diary/200606a.html#200606021
-augroup Binary
-    autocmd! Binary
+" Reference: http://jarp.does.notwork.org/diary/200606a.html#200606021
+augroup vimrc-autocmd
     autocmd BufReadPre   *.bin,*.swf let &bin=1
     autocmd BufReadPost  *.bin,*.swf if &bin | silent %!xxd -g 1
     autocmd BufReadPost  *.bin,*.swf set ft=xxd | endif
@@ -236,15 +230,16 @@ augroup Binary
 augroup END
 
 " TabpageCD
-" reference: http://ujihisa.nowa.jp/entry/91395f3003
+" Reference: kana's vimrc
 command! -complete=customlist,s:complete_cdpath -nargs=? TabpageCD
 \   execute 'cd' fnameescape(<q-args>)
 \ | let t:cwd = getcwd()
 
 cnoreabbrev <expr> cd
-            \ (getcmdtype() == ":" && getcmdline() ==# "cd")
-            \ ? "TabpageCD"
-            \ : "cd"
+\   (getcmdtype() == ":" && getcmdline() ==# "cd")
+\   ? "TabpageCD"
+\   : "cd"
+
 command! CD silent exe "TabpageCD " . expand('%:p:h')
 
 function! s:complete_cdpath(arglead, cmdline, cursorpos)
@@ -253,17 +248,17 @@ function! s:complete_cdpath(arglead, cmdline, cursorpos)
             \ "\n")
 endfunction
 
-augroup TabpageCD
-    autocmd! TabpageCD
+augroup vimrc-autocmd
     autocmd TabEnter *
     \   if !exists('t:cwd')
-    \ |   let t:cwd = getcwd()
-    \ | endif
-    \ | execute 'cd' fnameescape(t:cwd)
+    \|    let t:cwd = getcwd()
+    \|  endif
+    \|  execute 'cd' fnameescape(t:cwd)
 augroup END
 
 " Rename
 command! -nargs=1 -complete=file Rename saveas <args> | call delete(expand('#'))
+
 
 " ==================== Plugins settings ==================== "
 
@@ -271,8 +266,7 @@ command! -nargs=1 -complete=file Rename saveas <args> | call delete(expand('#'))
 command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
 
 " Ruby
-augroup Ruby
-    autocmd! Ruby
+augroup vimrc-autocmd
     autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
 augroup END
 
@@ -295,7 +289,7 @@ map gE <Plug>(smartword-ge)
 let NERDSpaceDelims = 1
 let NERDShutUp = 1
 
-" neocomplcache
+" neocomplcache (see :h neocomplcache)
 let g:NeoComplCache_EnableAtStartup = 1
 let g:NeoComplCache_SmartCase = 1
 let g:NeoComplCache_EnableMFU = 1
@@ -303,25 +297,31 @@ let g:NeoComplCache_TagsAutoUpdate = 1
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
 imap <silent> <C-@> <Plug>(neocomplcache_keyword_caching)
 nmap <silent> <C-@> <Plug>(neocomplcache_keyword_caching)
+inoremap <expr> <C-x><C-f> neocomplcache#manual_filename_complete()
+inoremap <expr> <C-y>      pumvisible() ? neocomplcache#close_popup() : "\<C-r>0"
+inoremap <expr> <C-e>      pumvisible() ? neocomplcache#cancel_popup() : "\<End>"
 
 " ku
 function! Ku_my_keymappings()
     inoremap <buffer> <silent> <Tab> <C-n>
     inoremap <buffer> <silent> <S-Tab> <C-p>
+
+    " for Vim
     imap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
     nmap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
     imap <buffer> <silent> <Esc><Cr> <Plug>(ku-choose-an-action)
     nmap <buffer> <silent> <Esc><Cr> <Plug>(ku-choose-an-action)
+
     " for GVim, MacVim
     imap <buffer> <silent> <A-Esc> <Plug>(ku-cancel)
     nmap <buffer> <silent> <A-Esc> <Plug>(ku-cancel)
     imap <buffer> <silent> <A-Cr> <Plug>(ku-choose-an-action)
     nmap <buffer> <silent> <A-Cr> <Plug>(ku-choose-an-action)
 endfunction
-augroup KuSetting
-    autocmd!
-    autocmd FileType ku call ku#default_key_mappings(1)
-            \ | call Ku_my_keymappings()
+augroup vimrc-autocmd
+    autocmd FileType ku
+    \|   call ku#default_key_mappings(1)
+    \|   call Ku_my_keymappings()
 augroup END
 
 function! Ku_common_action_my_cd(item)
@@ -344,6 +344,20 @@ nnoremap <silent> [Prefix]km :<C-u>Ku mrufile<Cr>
 nnoremap <silent> [Prefix]kt :<C-u>Ku tags<Cr>
 nnoremap <silent> [Prefix]h :<C-u>Ku tags/help<Cr>
 
+" NERD_tree
+" let g:NERDTreeHijackNetrw = 0
+nnoremap <silent> [Prefix]t :<C-u>NERDTree<CR>
+nnoremap <silent> [Prefix]T :<C-u>NERDTreeClose<CR>
+nnoremap <silent> [Prefix]<C-t> :<C-u>execute 'NERDTree ' . expand('%:p:h')<CR>
+
+" add Tabpaged CD command to NERDTree
+augroup vimrc-autocmd
+    autocmd FileType nerdtree command! -buffer NERDTreeTabpageCd
+    \   let b:currentDir = NERDTreeGetCurrentPath().getDir().strForCd()
+    \|  echo 'TabpageCD to ' . b:currentDir
+    \|  execute 'TabpageCD ' . b:currentDir
+    autocmd FileType nerdtree nnoremap <buffer> ct :NERDTreeTabpageCd<CR>
+augroup END
 
 " Reload Firefox {{{
 " Need MozRepl and +ruby
@@ -405,8 +419,7 @@ EOF
     endif
 endfunction
 
-augroup tex
-    autocmd! tex
+augroup vimrc-autocmd
     autocmd FileType plaintex noremap <buffer> <silent> [Prefix]pt :<C-u>call TexShop_TypeSet()<CR>
     autocmd FileType plaintex setlocal spell spelllang=en_us
 augroup END
@@ -426,24 +439,10 @@ let use_xhtml = 1
 let html_use_encoding = "utf-8"
 
 " Escape
-command! HTMLEscape silent exe "rubydo $_ = $_.gsub('&', '&amp;').gsub('>', '&gt;').gsub('<', '&lt;').gsub('\"', '&quot;')"
-
-" NERD_tree
-" let g:NERDTreeHijackNetrw = 0
-nnoremap <silent> [Prefix]t :<C-u>NERDTree<CR>
-nnoremap <silent> [Prefix]T :<C-u>NERDTreeClose<CR>
-nnoremap <silent> [Prefix]<C-t> :<C-u>execute 'NERDTree ' . expand('%:p:h')<CR>
-
-" add Tabpaged CD command to NERDTree
-augroup NERDTreeCustomCommand
-    autocmd! NERDTreeCustomCommand
-
-    autocmd FileType nerdtree command! -buffer NERDTreeTabpageCd
-                \ let b:currentDir = NERDTreeGetCurrentPath().getDir().strForCd()
-                \ | echo 'TabpageCD to ' . b:currentDir
-                \ | execute 'TabpageCD ' . b:currentDir
-    autocmd FileType nerdtree nnoremap <buffer> ct :NERDTreeTabpageCd<CR>
-augroup END
+if has('ruby')
+    command! HTMLEscape silent
+    \   exe "rubydo $_ = $_.gsub('&', '&amp;').gsub('>', '&gt;').gsub('<', '&lt;').gsub('\"', '&quot;')"
+endif
 
 " Load private information
 if filereadable("~/.vimrc.local")
