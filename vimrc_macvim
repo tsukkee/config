@@ -1,0 +1,4 @@
+if has('gui_macvim')
+  set langmenu=ja_ja.utf-8.macvim
+  let $PATH = simplify($VIM . '/../../MacOS') . ':' . $PATH
+endif

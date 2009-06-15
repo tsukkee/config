@@ -30,6 +30,7 @@ set imsearch=0                 " Disable input methods in search mode
 " Command completion
 set wildmenu                   " enhance command completion
 set wildmode=list:longest,full " first 'list:lingest' and second 'full'
+set wildoptions=tagfile
 
 " Search
 set wrapscan   " search wrap around the end of the file
@@ -177,11 +178,11 @@ nnoremap gc `[v`]
 
 " Keybind for completing and selecting popup menu
 " Reference: :h neocomplcache
-inoremap <silent> <expr> <CR>    pumvisible() ? "\<C-y>\<CR>X\<BS>" : "\<CR>X\<BS>"
-inoremap <silent> <expr> <Tab>   pumvisible() ? "\<C-n>"            : "\<Tab>"
-inoremap <silent> <expr> <S-Tab> pumvisible() ? "\<C-p>"            : "\<S-Tab>"
-inoremap <silent> <expr> <C-h>   pumvisible() ? "\<C-y>\<C-h>"      : "\<C-h>"
-inoremap <silent> <expr> <C-n>   pumvisible() ? "\<C-n>"            : "\<C-x>\<C-u>\<C-p>"
+inoremap <silent> <expr> <CR>    pumvisible() ? "\<C-y>\<CR>"  : "\<CR>"
+inoremap <silent> <expr> <Tab>   pumvisible() ? "\<C-n>"       : "\<Tab>"
+inoremap <silent> <expr> <S-Tab> pumvisible() ? "\<C-p>"       : "\<S-Tab>"
+inoremap <silent> <expr> <C-h>   pumvisible() ? "\<C-y>\<C-h>" : "\<C-h>"
+inoremap <silent> <expr> <C-n>   pumvisible() ? "\<C-n>"       : "\<C-x>\<C-u>\<C-p>"
 
 " Delete highlight
 nnoremap <silent> gh :nohlsearch<CR>
@@ -302,8 +303,8 @@ imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
 imap <silent> <C-@> <Plug>(neocomplcache_keyword_caching)
 nmap <silent> <C-@> <Plug>(neocomplcache_keyword_caching)
 inoremap <expr> <C-x><C-f> neocomplcache#manual_filename_complete()
-inoremap <expr> <C-y>      pumvisible() ? neocomplcache#close_popup() : "\<C-r>0"
-inoremap <expr> <C-e>      pumvisible() ? neocomplcache#cancel_popup() : "\<End>"
+inoremap <expr> <C-y>      pumvisible() ? neocomplcache#close_popup() : "\<C-y>"
+inoremap <expr> <C-e>      pumvisible() ? neocomplcache#cancel_popup() : "\<C-e>"
 
 " ku
 function! Ku_my_keymappings()
