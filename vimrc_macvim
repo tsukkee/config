@@ -1,3 +1,6 @@
+" this file should be put as
+" /Applications/MacVim.app/Contents/Resources/vim/vimrc
+" instead of original one
 if has('gui_macvim')
   set langmenu=ja_ja.utf-8.macvim
   let $PATH = simplify($VIM . '/../../MacOS') . ':' . $PATH
