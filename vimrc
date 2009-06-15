@@ -146,6 +146,9 @@ highlight ZenkakuSpace ctermbg=darkcyan ctermfg=darkcyan
 match ZenkakuSpace /　/
 
 " ==================== Keybind ==================== "
+" Use AlterCommand
+call altercmd#load()
+
 " Prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
 nnoremap [Prefix] <Nop>
@@ -233,12 +236,9 @@ augroup END
 " Reference: kana's vimrc
 command! -complete=customlist,s:complete_cdpath -nargs=? TabpageCD
 \   execute 'cd' fnameescape(<q-args>)
-\ | let t:cwd = getcwd()
+\|  let t:cwd = getcwd()
 
-cnoreabbrev <expr> cd
-\   (getcmdtype() == ":" && getcmdline() ==# "cd")
-\   ? "TabpageCD"
-\   : "cd"
+AlterCommand cd TabpageCD
 
 command! CD silent exe "TabpageCD " . expand('%:p:h')
 
@@ -285,6 +285,10 @@ map B <Plug>(smartword-b)
 map E <Plug>(smartword-e)
 map gE <Plug>(smartword-ge)
 
+" smarttill
+map ,t <Plug>(smarttill-t)
+map ,T <Plug>(smarttill-T)
+
 " NERD_comments
 let NERDSpaceDelims = 1
 let NERDShutUp = 1
@@ -320,7 +324,7 @@ function! Ku_my_keymappings()
 endfunction
 augroup vimrc-autocmd
     autocmd FileType ku
-    \|   call ku#default_key_mappings(1)
+    \    call ku#default_key_mappings(1)
     \|   call Ku_my_keymappings()
 augroup END
 
