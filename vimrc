@@ -126,7 +126,7 @@ set ffs=unix,dos,mac
 
 " File type
 syntax on " syntax coloring
-colorscheme xoria256 " colorscheme
+colorscheme lucius " colorscheme
 
 " set complete+=k    " to use dictionary for completion
 filetype indent on " to use filetype indent
