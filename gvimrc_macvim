@@ -1,3 +1,8 @@
+" this file should be put as
+" /Applications/MacVim.app/Contents/Resources/vim/gvimrc
+" instead of original one
+
+"
 " System gvimrc file for MacVim
 "
 " Maintainer:	Bjorn Winckler <bjorn.winckler@gmail.com>

@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 04-Jun-2009.
-" Version: 2.5
+" Last Change: 09-Jun-2009.
+" Version: 2.6
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
 "
@@ -181,9 +181,10 @@ function! s:GistList(user, token, gistls)
   silent! %s/&gt;/>/g
   silent! %s/&lt;/</g
   silent! %s/&#\(\d\d\);/\=nr2char(submatch(1))/g
+  silent! %g/^gist: /s/ //g
   setlocal buftype=nofile bufhidden=hide noswapfile 
   setlocal nomodified
-  syntax match SpecialKey /^gist: /he=e-2
+  syntax match SpecialKey /^gist:/he=e-1
   exec 'nnoremap <silent> <buffer> <cr> :call <SID>GistListAction()<cr>'
   normal! gg
 endfunction
@@ -245,7 +246,7 @@ endfunction
 
 function! s:GistListAction()
   let line = getline('.')
-  let mx = '^gist: \(\w\+\).*'
+  let mx = '^gist:\(\w\+\).*'
   if line =~# mx
     let gistid = substitute(line, mx, '\1', '')
     call s:GistGet(g:github_user, g:github_token, gistid, 0)
@@ -391,7 +392,7 @@ function! Gist(line1, line2, ...)
     elseif arg =~ '^\(-e\|--edit\)$' && bufname =~ bufnamemx
       let editpost = 1
       let gistid = substitute(bufname, bufnamemx, '\1', '')
-    elseif len(gistls) > 0 && len(gistnm) == 0
+    elseif len(gistnm) == 0
       if editpost == 1
         let gistnm = arg
       elseif len(gistls) > 0
