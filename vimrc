@@ -437,6 +437,11 @@ if has('mac')
     command! Cot  silent exe '!open -a CotEditor %'
 endif
 
+" Utility command for Windows
+if has('win32')
+    command! Here silent exe "!start explorer " . expand('%:p:h') . '/'
+endif
+
 " TOhtml
 let html_number_lines = 0
 let html_use_css = 1
