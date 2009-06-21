@@ -271,9 +271,12 @@ augroup vimrc-autocmd
     autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
 augroup END
 
+" less
+autocmd BufNewFile,BufRead *.less setfiletype css
+
 " CakePHP
-au BufNewFile,BufRead *.thtml setfiletype php
-au BufNewFile,BufRead *.ctp setfiletype php
+autocmd BufNewFile,BufRead *.thtml setfiletype php
+autocmd BufNewFile,BufRead *.ctp setfiletype php
 
 " gist
 let g:gist_clip_command = 'pbcopy'

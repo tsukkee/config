@@ -1,74 +1,65 @@
 (function() {
+if(!"TreeStyleTabService" in window) {
+    liberator.echoerr("TreeStyleTab.js needs TreeStyleTab Extension");
+    return;
+}
 
-mappings.addUserMap([modes.NORMAL], ["zc"],
-    "TreeStyleTab - Collapse SubTree",
-    function(count) {
-        if(gBrowser.treeStyleTab)
-            gBrowser.treeStyleTab.collapseExpandSubtree(tabs.getTab(), true);
-        else
-            liberator.echoerr("need TreeStyleTab", 0);
-    },
-    {});
+let addMap = function(keys, desc, fn) {
+    mappings.addUserMap([modes.NORMAL], keys,
+        "TreeStyleTab - " + desc, fn, {});
+};
 
-mappings.addUserMap([modes.NORMAL], ["zo"],
-    "TreeStyleTab - Expand SubTree",
-    function(count) {
-        if(gBrowser.treeStyleTab)
-            gBrowser.treeStyleTab.collapseExpandSubtree(tabs.getTab(), false);
-        else
-            liberator.echoerr("need TreeStyleTab", 0);
-    },
-    {});
+addMap(["zc"], "Collapse Subtree", function() {
+    gBrowser.treeStyleTab.collapseExpandSubtree(gBrowser.selectedTab, true);
+});
 
-mappings.addUserMap([modes.NORMAL], ["zM"],
-    "TreeStyleTab - Collapse All SubTree",
-    function(count) {
-        if(gBrowser.treeStyleTab)
-            TreeStyleTabService.collapseExpandAllSubtree(true);
-        else
-            liberator.echoerr("need TreeStyleTab", 0);
-    },
-    {});
+addMap(["zo"], "Expand Subtree", function() {
+    gBrowser.treeStyleTab.collapseExpandSubtree(gBrowser.selectedTab, false);
+});
 
-mappings.addUserMap([modes.NORMAL], ["zR"],
-    "TreeStyleTab - Expand All SubTree",
-    function(count) {
-        if(gBrowser.treeStyleTab)
-            TreeStyleTabService.collapseExpandAllSubtree(false);
-        else
-            liberator.echoerr("need TreeStyleTab", 0);
-    },
-    {});
+addMap(["zM"], "Collapse All Subtree", function() {
+    TreeStyleTabService.collapseExpandAllSubtree(true);
 
-mappings.addUserMap([modes.NORMAL], [">>"],
-    "TreeStyleTab - Attach Current Tab as Previous Tab's Child Tab",
-    function(count) {
-        if(gBrowser.treeStyleTab) {
-            let currentTab = tabs.getTab();
-            gBrowser.treeStyleTab.attachTabTo(currentTab,
-                TreeStyleTabService.getPreviousSiblingTab(currentTab));
-        }
-        else 
-            liberator.echoerr("need TreeStyleTab", 0);
-    },
-    {});
+});
 
-mappings.addUserMap([modes.NORMAL], ["<<"],
-    "TreeStyleTab - Part Current Tab from Parent Tab",
-    function(count) {
-        if(gBrowser.treeStyleTab) {
-            let currentTab = tabs.getTab();
-            let grandParent = TreeStyleTabService.getParentTab(
-                TreeStyleTabService.getParentTab(currentTab));
-            if(grandParent)
-                gBrowser.treeStyleTab.attachTabTo(currentTab, grandParent);
-            else
-                gBrowser.treeStyleTab.partTab(currentTab);
-        }
-        else 
-            liberator.echoerr("need TreeStyleTab", 0);
-    },
-    {});
+addMap(["zR"], "Expand All Subtree", function() {
+    TreeStyleTabService.collapseExpandAllSubtree(false);
+});
+
+addMap(["[z"], "Goto root tab of currrent tree", function() {
+    gBrowser.selectedTab = TreeStyleTabService.getRootTab(gBrowser.selectedTab);
+});
+
+addMap(["]z"], "Goto last descendant tab of current tree", function() {
+    gBrowser.selectedTab = TreeStyleTabService.getLastDescendantTab(gBrowser.selectedTab);
+});
+
+addMap(["zk"], "Goto previous sibling tab", function() {
+    gBrowser.selectedTab = TreeStyleTabService.getPreviousSiblingTab(
+        TreeStyleTabService.getRootTab(gBrowser.selectedTab));
+});
+
+addMap(["zj"], "Goto next sibling tab", function() {
+    gBrowser.selectedTab = TreeStyleTabService.getNextSiblingTab(
+        TreeStyleTabService.getRootTab(gBrowser.selectedTab));
+});
+
+addMap([">>"], "Attach current tab to previous tab", function() {
+    gBrowser.treeStyleTab.attachTabTo(gBrowser.selectedTab,
+        TreeStyleTabService.getPreviousSiblingTab(gBrowser.selectedTab));
+});
+
+addMap(["<<"], "Part current tab from parent tab", function() {
+    let grandParent = TreeStyleTabService.getParentTab(
+        TreeStyleTabService.getParentTab(gBrowser.selectedTab));
+
+    if(grandParent) {
+        gBrowser.treeStyleTab.attachTabTo(gBrowser.selectedTab, grandParent);
+    }
+    else {
+        gBrowser.treeStyleTab.partTab(gBrowser.selectedTab);
+    }
+});
 
 let positions = {
     h: "left",
@@ -79,16 +70,9 @@ let positions = {
 
 for(let i in positions) {
     let position = positions[i];
-    mappings.addUserMap([modes.NORMAL], ["<C-w>" + i],
-        "TreeStyleTab - Change Tabbar Position to " + position,
-        function(count) {
-            if(gBrowser.treeStyleTab) {
-                TreeStyleTabService.changeTabbarPosition(position);
-            }
-            else
-                liberator.echoerr("need TreeStyleTab", 0);
-        },
-        {});
+    addMap(["<C-w>" + i], "Change tabbar position to " + position, function() {
+        TreeStyleTabService.changeTabbarPosition(position);
+    });
 }
 
 })();
