@@ -70,6 +70,14 @@ augroup vimrc-autocmd
     autocmd WinEnter,BufRead * set cursorline
 augroup END
 
+" Use set encoding=utf-8 in Windows
+" needs ja.po with utf-8 encoding as $VIMRUNTIME/lang/ja_JP.UTF-8/LC_MESSAGES/vim.mo
+" Reference: http://d.hatena.ne.jp/thinca/20090111/1231684962
+if has('win32')
+    let $LANG='ja_JP.UTF-8'
+    set encoding=utf-8
+endif
+
 " Autodetect charset
 " Reference: http://www.kawaz.jp/pukiwiki/?vim#cb691f26
 if &encoding !=# 'utf-8'
