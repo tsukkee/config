@@ -73,10 +73,11 @@ function! MyTabLine()
         let title = empty(title) ? '[No Name]' : title
 
         let s .= i == tabpagenr() ? '%#TabLineSel#' : '%#TabLine#'
-        let s .= '%' . i . 'T[' . i . ']' . title
+        let s .= '%' . i . 'T[' . i . '] ' . title
         let s .= '  '
     endfor
-    let s .= '%#TabLineFill#%T'
+    let tabpaged_cwd = exists('t:cwd') ? '[' . t:cwd . ']' : ''
+    let s .= '%=%#TabLineFill#%T' . tabpaged_cwd
     return s
 endfunction
 
