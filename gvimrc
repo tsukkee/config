@@ -12,7 +12,6 @@ set textwidth=0
 set linespace=1
 set columns=140
 set lines=45
-set showtabline=2
 
 " This must be after 'columns' and 'lines',
 " and before 'transparency' and 'heighlight'
@@ -27,8 +26,8 @@ if has('gui_macvim')
     " set guifont=Osaka-Mono:h14
     " set guifont=mplus-1mn-regular:h14
     set transparency=5 " (opaque) 0-100 (transparent)
-    set guioptions+=e " use gui tab apperance
-    set guioptions-=T " hide toolbar
+    set guioptions-=e  " don't use gui tab apperance
+    set guioptions-=T  " hide toolbar
 
     noremap <silent> gw :macaction selectNextWindow:<CR>
     noremap <silent> gW :macaction selectPreviousWindow:<CR>
@@ -38,7 +37,8 @@ endif
 if has('win32')
     set guifont=M+2VM+IPAG_circle:h10:cSHIFTJIS
     set transparency=240 " (opaque) 255 - 0 (transparent)
-    set guioptions-=T " hide toolbar
+    set guioptions-=e    " don't use gui tab apperance
+    set guioptions-=T    " hide toolbar
 
     autocmd FileType cpp,h setlocal noexpandtab
 endif

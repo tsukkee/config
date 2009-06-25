@@ -61,6 +61,25 @@ set ambiwidth=double          " For multibyte characters, such as □, ○
 set laststatus=2 " always show statusine
 set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%m%v,%l/%L(%P:%n)
 
+" Tab line
+set showtabline=2         " always show tab bar
+set tabline=%!MyTabLine() " set custom tabline
+function! MyTabLine()
+    let s = ''
+    for i in range(1, tabpagenr('$'))
+        let list = tabpagebuflist(i)
+        let nr = tabpagewinnr(i)
+        let title = fnamemodify(bufname(list[nr - 1]), ':t')
+        let title = empty(title) ? '[No Name]' : title
+
+        let s .= i == tabpagenr() ? '%#TabLineSel#' : '%#TabLine#'
+        let s .= '%' . i . 'T[' . i . ']' . title
+        let s .= '  '
+    endfor
+    let s .= '%#TabLineFill#%T'
+    return s
+endfunction
+
 " Display cursorline only in active window
 " Reference: http://nanabit.net/blog/2007/11/03/vim-cursorline/
 augroup vimrc-autocmd
@@ -130,7 +149,12 @@ augroup vimrc-autocmd
 augroup END
 
 " line feed character
-set ffs=unix,dos,mac
+set ffs=dos,unix,mac
+
+" use ff=unix for new file
+augroup vimrc-autocmd
+    autocmd BufNewFile * set ff=unix
+augroup END
 
 " File type
 syntax on " syntax coloring
