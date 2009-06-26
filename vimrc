@@ -272,18 +272,18 @@ command! -complete=customlist,s:complete_cdpath -nargs=? TabpageCD
 \   execute 'cd' fnameescape(<q-args>)
 \|  let t:cwd = getcwd()
 
-AlterCommand cd TabpageCD
-
-command! CD silent exe "TabpageCD " . expand('%:p:h')
-
 function! s:complete_cdpath(arglead, cmdline, cursorpos)
     return split(globpath(&cdpath,
             \ join(split(a:cmdline, '\s', 1)[1:], ' ') . '*/'),
             \ "\n")
 endfunction
 
+AlterCommand cd TabpageCD
+
+command! CD silent exe "TabpageCD " . expand('%:p:h')
+
 augroup vimrc-autocmd
-    autocmd TabEnter *
+    autocmd VimEnter,TabEnter *
     \   if !exists('t:cwd')
     \|    let t:cwd = getcwd()
     \|  endif

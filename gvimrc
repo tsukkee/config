@@ -39,6 +39,7 @@ if has('win32')
     set transparency=240 " (opaque) 255 - 0 (transparent)
     set guioptions-=e    " don't use gui tab apperance
     set guioptions-=T    " hide toolbar
+    set guioptions-=m    " hide menubar
 
     autocmd FileType cpp,h setlocal noexpandtab
 endif
