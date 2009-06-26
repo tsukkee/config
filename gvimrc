@@ -14,11 +14,8 @@ set columns=140
 set lines=45
 
 " This must be after 'columns' and 'lines',
-" and before 'transparency' and 'heighlight'
+" and before 'transparency'
 gui
-
-highlight ZenkakuSpace guibg=#3333ff guifg=#3333ff
-match ZenkakuSpace /　/
 
 " ==================== Platform setting ==================== "
 " MacVim
@@ -31,6 +28,11 @@ if has('gui_macvim')
 
     noremap <silent> gw :macaction selectNextWindow:<CR>
     noremap <silent> gW :macaction selectPreviousWindow:<CR>
+
+    if has('kaoriya')
+        set ambiwidth=auto
+        set fencs=guess
+    endif
 endif
 
 " GVim(Windows)
@@ -42,5 +44,10 @@ if has('win32')
     set guioptions-=m    " hide menubar
 
     autocmd FileType cpp,h setlocal noexpandtab
+
+    if has('kaoriya')
+        set ambiwidth=auto
+        set fencs=guess
+    endif
 endif
 

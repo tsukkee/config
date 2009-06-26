@@ -54,7 +54,7 @@ set wrap                      " wrap each lines
 set scrolloff=5               " minimal number of screen lines to keep above and below the cursor.
 set foldmethod=marker         " folding
 set list                      " show unprintable characters
-set listchars=tab:>\ ,trail:- " strings to use in 'list'
+set listchars=tab:>\ ,trail:_ " strings to use in 'list'
 set ambiwidth=double          " For multibyte characters, such as □, ○
 
 " Status line
@@ -180,12 +180,12 @@ augroup END
 
 function! MyHighlight()
     " Hightlight Zenkaku space
-    highlight ZenkakuSpace ctermbg=darkcyan ctermfg=darkcyan
+    highlight ZenkakuSpace ctermbg=darkcyan ctermfg=darkcyan guifg=#3333ff guibg=#3333ff
     match ZenkakuSpace /　/
 
     " Modify color for 'lucius'
     if g:colors_name == 'lucius'
-        highlight SpecialKey ctermfg=172
+        highlight SpecialKey ctermfg=172 guifg=#ffaa00
     endif
 endfunction
 
