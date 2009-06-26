@@ -157,10 +157,10 @@ augroup vimrc-autocmd
     autocmd BufNewFile * set ff=unix
 augroup END
 
-" File type
-syntax on " syntax coloring
-colorscheme lucius " colorscheme
+" Omni completion
+set completeopt+=menuone " Display menu
 
+" File type settings
 " set complete+=k    " to use dictionary for completion
 filetype indent on " to use filetype indent
 filetype plugin on " to use filetype plugin
@@ -172,12 +172,26 @@ filetype plugin on " to use filetype plugin
     " autocmd FileType php setlocal dictionary+=~/.vim/dict/php.dict
 " augroup END
 
-" Omni completion
-set completeopt+=menuone " Display menu
 
-" Hightlight Zenkaku space
-highlight ZenkakuSpace ctermbg=darkcyan ctermfg=darkcyan
-match ZenkakuSpace /　/
+" ==================== Hightlight ==================== "
+augroup vimrc-autocmd
+    autocmd ColorScheme * call MyHighlight()
+augroup END
+
+function! MyHighlight()
+    " Hightlight Zenkaku space
+    highlight ZenkakuSpace ctermbg=darkcyan ctermfg=darkcyan
+    match ZenkakuSpace /　/
+
+    " Modify color for 'lucius'
+    if g:colors_name == 'lucius'
+        highlight SpecialKey ctermfg=172
+    endif
+endfunction
+
+syntax on " syntax coloring
+colorscheme lucius " colorscheme
+
 
 " ==================== Keybind ==================== "
 " Use AlterCommand
@@ -272,18 +286,17 @@ command! -complete=customlist,s:complete_cdpath -nargs=? TabpageCD
 \   execute 'cd' fnameescape(<q-args>)
 \|  let t:cwd = getcwd()
 
-AlterCommand cd TabpageCD
-
-command! CD silent exe "TabpageCD " . expand('%:p:h')
-
 function! s:complete_cdpath(arglead, cmdline, cursorpos)
     return split(globpath(&cdpath,
             \ join(split(a:cmdline, '\s', 1)[1:], ' ') . '*/'),
             \ "\n")
 endfunction
 
+command! CD silent exe "TabpageCD " . expand('%:p:h')
+AlterCommand cd TabpageCD
+
 augroup vimrc-autocmd
-    autocmd TabEnter *
+    autocmd VimEnter,TabEnter *
     \   if !exists('t:cwd')
     \|    let t:cwd = getcwd()
     \|  endif
