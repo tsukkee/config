@@ -28,11 +28,6 @@ if has('gui_macvim')
 
     noremap <silent> gw :macaction selectNextWindow:<CR>
     noremap <silent> gW :macaction selectPreviousWindow:<CR>
-
-    if has('kaoriya')
-        set ambiwidth=auto
-        set fencs=guess
-    endif
 endif
 
 " GVim(Windows)
@@ -44,10 +39,5 @@ if has('win32')
     set guioptions-=m    " hide menubar
 
     autocmd FileType cpp,h setlocal noexpandtab
-
-    if has('kaoriya')
-        set ambiwidth=auto
-        set fencs=guess
-    endif
 endif
 
