@@ -40,10 +40,9 @@ set incsearch  " incremental search
 set hlsearch   " highlight searched words
 
 " Reading and writing file
-set nobackup   " don't backup
-set noswapfile " don't use swap file
-set autoread   " auto reload when file rewrite other application
-set hidden     " allow open other file without saving current file
+set directory-=. " don't save tmp swap file in current directory
+set autoread     " auto reload when file rewrite other application
+set hidden       " allow open other file without saving current file
 
 " Display
 set notitle                   " don't rewrite title string
@@ -232,7 +231,7 @@ inoremap <silent> <expr> <C-h>   pumvisible() ? "\<C-y>\<C-h>" : "\<C-h>"
 inoremap <silent> <expr> <C-n>   pumvisible() ? "\<C-n>"       : "\<C-x>\<C-u>\<C-p>"
 
 " Delete highlight
-nnoremap <silent> gh :nohlsearch<CR>
+nnoremap <silent> gh :<C-u>nohlsearch<CR>
 
 " Input path in command mode
 cnoremap <expr> <C-x> expand('%:p:h') . "/"
