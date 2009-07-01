@@ -111,49 +111,34 @@ if has('iconv')
         set fileencodings=ucs-bom
     endif
 
-    " iconvがeucJP-msに対応しているかをチェック
+    " check iconv supports eucJP-ms
     if iconv("\x87\x64\x87\x6a", 'cp932', 'eucjp-ms') ==# "\xad\xc5\xad\xcb"
         let s:enc_euc = 'eucjp-ms'
         let s:enc_jis = 'iso-2022-jp-3'
-    " iconvがJISX0213に対応しているかをチェック
+    " check iconv supports JISX0213
     elseif iconv("\x87\x64\x87\x6a", 'cp932', 'euc-jisx0213') ==# "\xad\xc5\xad\xcb"
         let s:enc_euc = 'euc-jisx0213'
         let s:enc_jis = 'iso-2022-jp-3'
-    " その他
     else
         let s:enc_euc = 'euc-jp'
         let s:enc_jis = 'iso-2022-jp'
     endif
 
-    " fileencodingsを構築
-    " utf-8のとき
+    " build fileencodings (ignore euc-jp environment)
+    " encoding=utf-8
     if &encoding ==# 'utf-8'
         let &fileencodings = join([s:enc_jis, s:enc_euc, 'cp932', &fileencodings], ",")
-    " 基本UTF-8使うので多分ここのelse以下は使わない
+    " encoding=sjis
     else
-        let &fileencodings = &fileencodings .','. s:enc_jis
-        set fileencodings+=utf-8,ucs-2le,ucs-2
-
-        " eucのとき
-        if &encoding =~# '^\(euc-jp\|euc-jisx0213\|eucjp-ms\)$'
-            set fileencodings+=cp932
-            set fileencodings-=euc-jp
-            set fileencodings-=euc-jisx0213
-            set fileencodings-=eucjp-ms
-            let &encoding = s:enc_euc
-            let &fileencoding = s:enc_euc
-        " sjisのとき
-        else
-            let &fileencodings = &fileencodings .','. s:enc_euc
-        endif
+        let &fileencodings =
+        \   join([&fileencodings, s:enc_jis, 'utf-8', 'ucs-2le', 'ucs-2', s:enc_euc], ",")
     endif
 
-    " 定数を処分
     unlet s:enc_euc
     unlet s:enc_jis
 endif
 
-" 日本語を含まない場合は'fileencoding'に'encoding'を使うようにする
+" use 'fileencoding' for 'encoding' if the file don't contain multibyte characters
 augroup vimrc-autocmd
     autocmd BufReadPost *
     \   if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n') == 0
