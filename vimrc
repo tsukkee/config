@@ -158,16 +158,8 @@ augroup END
 set completeopt+=menuone " Display menu
 
 " File type settings
-" set complete+=k    " to use dictionary for completion
 filetype indent on " to use filetype indent
 filetype plugin on " to use filetype plugin
-
-" Dictionary
-" augroup vimrc-autocmd
-    " autocmd! Dictionary
-    " autocmd FileType javascript setlocal dictionary+=~/.vim/dict/javascript.dict
-    " autocmd FileType php setlocal dictionary+=~/.vim/dict/php.dict
-" augroup END
 
 
 " ==================== Hightlight ==================== "
@@ -251,10 +243,13 @@ if has('mac') && !has('gui')
     vnoremap <silent> [Prefix]y :w !pbcopy<CR><CR>
     nnoremap <silent> [Prefix]p :r !pbpaste<CR>
     vnoremap <silent> [Prefix]p :r !pbpaste<CR>
-" GVim(Mac & Win)
-else
-    noremap [Prefix]y "+y
-    noremap [Prefix]p "+p
+" GVim(Windows)
+" map for <Space> don't work in visual mode?
+elseif has('win32')
+    nnoremap [Prefix]y "+Y
+    vnoremap <C-y> "+y
+    nnoremap [Prefix]p "+p
+    vnoremap <C-p> "+p
 endif
 
 " Enable mouse wheel
