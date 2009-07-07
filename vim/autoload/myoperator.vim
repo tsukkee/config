@@ -1,4 +1,4 @@
-" smarttill - Smart motions, till before/after a punctuation
+" myoperator - Define your own operator easily
 " Version: 0.0.0
 " Copyright (C) 2009 kana <http://whileimautomaton.net/>
 " License: MIT license  {{{
@@ -22,40 +22,52 @@
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
 " Interface  "{{{1
-function! smarttill#after(mode)  "{{{2
-  echoerr 'FIXME: Not implemented yet'
+function! myoperator#define(operator_keyseq, function_name, ...)  "{{{2
+  if 0 < a:0
+    let additional_settings = '\|' . join(a:000)
+  else
+    let additional_settings = ''
+  endif
+
+  execute printf(('nnoremap <script> <silent> %s ' .
+  \               ':<C-u>set operatorfunc=%s%s<Return><SID>(count)g@'),
+  \              a:operator_keyseq, a:function_name, additional_settings)
+  execute printf(('vnoremap <script> <silent> %s ' .
+  \               '<Esc>:<C-u>set operatorfunc=%s%s<Return>gv<SID>(count)g@'),
+  \              a:operator_keyseq, a:function_name, additional_settings)
+  execute printf('onoremap %s  g@', a:operator_keyseq)
 endfunction
 
 
 
 
-function! smarttill#before(mode)  "{{{2
-  " t, the original command, is inclusive motion.
-  " But user-defined motion based on a function is always exclusive.
-  " So that the following strategy is used to emulate t-like motion:
-  " - In Operator-pending mode, move to the target character.
-  "   The motion is exclusive, so the text to be operated is the same as t.
-  " - In Normal mode and Visual mode, move to the target character then move
-  "   1 character to the left.
-  " FIXME: Support o_v and others.
-
-  " Visual mode is canceled to invoke this function,
-  " so that the last selection must be restored first.
-  if a:mode == 'v'
-    normal! gv
-  endif
-
-  " Move the cursor to [count]'th occurrence of any punctuation.
-  for i in range(v:count1)
-    call search('.\&\(\k\|\_s\)\@!', 'W')
-  endfor
-
-  " Adjust the cursor position to emulate the t motion.
-  if a:mode ==# 'n' || a:mode ==# 'v'
-    " FIXME: edge case - if the cursor is not moved at the previous step?
-    normal! h
-  endif
+function! myoperator#load()  "{{{2
+  runtime! plugin/myoperator.vim
 endfunction
+
+
+
+
+function! myoperator#_sid_prefix()  "{{{2
+  return s:SID_PREFIX()
+endfunction
+
+
+
+
+
+
+
+
+" Misc.  "{{{1
+
+function! s:SID_PREFIX()
+  return matchstr(expand('<sfile>'), '\%(^\|\.\.\)\zs<SNR>\d\+_\zeSID_PREFIX$')
+endfunction
+
+
+nnoremap <expr> <SID>(count)  v:count == v:count1 ? v:count : ''
+vnoremap <expr> <SID>(count)  v:count == v:count1 ? v:count : ''
 
 
 

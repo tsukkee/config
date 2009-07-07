@@ -183,8 +183,9 @@ colorscheme lucius " colorscheme
 
 
 " ==================== Keybind ==================== "
-" Use AlterCommand
+" Use AlterCommand and myoperator
 call altercmd#load()
+call myoperator#load()
 
 " Prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
@@ -299,6 +300,27 @@ augroup END
 " Rename
 command! -nargs=1 -complete=file Rename saveas <args> | call delete(expand('#'))
 
+" myoperator
+DefineOperator _ Op_replace_paste call SaveReg()
+let s:lastreg = ''
+function! SaveReg()
+    let s:lastreg = v:register
+endfunction
+function! Op_replace_paste(motion_wiseness)
+    if a:motion_wiseness == "line"
+        let op = "V"
+    elseif a:motion_wiseness == "block"
+        let op = "\<C-v>"
+    else
+        let op = "v"
+    endif
+
+    let reg = empty(s:lastreg) ? '' : '"' . s:lastreg
+    let paste = (getpos("`]") == getpos('.')) ? 'p' : 'P'
+
+    exe 'normal! `["_d' . op . '`]`[' . reg . paste
+endfunction
+
 
 " ==================== Plugins settings ==================== "
 
@@ -327,10 +349,6 @@ map W <Plug>(smartword-w)
 map B <Plug>(smartword-b)
 map E <Plug>(smartword-e)
 map gE <Plug>(smartword-ge)
-
-" smarttill
-map ,t <Plug>(smarttill-t)
-map ,T <Plug>(smarttill-T)
 
 " NERD_comments
 let NERDSpaceDelims = 1

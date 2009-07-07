@@ -1,4 +1,4 @@
-" smarttill - Smart motions, till before/after a punctuation
+" myoperator - Define your own operator easily
 " Version: 0.0.0
 " Copyright (C) 2009 kana <http://whileimautomaton.net/>
 " License: MIT license  {{{
@@ -22,26 +22,20 @@
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
 
-if exists('g:loaded_smarttill')
+if exists('g:loaded_myoperator')
   finish
 endif
 
 
 
 
-nnoremap <silent> <Plug>(smarttill-t)  :<C-u>call smarttill#before('n')<CR>
-nnoremap <silent> <Plug>(smarttill-T)  :<C-u>call smarttill#after('n')<CR>
-
-vnoremap <silent> <Plug>(smarttill-t)  :<C-u>call smarttill#before('v')<CR>
-vnoremap <silent> <Plug>(smarttill-T)  :<C-u>call smarttill#after('v')<CR>
-
-onoremap <silent> <Plug>(smarttill-t)  :<C-u>call smarttill#before('o')<CR>
-onoremap <silent> <Plug>(smarttill-T)  :<C-u>call smarttill#after('o')<CR>
+command! -complete=function -nargs=+ DefineOperator
+\        call myoperator#define(<f-args>)
 
 
 
 
-let g:loaded_smarttill = 1
+let g:loaded_myoperator = 1
 
 " __END__
 " vim: foldmethod=marker
