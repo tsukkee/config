@@ -5,6 +5,7 @@ set focuscontent
 set followhints=1
 set guioptions=BrbmN
 set hlsearch
+set noinsertmode
 set showstatuslinks=2
 set wildoptions=auto
 
