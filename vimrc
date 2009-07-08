@@ -92,7 +92,7 @@ augroup END
 " Use set encoding=utf-8 in Windows
 " needs ja.po with utf-8 encoding as $VIMRUNTIME/lang/ja_JP.UTF-8/LC_MESSAGES/vim.mo
 " Reference: http://d.hatena.ne.jp/thinca/20090111/1231684962
-if has('win32')
+if has('win32') && has('gui')
     let $LANG='ja_JP.UTF-8'
     set encoding=utf-8
 endif
@@ -179,7 +179,12 @@ function! MyHighlight()
 endfunction
 
 syntax on " syntax coloring
-colorscheme lucius " colorscheme
+" colorscheme
+if has('win32') && !has('gui')
+    colorscheme desert
+else
+    colorscheme lucius
+endif
 
 
 " ==================== Keybind ==================== "
@@ -246,7 +251,7 @@ if has('mac') && !has('gui')
     vnoremap <silent> [Prefix]p :r !pbpaste<CR>
 " GVim(Windows)
 " map for <Space> don't work in visual mode?
-elseif has('win32')
+elseif has('win32') && has('gui')
     nnoremap [Prefix]y "+Y
     vnoremap <C-y> "+y
     nnoremap [Prefix]p "+p
