@@ -1,32 +1,6 @@
---langmap=javascript:.js
---javascript-kinds=+f
---regex-javascript=/^(.*).prototype *= *(.*)/\1/o,object/
---regex-javascript=/^[ \t]*(.*) *: *function/\1/o,object/
---regex-javascript=/^[ \t]*(['"]?)([A-Za-z0-9_.]+)\1[ \t]*[:=][ \t]*function[ \t]*\(/\2/I,inner/i
-
---langmap=perl:+.pod
---regex-perl=/^=head1[[:space:]]*(.+)$/\1/d,pod/
---regex-perl=/^=head2[[:space:]]*(.+)$/. \1/d,pod/
---regex-perl=/^=head3[[:space:]]*(.+)$/\.\. \1/d,pod/
---regex-perl=/^=head4[[:space:]]*(.+)$/\.\.\. \1/d,pod/
---regex-perl=/^=for[[:space:]]+([^:]+):(.*)$/*\1:\2/d,pod/
---regex-perl=/^__END__$/__END__/l,labels/
---regex-perl=/^__DATA__$/__DATA__/l,labels/
-
---langmap=php:.php.inc.thtml
---php-kinds=+c+f+v
-
---langmap=ruby:.rb.rhtml
---ruby-kinds=+c+f+m+F
-
---langmap=c++:.cc.cpp.h.hpp
+--tag-relative=no
+--extra=+q+f
+--fields=+i+a+S+n
+--langmap=php:+.thtml
+--langmap=ruby:+.rhtml
 --c++-kinds=+p
-
---langdef=tex
---langmap=tex:.tex
---regex-tex=/\\subsubsection[ \t]*\*?\{[ \t]*([^}]*)\}/- \1/s,subsubsection/
---regex-tex=/\\subsection[ \t]*\*?\{[ \t]*([^}]*)\}/+\1/s,subsection/
---regex-tex=/\\section[ \t]*\*?\{[ \t]*([^}]*)\}/\1/s,section/
---regex-tex=/\\chapter[ \t]*\*?\{[ \t]*([^}]*)\}/\1/c,chapter/
---regex-tex=/\\label[ \t]*\*?\{[ \t]*([^}]*)\}/\1/l,label/
---regex-tex=/\\ref[ \t]*\*?\{[ \t]*([^}]*)\}/\1/r,ref/

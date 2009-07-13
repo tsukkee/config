@@ -1,4 +1,6 @@
 " ==================== Settings ==================== "
+scriptencoding utf-8
+
 " Define and reset augroup using in vimrc
 augroup vimrc-autocmd
     autocmd!
@@ -165,12 +167,12 @@ filetype plugin on " to use filetype plugin
 " ==================== Hightlight ==================== "
 augroup vimrc-autocmd
     autocmd ColorScheme * call MyHighlight()
+    autocmd VimEnter,WinEnter * match ZenkakuSpace /　/
 augroup END
 
 function! MyHighlight()
     " Hightlight Zenkaku space
     highlight ZenkakuSpace ctermbg=darkcyan ctermfg=darkcyan guifg=#3333ff guibg=#3333ff
-    match ZenkakuSpace /　/
 
     " Modify color for 'lucius'
     if g:colors_name == 'lucius'
@@ -330,7 +332,7 @@ endfunction
 " ==================== Plugins settings ==================== "
 
 " ctags
-command! CtagsR !ctags -R --tag-relative=no --fields=+iaS --extra=+q
+command! CtagsR !ctags -R
 
 " Ruby
 augroup vimrc-autocmd
