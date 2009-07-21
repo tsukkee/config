@@ -4,10 +4,10 @@ if(!"TreeStyleTabService" in window) {
     return;
 }
 
-let addMap = function(keys, desc, fn) {
+function addMap(keys, desc, fn) {
     mappings.addUserMap([modes.NORMAL], keys,
         "TreeStyleTab - " + desc, fn, {});
-};
+}
 
 addMap(["zc"], "Collapse Subtree", function() {
     gBrowser.treeStyleTab.collapseExpandSubtree(gBrowser.selectedTab, true);
@@ -19,7 +19,6 @@ addMap(["zo"], "Expand Subtree", function() {
 
 addMap(["zM"], "Collapse All Subtree", function() {
     TreeStyleTabService.collapseExpandAllSubtree(true);
-
 });
 
 addMap(["zR"], "Expand All Subtree", function() {
@@ -74,5 +73,4 @@ for(let i in positions) {
         TreeStyleTabService.changeTabbarPosition(position);
     });
 }
-
 })();
