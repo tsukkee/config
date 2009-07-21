@@ -190,9 +190,9 @@ endif
 
 
 " ==================== Keybind ==================== "
-" Use AlterCommand and myoperator
+" Use AlterCommand and operator-user
 call altercmd#load()
-call myoperator#load()
+call operator#user#load()
 
 " Prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
@@ -372,6 +372,10 @@ nmap <silent> <C-@> <Plug>(neocomplcache_keyword_caching)
 inoremap <expr> <C-x><C-f> neocomplcache#manual_filename_complete()
 inoremap <expr> <C-y>      pumvisible() ? neocomplcache#close_popup() : "\<C-y>"
 inoremap <expr> <C-e>      pumvisible() ? neocomplcache#cancel_popup() : "\<C-e>"
+if !exists('g:NeoComplCache_OmniPatterns')
+    let g:NeoComplCache_OmniPatterns = {}
+endif
+let g:NeoComplCache_OmniPatterns['css'] = '\v^\s+\w+|\w+[):;]?\s+|[@!]'
 
 " ku
 function! Ku_my_keymappings()

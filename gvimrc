@@ -25,6 +25,7 @@ if has('gui_macvim')
     set transparency=5 " (opaque) 0-100 (transparent)
     set guioptions-=e  " don't use gui tab apperance
     set guioptions-=T  " hide toolbar
+    set noimdisable
 
     noremap <silent> gw :macaction selectNextWindow:<CR>
     noremap <silent> gW :macaction selectPreviousWindow:<CR>
