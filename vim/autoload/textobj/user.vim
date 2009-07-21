@@ -1,5 +1,5 @@
 " textobj-user - Support for user-defined text objects
-" Version: 0.3.7
+" Version: 0.3.8
 " Copyright (C) 2007-2008 kana <http://whileimautomaton.net/>
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -61,8 +61,9 @@ function! textobj#user#select(pattern, flags, previous_mode)
   endif
 
   if s:range_validp(pos_head, pos_tail)
-    call cursor(pos_head)
     execute 'normal!' s:wise('v')
+    call cursor(pos_head)
+    normal! o
     call cursor(pos_tail)
     return [pos_head, pos_tail]
   else
@@ -264,8 +265,9 @@ endfunction
 
 
 function! s:range_select(range_head, range_tail)
-  call cursor(a:range_head)
   execute 'normal!' s:wise('v')
+  call cursor(a:range_head)
+  normal! o
   call cursor(a:range_tail)
 endfunction
 
@@ -327,11 +329,19 @@ function s:plugin.normalize()
       endif
 
       if spec_name =~# '^\*.*-function\*$'
-        if !has_key(specs, '*sfile*')
-          throw ''
+        if spec_info =~# '^s:'
+          if has_key(specs, '*sfile*')
+            let specs[spec_name] = substitute(spec_info,
+            \                                 '^s:',
+            \                                 s:snr_prefix(specs['*sfile*']),
+            \                                 '')
+          else
+            echoerr 'Script-local function is given without *sfile*:'
+            \       string(spec_name) '/' string(spec_info)
+          endif
+        else
+          " Nothing to do.
         endif
-        let specs[spec_name]
-        \ = substitute(spec_info, '^s:', s:snr_prefix(specs['*sfile*']), '')
       endif
 
       unlet spec_info  " to avoid E706.
@@ -483,8 +493,9 @@ function! s:select_function_wrapper(function_name, previous_mode)
     call s:cancel_selection(a:previous_mode, ORIG_POS)
   else
     let [motion_type, start_position, end_position] = _
-    call setpos('.', start_position)
     execute 'normal!' s:wise(motion_type)
+    call setpos('.', start_position)
+    normal! o
     call setpos('.', end_position)
   endif
 endfunction

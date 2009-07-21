@@ -1,16 +1,9 @@
 " Vim syntax file
 " Language:     JavaScript
 " Maintainer:   Yi Zhao (ZHAOYI) <zzlinux AT hotmail DOT com>
-" Last Change:  May 17, 2007
-" Version:      0.7.5
-" Changes:      1, Get the vimdiff problem fixed finally.
-"                Matthew Gallant reported the problem and test the fix. ;)
-"               2, Follow the suggestioin from Ingo Karkat.
-"                The 'foldtext' and 'foldlevel' settings should only be
-"                changed if the file being edited is pure JavaScript,
-"                not if JavaScript syntax is embedded inside other syntaxes.
-"               3, Remove function FT_JavaScriptDoc().
-"                Since VIM do the better than me.
+" Last Change:  June 4, 2009
+" Version:      0.7.7
+" Changes:      Add "undefined" as a type keyword
 "
 " TODO:
 "  - Add the HTML syntax inside the JSDoc
@@ -30,24 +23,17 @@ if version < 600    " Don't support the old version
   unlet! b:javascript_fold
 endif
 
-syn include @xmlTop syntax/xml.vim
-unlet b:current_syntax
-
-syn include @cssTop syntax/css.vim
-unlet b:current_syntax
-
 "" dollar sigh is permittd anywhere in an identifier
 setlocal iskeyword+=$
 
 syntax sync fromstart
-syntax sync maxlines=200
 
 "" JavaScript comments
 syntax keyword javaScriptCommentTodo    TODO FIXME XXX TBD contained
-syntax region  javaScriptLineComment    start=+\/\/+ end="\v$|(\</?(css|e4x)\>)@=" keepend contains=javaScriptCommentTodo,@Spell
-syntax region  javaScriptLineComment    start=+^\s*\/\/+ skip=+\n\s*\/\/+ end="\v$|(\</?(css|e4x)\>)@=" keepend contains=javaScriptCommentTodo,@Spell fold
+syntax region  javaScriptLineComment    start=+\/\/+ end=+$+ keepend contains=javaScriptCommentTodo,@Spell
+syntax region  javaScriptLineComment    start=+^\s*\/\/+ skip=+\n\s*\/\/+ end=+$+ keepend contains=javaScriptCommentTodo,@Spell fold
 syntax region  javaScriptCvsTag         start="\$\cid:" end="\$" oneline contained
-syntax region  javaScriptComment        start="/\*"  end="\v\*/|(\</?(css|e4x)\>)@=" contains=javaScriptCommentTodo,javaScriptCvsTag,@Spell fold
+syntax region  javaScriptComment        start="/\*"  end="\*/" contains=javaScriptCommentTodo,javaScriptCvsTag,@Spell fold
 
 "" JSDoc support start
 if !exists("javascript_ignore_javaScriptdoc")
@@ -72,7 +58,7 @@ syntax case match
 syntax match   javaScriptSpecial        "\\\d\d\d\|\\x\x\{2\}\|\\u\x\{4\}\|\\."
 syntax region  javaScriptStringD        start=+"+  skip=+\\\\\|\\$"+  end=+"+  contains=javaScriptSpecial,@htmlPreproc
 syntax region  javaScriptStringS        start=+'+  skip=+\\\\\|\\$'+  end=+'+  contains=javaScriptSpecial,@htmlPreproc
-syntax region  javaScriptRegexpString   start=+/\(\*\|/\)\@!+ skip=+\\\\\|\\/+ end=+/[gim]\{-,3}+ contains=javaScriptSpecial,@htmlPreproc oneline
+syntax region  javaScriptRegexpString   start=+/\(\*\|/\)\@!+ skip=+\\\\\|\\/+ end=+/[gim]\{,3}+ contains=javaScriptSpecial,@htmlPreproc oneline
 syntax match   javaScriptNumber         /\<-\=\d\+L\=\>\|\<0[xX]\x\+\>/
 syntax match   javaScriptFloat          /\<-\=\%(\d\+\.\d\+\|\d\+\.\|\.\d\+\)\%([eE][+-]\=\d\+\)\=\>/
 syntax match   javaScriptLabel          /\(?\s*\)\@<!\<\w\+\(\s*:\)\@=/
@@ -82,7 +68,7 @@ syntax keyword javaScriptPrototype      prototype
 
 "" Programm Keywords
 syntax keyword javaScriptSource         import export
-syntax keyword javaScriptType           const this var void yield arguments
+syntax keyword javaScriptType           const this undefined var void yield 
 syntax keyword javaScriptOperator       delete new in instanceof let typeof
 syntax keyword javaScriptBoolean        true false
 syntax keyword javaScriptNull           null
@@ -97,7 +83,7 @@ syntax keyword javaScriptGlobalObjects  Array Boolean Date Function Infinity Jav
 
 syntax keyword javaScriptExceptions     Error EvalError RangeError ReferenceError SyntaxError TypeError URIError
 
-syntax keyword javaScriptFutureKeys     abstract enum int short boolean export interface static byte extends long super char final native synchronized class float package throws  goto private transient debugger implements protected volatile double import public
+syntax keyword javaScriptFutureKeys     abstract enum int short boolean export interface static byte extends long super char final native synchronized class float package throws const goto private transient debugger implements protected volatile double import public
 
 "" DOM/HTML/CSS specified things
 
@@ -149,15 +135,10 @@ endif "DOM/HTML/CSS
 
 
 "" Code blocks
-syntax cluster javaScriptAll       contains=javaScriptComment,javaScriptLineComment,javaScriptDocComment,javaScriptStringD,javaScriptStringS,javaScriptRegexpString,javaScriptNumber,javaScriptFloat,javaScriptLabel,javaScriptSource,javaScriptType,javaScriptOperator,javaScriptBoolean,javaScriptNull,javaScriptFunction,javaScriptConditional,javaScriptRepeat,javaScriptBranch,javaScriptStatement,javaScriptGlobalObjects,javaScriptExceptions,javaScriptFutureKeys,javaScriptDomErrNo,javaScriptDomNodeConsts,javaScriptHtmlEvents,javaScriptDotNotation,javascriptE4X,javascriptCSS,javascriptCDATA
+syntax cluster javaScriptAll       contains=javaScriptComment,javaScriptLineComment,javaScriptDocComment,javaScriptStringD,javaScriptStringS,javaScriptRegexpString,javaScriptNumber,javaScriptFloat,javaScriptLabel,javaScriptSource,javaScriptType,javaScriptOperator,javaScriptBoolean,javaScriptNull,javaScriptFunction,javaScriptConditional,javaScriptRepeat,javaScriptBranch,javaScriptStatement,javaScriptGlobalObjects,javaScriptExceptions,javaScriptFutureKeys,javaScriptDomErrNo,javaScriptDomNodeConsts,javaScriptHtmlEvents,javaScriptDotNotation
 syntax region  javaScriptBracket   matchgroup=javaScriptBracket transparent start="\[" end="\]" contains=@javaScriptAll,javaScriptParensErrB,javaScriptParensErrC,javaScriptBracket,javaScriptParen,javaScriptBlock,@htmlPreproc
 syntax region  javaScriptParen     matchgroup=javaScriptParen   transparent start="("  end=")"  contains=@javaScriptAll,javaScriptParensErrA,javaScriptParensErrC,javaScriptParen,javaScriptBracket,javaScriptBlock,@htmlPreproc
-syntax region  javaScriptBlock     matchgroup=javaScriptBlock   transparent start="{"  end="}"  contains=@javaScriptAll,javaScriptParensErrA,javaScriptParensErrB,javaScriptParen,javaScriptBracket,javaScriptBlock,@htmlPreproc
-
-syntax region  javascriptCDATA	matchgroup=javascriptCDATA start="<\!\[CDATA\[" end="\]\]>" keepend contains=javascriptCSS
-syntax region  javascriptCSS	matchgroup=javascriptCSSDelimiter start="<css>" end="</css>" contains=@cssTop
-syntax region  javascriptE4X	matchgroup=javascriptE4XDelimiter start="<e4x>" end="</e4x>" contains=@xmlTop
-syntax region  javascriptE4X	matchgroup=javascriptE4XDelimiter start="<>" end="</>" contains=@xmlTop oneline
+syntax region  javaScriptBlock     matchgroup=javaScriptBlock   transparent start="{"  end="}"  contains=@javaScriptAll,javaScriptParensErrA,javaScriptParensErrB,javaScriptParen,javaScriptBracket,javaScriptBlock,@htmlPreproc 
 
 "" catch errors caused by wrong parenthesis
 syntax match   javaScriptParensError    ")\|}\|\]"
@@ -166,7 +147,9 @@ syntax match   javaScriptParensErrB     contained ")"
 syntax match   javaScriptParensErrC     contained "}"
 
 if main_syntax == "javascript"
-  syntax sync ccomment javaScriptComment
+  syntax sync clear
+  syntax sync ccomment javaScriptComment minlines=200
+  syntax sync match javaScriptHighlight grouphere javaScriptBlock /{/
 endif
 
 "" Fold control
@@ -200,7 +183,6 @@ if version >= 508 || !exists("did_javascript_syn_inits")
   else
     command -nargs=+ HiLink hi def link <args>
   endif
-  HiLink javascriptCDATA                String
   HiLink javaScriptComment              Comment
   HiLink javaScriptLineComment          Comment
   HiLink javaScriptDocComment           Comment
@@ -260,84 +242,5 @@ let b:current_syntax = "javascript"
 if main_syntax == 'javascript'
   unlet main_syntax
 endif
-
-
-if exists('b:did_indent')
-  finish
-endif
-let b:did_indent = 1
-
-setlocal indentexpr=GetJsIndent()
-setlocal indentkeys=0{,0},0),:,!^F,O,e,=*/
-" Clean CR when the file is in Unix format
-if &fileformat == "unix"
-    silent! %s/\r$//g
-endif
-" Only define the functions once per Vim session.
-"if exists("*GetJsIndent")
-"    finish
-"endif
-"function! GetJsIndent()
-"    let pnum = prevnonblank(v:lnum - 1)
-"    if pnum == 0
-"       return 0
-"    endif
-"    let line = getline(v:lnum)
-"    let pline = getline(pnum)
-"    let ind = indent(pnum)
-"
-"    if pline =~ '{\s*$\|[\s*$\|(\s*$'
-"	let ind = ind + &sw
-"    endif
-"
-"    if pline =~ ';\s*$' && line =~ '^\s*}'
-"        let ind = ind - &sw
-"    endif
-"
-"    if pline =~ '\s*]\s*$' && line =~ '^\s*),\s*$'
-"      let ind = ind - &sw
-"    endif
-"
-"    if pline =~ '\s*]\s*$' && line =~ '^\s*}\s*$'
-"      let ind = ind - &sw
-"    endif
-"
-"    if line =~ '^\s*});\s*$\|^\s*);\s*$' && pline !~ ';\s*$'
-"      let ind = ind - &sw
-"    endif
-"
-"    if line =~ '^\s*})' && pline =~ '\s*,\s*$'
-"      let ind = ind - &sw
-"    endif
-"
-"    if line =~ '^\s*}();\s*$' && pline =~ '^\s*}\s*$'
-"      let ind = ind - &sw
-"    endif
-"
-"    if line =~ '^\s*}),\s*$'
-"      let ind = ind - &sw
-"    endif
-"
-"    if pline =~ '^\s*}\s*$' && line =~ '),\s*$'
-"       let ind = ind - &sw
-"    endif
-"
-"    if pline =~ '^\s*for\s*' && line =~ ')\s*$'
-"       let ind = ind + &sw
-"    endif
-"
-"    if line =~ '^\s*}\s*$\|^\s*]\s*$\|\s*},\|\s*]);\s*\|\s*}]\s*$\|\s*};\s*$\|\s*})$\|\s*}).el$' && pline !~ '\s*;\s*$\|\s*]\s*$' && line !~ '^\s*{' && line !~ '\s*{\s*}\s*'
-"          let ind = ind - &sw
-"    endif
-"
-"    if pline =~ '^\s*/\*'
-"      let ind = ind + 1
-"    endif
-"
-"    if pline =~ '\*/$'
-"      let ind = ind - 1
-"    endif
-"    return ind
-"endfunction
 
 " vim: ts=4
