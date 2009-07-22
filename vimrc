@@ -1,6 +1,4 @@
 " ==================== Settings ==================== "
-scriptencoding utf-8
-
 " Define and reset augroup using in vimrc
 augroup vimrc-autocmd
     autocmd!
@@ -248,9 +246,9 @@ cnoremap <expr> <C-z> expand('%:p:r')
 " Vim(Mac)
 if has('mac') && !has('gui')
     nnoremap <silent> [Prefix]y :.w !pbcopy<CR><CR>
-    vnoremap <silent> [Prefix]y :w !pbcopy<CR><CR>
+    vnoremap <silent> <C-y> :w !pbcopy<CR><CR>
     nnoremap <silent> [Prefix]p :r !pbpaste<CR>
-    vnoremap <silent> [Prefix]p :r !pbpaste<CR>
+    vnoremap <silent> <C-p> :r !pbpaste<CR>
 " GVim(Windows)
 " map for <Space> don't work in visual mode?
 elseif has('win32') && has('gui')

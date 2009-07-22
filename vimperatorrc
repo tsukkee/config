@@ -13,12 +13,6 @@ set runtimepath+=~/.vimperator/after,~/vimperator/after
 
 let mapleader=","
 
-" auto pass keys
-" autocmd LocationChange .* js modes.passAllKeys=false
-" autocmd LocationChange reader\\.livedoor\\.com/reader js modes.passAllKeys=true
-" autocmd LocationChange reader\\.livedoor\\.com/public js modes.passAllKeys=true
-" autocmd LocationChange fastladder\\.com/reader js modes.passAllKeys=true
-" autocmd LocationChange mail\\.google\\.com/mail js modes.passAllKeys=true
 
 " ==================== Firefox options ==================== "
 " disable accesskey
@@ -237,6 +231,21 @@ liberator.globalVariables.proxy_settings = [
     }
 ];
 EOM
+
+" hatebu
+js <<EOM
+if (typeof hBookmark != 'undefined') {
+    liberator.globalVariables.hBookmark_shortcuts = {
+        hintAdd: 'c',
+        hintsComment: 'C',
+        add: [],
+        comment: ['C']
+    };
+
+    liberator.loadScript('chrome://hatenabookmark/content/vimperator/plugin/hatenabookmark.js', {__proto__: this});
+}
+EOM
+
 
 " ==================== colorscheme ==================== "
 colorscheme mac

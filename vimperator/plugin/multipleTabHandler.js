@@ -4,14 +4,13 @@ if(!"MultipleTabService" in window) {
     return;
 }
 
+/**
+ * Mappings
+ */
+
 function addMap(keys, desc, fn) {
     mappings.addUserMap([modes.NORMAL], keys,
         "MultipleTabHandler - " + desc, fn, {});
-}
-
-function addCommand(name, desc, fn, option) {
-    commands.addUserCommand(name, "MultipleTabHandler - " + desc,
-        fn, option, true /*replace*/);
 }
 
 addMap(["<Leader>m"], "toggle selection", function() {
@@ -52,14 +51,23 @@ addMap(["A"], "add bookmark", function() {
     }
 });
 
-addCommand(["multidu[plicate]"], "duplicate", function(args) {
+/**
+ * Commands
+ */
+
+function addCommand(name, desc, fn, option) {
+    commands.addUserCommand(name, "MultipleTabHandler - " + desc,
+        fn, option, true /*replace*/);
+}
+
+addCommand(["multipleduplicate", "mdu[plicate]"], "duplicate", function(args) {
     if(MultipleTabService.hasSelection()) {
         let tabs = MultipleTabService.getSelectedTabs();
         MultipleTabService.duplicateTabs(tabs);
     }
     else
     {
-        // from original tabduplicate in liberator/common/content/tabs.js
+        // copy from original tabduplicate in liberator/common/content/tabs.js
         let tab = tabs.getTab();
 
         let activate = args.bang ? true : false;
@@ -76,7 +84,7 @@ addCommand(["multidu[plicate]"], "duplicate", function(args) {
     count: true
 });
 
-addCommand(["multide[tach]"], "detach", function(args) {
+addCommand(["multipledetach", "mde[tach]"], "detach", function(args) {
     if(MultipleTabService.hasSelection()) {
         let tabs = MultipleTabService.getSelectedTabs();
         MultipleTabService.splitWindowFromTabs(tabs);
@@ -94,10 +102,8 @@ let builtin_formats = [
     { label: 'Anchor', format: '<a href="%URL_HTMLIFIED%">%TITLE_HTMLIFIED%</a>' }
 ];
 
-// create formats
-let formats = [];
-
 // load custom formats
+let formats = [];
 function loadFormats() {
     formats = [];
 
@@ -113,7 +119,7 @@ function loadFormats() {
 }
 loadFormats();
 
-addCommand(["multico[py]"], "copy (bang to reload formats)", function(args) {
+addCommand(["multiplecopy", "mco[py]"], "copy (bang to reload formats)", function(args) {
     if(args.bang) { loadFormats(); return; }
 
     let tabs = MultipleTabService.hasSelection()
@@ -134,4 +140,26 @@ addCommand(["multico[py]"], "copy (bang to reload formats)", function(args) {
     },
     bang: true
 });
+
+/**
+ * with TreeStyleTab
+ */
+if("TreeStyleTabService" in window) {
+    addMap(["zt"], "select current tree", function() {
+        let root = TreeStyleTabService.getRootTab(gBrowser.selectedTab);
+        let tabs = TreeStyleTabService.getDescendantTabs(root);
+        tabs.push(root);
+
+        tabs.forEach(function(tab) MultipleTabService.setSelection(tab, true));
+    });
+
+    addMap(["zs"], "select all siblings", function() {
+        let parent = TreeStyleTabService.getParentTab(gBrowser.selectedTab);
+        let siblings = (parent == null)
+            ? TreeStyleTabService.rootTabs
+            : TreeStyleTabService.getChildTabs(parent);
+
+        siblings.forEach(function(tab) MultipleTabService.setSelection(tab, true));
+    });
+}
 })();
