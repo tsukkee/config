@@ -1,9 +1,17 @@
 (function() {
+
+// delicious, hatebu, livedoorclip, googlebookmarks
+let sbm_name = liberator.globalVariables.sbmincsearch_service_name || "delicious";
+let sbm_service = sbm_name + "_incsearch";
+
+// max
+let max = liberator.globalVariables.sbmincsearch_max || 15;
+
 // load scripts
-let d = {};
+let module = {};
 try {
-    liberator.loadScript("chrome://delicious_incsearch/content/database.js", d);
-    liberator.loadScript("chrome://delicious_incsearch/content/incsearch.js", d);
+    liberator.loadScript("chrome://" + sbm_service + "/content/database.js", module);
+    liberator.loadScript("chrome://" + sbm_service + "/content/incsearch.js", module);
 }
 catch(e)
 {
@@ -12,11 +20,11 @@ catch(e)
 }
 
 // load database
-let database = new d.Database('bookmark', 'delicious_incsearch');
+let database = new module.Database('bookmark', sbm_service);
 
 // only use search method
-d.IncSearch.prototype.checkLoop = d.IncSearch.prototype.reset = function() {};
-let incsearch = new d.IncSearch(null, null, { dispMax: 15, database: database });
+module.IncSearch.prototype.checkLoop = module.IncSearch.prototype.reset = function() {};
+let incsearch = new module.IncSearch(null, null, { dispMax: max, database: database });
 
 // completion
 let format = {
@@ -42,7 +50,7 @@ let result_mapper = function(item) {
     return item;
 };
 
-commands.addUserCommand(["deliciousIncsearch", "ds"], "delicious IncSearch",
+commands.addUserCommand([sbm_name + "Incsearch"], sbm_name + " IncSearch",
     function(args) {
         liberator.open(args.string, args.bang ? liberator.NEW_TAB : null);
     },

@@ -43,6 +43,7 @@ set hlsearch   " highlight searched words
 set directory-=. " don't save tmp swap file in current directory
 set autoread     " auto reload when file rewrite other application
 set hidden       " allow open other file without saving current file
+set tags=./tags; " search tag file recursively (see :h file-searching)
 
 " Display
 set notitle                   " don't rewrite title string
@@ -370,10 +371,6 @@ nmap <silent> <C-@> <Plug>(neocomplcache_keyword_caching)
 inoremap <expr> <C-x><C-f> neocomplcache#manual_filename_complete()
 inoremap <expr> <C-y>      pumvisible() ? neocomplcache#close_popup() : "\<C-y>"
 inoremap <expr> <C-e>      pumvisible() ? neocomplcache#cancel_popup() : "\<C-e>"
-if !exists('g:NeoComplCache_OmniPatterns')
-    let g:NeoComplCache_OmniPatterns = {}
-endif
-let g:NeoComplCache_OmniPatterns['css'] = '\v^\s+\w+|\w+[):;]?\s+|[@!]'
 
 " ku
 function! Ku_my_keymappings()
