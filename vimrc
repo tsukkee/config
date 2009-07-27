@@ -234,29 +234,18 @@ nnoremap <silent> gh :<C-u>nohlsearch<CR>
 cnoremap <expr> <C-x> expand('%:p:h') . "/"
 cnoremap <expr> <C-z> expand('%:p:r')
 
-" Copy and paste
+" Copy and paste with fakeclip
 " Command-C and Command-V are also available in MacVim
-" Reference:
-" http://subtech.g.hatena.ne.jp/cho45/20061010/1160459376
-" http://vim.wikia.com/wiki/Mac_OS_X_clipboard_sharing
-"
-" need  'set enc=utf-8' and
-" below environment variable for UTF-8 characters
-" export __CF_USER_TEXT_ENCODING='0x1F5:0x08000100:14'
-"
-" Vim(Mac)
-if has('mac') && !has('gui')
-    nnoremap <silent> [Prefix]y :.w !pbcopy<CR><CR>
-    vnoremap <silent> <C-y> :w !pbcopy<CR><CR>
-    nnoremap <silent> [Prefix]p :r !pbpaste<CR>
-    vnoremap <silent> <C-p> :r !pbpaste<CR>
-" GVim(Windows)
-" map for <Space> don't work in visual mode?
-elseif has('win32') && has('gui')
-    nnoremap [Prefix]y "+Y
-    vnoremap <C-y> "+y
-    nnoremap [Prefix]p "+p
-    vnoremap <C-p> "+p
+" see :help fakeclip-multibyte-on-mac
+nmap <C-y> <Plug>(fakeclip-y)
+vmap <C-y> <Plug>(fakeclip-y)
+nmap <C-p> <Plug>(fakeclip-p)
+vmap <C-p> <Plug>(fakeclip-p)
+if !empty($WINDOW)
+    nmap gy <Plug>(fakeclip-screen-y)
+    vmap gy <Plug>(fakeclip-screen-y)
+    nmap gp <Plug>(fakeclip-screen-p)
+    vmap gp <Plug>(fakeclip-screen-p)
 endif
 
 " Enable mouse wheel
@@ -307,25 +296,25 @@ augroup END
 command! -nargs=1 -complete=file Rename saveas <args> | call delete(expand('#'))
 
 " myoperator
-DefineOperator _ Op_replace_paste call SaveReg()
-let s:lastreg = ''
-function! SaveReg()
-    let s:lastreg = v:register
-endfunction
-function! Op_replace_paste(motion_wiseness)
-    if a:motion_wiseness == "line"
-        let op = "V"
-    elseif a:motion_wiseness == "block"
-        let op = "\<C-v>"
-    else
-        let op = "v"
-    endif
+" DefineOperator _ Op_replace_paste call SaveReg()
+" let s:lastreg = ''
+" function! SaveReg()
+    " let s:lastreg = v:register
+" endfunction
+" function! Op_replace_paste(motion_wiseness)
+    " if a:motion_wiseness == "line"
+        " let op = "V"
+    " elseif a:motion_wiseness == "block"
+        " let op = "\<C-v>"
+    " else
+        " let op = "v"
+    " endif
 
-    let reg = empty(s:lastreg) ? '' : '"' . s:lastreg
-    let paste = (getpos("`]") == getpos('.')) ? 'p' : 'P'
+    " let reg = empty(s:lastreg) ? '' : '"' . s:lastreg
+    " let paste = (getpos("`]") == getpos('.')) ? 'p' : 'P'
 
-    exe 'normal! `["_d' . op . '`]`[' . reg . paste
-endfunction
+    " exe 'normal! `["_d' . op . '`]`[' . reg . paste
+" endfunction
 
 
 " ==================== Plugins settings ==================== "

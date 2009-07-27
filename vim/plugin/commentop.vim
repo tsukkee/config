@@ -3,7 +3,7 @@
 "=============================================================================
 "
 " Author:  Takahiro SUZUKI <takahiro.suzuki.ja@gmDELETEMEail.com>
-" Version: 1.1.0 (Vim 7.1)
+" Version: 1.1.1 (Vim 7.1)
 " Licence: MIT Licence
 " URL:     http://www.vim.org/scripts/script.php?script_id=2708
 "
@@ -32,7 +32,7 @@
 "
 "     <Plug>CommentopToggleOP    " (n op) toggle comment {motion}
 "     <Plug>CommentopAppendOP    " (n op) comment out {motion}
-"     <Plug>CommentopRemoveOP    " (n op) uncomment {motion}Re
+"     <Plug>CommentopRemoveOP    " (n op) uncomment {motion}
 "
 "   default mapping:
 "     co       <Plug>CommentopToggleNV
@@ -62,6 +62,9 @@
 "
 "-----------------------------------------------------------------------------
 " ChangeLog:
+"   1.1.1:
+"     - simplified the script using range function
+"     - counting WS with virtcol (work fine with mixture of tabs and spaces)
 "   1.1.0:
 "     - simplified <Plug> maps (no backward compatibility for 1.0.2 or before)
 "     - determine the comment string automatically (using 'commentstring')
@@ -79,15 +82,16 @@
 " }}}1
 "=============================================================================
 
-function! s:CountHeadSpace()
-  let p = getpos('.')
-  if p[2]==1 | return 0 | endif
-  let line = getline('.')[0:p[2]-2]
-  let len = 0
-  while len < strlen(line)
-    if line[len]=~"[ \<TAB>]" | let len += 1 | else | break | endif
-  endwhile
-  return len
+if v:version<700 | finish | endif
+
+let s:save_cpo=&cpo
+set cpo&vim
+
+function! s:CountHeadSpace(line)
+  call cursor([a:line, 1])
+  normal 0
+  call searchpos("[^ \<TAB>]", "c")
+  return virtcol('.')-1
 endfunction
 
 
@@ -103,49 +107,50 @@ function! s:Comment(mode, count)
     if len(pat)==1
       let commentmatch = '^' . pat[0] . "[ \<TAB>]\\{,1}"
       let commentinsertstr = pat[0] . ' '
-      let s:comment_types[&ft] = {'match': commentmatch, 'insert': commentinsertstr}
+      let s:comment_types[&ft] =
+        \{'match': commentmatch, 'insert': commentinsertstr}
     else
       return
     endif
   endif
 
   let c = a:count
-  " count head spaces
+  " count virtual head spaces
   normal! ^
   let p = getpos('.')
-  let mh = -1
-  while c>0
-    let hs = s:CountHeadSpace()
-    if hs<mh || mh==-1 | let mh = hs | endif
-    normal! j
-    let c -= 1
-  endwhile
-  " insert/remove comments
+  let mh = min(map(range(getpos('.')[1], getpos('.')[1]+c-1),
+        \"s:CountHeadSpace(v:val)"))
   call setpos('.', p)
-  let c = a:count
+
+  " insert/remove comments" 
+  let save_ve=&virtualedit
+  set virtualedit=all
   while c>0
-    let iscomment = getline('.')[mh :] =~ commentmatch
-    let prevstr = (mh>0) ? getline('.')[0:mh-1] : ''
+    " calc bytewise position h from a virtual position mh
+    exe "normal ".(mh+1)."\|"
+    let h = getpos('.')[2]-1
+    let line = getline('.')
+
+    let iscomment = line[h :] =~ commentmatch
+    let prevstr = (h>0) ? line[0:h-1] : ''
     if a:mode==0 || (a:mode==2 && iscomment)
       " remove
-      call setline('.', prevstr . substitute(getline('.')[mh :], commentmatch, '', ''))
+      call setline('.', prevstr . substitute(getline('.')[h :],
+            \commentmatch, '', ''))
     else
       " insert
-     call setline('.', prevstr . commentinsertstr . getline('.')[mh :])
+     call setline('.', prevstr . commentinsertstr . getline('.')[h :])
     endif
     normal! j
     let c -= 1
   endwhile
+  let &virtualedit=save_ve
   call setpos('.', p)
 endfunction
 
 " normal / visual mode
-function! s:LinewiseComment(mode)
-  if exists('s:lastmode') && s:lastmode =~ "[vV\<C-V>]"
-    call s:Comment(a:mode, getpos("'>")[1]-getpos("'<")[1]+1)
-  else
-    call s:Comment(a:mode, v:count1)
-  endif
+function! s:LinewiseComment(mode) range
+  call s:Comment(a:mode, a:lastline - a:firstline + 1)
 endfunction
 
 " toggle / append / remove comment operator
@@ -155,13 +160,6 @@ endfunction
 function! s:LinewiseCommentOperator(type)
   call s:Comment(s:commentmode, getpos("']")[1]-getpos("'[")[1]+1)
 endfunction
-
-" save mode
-function! <SID>SaveMode()
-  let s:lastmode = mode()
-  return ':'
-endfunction
-noremap <expr> <SID>: <SID>SaveMode()
 
 " function and command to set the comment type from file type
 let s:comment_types = {}
@@ -207,12 +205,23 @@ endif
 
 " === plugin keymaps
 " normal and visual
-noremap <script><silent> <Plug>CommentopRemoveNV <SID>:<C-U>call <SID>LinewiseComment(0)<CR>
-noremap <script><silent> <Plug>CommentopAppendNV <SID>:<C-U>call <SID>LinewiseComment(1)<CR>
-noremap <script><silent> <Plug>CommentopToggleNV <SID>:<C-U>call <SID>LinewiseComment(2)<CR>
+noremap <script><silent> <Plug>CommentopRemoveNV 
+      \:call <SID>LinewiseComment(0)<CR>
+noremap <script><silent> <Plug>CommentopAppendNV 
+      \:call <SID>LinewiseComment(1)<CR>
+noremap <script><silent> <Plug>CommentopToggleNV 
+      \:call <SID>LinewiseComment(2)<CR>
 
 " operator
-nnoremap <script><silent> <Plug>CommentopRemoveOP <SID>:<C-U>call <SID>SetCommentMode(0)<CR>:set opfunc=<SID>LinewiseCommentOperator<CR>g@
-nnoremap <script><silent> <Plug>CommentopAppendOP <SID>:<C-U>call <SID>SetCommentMode(1)<CR>:set opfunc=<SID>LinewiseCommentOperator<CR>g@
-nnoremap <script><silent> <Plug>CommentopToggleOP <SID>:<C-U>call <SID>SetCommentMode(2)<CR>:set opfunc=<SID>LinewiseCommentOperator<CR>g@
+nnoremap <script><silent> <Plug>CommentopRemoveOP 
+      \:<C-U>call <SID>SetCommentMode(0)<CR>
+      \:set opfunc=<SID>LinewiseCommentOperator<CR>g@
+nnoremap <script><silent> <Plug>CommentopAppendOP 
+      \:<C-U>call <SID>SetCommentMode(1)<CR>
+      \:set opfunc=<SID>LinewiseCommentOperator<CR>g@
+nnoremap <script><silent> <Plug>CommentopToggleOP 
+      \:<C-U>call <SID>SetCommentMode(2)<CR>
+      \:set opfunc=<SID>LinewiseCommentOperator<CR>g@
+
+let &cpo=s:save_cpo
 
