@@ -48,32 +48,14 @@ nnoremap P <Nop>
 " ghでハイライトオフ
 nnoremap gh :nohl<CR>:offwordhighlight<CR>
 
-" Flashblock
-nnoremap <C-f> :js Flashblock.toggleSiteWhitelisted();<CR>r
-
 " toggle autopagerize
-nnoremap <C-a> :toggleautopagerize<CR>
-
-" search
-js <<EOM
-(function() {
-    var defsearch = options.get("defsearch");
-
-    mappings.addUserMap([modes.NORMAL], ["s"],
-        "search by default search engine in current tab",
-        function() { commandline.open(":", "open " + defsearch.value + " ", modes.EX); });
-
-    mappings.addUserMap([modes.NORMAL], ["S"],
-        "search by default search engine in new tab",
-        function() { commandline.open(":", "tabopen " + defsearch.value + " ", modes.EX); });
-})();
-EOM
+nnoremap a :toggleautopagerize<CR>
 
 " toggle guioptions
 js <<EOM
 (function() {
-    var guioptions = options.get("guioptions");
-    var original = guioptions.value;
+    let guioptions = options.get("guioptions");
+    let original = guioptions.value;
 
     mappings.addUserMap([modes.NORMAL], ["I"],
         "toggle guioptions",
@@ -149,12 +131,6 @@ hints.addMode("i", "Focus to input",
     function() "//input[not(@type='hidden')] | //textarea | //xhtml:input[not(@type='hidden')] | //xhtml:textarea"
     );
 
-hints.addMode("h", "Hide element",
-    function(element) {
-        element.style.display = "none";
-    },
-    function() "//*");
-
 // require FireBug
 hints.addMode("x", "copy XPath",
     function(element) {
@@ -176,7 +152,8 @@ let command_bookmarklet_prefix=""
 
 " sbmincsearch
 let sbmincsearch_service_name = "delicious"
-let sbmincsearch_max = 20
+let sbmincsearch_max = 50
+nnoremap D :deliciousIncsearch! 
 
 " migratestatusbar
 javascript <<EOM
