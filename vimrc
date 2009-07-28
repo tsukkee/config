@@ -237,10 +237,11 @@ cnoremap <expr> <C-z> expand('%:p:r')
 " Copy and paste with fakeclip
 " Command-C and Command-V are also available in MacVim
 " see :help fakeclip-multibyte-on-mac
-nmap <C-y> <Plug>(fakeclip-y)
-vmap <C-y> <Plug>(fakeclip-y)
-nmap <C-p> <Plug>(fakeclip-p)
-vmap <C-p> <Plug>(fakeclip-p)
+nmap <C-y> "*y
+vmap <C-y> "*y
+nmap <C-p> "*p
+vmap <C-p> "*p
+
 if !empty($WINDOW)
     nmap gy <Plug>(fakeclip-screen-y)
     vmap gy <Plug>(fakeclip-screen-y)

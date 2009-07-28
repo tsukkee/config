@@ -27,6 +27,8 @@ if has('macunix') || system('uname') =~? '^darwin'
   let s:PLATFORM = 'mac'
 elseif has('win32unix')
   let s:PLATFORM = 'cygwin'
+elseif has('win32')
+  let s:PLATFORM = 'win32'
 else
   let s:PLATFORM = 'unknown'
 endif
@@ -131,6 +133,12 @@ function! s:read_clipboard_cygwin()
 endfunction
 
 
+function! s:read_clipboard_win32()
+  " return s:read_clipboard_unknown()
+  return system('cliputil_paste')
+endfunction
+
+
 function! s:read_clipboard_unknown()
   echoerr 'Getting the clipboard content is not supported on this platform:'
   \       s:PLATFORM
@@ -170,6 +178,13 @@ endfunction
 
 function! s:write_clipboard_cygwin(text)
   call writefile(split(a:text, "\x0A", 1), '/dev/clipboard', 'b')
+  return
+endfunction
+
+
+function! s:write_clipboard_win32(text)
+  " call system('clip', a:text)
+  call system('cliputil_copy', a:text)
   return
 endfunction
 
