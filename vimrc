@@ -296,7 +296,7 @@ augroup END
 " Rename
 command! -nargs=1 -complete=file Rename saveas <args> | call delete(expand('#'))
 
-" myoperator
+" myoperator {{{
 " DefineOperator _ Op_replace_paste call SaveReg()
 " let s:lastreg = ''
 " function! SaveReg()
@@ -316,6 +316,7 @@ command! -nargs=1 -complete=file Rename saveas <args> | call delete(expand('#'))
 
     " exe 'normal! `["_d' . op . '`]`[' . reg . paste
 " endfunction
+" }}}
 
 
 " ==================== Plugins settings ==================== "
