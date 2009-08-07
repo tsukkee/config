@@ -30,7 +30,7 @@ let incsearch = new module.IncSearch(null, null, { dispMax: max, database: datab
 let format = {
     anchored: false,
     keys: { text: 'url', description: 'title', icon: '', extra: 'extra' },
-    title: ["Title", "Info"],
+    title: [sbm_name, "Info"],
     process: [
         // Title
         function(item, text) {
@@ -50,21 +50,27 @@ let result_mapper = function(item) {
     return item;
 };
 
+// completer
+let completer = function(context, args) {
+    context.format = format;
+    context.filters = [];
+
+    incsearch.search(context.filter.split(/\s/), 0);
+    context.completions = incsearch.results.map(result_mapper);
+};
+
 commands.addUserCommand([sbm_name + "Incsearch"], sbm_name + " IncSearch",
     function(args) {
         liberator.open(args.string, args.bang ? liberator.NEW_TAB : null);
     },
     {
-        completer: function(context, args) {
-            context.format = format;
-            context.filters = [];
-
-            incsearch.search(context.filter.split(/\s/), 0);
-            context.completions = incsearch.results.map(result_mapper);
-        },
+        completer: completer,
         literal: 0,
         argCount: '*',
         bang: true
     },
     true);
+
+completion.addUrlCompleter("I", sbm_name + " IncSearch", completer);
+
 })();
