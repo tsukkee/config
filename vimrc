@@ -162,7 +162,6 @@ set completeopt+=menuone " Display menu
 filetype indent on " to use filetype indent
 filetype plugin on " to use filetype plugin
 
-
 " ==================== Hightlight ==================== "
 augroup vimrc-autocmd
     autocmd ColorScheme * call MyHighlight()

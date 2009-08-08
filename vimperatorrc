@@ -68,6 +68,7 @@ js <<EOM
 })();
 EOM
 
+" javascript
 js <<EOM
 commands.addUserCommand(["javascriptincontent", "jsc"],
     "Run a JavaScript command in content context",
@@ -93,6 +94,7 @@ commands.addUserCommand(["javascriptincontent", "jsc"],
     });
 EOM
 
+" dispatch mouse event
 js <<EOM
 (function() {
 function dispatchMouseClickByXPath(xpath) {
@@ -124,6 +126,7 @@ commands.addUserCommand(["offwordhighlight"],
 })();
 EOM
 
+
 " ==================== hints ==================== "
 js <<EOM
 hints.addMode("i", "Focus to input",
@@ -143,9 +146,6 @@ EOM
 
 
 " ==================== plugin options ==================== "
-
-" migemo_hint
-set hintmatching="custom"
 
 " commandBookmarklet
 let command_bookmarklet_prefix=""
@@ -175,40 +175,6 @@ liberator.globalVariables.migrate_elements = [
         dest:  'liberator-statusline',
         after: false,
     },
-];
-EOM
-
-" proxy
-js <<EOM
-liberator.globalVariables.proxy_settings = [
-    {
-        conf_name: 'disable',
-        conf_usage: 'direct connection',
-        settings: [
-            {
-                label: 'type',
-                param: 0
-            }
-        ]
-    },
-    {
-        conf_name: 'cocproxy',
-        conf_usage: 'use CocProxy',
-        settings: [
-            {
-                label: 'type',
-                param: 1
-            },
-            {
-                label: 'http',
-                param: 'localhost'
-            },
-            {
-                label: 'http_port',
-                param: 5432
-            }
-        ]
-    }
 ];
 EOM
 
