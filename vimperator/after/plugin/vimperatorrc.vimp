@@ -4,9 +4,9 @@ set complete+=I
 
 " feedSomeKey
 autocmd LocationChange .* :fmapc
-autocmd LocationChange reader\\.livedoor\\.com/reader :fmap j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ? S
-autocmd LocationChange fastladder\\.com/reader :fmap j k s a p o v V c <Space> <S-Space> z Z b < > q w r g ? S
-autocmd LocationChange mail\\.google\\.com/mail :fmap -d 4 u k j o p n c / q ? x s y e m ! # r a f N [ ] z . I U T gi gs gt gd ga gc gk gl *a *n *r *u *s *t
+autocmd LocationChange reader\\.livedoor\\.com/reader :fmap s a r c j k <Space> <S-Space> z b p o v > J < K
+autocmd LocationChange fastladder\\.com/reader :fmap s a r c j k <Space> <S-Space> z b p o v > J < K
+autocmd LocationChange mail\\.google\\.com/mail :fmap -d 4 u k j o <CR> p n c ? x s y e m ! #
 autocmd LocationChange www\\.tumblr\\.com/dashboard :fmap -vkey -event keydown j k
 
 " arpeggio
