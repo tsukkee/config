@@ -39,10 +39,10 @@ zle -N _quote-previous-word-in-double
 bindkey '^[d' _quote-previous-word-in-double
 
 # colorize
-zstyle ':completion:*' list-colors '' 
+zstyle ':completion:*' list-colors ''
 # ignore case
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' 
-# sudo 
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+# sudo
 zstyle ':completion:*:sudo:*' command-path /opt/local/bin /opt/local/sbin \
     /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin
 
@@ -70,20 +70,27 @@ setopt hist_ignore_all_dups
 setopt hist_reduce_blanks
 setopt share_history
 
-# prompt
+# color
 autoload -U colors
 colors
 
+# prompt
 function _colorize_prompt {
     PROMPT="%{%(?.$fg[green].$fg[red])%}%n@%m $reset_color$fg[yellow]%~%{$reset_color%}
 %# "
 }
 _colorize_prompt
 
-# auto commands
-typeset -ga chpwd_functions
-typeset -ga precmd_functions
-typeset -ga preexec_functions
+# rprompt
+autoload -Uz vcs_info
+zstyle ':vcs_info:*' formats '(%s)-[%b]'
+zstyle ':vcs_info:*' actionformats '(%s)-[%b|%a]'
+function _vsc_info() {
+    psvar=()
+    vcs_info
+    RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}"
+}
+_vsc_info
 
 # set directory name to screen
 function _screen_dirname() {
@@ -99,42 +106,13 @@ function _screen_cmdname() {
     fi
 }
 
-# display current SCM in RPROMPT
-function _rprompt() {
-    # git
-    local -A git_res
-    git_res=`git branch -a --no-color 2> /dev/null`
-    if [ $? = "0" ]; then
-        git_res=`echo $git_res | grep '^*' | tr -d '\* '`
-        RPROMPT="%{$fg[cyan]%}git [$git_res]%{$reset_color%}"
-        return
-    fi
-
-    # hg
-    local -A hg_res
-    hg_res=`hg branch 2> /dev/null`
-    if [ $? = "0" ]; then
-        RPROMPT="%{$fg[cyan]%}hg [$hg_res]%{$reset_color%}"
-        return
-    fi
-
-    # svn
-    if [ -d .svn ]; then
-        RPROMPT="%{$fg[cyan]%}svn%{$reset_color%}"
-        return
-    fi
-
-    # none
-    RPROMPT=""
-}
-
-# function chpwd() {
-   # RPROMPT=`ruby -e "d=Dir.new('./');%w(.hg .git .svn).each{|i| puts i if d.include?(i)}"`
-# }
-# chpwd
+# auto commands
+typeset -ga chpwd_functions
+typeset -ga precmd_functions
+typeset -ga preexec_functions
 
 precmd_functions+=_colorize_prompt
-precmd_functions+=_rprompt
+precmd_functions+=_vsc_info
 precmd_functions+=_screen_dirname
 preexec_functions+=_screen_cmdname
 

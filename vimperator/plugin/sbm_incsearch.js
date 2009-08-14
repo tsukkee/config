@@ -59,6 +59,7 @@ let completer = function(context, args) {
     context.completions = incsearch.results.map(result_mapper);
 };
 
+// add commmand
 commands.addUserCommand([sbm_name + "Incsearch"], sbm_name + " IncSearch",
     function(args) {
         liberator.open(args.string, args.bang ? liberator.NEW_TAB : null);
@@ -71,6 +72,7 @@ commands.addUserCommand([sbm_name + "Incsearch"], sbm_name + " IncSearch",
     },
     true);
 
+// add complete option
 completion.addUrlCompleter("I", sbm_name + " IncSearch", completer);
 
 })();
