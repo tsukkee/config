@@ -197,6 +197,16 @@ call operator#user#load()
 nnoremap [Prefix] <Nop>
 nmap <Space> [Prefix]
 
+" Use display line
+noremap j gj
+noremap gj j
+noremap k gk
+noremap gk k
+noremap $ g$
+noremap g$ $
+noremap 0 g0
+noremap g0 0
+
 " Folding
 " Reference: http://d.hatena.ne.jp/ns9tks/20080318/1205851539
 " hold with 'h' if the cursor is on the head of line

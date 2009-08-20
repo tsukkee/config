@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: neocomplcache.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 13 Aug 2009
+" Last Modified: 17 Aug 2009
 " Usage: Just source this file.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -23,13 +23,26 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 2.69, for Vim 7.0
+" Version: 2.71, for Vim 7.0
 "-----------------------------------------------------------------------------
 " ChangeLog: "{{{
 " ChangeLog NeoComplCache2: "{{{
-"   2.69:
+"   2.71:
+"    - Create g:NeoComplCache_TemporaryDir directory if not exists.
+"    - Create g:NeoComplCache_SnippetsDir directory if not exists.
+"
+"   2.70:
+"    - Improved omni completion.
+"    - Display readonly files.
+"    - Fixed filename completion bug.
+"    - No ignorecase in next keyword completion.
+"
+"   2.69: - Improved quick match.
 "    - Fixed html omni completion error.
 "    - Improved html omni completion pattern.
+"    - Improved g:NeoComplCache_CtagsArgumentsList in vim filetype.
+"    - Delete quick match cache when BufWinEnter.
+"    - Convert string omni completion.
 "
 "   2.68:
 "    - Improved quick match in filename completion.
@@ -745,7 +758,7 @@ if !exists('g:NeoComplCache_TemporaryDir')
     let g:NeoComplCache_TemporaryDir = $HOME . '/.neocon'
 
     if !isdirectory(g:NeoComplCache_TemporaryDir)
-         call mkdir(g:NeoComplCache_TemporaryDir)
+         call mkdir(g:NeoComplCache_TemporaryDir, 'p')
     endif
 endif
 if exists('g:NeoComplCache_EnableAtStartup') && g:NeoComplCache_EnableAtStartup
