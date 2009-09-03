@@ -4,9 +4,10 @@ if(!"TreeStyleTabService" in window) {
     return;
 }
 
-function addMap(keys, desc, fn) {
+function addMap(keys, desc, fn, options) {
+    options = options || {};
     mappings.addUserMap([modes.NORMAL], keys,
-        "TreeStyleTab - " + desc, fn, {});
+        "TreeStyleTab - " + desc, fn, options);
 }
 
 addMap(["gt"],
@@ -18,19 +19,28 @@ addMap(["gt"],
         else {
             gBrowser.mTabContainer.advanceSelectedTab(+1, true);
         }
-    });
+    },
+    { flags: Mappings.flags.COUNT });
 
 addMap(["<C-n>", "<C-Tab>", "<C-PageDown>"],
     "Go to the next tab with skipping collapsed tab tree",
-    function() {
-        gBrowser.mTabContainer.advanceSelectedTab(+1, true);
-    });
+    function(count) {
+        let count = count < 1 ? 1 : count;
+        for(let i = 0; i < count; ++i) {
+            gBrowser.mTabContainer.advanceSelectedTab(+1, true);
+        }
+    },
+    { flags: Mappings.flags.COUNT });
 
 addMap(["gT", "<C-p>", "<C-S-Tab>", "<C-PageUp>"],
     "Go to the  previous tab with skipping collapsed tab tree",
-    function() {
-        gBrowser.mTabContainer.advanceSelectedTab(-1, true);
-    });
+    function(count) {
+        let count = count < 1 ? 1 : count;
+        for(let i = 0; i < count; ++i) {
+            gBrowser.mTabContainer.advanceSelectedTab(-1, true);
+        }
+    },
+    { flags: Mappings.flags.COUNT });
 
 addMap(["zc"], "Collapse Subtree", function() {
     gBrowser.treeStyleTab.collapseExpandSubtree(gBrowser.selectedTab, true);
