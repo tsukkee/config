@@ -9,6 +9,29 @@ function addMap(keys, desc, fn) {
         "TreeStyleTab - " + desc, fn, {});
 }
 
+addMap(["gt"],
+    "Go to the next tab with skipping collapsed tab tree",
+    function(count) {
+        if(count > 0) {
+            events.feedkeys(count + "gt", true, false);
+        }
+        else {
+            gBrowser.mTabContainer.advanceSelectedTab(+1, true);
+        }
+    });
+
+addMap(["<C-n>", "<C-Tab>", "<C-PageDown>"],
+    "Go to the next tab with skipping collapsed tab tree",
+    function() {
+        gBrowser.mTabContainer.advanceSelectedTab(+1, true);
+    });
+
+addMap(["gT", "<C-p>", "<C-S-Tab>", "<C-PageUp>"],
+    "Go to the  previous tab with skipping collapsed tab tree",
+    function() {
+        gBrowser.mTabContainer.advanceSelectedTab(-1, true);
+    });
+
 addMap(["zc"], "Collapse Subtree", function() {
     gBrowser.treeStyleTab.collapseExpandSubtree(gBrowser.selectedTab, true);
 });
