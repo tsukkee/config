@@ -190,7 +190,6 @@ endif
 " ==================== Keybind ==================== "
 " Use AlterCommand and operator-user
 call altercmd#load()
-call operator#user#load()
 
 " Prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
@@ -305,28 +304,6 @@ augroup END
 " Rename
 command! -nargs=1 -complete=file Rename saveas <args> | call delete(expand('#'))
 
-" myoperator {{{
-" DefineOperator _ Op_replace_paste call SaveReg()
-" let s:lastreg = ''
-" function! SaveReg()
-    " let s:lastreg = v:register
-" endfunction
-" function! Op_replace_paste(motion_wiseness)
-    " if a:motion_wiseness == "line"
-        " let op = "V"
-    " elseif a:motion_wiseness == "block"
-        " let op = "\<C-v>"
-    " else
-        " let op = "v"
-    " endif
-
-    " let reg = empty(s:lastreg) ? '' : '"' . s:lastreg
-    " let paste = (getpos("`]") == getpos('.')) ? 'p' : 'P'
-
-    " exe 'normal! `["_d' . op . '`]`[' . reg . paste
-" endfunction
-" }}}
-
 
 " ==================== Plugins settings ==================== "
 
@@ -359,6 +336,42 @@ map gE <Plug>(smartword-ge)
 " NERD_comments
 let NERDSpaceDelims = 1
 let NERDShutUp = 1
+
+" NERD_comments + operator-user
+let g:NERDCreateDefaultMappings = 0
+call operator#user#define(",c", "Execute_comment_command",
+\                     'call Set_comment_command("norm")')
+call operator#user#define(",<Space>", "Execute_comment_command",
+\                     'call Set_comment_command("toggle")')
+call operator#user#define(",m", "Execute_comment_command",
+\                     'call Set_comment_command("minimal")')
+call operator#user#define(",s", "Execute_comment_command",
+\                     'call Set_comment_command("sexy")')
+call operator#user#define(",i", "Execute_comment_command",
+\                     'call Set_comment_command("invert")')
+call operator#user#define(",y", "Execute_comment_command",
+\                     'call Set_comment_command("yank")')
+call operator#user#define(",l", "Execute_comment_command",
+\                     'call Set_comment_command("alignLeft")')
+call operator#user#define(",b", "Execute_comment_command",
+\                     'call Set_comment_command("alignBoth")')
+call operator#user#define(",n", "Execute_comment_command",
+\                     'call Set_comment_command("nested")')
+call operator#user#define(",u", "Execute_comment_command",
+\                     'call Set_comment_command("uncomment")')
+
+nmap ,A <Plug>NERDCommenterAppend
+nmap ,a <Plug>NERDCommenterAltDelims
+
+function! Set_comment_command(command)
+    let s:comment_command = a:command
+endfunction
+
+function! Execute_comment_command(motion_wiseness)
+    let op = (a:motion_wiseness == 'line') ? 'V' : 'v'
+    exe "normal! `[" . op . "`]\<Esc>"
+    call NERDComment(1, s:comment_command)
+endfunction
 
 " neocomplcache (see :h neocomplcache)
 let g:NeoComplCache_EnableAtStartup = 1
