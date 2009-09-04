@@ -339,26 +339,37 @@ let NERDShutUp = 1
 
 " NERD_comments + operator-user
 let g:NERDCreateDefaultMappings = 0
-call operator#user#define(",c", "Execute_comment_command",
+call operator#user#define("comment-norm", "Execute_comment_command",
 \                     'call Set_comment_command("norm")')
-call operator#user#define(",<Space>", "Execute_comment_command",
+call operator#user#define("comment-toggle", "Execute_comment_command",
 \                     'call Set_comment_command("toggle")')
-call operator#user#define(",m", "Execute_comment_command",
+call operator#user#define("comment-minimal", "Execute_comment_command",
 \                     'call Set_comment_command("minimal")')
-call operator#user#define(",s", "Execute_comment_command",
+call operator#user#define("comment-sexy", "Execute_comment_command",
 \                     'call Set_comment_command("sexy")')
-call operator#user#define(",i", "Execute_comment_command",
+call operator#user#define("comment-invert", "Execute_comment_command",
 \                     'call Set_comment_command("invert")')
-call operator#user#define(",y", "Execute_comment_command",
+call operator#user#define("comment-yank", "Execute_comment_command",
 \                     'call Set_comment_command("yank")')
-call operator#user#define(",l", "Execute_comment_command",
+call operator#user#define("comment-alignLeft", "Execute_comment_command",
 \                     'call Set_comment_command("alignLeft")')
-call operator#user#define(",b", "Execute_comment_command",
+call operator#user#define("comment-alignBoth", "Execute_comment_command",
 \                     'call Set_comment_command("alignBoth")')
-call operator#user#define(",n", "Execute_comment_command",
+call operator#user#define("comment-nested", "Execute_comment_command",
 \                     'call Set_comment_command("nested")')
-call operator#user#define(",u", "Execute_comment_command",
+call operator#user#define("comment-uncomment", "Execute_comment_command",
 \                     'call Set_comment_command("uncomment")')
+
+map ,c <Plug>(operator-comment-norm)
+map ,<Space> <Plug>(operator-comment-toggle)
+map ,m <Plug>(operator-comment-minimal)
+map ,s <Plug>(operator-comment-sexy)
+map ,i <Plug>(operator-comment-invert)
+map ,y <Plug>(operator-comment-yank)
+map ,l <Plug>(operator-comment-alignLeft)
+map ,b <Plug>(operator-comment-alignBoth)
+map ,n <Plug>(operator-comment-nested)
+map ,u <Plug>(operator-comment-uncomment)
 
 nmap ,A <Plug>NERDCommenterAppend
 nmap ,a <Plug>NERDCommenterAltDelims
