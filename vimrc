@@ -333,46 +333,25 @@ map B <Plug>(smartword-b)
 map E <Plug>(smartword-e)
 map gE <Plug>(smartword-ge)
 
-" NERD_comments
-let NERDSpaceDelims = 1
-let NERDShutUp = 1
-
-" NERD_comments + operator-user
+" NERDCommenter
+let g:NERDSpaceDelims = 1
 let g:NERDCreateDefaultMappings = 0
-call operator#user#define("comment-norm", "Execute_comment_command",
-\                     'call Set_comment_command("norm")')
-call operator#user#define("comment-toggle", "Execute_comment_command",
-\                     'call Set_comment_command("toggle")')
-call operator#user#define("comment-minimal", "Execute_comment_command",
-\                     'call Set_comment_command("minimal")')
-call operator#user#define("comment-sexy", "Execute_comment_command",
-\                     'call Set_comment_command("sexy")')
-call operator#user#define("comment-invert", "Execute_comment_command",
-\                     'call Set_comment_command("invert")')
-call operator#user#define("comment-yank", "Execute_comment_command",
-\                     'call Set_comment_command("yank")')
-call operator#user#define("comment-alignLeft", "Execute_comment_command",
-\                     'call Set_comment_command("alignLeft")')
-call operator#user#define("comment-alignBoth", "Execute_comment_command",
-\                     'call Set_comment_command("alignBoth")')
-call operator#user#define("comment-nested", "Execute_comment_command",
-\                     'call Set_comment_command("nested")')
-call operator#user#define("comment-uncomment", "Execute_comment_command",
-\                     'call Set_comment_command("uncomment")')
-
-map ,c <Plug>(operator-comment-norm)
-map ,<Space> <Plug>(operator-comment-toggle)
-map ,m <Plug>(operator-comment-minimal)
-map ,s <Plug>(operator-comment-sexy)
-map ,i <Plug>(operator-comment-invert)
-map ,y <Plug>(operator-comment-yank)
-map ,l <Plug>(operator-comment-alignLeft)
-map ,b <Plug>(operator-comment-alignBoth)
-map ,n <Plug>(operator-comment-nested)
-map ,u <Plug>(operator-comment-uncomment)
 
 nmap ,A <Plug>NERDCommenterAppend
 nmap ,a <Plug>NERDCommenterAltDelims
+
+" NERDCommenter + operator-user
+let comment_prefix = ','
+for [name, key] in [
+\   ['norm',      'c'], ['toggle',    '<Space>'], ['minimal', 'm'],
+\   ['sexy',      's'], ['invert',    'i'],       ['yank',    'y'],
+\   ['alignLeft', 'l'], ['alignBoth', 'b'],
+\   ['nested',    'n'], ['uncomment', 'u']
+\   ]
+    call operator#user#define('comment-' . name, 'Execute_comment_command',
+    \   'call Set_comment_command("' . name . '")')
+    exe 'map ' . comment_prefix . key . ' <Plug>(operator-comment-' . name . ')'
+endfor
 
 function! Set_comment_command(command)
     let s:comment_command = a:command
