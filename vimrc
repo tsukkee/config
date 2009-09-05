@@ -341,7 +341,7 @@ nmap ,A <Plug>NERDCommenterAppend
 nmap ,a <Plug>NERDCommenterAltDelims
 
 " NERDCommenter + operator-user
-let comment_prefix = ','
+let s:comment_prefix = ','
 for [name, key] in [
 \   ['norm',      'c'], ['toggle',    '<Space>'], ['minimal', 'm'],
 \   ['sexy',      's'], ['invert',    'i'],       ['yank',    'y'],
@@ -350,8 +350,9 @@ for [name, key] in [
 \   ]
     call operator#user#define('comment-' . name, 'Execute_comment_command',
     \   'call Set_comment_command("' . name . '")')
-    exe 'map ' . comment_prefix . key . ' <Plug>(operator-comment-' . name . ')'
+    exe 'map ' . s:comment_prefix . key . ' <Plug>(operator-comment-' . name . ')'
 endfor
+unlet s:comment_prefix
 
 function! Set_comment_command(command)
     let s:comment_command = a:command
