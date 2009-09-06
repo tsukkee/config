@@ -162,6 +162,7 @@ set completeopt+=menuone " Display menu
 filetype indent on " to use filetype indent
 filetype plugin on " to use filetype plugin
 
+
 " ==================== Hightlight ==================== "
 augroup vimrc-autocmd
     autocmd ColorScheme * call MyHighlight()
@@ -179,6 +180,7 @@ function! MyHighlight()
 endfunction
 
 syntax on " syntax coloring
+
 " colorscheme
 if has('win32') && !has('gui')
     colorscheme desert
@@ -188,13 +190,15 @@ endif
 
 
 " ==================== Keybind ==================== "
-" Use AlterCommand and operator-user
+" Use AlterCommand
 call altercmd#load()
 
 " Prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
 nnoremap [Prefix] <Nop>
 nmap <Space> [Prefix]
+nnoremap [Operator] <Nop>
+nmap , [Operator]
 
 " Use display line
 noremap j gj
@@ -328,20 +332,20 @@ let g:gist_detect_filetype = 1
 let g:gist_open_browser_after_post = 1
 
 " smartword
-map W <Plug>(smartword-w)
-map B <Plug>(smartword-b)
-map E <Plug>(smartword-e)
+map W  <Plug>(smartword-w)
+map B  <Plug>(smartword-b)
+map E  <Plug>(smartword-e)
 map gE <Plug>(smartword-ge)
 
 " NERDCommenter
 let g:NERDSpaceDelims = 1
+let g:NERDMenuMode = 0
 let g:NERDCreateDefaultMappings = 0
 
 nmap ,A <Plug>NERDCommenterAppend
-nmap ,a <Plug>NERDCommenterAltDelims
+nmap ,d <Plug>NERDCommenterAltDelims
 
 " NERDCommenter + operator-user
-let s:comment_prefix = ','
 for [name, key] in [
 \   ['norm',      'c'], ['toggle',    '<Space>'], ['minimal', 'm'],
 \   ['sexy',      's'], ['invert',    'i'],       ['yank',    'y'],
@@ -350,9 +354,8 @@ for [name, key] in [
 \   ]
     call operator#user#define('comment-' . name, 'Execute_comment_command',
     \   'call Set_comment_command("' . name . '")')
-    exe 'map ' . s:comment_prefix . key . ' <Plug>(operator-comment-' . name . ')'
+    exe 'map [Operator]' . key . ' <Plug>(operator-comment-' . name . ')'
 endfor
-unlet s:comment_prefix
 
 function! Set_comment_command(command)
     let s:comment_command = a:command
@@ -362,6 +365,23 @@ function! Execute_comment_command(motion_wiseness)
     let op = (a:motion_wiseness == 'line') ? 'V' : 'v'
     exe "normal! `[" . op . "`]\<Esc>"
     call NERDComment(1, s:comment_command)
+endfunction
+
+" Align
+let g:loaded_AlignMapsPlugin = "1"
+call Align#AlignCtrl('p0')
+
+" Align + operator-user
+call operator#user#define('align', 'Execute_align_command')
+map [Operator]a <Plug>(operator-align)
+
+function! Execute_align_command(motion_wiseness)
+    let separators = input(":'[,']Align ")
+    AlignPush
+    " apply only lines that contain separators
+    exe "AlignCtrl g " . join(split(separators, '\s\+'), '\|')
+    exe "'[,']Align " . args
+    AlignPop
 endfunction
 
 " neocomplcache (see :h neocomplcache)
@@ -393,6 +413,7 @@ function! Ku_my_keymappings()
     imap <buffer> <silent> <A-Cr> <Plug>(ku-choose-an-action)
     nmap <buffer> <silent> <A-Cr> <Plug>(ku-choose-an-action)
 endfunction
+
 augroup vimrc-autocmd
     autocmd FileType ku
     \    call ku#default_key_mappings(1)
@@ -406,23 +427,23 @@ function! Ku_common_action_my_cd(item)
         execute 'TabpageCD' fnamemodify(a:item.word, ':h')
     endif
 endfunction
+
 call ku#custom_action('common', 'cd', 'Ku_common_action_my_cd')
 
-call ku#custom_prefix('common', '.vim', $HOME.'/.vim')
+call ku#custom_prefix('common', '.vim', $HOME . '/.vim')
 call ku#custom_prefix('common', '~', $HOME)
 
-nnoremap <silent> [Prefix]b :<C-u>Ku buffer<Cr>
+nnoremap <silent> [Prefix]b  :<C-u>Ku buffer<Cr>
 nnoremap <silent> [Prefix]kf :<C-u>Ku file<Cr>
 nnoremap <silent> [Prefix]kh :<C-u>Ku history<Cr>
 nnoremap <silent> [Prefix]kc :<C-u>Ku mrucommand<Cr>
 nnoremap <silent> [Prefix]km :<C-u>Ku mrufile<Cr>
 nnoremap <silent> [Prefix]kt :<C-u>Ku tags<Cr>
-nnoremap <silent> [Prefix]h :<C-u>Ku tags/help<Cr>
+nnoremap <silent> [Prefix]h  :<C-u>Ku tags/help<Cr>
 
-" NERD_tree
-" let g:NERDTreeHijackNetrw = 0
-nnoremap <silent> [Prefix]t :<C-u>NERDTree<CR>
-nnoremap <silent> [Prefix]T :<C-u>NERDTreeClose<CR>
+" NERDTree
+nnoremap <silent> [Prefix]t     :<C-u>NERDTree<CR>
+nnoremap <silent> [Prefix]T     :<C-u>NERDTreeClose<CR>
 nnoremap <silent> [Prefix]<C-t> :<C-u>execute 'NERDTree ' . expand('%:p:h')<CR>
 
 " add Tabpaged CD command to NERDTree
@@ -504,7 +525,6 @@ augroup END
 if has('mac')
     command! Here silent exe '!open ' . expand('%:p:h') . '/'
     command! This silent exe '!open %'
-    command! Cot  silent exe '!open -a CotEditor %'
 endif
 
 " Utility command for Windows
@@ -517,12 +537,6 @@ let html_number_lines = 0
 let html_use_css = 1
 let use_xhtml = 1
 let html_use_encoding = "utf-8"
-
-" Escape
-if has('ruby')
-    command! HTMLEscape silent
-    \   exe "rubydo $_ = $_.gsub('&', '&amp;').gsub('>', '&gt;').gsub('<', '&lt;').gsub('\"', '&quot;')"
-endif
 
 " Load private information
 if filereadable($HOME . "/.vimrc.local")
