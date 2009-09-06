@@ -377,11 +377,11 @@ map [Operator]a <Plug>(operator-align)
 
 function! Execute_align_command(motion_wiseness)
     let separators = input(":'[,']Align ")
-    AlignPush
+    call Align#AlignPush()
     " apply only lines that contain separators
-    exe "AlignCtrl g " . join(split(separators, '\s\+'), '\|')
-    exe "'[,']Align " . args
-    AlignPop
+    call Align#AlignCtrl('g ' . join(split(separators, '\s\+'), '\|'))
+    '[,']call Align#Align(0, separators)
+    call Align#AlignPop()
 endfunction
 
 " neocomplcache (see :h neocomplcache)
