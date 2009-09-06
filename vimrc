@@ -197,17 +197,17 @@ call altercmd#load()
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
 nnoremap [Prefix] <Nop>
 nmap <Space> [Prefix]
-nnoremap [Operator] <Nop>
-nmap , [Operator]
+noremap [Operator] <Nop>
+map , [Operator]
 
 " Use display line
-noremap j gj
+noremap j  gj
 noremap gj j
-noremap k gk
+noremap k  gk
 noremap gk k
-noremap $ g$
+noremap $  g$
 noremap g$ $
-noremap 0 g0
+noremap 0  g0
 noremap g0 0
 
 " Folding
@@ -222,9 +222,9 @@ vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
 vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 
 " Use beginning matches on command-line history
-cnoremap <C-p> <Up>
-cnoremap <C-n> <Down>
-cnoremap <Up> <C-p>
+cnoremap <C-p>  <Up>
+cnoremap <C-n>  <Down>
+cnoremap <Up>   <C-p>
 cnoremap <Down> <C-n>
 
 " Re-select last yanked word
