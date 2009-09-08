@@ -300,6 +300,19 @@ augroup vimrc-autocmd
     \|  execute 'cd' fnameescape(t:cwd)
 augroup END
 
+" Go to alternate tab
+if !exists("g:AlternateTabNumber")
+    let g:AlternateTabNumber = 1
+endif
+
+augroup vimrc-autocmd
+    autocmd TabLeave * let g:AlternateTabNumber = tabpagenr()
+augroup END
+
+command! GoToAlternateTab silent execute 'tabnext' g:AlternateTabNumber
+
+nnoremap <silent> g<C-^> :<C-u>GoToAlternateTab<Cr>
+
 " Rename
 command! -nargs=1 -complete=file Rename saveas <args> | call delete(expand('#'))
 
@@ -411,14 +424,10 @@ function! Ku_my_keymappings()
     INMap <buffer> <silent> <Esc><Cr> <Plug>(ku-choose-an-action)
 
     " for GVim, MacVim
-    INMap <buffer> <silent> <A-Esc> <Plug>(ku-cancel)
     INMap <buffer> <silent> <A-Cr> <Plug>(ku-choose-an-action)
 
     " for MacVim
-    if has('gui_macvim')
-        INMap <buffer> <silent> <D-Esc> <Plug>(ku-cancel)
-        INMap <buffer> <silent> <D-Cr> <Plug>(ku-choose-an-action)
-    endif
+    INMap <buffer> <silent> <D-Cr> <Plug>(ku-choose-an-action)
 endfunction
 
 augroup vimrc-autocmd
@@ -435,7 +444,13 @@ function! Ku_common_action_my_cd(item)
     endif
 endfunction
 
+function! Ku_common_action_my_tab_right(item)
+    execute 'tabe' a:item.word
+    CD
+endfunction
+
 call ku#custom_action('common', 'cd', 'Ku_common_action_my_cd')
+call ku#custom_action('common', 'tab-Right', 'Ku_common_action_my_tab_right')
 
 call ku#custom_prefix('common', '.vim', $HOME . '/.vim')
 call ku#custom_prefix('common', '~', $HOME)
@@ -530,13 +545,13 @@ augroup END
 
 " Utility command for Mac
 if has('mac')
-    command! Here silent execute '!open ' . expand('%:p:h') . '/'
+    command! Here silent execute '!open' expand('%:p:h')
     command! This silent execute '!open %'
 endif
 
 " Utility command for Windows
 if has('win32')
-    command! Here silent execute "!start explorer " . expand('%:p:h') . '/'
+    command! Here silent execute "!explorer" expand('%:p:h')
 endif
 
 " TOhtml

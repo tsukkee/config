@@ -5,6 +5,9 @@
 " override vimrc settings
 set title
 
+" reset vimrc settings (overridden anyware)
+set textwidth=0
+
 " gvim settings
 set linespace=1
 set columns=140
