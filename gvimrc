@@ -5,9 +5,6 @@
 " override vimrc settings
 set title
 
-" re-set vimrc settings (this setting is rewrote anywhere)
-set textwidth=0
-
 " gvim settings
 set linespace=1
 set columns=140
@@ -20,8 +17,7 @@ gui
 " ==================== Platform setting ==================== "
 " MacVim
 if has('gui_macvim')
-    " set guifont=Osaka-Mono:h14
-    " set guifont=mplus-1mn-regular:h14
+    set guifont=Osaka-Mono:h14
     set transparency=5 " (opaque) 0-100 (transparent)
     set guioptions-=e  " don't use gui tab apperance
     set guioptions-=T  " hide toolbar
@@ -38,6 +34,4 @@ if has('win32')
     set guioptions-=e    " don't use gui tab apperance
     set guioptions-=T    " hide toolbar
     set guioptions-=m    " hide menubar
-
-    autocmd FileType cpp,h setlocal noexpandtab
 endif

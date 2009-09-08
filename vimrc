@@ -30,7 +30,6 @@ set imsearch=0                 " Disable input methods in search mode
 " Command completion
 set wildmenu                   " enhance command completion
 set wildmode=list:longest,full " first 'list:lingest' and second 'full'
-set wildoptions=tagfile
 
 " Search
 set wrapscan   " search wrap around the end of the file
@@ -174,7 +173,7 @@ function! MyHighlight()
     highlight ZenkakuSpace ctermbg=darkcyan ctermfg=darkcyan guifg=#3333ff guibg=#3333ff
 
     " Modify color for 'lucius'
-    if g:colors_name == 'lucius'
+    if exists("g:colors_name") && g:colors_name == 'lucius'
         highlight SpecialKey ctermfg=172 guifg=#ffaa00
     endif
 endfunction
@@ -189,7 +188,7 @@ else
 endif
 
 
-" ==================== Keybind ==================== "
+" ==================== Keybind and commands ==================== "
 " Use AlterCommand
 call altercmd#load()
 
@@ -226,10 +225,6 @@ cnoremap <C-p>  <Up>
 cnoremap <C-n>  <Down>
 cnoremap <Up>   <C-p>
 cnoremap <Down> <C-n>
-
-" Re-select last yanked word
-" Reference: kana's vimrc
-nnoremap gc `[v`]
 
 " Keybind for completing and selecting popup menu
 " Reference: :h neocomplcache
@@ -295,7 +290,7 @@ endfunction
 
 AlterCommand cd TabpageCD
 
-command! CD silent exe "TabpageCD " . expand('%:p:h')
+command! CD silent execute "TabpageCD" expand('%:p:h')
 
 augroup vimrc-autocmd
     autocmd VimEnter,TabEnter *
@@ -308,26 +303,28 @@ augroup END
 " Rename
 command! -nargs=1 -complete=file Rename saveas <args> | call delete(expand('#'))
 
-
-" ==================== Plugins settings ==================== "
-
 " ctags
 command! CtagsR !ctags -R
 
-" Ruby
+
+" ==================== Plugins settings ==================== "
+" FileType
 augroup vimrc-autocmd
+    " Ruby
     autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
+
+    " less
+    autocmd BufNewFile,BufRead *.less setfiletype css
+
+    " CakePHP
+    autocmd BufNewFile,BufRead *.thtml setfiletype php
+    autocmd BufNewFile,BufRead *.ctp setfiletype php
 augroup END
 
-" less
-autocmd BufNewFile,BufRead *.less setfiletype css
-
-" CakePHP
-autocmd BufNewFile,BufRead *.thtml setfiletype php
-autocmd BufNewFile,BufRead *.ctp setfiletype php
-
 " gist
-let g:gist_clip_command = 'pbcopy'
+if has('mac')
+    let g:gist_clip_command = 'pbcopy'
+endif
 let g:gist_detect_filetype = 1
 let g:gist_open_browser_after_post = 1
 
@@ -354,7 +351,7 @@ for [name, key] in [
 \   ]
     call operator#user#define('comment-' . name, 'Execute_comment_command',
     \   'call Set_comment_command("' . name . '")')
-    exe 'map [Operator]' . key . ' <Plug>(operator-comment-' . name . ')'
+    execute 'map [Operator]' . key . ' <Plug>(operator-comment-' . name . ')'
 endfor
 
 function! Set_comment_command(command)
@@ -363,13 +360,12 @@ endfunction
 
 function! Execute_comment_command(motion_wiseness)
     let v = operator#user#visual_command_from_wise_name(a:motion_wiseness)
-    exe "normal! `[" . v . "`]\<Esc>"
+    execute "normal! `[" . v . "`]\<Esc>"
     call NERDComment(1, s:comment_command)
 endfunction
 
 " Align
 let g:loaded_AlignMapsPlugin = "1"
-call Align#AlignCtrl('p0')
 
 " Align + operator-user
 call operator#user#define('align', 'Execute_align_command')
@@ -386,32 +382,43 @@ endfunction
 
 " neocomplcache (see :h neocomplcache)
 let g:NeoComplCache_EnableAtStartup = 1
+let g:NeoComplCache_PartialCompletionStartLength = 2
+let g:NeoComplCache_MinKeywordLength = 2
+let g:NeoComplCache_MinSyntaxLength = 2
 let g:NeoComplCache_SmartCase = 1
 let g:NeoComplCache_EnableMFU = 1
 let g:NeoComplCache_TagsAutoUpdate = 1
+let g:NeoComplCache_EnableUnderbarCompletion = 1
+if !exists("g:NeoComplCache_SameFileTypeLists")
+    let g:NeoComplCache_SameFileTypeLists = {}
+endif
+let g:NeoComplCache_SameFileTypeLists['vim'] = 'help'
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
-imap <silent> <C-@> <Plug>(neocomplcache_keyword_caching)
-nmap <silent> <C-@> <Plug>(neocomplcache_keyword_caching)
-inoremap <expr> <C-x><C-f> neocomplcache#manual_filename_complete()
-inoremap <expr> <C-y>      pumvisible() ? neocomplcache#close_popup() : "\<C-y>"
-inoremap <expr> <C-e>      pumvisible() ? neocomplcache#cancel_popup() : "\<C-e>"
+nmap <silent> <C-e> <Plug>(neocomplcache_keyword_caching)
+inoremap <expr> <C-y> pumvisible() ? neocomplcache#close_popup() : "\<C-y>"
+inoremap <expr> <C-e> pumvisible() ? neocomplcache#cancel_popup() : <Plug>(neocomplcache_keyword_caching)
 
 " ku
 function! Ku_my_keymappings()
+    command! -buffer -nargs=+ INMap
+    \   execute 'imap' <q-args> | execute 'nmap' <q-args>
+
     inoremap <buffer> <silent> <Tab> <C-n>
     inoremap <buffer> <silent> <S-Tab> <C-p>
 
     " for Vim
-    imap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
-    nmap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
-    imap <buffer> <silent> <Esc><Cr> <Plug>(ku-choose-an-action)
-    nmap <buffer> <silent> <Esc><Cr> <Plug>(ku-choose-an-action)
+    INMap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
+    INMap <buffer> <silent> <Esc><Cr> <Plug>(ku-choose-an-action)
 
     " for GVim, MacVim
-    imap <buffer> <silent> <A-Esc> <Plug>(ku-cancel)
-    nmap <buffer> <silent> <A-Esc> <Plug>(ku-cancel)
-    imap <buffer> <silent> <A-Cr> <Plug>(ku-choose-an-action)
-    nmap <buffer> <silent> <A-Cr> <Plug>(ku-choose-an-action)
+    INMap <buffer> <silent> <A-Esc> <Plug>(ku-cancel)
+    INMap <buffer> <silent> <A-Cr> <Plug>(ku-choose-an-action)
+
+    " for MacVim
+    if has('gui_macvim')
+        INMap <buffer> <silent> <D-Esc> <Plug>(ku-cancel)
+        INMap <buffer> <silent> <D-Cr> <Plug>(ku-choose-an-action)
+    endif
 endfunction
 
 augroup vimrc-autocmd
@@ -444,15 +451,15 @@ nnoremap <silent> [Prefix]h  :<C-u>Ku tags/help<Cr>
 " NERDTree
 nnoremap <silent> [Prefix]t     :<C-u>NERDTree<CR>
 nnoremap <silent> [Prefix]T     :<C-u>NERDTreeClose<CR>
-nnoremap <silent> [Prefix]<C-t> :<C-u>execute 'NERDTree ' . expand('%:p:h')<CR>
+nnoremap <silent> [Prefix]<C-t> :<C-u>execute 'NERDTree' expand('%:p:h')<CR>
 
 " add Tabpaged CD command to NERDTree
 augroup vimrc-autocmd
     autocmd FileType nerdtree command! -buffer NERDTreeTabpageCd
     \   let b:currentDir = NERDTreeGetCurrentPath().getDir().strForCd()
     \|  echo 'TabpageCD to ' . b:currentDir
-    \|  execute 'TabpageCD ' . b:currentDir
-    autocmd FileType nerdtree nnoremap <buffer> ct :NERDTreeTabpageCd<CR>
+    \|  execute 'TabpageCD' b:currentDir
+    autocmd FileType nerdtree nnoremap <buffer> ct :<C-u>NERDTreeTabpageCd<CR>
 augroup END
 
 " Reload Firefox {{{
@@ -523,13 +530,13 @@ augroup END
 
 " Utility command for Mac
 if has('mac')
-    command! Here silent exe '!open ' . expand('%:p:h') . '/'
-    command! This silent exe '!open %'
+    command! Here silent execute '!open ' . expand('%:p:h') . '/'
+    command! This silent execute '!open %'
 endif
 
 " Utility command for Windows
 if has('win32')
-    command! Here silent exe "!start explorer " . expand('%:p:h') . '/'
+    command! Here silent execute "!start explorer " . expand('%:p:h') . '/'
 endif
 
 " TOhtml
