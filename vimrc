@@ -283,9 +283,7 @@ command! -complete=customlist,s:complete_cdpath -nargs=? TabpageCD
 \|  let t:cwd = getcwd()
 
 function! s:complete_cdpath(arglead, cmdline, cursorpos)
-    return split(globpath(&cdpath,
-            \ join(split(a:cmdline, '\s', 1)[1:], ' ') . '*/'),
-            \ "\n")
+    return split(globpath(&cdpath, join(split(a:cmdline, '\s', 1)[1:], ' ') . '*/'), "\n")
 endfunction
 
 AlterCommand cd TabpageCD
