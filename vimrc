@@ -362,8 +362,8 @@ function! Set_comment_command(command)
 endfunction
 
 function! Execute_comment_command(motion_wiseness)
-    let op = (a:motion_wiseness == 'line') ? 'V' : 'v'
-    exe "normal! `[" . op . "`]\<Esc>"
+    let v = operator#user#visual_command_from_wise_name(a:motion_wiseness)
+    exe "normal! `[" . v . "`]\<Esc>"
     call NERDComment(1, s:comment_command)
 endfunction
 
