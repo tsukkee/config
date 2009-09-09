@@ -37,6 +37,7 @@ set ignorecase " ignore case search
 set smartcase  " override 'ignorecase' if the search pattern contains upper case
 set incsearch  " incremental search
 set hlsearch   " highlight searched words
+nohlsearch     " avoid to highlight when reload vimrc
 
 " Reading and writing file
 set directory-=. " don't save tmp swap file in current directory
@@ -170,11 +171,18 @@ augroup END
 
 function! MyHighlight()
     " Hightlight Zenkaku space
-    highlight ZenkakuSpace ctermbg=darkcyan ctermfg=darkcyan guifg=#3333ff guibg=#3333ff
+    highlight ZenkakuSpace ctermbg=151 guibg=#9ece9e
 
-    " Modify color for 'lucius'
-    if exists("g:colors_name") && g:colors_name == 'lucius'
-        highlight SpecialKey ctermfg=172 guifg=#ffaa00
+    " Modify colorscheme
+    if exists('g:colors_name')
+        if g:colors_name == 'lucius'
+            highlight SpecialKey ctermfg=172 guifg=#ffaa00
+        endif
+
+        if g:colors_name == 'zenburn'
+            highlight Function ctermfg=230 guifg=#cdcd8f
+            highlight Search ctermfg=229 ctermbg=240 guifg=#eded8f guibg=#6c8f6c
+        endif
     endif
 endfunction
 
@@ -184,7 +192,9 @@ syntax on " syntax coloring
 if has('win32') && !has('gui')
     colorscheme desert
 else
-    colorscheme lucius
+    let g:zenburn_high_Contrast=0
+    colorscheme zenburn
+    " colorscheme lucius
 endif
 
 
@@ -309,7 +319,7 @@ augroup END
 
 command! GoToAlternateTab silent execute 'tabnext' g:AlternateTabNumber
 
-nnoremap <silent> g<C-^> :<C-u>GoToAlternateTab<Cr>
+nnoremap <silent> g<C-^> :<C-u>GoToAlternateTab<CR>
 
 " Rename
 command! -nargs=1 -complete=file Rename saveas <args> | call delete(expand('#'))
@@ -419,13 +429,13 @@ function! Ku_my_keymappings()
 
     " for Vim
     INMap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
-    INMap <buffer> <silent> <Esc><Cr> <Plug>(ku-choose-an-action)
+    INMap <buffer> <silent> <Esc><CR> <Plug>(ku-choose-an-action)
 
     " for GVim, MacVim
-    INMap <buffer> <silent> <A-Cr> <Plug>(ku-choose-an-action)
+    INMap <buffer> <silent> <A-CR> <Plug>(ku-choose-an-action)
 
     " for MacVim
-    INMap <buffer> <silent> <D-Cr> <Plug>(ku-choose-an-action)
+    INMap <buffer> <silent> <D-CR> <Plug>(ku-choose-an-action)
 endfunction
 
 augroup vimrc-autocmd
@@ -453,13 +463,13 @@ call ku#custom_action('common', 'tab-Right', 'Ku_common_action_my_tab_right')
 call ku#custom_prefix('common', '.vim', $HOME . '/.vim')
 call ku#custom_prefix('common', '~', $HOME)
 
-nnoremap <silent> [Prefix]b  :<C-u>Ku buffer<Cr>
-nnoremap <silent> [Prefix]kf :<C-u>Ku file<Cr>
+nnoremap <silent> [Prefix]b  :<C-u>Ku buffer<CR>
+nnoremap <silent> [Prefix]kf :<C-u>Ku file<CR>
 nnoremap <silent> [Prefix]kh :<C-u>Ku history<Cr>
-nnoremap <silent> [Prefix]kc :<C-u>Ku mrucommand<Cr>
-nnoremap <silent> [Prefix]km :<C-u>Ku mrufile<Cr>
-nnoremap <silent> [Prefix]kt :<C-u>Ku tags<Cr>
-nnoremap <silent> [Prefix]h  :<C-u>Ku tags/help<Cr>
+nnoremap <silent> [Prefix]kc :<C-u>Ku mrucommand<CR>
+nnoremap <silent> [Prefix]km :<C-u>Ku mrufile<CR>
+nnoremap <silent> [Prefix]kt :<C-u>Ku tags<CR>
+nnoremap <silent> [Prefix]h  :<C-u>Ku tags/help<CR>
 
 " NERDTree
 nnoremap <silent> [Prefix]t     :<C-u>NERDTree<CR>
