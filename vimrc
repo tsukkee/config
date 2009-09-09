@@ -77,7 +77,7 @@ function! MyTabLine()
         let s .= '  '
     endfor
     let tabpaged_cwd = exists('t:cwd') ? '[' . t:cwd . ']' : ''
-    let s .= '%=%#TabLineFill#%T' . tabpaged_cwd
+    let s .= '%#TabLineFill#%T%=' . tabpaged_cwd
     return s
 endfunction
 
@@ -171,7 +171,7 @@ augroup END
 
 function! MyHighlight()
     " Hightlight Zenkaku space
-    highlight ZenkakuSpace ctermbg=151 guibg=#9ece9e
+    hi ZenkakuSpace ctermbg=151 guibg=#9ece9e
 
     " Modify colorscheme
     if exists('g:colors_name')
@@ -180,8 +180,15 @@ function! MyHighlight()
         endif
 
         if g:colors_name == 'zenburn'
-            highlight Function ctermfg=230 guifg=#cdcd8f
-            highlight Search ctermfg=229 ctermbg=240 guifg=#eded8f guibg=#6c8f6c
+            highlight Function    ctermfg=230
+            highlight Function    guifg=#cdcd8f
+            highlight Search      ctermfg=229   ctermbg=240
+            highlight Search      guifg=#eded8f guibg=#6c8f6c
+            highlight TabLine     ctermfg=244   ctermbg=233   cterm=none
+            highlight TabLine     guifg=#9a9a9a guibg=#1c1c1b gui=bold
+            highlight TabLineFill ctermfg=187   ctermbg=233   cterm=none
+            highlight TabLineSel  ctermfg=230   ctermbg=233   cterm=none
+            highlight TabLineSel  guifg=#b6bf98 guibg=#181818 gui=bold
         endif
     endif
 endfunction
