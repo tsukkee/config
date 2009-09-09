@@ -168,28 +168,32 @@ augroup vimrc-autocmd
     autocmd ColorScheme * call MyHighlight()
     autocmd VimEnter,WinEnter * match ZenkakuSpace /　/
 augroup END
-
 function! MyHighlight()
     " Hightlight Zenkaku space
     hi ZenkakuSpace ctermbg=151 guibg=#9ece9e
 
     " Modify colorscheme
-    if exists('g:colors_name')
-        if g:colors_name == 'lucius'
-            highlight SpecialKey ctermfg=172 guifg=#ffaa00
-        endif
+    if !exists('g:colors_name')
+        return
+    endif
 
-        if g:colors_name == 'zenburn'
-            highlight Function    ctermfg=230
-            highlight Function    guifg=#cdcd8f
-            highlight Search      ctermfg=229   ctermbg=240
-            highlight Search      guifg=#eded8f guibg=#6c8f6c
-            highlight TabLine     ctermfg=244   ctermbg=233   cterm=none
-            highlight TabLine     guifg=#9a9a9a guibg=#1c1c1b gui=bold
-            highlight TabLineFill ctermfg=187   ctermbg=233   cterm=none
-            highlight TabLineSel  ctermfg=230   ctermbg=233   cterm=none
-            highlight TabLineSel  guifg=#b6bf98 guibg=#181818 gui=bold
-        endif
+    if g:colors_name == 'lucius'
+        highlight SpecialKey ctermfg=172 guifg=#ffaa00
+    endif
+
+    if g:colors_name == 'zenburn'
+        highlight Function    ctermfg=230
+        highlight Function    guifg=#cdcd8f
+        highlight Search      ctermfg=229   ctermbg=240
+        highlight Search      guifg=#eded8f guibg=#6c8f6c
+        highlight TabLine     ctermfg=244   ctermbg=233   cterm=none
+        highlight TabLine     guifg=#9a9a9a guibg=#1c1c1b gui=bold
+        highlight TabLineFill ctermfg=187   ctermbg=233   cterm=none
+        highlight TabLineFill guifg=#cfcfaf guibg=#181818 gui=none
+        highlight TabLineSel  ctermfg=230   ctermbg=233   cterm=none
+        highlight TabLineSel  guifg=#b6bf98 guibg=#181818 gui=bold
+        highlight Comment                                 gui=none
+        highlight CursorLine                              gui=none
     endif
 endfunction
 
@@ -199,7 +203,7 @@ syntax on " syntax coloring
 if has('win32') && !has('gui')
     colorscheme desert
 else
-    let g:zenburn_high_Contrast=0
+    let g:zenburn_high_Contrast = 0
     colorscheme zenburn
     " colorscheme lucius
 endif
@@ -209,6 +213,26 @@ endif
 " Use AlterCommand
 call altercmd#load()
 
+" Mapping command
+command! -nargs=+ INMap
+\   execute 'imap' <q-args> | execute 'nmap' <q-args>
+
+command! -nargs=+ NVMap
+\   execute 'nmap' <q-args> | execute 'vmap' <q-args>
+
+command! -nargs=+ NExchangeMap call ExchangeMap('n', <f-args>)
+command! -nargs=+ CExchangeMap call ExchangeMap('c', <f-args>)
+function! ExchangeMap(mode, a, b)
+    execute a:mode . 'noremap' a:a a:b
+    execute a:mode . 'noremap' a:b a:a
+endfunction
+
+command! -nargs=+ PopupMap call PopupMap(<f-args>)
+function! PopupMap(lhs, rhs)
+    execute printf('inoremap <silent> <expr> %s pumvisible() ? %s : "%s"',
+    \    a:lhs, a:rhs, a:lhs)
+endfunction
+
 " Prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
 nnoremap [Prefix] <Nop>
@@ -217,14 +241,14 @@ noremap [Operator] <Nop>
 map , [Operator]
 
 " Use display line
-noremap j  gj
-noremap gj j
-noremap k  gk
-noremap gk k
-noremap $  g$
-noremap g$ $
-noremap 0  g0
-noremap g0 0
+NExchangeMap j gj
+NExchangeMap k gk
+NExchangeMap $ g$
+NExchangeMap 0 g0
+
+" Use beginning matches on command-line history
+CExchangeMap <C-p> <Up>
+CExchangeMap <C-n> <Down>
 
 " Folding
 " Reference: http://d.hatena.ne.jp/ns9tks/20080318/1205851539
@@ -237,20 +261,6 @@ vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
 " expand with 'l' if the cursor on the holded text in visual mode
 vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 
-" Use beginning matches on command-line history
-cnoremap <C-p>  <Up>
-cnoremap <C-n>  <Down>
-cnoremap <Up>   <C-p>
-cnoremap <Down> <C-n>
-
-" Keybind for completing and selecting popup menu
-" Reference: :h neocomplcache
-inoremap <silent> <expr> <CR>    pumvisible() ? "\<C-y>\<CR>"  : "\<CR>"
-inoremap <silent> <expr> <Tab>   pumvisible() ? "\<C-n>"       : "\<Tab>"
-inoremap <silent> <expr> <S-Tab> pumvisible() ? "\<C-p>"       : "\<S-Tab>"
-inoremap <silent> <expr> <C-h>   pumvisible() ? "\<C-y>\<C-h>" : "\<C-h>"
-inoremap <silent> <expr> <C-n>   pumvisible() ? "\<C-n>"       : "\<C-x>\<C-u>\<C-p>"
-
 " Delete highlight
 nnoremap <silent> gh :<C-u>nohlsearch<CR>
 
@@ -261,16 +271,11 @@ cnoremap <expr> <C-z> expand('%:p:r')
 " Copy and paste with fakeclip
 " Command-C and Command-V are also available in MacVim
 " see :help fakeclip-multibyte-on-mac
-nmap <C-y> "*y
-vmap <C-y> "*y
-nmap <C-p> "*p
-vmap <C-p> "*p
-
+NVMap <C-y> "*y
+NVMap <C-p> "*p
 if !empty($WINDOW)
-    nmap gy <Plug>(fakeclip-screen-y)
-    vmap gy <Plug>(fakeclip-screen-y)
-    nmap gp <Plug>(fakeclip-screen-p)
-    vmap gp <Plug>(fakeclip-screen-p)
+    NVMap gy <Plug>(fakeclip-screen-y)
+    NVMap gp <Plug>(fakeclip-screen-p)
 endif
 
 " Enable mouse wheel
@@ -298,13 +303,11 @@ augroup END
 command! -complete=customlist,s:complete_cdpath -nargs=? TabpageCD
 \   execute 'cd' fnameescape(<q-args>)
 \|  let t:cwd = getcwd()
-
 function! s:complete_cdpath(arglead, cmdline, cursorpos)
     return split(globpath(&cdpath, join(split(a:cmdline, '\s', 1)[1:], ' ') . '*/'), "\n")
 endfunction
 
 AlterCommand cd TabpageCD
-
 command! CD silent execute "TabpageCD" expand('%:p:h')
 
 augroup vimrc-autocmd
@@ -320,13 +323,12 @@ if !exists("g:AlternateTabNumber")
     let g:AlternateTabNumber = 1
 endif
 
+command! GoToAlternateTab silent execute 'tabnext' g:AlternateTabNumber
+nnoremap <silent> g<C-^> :<C-u>GoToAlternateTab<CR>
+
 augroup vimrc-autocmd
     autocmd TabLeave * let g:AlternateTabNumber = tabpagenr()
 augroup END
-
-command! GoToAlternateTab silent execute 'tabnext' g:AlternateTabNumber
-
-nnoremap <silent> g<C-^> :<C-u>GoToAlternateTab<CR>
 
 " Rename
 command! -nargs=1 -complete=file Rename saveas <args> | call delete(expand('#'))
@@ -379,7 +381,7 @@ for [name, key] in [
 \   ]
     call operator#user#define('comment-' . name, 'Execute_comment_command',
     \   'call Set_comment_command("' . name . '")')
-    execute 'map [Operator]' . key . ' <Plug>(operator-comment-' . name . ')'
+    execute printf('map [Operator]%s <Plug>(operator-comment-%s)', key, name)
 endfor
 
 function! Set_comment_command(command)
@@ -408,29 +410,37 @@ function! Execute_align_command(motion_wiseness)
     call Align#AlignPop()
 endfunction
 
-" neocomplcache (see :h neocomplcache)
+" neocomplcache
+" Reference: :h neocomplcache
 let g:NeoComplCache_EnableAtStartup = 1
 let g:NeoComplCache_PartialCompletionStartLength = 2
 let g:NeoComplCache_MinKeywordLength = 2
 let g:NeoComplCache_MinSyntaxLength = 2
 let g:NeoComplCache_SmartCase = 1
 let g:NeoComplCache_EnableMFU = 1
+let g:NeoComplCache_EnableQuickMatch = 0
 let g:NeoComplCache_TagsAutoUpdate = 1
 let g:NeoComplCache_EnableUnderbarCompletion = 1
+let g:NeoComplCache_EnableCamelCaseCompletion = 1
 if !exists("g:NeoComplCache_SameFileTypeLists")
     let g:NeoComplCache_SameFileTypeLists = {}
 endif
-let g:NeoComplCache_SameFileTypeLists['vim'] = 'help'
+
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
-nmap <silent> <C-e> <Plug>(neocomplcache_keyword_caching)
-inoremap <expr> <C-y> pumvisible() ? neocomplcache#close_popup() : "\<C-y>"
-inoremap <expr> <C-e> pumvisible() ? neocomplcache#cancel_popup() : <Plug>(neocomplcache_keyword_caching)
+PopupMap <C-y>   neocomplcache#close_popup()
+PopupMap <C-e>   neocomplcache#cancel_popup()
+PopupMap <CR>    neocomplcache#close_popup()."\<CR>"
+PopupMap <Tab>   "\<C-n>"
+PopupMap <S-Tab> "\<C-p>"
+PopupMap <C-h>   neocomplcache#cancel_popup()."\<C-h>"
 
 " ku
+augroup vimrc-autocmd
+    autocmd FileType ku
+    \    call ku#default_key_mappings(1)
+    \|   call Ku_my_keymappings()
+augroup END
 function! Ku_my_keymappings()
-    command! -buffer -nargs=+ INMap
-    \   execute 'imap' <q-args> | execute 'nmap' <q-args>
-
     inoremap <buffer> <silent> <Tab> <C-n>
     inoremap <buffer> <silent> <S-Tab> <C-p>
 
@@ -445,12 +455,7 @@ function! Ku_my_keymappings()
     INMap <buffer> <silent> <D-CR> <Plug>(ku-choose-an-action)
 endfunction
 
-augroup vimrc-autocmd
-    autocmd FileType ku
-    \    call ku#default_key_mappings(1)
-    \|   call Ku_my_keymappings()
-augroup END
-
+call ku#custom_action('common', 'cd', 'Ku_common_action_my_cd')
 function! Ku_common_action_my_cd(item)
     if isdirectory(a:item.word)
         execute 'TabpageCD' a:item.word
@@ -459,13 +464,11 @@ function! Ku_common_action_my_cd(item)
     endif
 endfunction
 
+call ku#custom_action('common', 'tab-Right', 'Ku_common_action_my_tab_right')
 function! Ku_common_action_my_tab_right(item)
     execute 'tabe' a:item.word
     CD
 endfunction
-
-call ku#custom_action('common', 'cd', 'Ku_common_action_my_cd')
-call ku#custom_action('common', 'tab-Right', 'Ku_common_action_my_tab_right')
 
 call ku#custom_prefix('common', '.vim', $HOME . '/.vim')
 call ku#custom_prefix('common', '~', $HOME)
