@@ -4,6 +4,11 @@ augroup vimrc-autocmd
     autocmd!
 augroup END
 
+" get SID prefix of .vimrc
+function! s:SID_PREFIX()
+    return matchstr(expand('<sfile>'), '<SNR>\d\+_')
+endfunction
+
 " Generate help tags
 if has('mac')
     helptags ~/.vim/doc/
@@ -62,9 +67,9 @@ set laststatus=2 " always show statusine
 set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%m%v,%l/%L(%P:%n)
 
 " Tab line
-set showtabline=2         " always show tab bar
-set tabline=%!MyTabLine() " set custom tabline
-function! MyTabLine()
+set showtabline=2                                  " always show tab bar
+let &tabline = '%!' . s:SID_PREFIX() . 'tabline()' " set custom tabline
+function! s:tabline()
     let s = ''
     for i in range(1, tabpagenr('$'))
         let list = tabpagebuflist(i)
@@ -165,10 +170,10 @@ filetype plugin on " to use filetype plugin
 
 " ==================== Hightlight ==================== "
 augroup vimrc-autocmd
-    autocmd ColorScheme * call MyHighlight()
+    autocmd ColorScheme * call s:onColorScheme()
     autocmd VimEnter,WinEnter * match ZenkakuSpace /　/
 augroup END
-function! MyHighlight()
+function! s:onColorScheme()
     " Hightlight Zenkaku space
     hi ZenkakuSpace ctermbg=151 guibg=#9ece9e
 
@@ -213,6 +218,13 @@ endif
 " Use AlterCommand
 call altercmd#load()
 
+" Prefix
+" Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
+nnoremap [Prefix] <Nop>
+nmap <Space> [Prefix]
+noremap [Operator] <Nop>
+map , [Operator]
+
 " Mapping command
 command! -nargs=+ INMap
 \   execute 'imap' <q-args> | execute 'nmap' <q-args>
@@ -220,25 +232,26 @@ command! -nargs=+ INMap
 command! -nargs=+ NVMap
 \   execute 'nmap' <q-args> | execute 'vmap' <q-args>
 
-command! -nargs=+ NExchangeMap call ExchangeMap('n', <f-args>)
-command! -nargs=+ CExchangeMap call ExchangeMap('c', <f-args>)
-function! ExchangeMap(mode, a, b)
+command! -nargs=+ NExchangeMap call s:exchangeMap('n', <f-args>)
+command! -nargs=+ CExchangeMap call s:exchangeMap('c', <f-args>)
+function! s:exchangeMap(mode, a, b)
     execute a:mode . 'noremap' a:a a:b
     execute a:mode . 'noremap' a:b a:a
 endfunction
 
-command! -nargs=+ PopupMap call PopupMap(<f-args>)
-function! PopupMap(lhs, rhs)
+command! -nargs=+ PopupMap call s:popupMap(<f-args>)
+function! s:popupMap(lhs, ...)
+    let rhs = join(a:000, ' ')
     execute printf('inoremap <silent> <expr> %s pumvisible() ? %s : "%s"',
-    \    a:lhs, a:rhs, a:lhs)
+    \    a:lhs, rhs, a:lhs)
 endfunction
 
-" Prefix
-" Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
-nnoremap [Prefix] <Nop>
-nmap <Space> [Prefix]
-noremap [Operator] <Nop>
-map , [Operator]
+command! -nargs=+ PrefixMap call s:prefixMap(<f-args>)
+function! s:prefixMap(lhs, ...)
+    let rhs = join(a:000, ' ')
+    execute printf('nnoremap <silent> [Prefix]%s :<C-u>%s<CR>',
+    \   a:lhs, rhs)
+endfunction
 
 " Use display line
 NExchangeMap j gj
@@ -262,7 +275,7 @@ vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
 vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 
 " Delete highlight
-nnoremap <silent> gh :<C-u>nohlsearch<CR>
+PrefixMap i nohlsearch
 
 " Input path in command mode
 cnoremap <expr> <C-x> expand('%:p:h') . "/"
@@ -379,16 +392,18 @@ for [name, key] in [
 \   ['alignLeft', 'l'], ['alignBoth', 'b'],
 \   ['nested',    'n'], ['uncomment', 'u']
 \   ]
-    call operator#user#define('comment-' . name, 'Execute_comment_command',
-    \   'call Set_comment_command("' . name . '")')
+    execute printf('call operator#user#define("comment-%s", "%s", "call %s")',
+    \   name,
+    \   s:SID_PREFIX() . 'doCommentCommand',
+    \   s:SID_PREFIX() . "setCommentCommand('" . name . "')")
     execute printf('map [Operator]%s <Plug>(operator-comment-%s)', key, name)
 endfor
 
-function! Set_comment_command(command)
+function! s:setCommentCommand(command)
     let s:comment_command = a:command
 endfunction
 
-function! Execute_comment_command(motion_wiseness)
+function! s:doCommentCommand(motion_wiseness)
     let v = operator#user#visual_command_from_wise_name(a:motion_wiseness)
     execute "normal! `[" . v . "`]\<Esc>"
     call NERDComment(1, s:comment_command)
@@ -398,10 +413,10 @@ endfunction
 let g:loaded_AlignMapsPlugin = "1"
 
 " Align + operator-user
-call operator#user#define('align', 'Execute_align_command')
+call operator#user#define('align', s:SID_PREFIX() . 'doAlignCommand')
 map [Operator]a <Plug>(operator-align)
 
-function! Execute_align_command(motion_wiseness)
+function! s:doAlignCommand(motion_wiseness)
     let separators = input(":'[,']Align ")
     call Align#AlignPush()
     " apply only lines that contain separators
@@ -429,18 +444,18 @@ endif
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
 PopupMap <C-y>   neocomplcache#close_popup()
 PopupMap <C-e>   neocomplcache#cancel_popup()
-PopupMap <CR>    neocomplcache#close_popup()."\<CR>"
+PopupMap <CR>    neocomplcache#close_popup() . "\<CR>"
 PopupMap <Tab>   "\<C-n>"
 PopupMap <S-Tab> "\<C-p>"
-PopupMap <C-h>   neocomplcache#cancel_popup()."\<C-h>"
+PopupMap <C-h>   neocomplcache#cancel_popup() . "\<C-h>"
 
 " ku
 augroup vimrc-autocmd
     autocmd FileType ku
     \    call ku#default_key_mappings(1)
-    \|   call Ku_my_keymappings()
+    \|   call s:kuMappings()
 augroup END
-function! Ku_my_keymappings()
+function! s:kuMappings()
     inoremap <buffer> <silent> <Tab> <C-n>
     inoremap <buffer> <silent> <S-Tab> <C-p>
 
@@ -455,8 +470,8 @@ function! Ku_my_keymappings()
     INMap <buffer> <silent> <D-CR> <Plug>(ku-choose-an-action)
 endfunction
 
-call ku#custom_action('common', 'cd', 'Ku_common_action_my_cd')
-function! Ku_common_action_my_cd(item)
+call ku#custom_action('common', 'cd', s:SID_PREFIX() . 'kuCommonActionCd')
+function! s:kuCommonActionCd(item)
     if isdirectory(a:item.word)
         execute 'TabpageCD' a:item.word
     else
@@ -464,8 +479,8 @@ function! Ku_common_action_my_cd(item)
     endif
 endfunction
 
-call ku#custom_action('common', 'tab-Right', 'Ku_common_action_my_tab_right')
-function! Ku_common_action_my_tab_right(item)
+call ku#custom_action('common', 'tab-Right', s:SID_PREFIX() . 'kuCommonActionTabRight')
+function! s:kuCommonActionTabRight(item)
     execute 'tabe' a:item.word
     CD
 endfunction
@@ -473,18 +488,18 @@ endfunction
 call ku#custom_prefix('common', '.vim', $HOME . '/.vim')
 call ku#custom_prefix('common', '~', $HOME)
 
-nnoremap <silent> [Prefix]b  :<C-u>Ku buffer<CR>
-nnoremap <silent> [Prefix]kf :<C-u>Ku file<CR>
-nnoremap <silent> [Prefix]kh :<C-u>Ku history<Cr>
-nnoremap <silent> [Prefix]kc :<C-u>Ku mrucommand<CR>
-nnoremap <silent> [Prefix]km :<C-u>Ku mrufile<CR>
-nnoremap <silent> [Prefix]kt :<C-u>Ku tags<CR>
-nnoremap <silent> [Prefix]h  :<C-u>Ku tags/help<CR>
+PrefixMap b  Ku buffer
+PrefixMap kf Ku file
+PrefixMap kh Ku history
+PrefixMap kc Ku mrucommand
+PrefixMap km Ku mrufile
+PrefixMap kt Ku tags
+PrefixMap h  Ku tags/help
 
 " NERDTree
-nnoremap <silent> [Prefix]t     :<C-u>NERDTree<CR>
-nnoremap <silent> [Prefix]T     :<C-u>NERDTreeClose<CR>
-nnoremap <silent> [Prefix]<C-t> :<C-u>execute 'NERDTree' expand('%:p:h')<CR>
+PrefixMap t     NERDTree
+PrefixMap T     NERDTreeClose
+PrefixMap <C-t> execute 'NERDTree' expand('%:p-h')
 
 " add Tabpaged CD command to NERDTree
 augroup vimrc-autocmd
@@ -495,71 +510,37 @@ augroup vimrc-autocmd
     autocmd FileType nerdtree nnoremap <buffer> ct :<C-u>NERDTreeTabpageCd<CR>
 augroup END
 
-" Reload Firefox {{{
+" Reload Firefox
 " Need MozRepl and +ruby
 function! ReloadFirefox()
     if has('ruby')
         ruby <<EOF
-        require "net/telnet"
-
-        telnet = Net::Telnet.new({
-            "Host" => "localhost",
-            "Port" => 4242
-        })
-
+        require 'net/telnet'
+        telnet = Net::Telnet.new({'Host' => 'localhost', 'Port' => 4242})
         telnet.puts("content.location.reload(true)")
         telnet.close
 EOF
-    else
+    elss
         echoerr 'need has("ruby")'
     endif
 endfunction
-nnoremap <silent> [Prefix]rf :<C-u>call ReloadFirefox()<CR>
-" }}}
+PrefixMap rf call ReloadFirefox()
 
-" Reload Safari {{{
+" Reload Safari
 " Need RubyOSA and +ruby
 function! ReloadSafari()
     if has('ruby') && has('mac')
         ruby <<EOF
         require 'rubygems'
         require 'rbosa'
-
-        safari = OSA.app("Safari")
-        safari.do_javascript("location.reload(true)", safari.documents[0])
+        safari = OSA.app('Safari')
+        safari.do_javascript('location.reload(true)', safari.documents[0])
 EOF
     else
         echoerr 'need has("mac") and has("ruby")'
     endif
 endfunction
-nnoremap <silent> [Prefix]rs :<C-u>call ReloadSafari()<CR>
-" }}}
-
-" TeXShop {{{
-" Need RubyOSA and +ruby
-function! TexShop_TypeSet()
-    if has('ruby') && has('mac')
-        ruby <<EOF
-        unless $texshop
-            require 'rubygems'
-            require 'rbosa'
-
-            $texshop = OSA.app("TeXShop")
-        end
-        $texshop.documents.each {|d|
-            $texshop.typesetinteractive(d)
-        }
-EOF
-    else
-        echoerr 'need has("mac") and has("ruby")'
-    endif
-endfunction
-
-augroup vimrc-autocmd
-    autocmd FileType plaintex noremap <buffer> <silent> [Prefix]pt :<C-u>call TexShop_TypeSet()<CR>
-    autocmd FileType plaintex setlocal spell spelllang=en_us
-augroup END
-" }}}
+PrefixMap rs call ReloadSafari()
 
 " Utility command for Mac
 if has('mac')
