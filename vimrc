@@ -58,6 +58,7 @@ set number                    " show row number
 set wrap                      " wrap each lines
 set scrolloff=5               " minimal number of screen lines to keep above and below the cursor.
 set foldmethod=marker         " folding
+set foldcolumn=3              " display fold
 set list                      " show unprintable characters
 set listchars=tab:>\ ,trail:_ " strings to use in 'list'
 set ambiwidth=double          " For multibyte characters, such as □, ○
@@ -89,8 +90,6 @@ endfunction
 " Display cursorline only in active window
 " Reference: http://nanabit.net/blog/2007/11/03/vim-cursorline/
 augroup vimrc-autocmd
-    " autocmd WinLeave * set nocursorcolumn nocursorline
-    " autocmd WinEnter,BufRead * set cursorcolumn cursorline
     autocmd WinLeave * set nocursorline
     autocmd WinEnter,BufRead * set cursorline
 augroup END
@@ -175,11 +174,15 @@ augroup vimrc-autocmd
 augroup END
 function! s:onColorScheme()
     " Hightlight Zenkaku space
-    hi ZenkakuSpace ctermbg=151 guibg=#9ece9e
+    hi ZenkakuSpace ctermbg=77 guibg=#5fdf5f
 
     " Modify colorscheme
     if !exists('g:colors_name')
         return
+    endif
+
+    if g:colors_name == 'xoria256'
+        highlight CursorLine cterm=none gui=none
     endif
 
     if g:colors_name == 'lucius'
@@ -209,8 +212,7 @@ if has('win32') && !has('gui')
     colorscheme desert
 else
     let g:zenburn_high_Contrast = 0
-    colorscheme zenburn
-    " colorscheme lucius
+    colorscheme xoria256
 endif
 
 
@@ -226,12 +228,6 @@ noremap [Operator] <Nop>
 map , [Operator]
 
 " Mapping command
-command! -nargs=+ INMap
-\   execute 'imap' <q-args> | execute 'nmap' <q-args>
-
-command! -nargs=+ NVMap
-\   execute 'nmap' <q-args> | execute 'vmap' <q-args>
-
 command! -nargs=+ NExchangeMap call s:exchangeMap('n', <f-args>)
 command! -nargs=+ CExchangeMap call s:exchangeMap('c', <f-args>)
 function! s:exchangeMap(mode, a, b)
@@ -246,11 +242,11 @@ function! s:popupMap(lhs, ...)
     \    a:lhs, rhs, a:lhs)
 endfunction
 
-command! -nargs=+ PrefixMap call s:prefixMap(<f-args>)
-function! s:prefixMap(lhs, ...)
+command! -bang -nargs=+ CommandMap call s:commandMap('<bang>', <f-args>)
+function! s:commandMap(buffer, lhs, ...)
     let rhs = join(a:000, ' ')
-    execute printf('nnoremap <silent> [Prefix]%s :<C-u>%s<CR>',
-    \   a:lhs, rhs)
+    execute printf('nnoremap <silent> %s %s :<C-u>%s<CR>',
+    \   a:buffer == '!' ? '<buffer>' : '', a:lhs, rhs)
 endfunction
 
 " Use display line
@@ -275,7 +271,7 @@ vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
 vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 
 " Delete highlight
-PrefixMap i nohlsearch
+CommandMap gh nohlsearch
 
 " Input path in command mode
 cnoremap <expr> <C-x> expand('%:p:h') . "/"
@@ -284,11 +280,11 @@ cnoremap <expr> <C-z> expand('%:p:r')
 " Copy and paste with fakeclip
 " Command-C and Command-V are also available in MacVim
 " see :help fakeclip-multibyte-on-mac
-NVMap <C-y> "*y
-NVMap <C-p> "*p
+map <C-y> "*y
+map <C-p> "*p
 if !empty($WINDOW)
-    NVMap gy <Plug>(fakeclip-screen-y)
-    NVMap gp <Plug>(fakeclip-screen-p)
+    map gy <Plug>(fakeclip-screen-y)
+    map gp <Plug>(fakeclip-screen-p)
 endif
 
 " Enable mouse wheel
@@ -337,7 +333,7 @@ if !exists("g:AlternateTabNumber")
 endif
 
 command! GoToAlternateTab silent execute 'tabnext' g:AlternateTabNumber
-nnoremap <silent> g<C-^> :<C-u>GoToAlternateTab<CR>
+CommandMap g<C-^> GoToAlternateTab
 
 augroup vimrc-autocmd
     autocmd TabLeave * let g:AlternateTabNumber = tabpagenr()
@@ -460,14 +456,14 @@ function! s:kuMappings()
     inoremap <buffer> <silent> <S-Tab> <C-p>
 
     " for Vim
-    INMap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
-    INMap <buffer> <silent> <Esc><CR> <Plug>(ku-choose-an-action)
+    imap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
+    imap <buffer> <silent> <Esc><CR> <Plug>(ku-choose-an-action)
 
     " for GVim, MacVim
-    INMap <buffer> <silent> <A-CR> <Plug>(ku-choose-an-action)
+    imap <buffer> <silent> <A-CR> <Plug>(ku-choose-an-action)
 
     " for MacVim
-    INMap <buffer> <silent> <D-CR> <Plug>(ku-choose-an-action)
+    imap <buffer> <silent> <D-CR> <Plug>(ku-choose-an-action)
 endfunction
 
 call ku#custom_action('common', 'cd', s:SID_PREFIX() . 'kuCommonActionCd')
@@ -488,18 +484,19 @@ endfunction
 call ku#custom_prefix('common', '.vim', $HOME . '/.vim')
 call ku#custom_prefix('common', '~', $HOME)
 
-PrefixMap b  Ku buffer
-PrefixMap kf Ku file
-PrefixMap kh Ku history
-PrefixMap kc Ku mrucommand
-PrefixMap km Ku mrufile
-PrefixMap kt Ku tags
-PrefixMap h  Ku tags/help
+CommandMap [Prefix]b  Ku buffer
+CommandMap [Prefix]kf Ku file
+CommandMap [Prefix]kh Ku history
+CommandMap [Prefix]kc Ku mrucommand
+CommandMap [Prefix]km Ku mrufile
+CommandMap [Prefix]kt Ku tags
+CommandMap [Prefix]h  Ku tags/help
 
 " NERDTree
-PrefixMap t     NERDTree
-PrefixMap T     NERDTreeClose
-PrefixMap <C-t> execute 'NERDTree' expand('%:p-h')
+let g:NERDTreeWinSize = 25
+CommandMap [Prefix]t     NERDTree
+CommandMap [Prefix]T     NERDTreeClose
+CommandMap [Prefix]<C-t> execute 'NERDTree' expand('%:p-h')
 
 " add Tabpaged CD command to NERDTree
 augroup vimrc-autocmd
@@ -507,7 +504,7 @@ augroup vimrc-autocmd
     \   let b:currentDir = NERDTreeGetCurrentPath().getDir().strForCd()
     \|  echo 'TabpageCD to ' . b:currentDir
     \|  execute 'TabpageCD' b:currentDir
-    autocmd FileType nerdtree nnoremap <buffer> ct :<C-u>NERDTreeTabpageCd<CR>
+    autocmd FileType nerdtree CommandMap! ct NERDTreeTabpageCd
 augroup END
 
 " Reload Firefox
@@ -524,7 +521,7 @@ EOF
         echoerr 'need has("ruby")'
     endif
 endfunction
-PrefixMap rf call ReloadFirefox()
+CommandMap [Prefix]rf call ReloadFirefox()
 
 " Reload Safari
 " Need RubyOSA and +ruby
@@ -540,7 +537,7 @@ EOF
         echoerr 'need has("mac") and has("ruby")'
     endif
 endfunction
-PrefixMap rs call ReloadSafari()
+CommandMap [Prefix]rs call ReloadSafari()
 
 " Utility command for Mac
 if has('mac')
