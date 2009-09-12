@@ -211,7 +211,7 @@ syntax on " syntax coloring
 if has('win32') && !has('gui')
     colorscheme desert
 else
-    let g:zenburn_high_Contrast = 0
+    " let g:zenburn_high_Contrast = 0
     colorscheme xoria256
 endif
 
@@ -238,15 +238,14 @@ endfunction
 command! -nargs=+ PopupMap call s:popupMap(<f-args>)
 function! s:popupMap(lhs, ...)
     let rhs = join(a:000, ' ')
-    execute printf('inoremap <silent> <expr> %s pumvisible() ? %s : "%s"',
-    \    a:lhs, rhs, a:lhs)
+    execute 'inoremap <silent> <expr>' a:lhs 'pumvisible() ?' rhs ': "' . a:lhs . '"'
 endfunction
 
 command! -bang -nargs=+ CommandMap call s:commandMap('<bang>', <f-args>)
 function! s:commandMap(buffer, lhs, ...)
     let rhs = join(a:000, ' ')
-    execute printf('nnoremap <silent> %s %s :<C-u>%s<CR>',
-    \   a:buffer == '!' ? '<buffer>' : '', a:lhs, rhs)
+    let buffer = a:buffer == '!' ? '<buffer>' : ''
+    execute 'nnoremap <silent>' buffer a:lhs ':<C-u>' . rhs . '<CR>'
 endfunction
 
 " Use display line
@@ -309,12 +308,9 @@ augroup END
 
 " TabpageCD
 " Reference: kana's vimrc
-command! -complete=customlist,s:complete_cdpath -nargs=? TabpageCD
+command! -complete=file -nargs=? TabpageCD
 \   execute 'cd' fnameescape(<q-args>)
 \|  let t:cwd = getcwd()
-function! s:complete_cdpath(arglead, cmdline, cursorpos)
-    return split(globpath(&cdpath, join(split(a:cmdline, '\s', 1)[1:], ' ') . '*/'), "\n")
-endfunction
 
 AlterCommand cd TabpageCD
 command! CD silent execute "TabpageCD" expand('%:p:h')
@@ -340,7 +336,7 @@ augroup vimrc-autocmd
 augroup END
 
 " Rename
-command! -nargs=1 -complete=file Rename saveas <args> | call delete(expand('#'))
+command! -nargs=1 -bang -complete=file Rename saveas<bang> <args> | call delete(expand('#'))
 
 " ctags
 command! CtagsR !ctags -R
@@ -378,22 +374,17 @@ let g:NERDSpaceDelims = 1
 let g:NERDMenuMode = 0
 let g:NERDCreateDefaultMappings = 0
 
-nmap ,A <Plug>NERDCommenterAppend
-nmap ,d <Plug>NERDCommenterAltDelims
+nmap gA <Plug>NERDCommenterAppend
+nmap [Prefix]a <Plug>NERDCommenterAltDelims
 
 " NERDCommenter + operator-user
-for [name, key] in [
-\   ['norm',      'c'], ['toggle',    '<Space>'], ['minimal', 'm'],
-\   ['sexy',      's'], ['invert',    'i'],       ['yank',    'y'],
-\   ['alignLeft', 'l'], ['alignBoth', 'b'],
-\   ['nested',    'n'], ['uncomment', 'u']
-\   ]
-    execute printf('call operator#user#define("comment-%s", "%s", "call %s")',
-    \   name,
+function! s:setCommentOperator(name, key)
+    call operator#user#define(
+    \   'comment-' . a:name,
     \   s:SID_PREFIX() . 'doCommentCommand',
-    \   s:SID_PREFIX() . "setCommentCommand('" . name . "')")
-    execute printf('map [Operator]%s <Plug>(operator-comment-%s)', key, name)
-endfor
+    \   'call ' . s:SID_PREFIX() . 'setCommentCommand("' . a:name . '")')
+    execute 'map [Operator]' . a:key '<Plug>(operator-comment-' . a:name . ')'
+endfunction
 
 function! s:setCommentCommand(command)
     let s:comment_command = a:command
@@ -404,6 +395,18 @@ function! s:doCommentCommand(motion_wiseness)
     execute "normal! `[" . v . "`]\<Esc>"
     call NERDComment(1, s:comment_command)
 endfunction
+
+call s:setCommentOperator('norm',      'c')
+call s:setCommentOperator('toggle',    '<Space>')
+call s:setCommentOperator('minimal',   'm')
+call s:setCommentOperator('sexy',      's')
+call s:setCommentOperator('invert',    'i')
+call s:setCommentOperator('yank',      'y')
+call s:setCommentOperator('alignLeft', 'l')
+call s:setCommentOperator('alignBoth', 'b')
+call s:setCommentOperator('nested',    'n')
+call s:setCommentOperator('uncomment', 'u')
+
 
 " Align
 let g:loaded_AlignMapsPlugin = "1"
@@ -436,7 +439,7 @@ let g:NeoComplCache_EnableCamelCaseCompletion = 1
 if !exists("g:NeoComplCache_SameFileTypeLists")
     let g:NeoComplCache_SameFileTypeLists = {}
 endif
-
+let g:NeoComplCache_SameFileTypeLists['vim'] = 'help'
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
 PopupMap <C-y>   neocomplcache#close_popup()
 PopupMap <C-e>   neocomplcache#cancel_popup()
@@ -496,7 +499,7 @@ CommandMap [Prefix]h  Ku tags/help
 let g:NERDTreeWinSize = 25
 CommandMap [Prefix]t     NERDTree
 CommandMap [Prefix]T     NERDTreeClose
-CommandMap [Prefix]<C-t> execute 'NERDTree' expand('%:p-h')
+CommandMap [Prefix]<C-t> execute 'NERDTree' expand('%:p:h')
 
 " add Tabpaged CD command to NERDTree
 augroup vimrc-autocmd
