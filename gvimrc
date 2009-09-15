@@ -11,7 +11,7 @@ set textwidth=0
 " gvim settings
 set linespace=1
 set columns=140
-set lines=45
+set lines=40
 
 " This must be after 'columns' and 'lines',
 " and before 'transparency'

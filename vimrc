@@ -313,7 +313,7 @@ command! -complete=file -nargs=? TabpageCD
 \|  let t:cwd = getcwd()
 
 AlterCommand cd TabpageCD
-command! CD silent execute "TabpageCD" expand('%:p:h')
+command! CD silent execute 'TabpageCD' expand('%:p:h')
 
 augroup vimrc-autocmd
     autocmd VimEnter,TabEnter *
@@ -324,7 +324,7 @@ augroup vimrc-autocmd
 augroup END
 
 " Go to alternate tab
-if !exists("g:AlternateTabNumber")
+if !exists('g:AlternateTabNumber')
     let g:AlternateTabNumber = 1
 endif
 
@@ -392,7 +392,7 @@ endfunction
 
 function! s:doCommentCommand(motion_wiseness)
     let v = operator#user#visual_command_from_wise_name(a:motion_wiseness)
-    execute "normal! `[" . v . "`]\<Esc>"
+    execute 'normal! `[' . v . "`]\<Esc>"
     call NERDComment(1, s:comment_command)
 endfunction
 
@@ -409,14 +409,14 @@ call s:setCommentOperator('uncomment', 'u')
 
 
 " Align
-let g:loaded_AlignMapsPlugin = "1"
+let g:loaded_AlignMapsPlugin = '1'
 
 " Align + operator-user
 call operator#user#define('align', s:SID_PREFIX() . 'doAlignCommand')
 map [Operator]a <Plug>(operator-align)
 
 function! s:doAlignCommand(motion_wiseness)
-    let separators = input(":'[,']Align ")
+    let separators = input(':'[,']Align ')
     call Align#AlignPush()
     " apply only lines that contain separators
     call Align#AlignCtrl('g ' . join(split(separators, '\s\+'), '\|'))
@@ -436,7 +436,7 @@ let g:NeoComplCache_EnableQuickMatch = 0
 let g:NeoComplCache_TagsAutoUpdate = 1
 let g:NeoComplCache_EnableUnderbarCompletion = 1
 let g:NeoComplCache_EnableCamelCaseCompletion = 1
-if !exists("g:NeoComplCache_SameFileTypeLists")
+if !exists('g:NeoComplCache_SameFileTypeLists')
     let g:NeoComplCache_SameFileTypeLists = {}
 endif
 let g:NeoComplCache_SameFileTypeLists['vim'] = 'help'
@@ -517,7 +517,7 @@ function! ReloadFirefox()
         ruby <<EOF
         require 'net/telnet'
         telnet = Net::Telnet.new({'Host' => 'localhost', 'Port' => 4242})
-        telnet.puts("content.location.reload(true)")
+        telnet.puts('content.location.reload(true)')
         telnet.close
 EOF
     elss
@@ -550,16 +550,16 @@ endif
 
 " Utility command for Windows
 if has('win32')
-    command! Here silent execute "!explorer" expand('%:p:h')
+    command! Here silent execute '!explorer' expand('%:p:h')
 endif
 
 " TOhtml
 let html_number_lines = 0
 let html_use_css = 1
 let use_xhtml = 1
-let html_use_encoding = "utf-8"
+let html_use_encoding = 'utf-8'
 
 " Load private information
-if filereadable($HOME . "/.vimrc.local")
+if filereadable($HOME . '/.vimrc.local')
     source ~/.vimrc.local
 endif
