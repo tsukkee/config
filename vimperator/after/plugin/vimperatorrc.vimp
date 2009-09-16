@@ -1,6 +1,6 @@
 " ==================== plugin options ==================== "
 " sbm_incsearch
-set complete+=I
+set complete=sIl
 
 " feedSomeKey
 autocmd LocationChange .* :fmapc

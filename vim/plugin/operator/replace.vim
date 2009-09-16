@@ -1,5 +1,5 @@
-" textobj-syntax - Text objects for syntax highlighted items
-" Version: 0.0.0
+" operator-replace - Operator to replace text with register content
+" Version: 0.0.1
 " Copyright (C) 2009 kana <http://whileimautomaton.net/>
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -21,64 +21,20 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Interface  "{{{1
-function! textobj#syntax#select_a()  "{{{2
-  " FIXME: Currently this acts the same as "iy", but it'll be changed.
-  return textobj#syntax#select_i()
-endfunction
+
+if exists('g:loaded_operator_replace')
+  finish
+endif
 
 
 
 
-function! textobj#syntax#select_i()  "{{{2
-  let current_position = getpos('.')
-  let synstack = synstack(current_position[1], current_position[2])
-
-  if empty(synstack)   " The character under the cursor is not highlighted.
-    return 0
-  endif
-
-  let original_whichwrap = &g:whichwrap
-    setglobal whichwrap=h,l
-    while !0
-      let start_position = getpos('.')
-      normal! h
-      let _ = getpos('.')
-      if synstack(_[1], _[2])[:len(synstack)-1] != synstack
-      \  || start_position == _
-        break
-      endif
-    endwhile
-
-    call setpos('.', current_position)
-    while !0
-      let end_position = getpos('.')
-      normal! l
-      let _ = getpos('.')
-      if synstack(_[1], _[2])[:len(synstack)-1] != synstack
-      \  || end_position == _
-        break
-      endif
-    endwhile
-  let &g:whichwrap = original_whichwrap
-  return ['v', start_position, end_position]
-endfunction
+call operator#user#define('replace', 'operator#replace#do')
 
 
 
 
+let g:loaded_operator_replace = 1
 
-
-
-
-" Misc.  "{{{1
-
-
-
-
-
-
-
-
-" __END__  "{{{1
+" __END__
 " vim: foldmethod=marker

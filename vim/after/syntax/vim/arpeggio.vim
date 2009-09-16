@@ -1,6 +1,6 @@
-" textobj-syntax - Text objects for syntax highlighted items
-" Version: 0.0.0
-" Copyright (C) 2009 kana <http://whileimautomaton.net/>
+" Vim additional syntax: vim/arpeggio - highlight :Arpeggio commands
+" Version: 0.0.5
+" Copyright (C) 2008 kana <http://whileimautomaton.net/>
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -22,24 +22,28 @@
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
 
-if exists('g:loaded_textobj_syntax')
-  finish
-endif
+syntax keyword vimArpeggioCommand
+\      Arpeggio
+\      skipwhite nextgroup=vimMap
+
+syntax match vimArpeggioCommand
+\      /\<Arpeggio[cilnosvx]\(\|nore\|un\)map\>/
+\      contains=vimArpeggioCommandInside
+\      skipwhite nextgroup=vimMapBang,vimMapMod,vimMapLhs
+
+syntax match vimArpeggioCommand
+\      /\<Arpeggio\%(\|nore\|un\)map\>!\?/
+\      contains=vimArpeggioCommandInside
+\      skipwhite nextgroup=vimMapMod,vimMapLhs
+
+syntax match vimArpeggioCommandInside /\<Arpeggio\zs\l*map!\?/
+\      contained
 
 
 
 
-call textobj#user#plugin('syntax', {
-\      '-': {
-\        'select-a': 'ay',  '*select-a-function*': 'textobj#syntax#select_a',
-\        'select-i': 'iy',  '*select-i-function*': 'textobj#syntax#select_i',
-\      }
-\    })
-
-
-
-
-let g:loaded_textobj_syntax = 1
+highlight default link vimArpeggioCommand  NONE
+highlight default link vimArpeggioCommandInside  vimCommand
 
 " __END__
 " vim: foldmethod=marker

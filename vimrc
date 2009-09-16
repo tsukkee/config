@@ -217,8 +217,9 @@ endif
 
 
 " ==================== Keybind and commands ==================== "
-" Use AlterCommand
+" Use AlterCommand and Arpeggio
 call altercmd#load()
+call arpeggio#load()
 
 " Prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
@@ -363,11 +364,8 @@ endif
 let g:gist_detect_filetype = 1
 let g:gist_open_browser_after_post = 1
 
-" smartword
-map W  <Plug>(smartword-w)
-map B  <Plug>(smartword-b)
-map E  <Plug>(smartword-e)
-map gE <Plug>(smartword-ge)
+" operator-replace
+map [Operator]r <Plug>(operator-replace)
 
 " NERDCommenter
 let g:NERDSpaceDelims = 1
@@ -378,12 +376,12 @@ nmap gA <Plug>NERDCommenterAppend
 nmap [Prefix]a <Plug>NERDCommenterAltDelims
 
 " NERDCommenter + operator-user
-function! s:setCommentOperator(name, key)
+function! s:setCommentOperator(key, name)
     call operator#user#define(
     \   'comment-' . a:name,
     \   s:SID_PREFIX() . 'doCommentCommand',
     \   'call ' . s:SID_PREFIX() . 'setCommentCommand("' . a:name . '")')
-    execute 'map [Operator]' . a:key '<Plug>(operator-comment-' . a:name . ')'
+    execute 'map' a:key '<Plug>(operator-comment-' . a:name . ')'
 endfunction
 
 function! s:setCommentCommand(command)
@@ -396,16 +394,16 @@ function! s:doCommentCommand(motion_wiseness)
     call NERDComment(1, s:comment_command)
 endfunction
 
-call s:setCommentOperator('norm',      'c')
-call s:setCommentOperator('toggle',    '<Space>')
-call s:setCommentOperator('minimal',   'm')
-call s:setCommentOperator('sexy',      's')
-call s:setCommentOperator('invert',    'i')
-call s:setCommentOperator('yank',      'y')
-call s:setCommentOperator('alignLeft', 'l')
-call s:setCommentOperator('alignBoth', 'b')
-call s:setCommentOperator('nested',    'n')
-call s:setCommentOperator('uncomment', 'u')
+call s:setCommentOperator('[Operator]c',       'norm')
+call s:setCommentOperator('[Operator]<Scace>', 'toggle')
+call s:setCommentOperator('[Operator]m',       'minimal')
+call s:setCommentOperator('[Operator]s',       'sexy')
+call s:setCommentOperator('[Operator]i',       'invert')
+call s:setCommentOperator('[Operator]y',       'yank')
+call s:setCommentOperator('[Operator]l',       'alignLeft')
+call s:setCommentOperator('[Operator]b',       'alignBoth')
+call s:setCommentOperator('[Operator]n',       'nested')
+call s:setCommentOperator('[Operator]u',       'uncomment')
 
 
 " Align
@@ -492,14 +490,18 @@ CommandMap [Prefix]kf Ku file
 CommandMap [Prefix]kh Ku history
 CommandMap [Prefix]kc Ku mrucommand
 CommandMap [Prefix]km Ku mrufile
+CommandMap [Prefix]ks Ku source
 CommandMap [Prefix]kt Ku tags
 CommandMap [Prefix]h  Ku tags/help
+" Arpeggionmap kb :<C-u>Ku buffer<CR>
+" Arpeggionmap km :<C-u>Ku mrufile<CR>
 
 " NERDTree
 let g:NERDTreeWinSize = 25
 CommandMap [Prefix]t     NERDTree
 CommandMap [Prefix]T     NERDTreeClose
 CommandMap [Prefix]<C-t> execute 'NERDTree' expand('%:p:h')
+" Arpeggionmap nt :<C-u>NERDTreeToggle<CR>
 
 " add Tabpaged CD command to NERDTree
 augroup vimrc-autocmd
