@@ -414,11 +414,16 @@ call operator#user#define('align', s:SID_PREFIX() . 'doAlignCommand')
 map [Operator]a <Plug>(operator-align)
 
 function! s:doAlignCommand(motion_wiseness)
-    let separators = input(':'[,']Align ')
-    call Align#AlignPush()
+    let separators = input(":'[,']Align ")
+
     " apply only lines that contain separators
+    call Align#AlignPush()
     call Align#AlignCtrl('g ' . join(split(separators, '\s\+'), '\|'))
-    '[,']call Align#Align(0, separators)
+
+    let v = operator#user#visual_command_from_wise_name(a:motion_wiseness)
+    execute 'normal! `[' . v . "`]\<Esc>"
+    '<,'>call Align#Align(0, separators)
+
     call Align#AlignPop()
 endfunction
 
