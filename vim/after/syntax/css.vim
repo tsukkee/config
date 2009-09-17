@@ -11,9 +11,9 @@
 
 function! s:FGforBG(bg)
    " takes a 6hex color code and returns a matching color that is visible
-   let r = eval('0x'.a:bg[1:2])
-   let g = eval('0x'.a:bg[3:4])
-   let b = eval('0x'.a:bg[5:6])
+   let r = str2nr(a:bg[1:2], 16)
+   let g = str2nr(a:bg[3:4], 16)
+   let b = str2nr(a:bg[5:6], 16)
    if r*30 + g*59 + b*11 > 12000
       return 'black'
    else
@@ -22,27 +22,23 @@ function! s:FGforBG(bg)
 endfunction
 
 function! s:SetMatcher(clr,pat)
-   let group = 'cssColor'.a:clr[1:6]
+   let group = 'cssColor'.a:pat
    if !hlexists(group)
       exe 'syn match' group '/'.a:pat.'\>/ containedin=cssColor'
-      if has('gui_running')
-        exe 'hi' group 'guifg='.s:FGforBG(a:clr)
-        exe 'hi' group 'guibg='.a:clr
-      elseif &t_Co == 256
-        exe 'hi' group 'ctermfg='.s:FGforBG(a:clr)
-        exe 'hi' group 'ctermbg='.s:Rgb2xterm(a:clr)
-      endif
+
+      let fg = s:FGforBG(a:clr)
+      exe 'hi' group 'ctermfg='.fg 'guifg='.fg
+      exe 'hi' group 'guibg='.a:clr 'ctermbg='.s:Rgb2xterm(a:clr)
    endif
 endfunction
 
 "" the 6 value iterations in the xterm color cube
 let s:valuerange = [ 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF ]
-
 function! s:GetNearestIndex(value)
    for c in range(0, 4)
       let a = a:value - s:valuerange[c]
       let b = a:value - s:valuerange[c+1]
-      if a * b <= 0
+      if a * b <= 0 " value is between a and b
          return abs(a) < abs(b) ? c : c+1
       endif
    endfor
@@ -51,9 +47,9 @@ endfunction
 
 " selects the nearest xterm color for a rgb value like #FF0000
 function! s:Rgb2xterm(color)
-   let r = eval('0x'.a:color[1:2])
-   let g = eval('0x'.a:color[3:4])
-   let b = eval('0x'.a:color[5:6])
+   let r = str2nr(a:color[1:2], 16)
+   let g = str2nr(a:color[3:4], 16)
+   let b = str2nr(a:color[5:6], 16)
 
    let r = s:GetNearestIndex(r)
    let g = s:GetNearestIndex(g)
@@ -63,15 +59,12 @@ function! s:Rgb2xterm(color)
 endfunction
 
 function! s:SetNamedColor(clr,name)
-   let group = 'cssColor'.a:clr[1:6]
+   let group = 'cssColor'.a:name
    exe 'syn keyword' group a:name 'containedin=cssDefinition'
-   if has('gui_running')
-     exe 'hi' group 'guifg='.s:FGforBG(a:clr)
-     exe 'hi' group 'guibg='.a:clr
-   elseif &t_Co == 256
-     exe 'hi' group 'ctermfg='.s:FGforBG(a:clr)
-     exe 'hi' group 'ctermbg='.s:Rgb2xterm(a:clr)
-   endif
+
+   let fg = s:FGforBG(a:clr)
+   exe 'hi' group 'guifg='.fg 'ctermfg='.fg
+   exe 'hi' group 'guibg='.a:clr 'ctermbg='.s:Rgb2xterm(a:clr)
 endfunction
 
 function! s:PreviewCSSColorInLine()
@@ -87,7 +80,7 @@ function! s:PreviewCSSColorInLine()
       let i += 1
 
       if len(foundcolor) == 4 " such as '#01a'
-         let color = substitute(foundcolor, '\(\x\)\(\x\)\(\x\)', '\1\1\2\2\3\3', '')
+         let color = '#'.foundcolor[1].foundcolor[1].foundcolor[2].foundcolor[2].foundcolor[3].foundcolor[3]
       else
          let color = foundcolor
       endif
