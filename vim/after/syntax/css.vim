@@ -7,7 +7,7 @@
 
 " Modified Date:    2009 Sep 17
 " Original Version: 0.7
-" Current Version:  0.7.1
+" Current Version:  0.7.2
 
 function! s:FGforBG(bg)
    " takes a 6hex color code and returns a matching color that is visible
@@ -22,14 +22,15 @@ function! s:FGforBG(bg)
 endfunction
 
 function! s:SetMatcher(clr,pat)
-   let group = 'cssColor'.a:pat
-   if !hlexists(group)
-      exe 'syn match' group '/'.a:pat.'\>/ containedin=cssColor'
-
-      let fg = s:FGforBG(a:clr)
-      exe 'hi' group 'ctermfg='.fg 'guifg='.fg
-      exe 'hi' group 'guibg='.a:clr 'ctermbg='.s:Rgb2xterm(a:clr)
+   let group = 'cssColor'.a:pat[1:6]
+   if hlexists(group)
+      exe 'syn clear' group
    endif
+   exe 'syn match' group '/'.a:pat.'\>/ containedin=cssColor, contained'
+
+   let fg = s:FGforBG(a:clr)
+   exe 'hi' group 'ctermfg='.fg 'guifg='.fg
+   exe 'hi' group 'guibg='.a:clr 'ctermbg='.s:Rgb2xterm(a:clr)
 endfunction
 
 "" the 6 value iterations in the xterm color cube
@@ -60,33 +61,38 @@ endfunction
 
 function! s:SetNamedColor(clr,name)
    let group = 'cssColor'.a:name
-   exe 'syn keyword' group a:name 'containedin=cssDefinition'
+   if hlexists(group)
+      exe 'syn clear' group
+   endif
+   exe 'syn keyword' group a:name 'containedin=cssDefinition contained'
 
    let fg = s:FGforBG(a:clr)
    exe 'hi' group 'guifg='.fg 'ctermfg='.fg
    exe 'hi' group 'guibg='.a:clr 'ctermbg='.s:Rgb2xterm(a:clr)
 endfunction
 
-function! s:PreviewCSSColorInLine()
+function! s:PreviewCSSColorInLine() range
    " TODO use cssColor matchdata
-   let i = 1
-   let line = getline(line('.'))
-   while 1
-      " TODO highlight rgb(255, 0, 0), rgb(100%, 0%, 0%), rgba(255, 0, 0, 0.3)
-      let foundcolor = matchstr(line, '#\%(\x\{6\}\|\x\{3\}\)', 0, i)
-      if empty(foundcolor)
-          break
-      endif
-      let i += 1
+   for n in range(a:firstline, a:lastline)
+      let line = getline(n)
+      let i = 1
+      while 1
+         " TODO highlight rgb(255, 0, 0), rgb(100%, 0%, 0%), rgba(255, 0, 0, 0.3)
+         let foundcolor = matchstr(line, '#\%(\x\{6\}\|\x\{3\}\)', 0, i)
+         if empty(foundcolor)
+             break
+         endif
+         let i += 1
 
-      if len(foundcolor) == 4 " such as '#01a'
-         let color = '#'.foundcolor[1].foundcolor[1].foundcolor[2].foundcolor[2].foundcolor[3].foundcolor[3]
-      else
-         let color = foundcolor
-      endif
+         if len(foundcolor) == 4 " such as '#01a'
+            let color = substitute(foundcolor, '\(\x\)', '\1\1', 'g')
+         else
+            let color = foundcolor
+         endif
 
-      call s:SetMatcher(color, foundcolor)
-   endwhile
+         call s:SetMatcher(color, foundcolor)
+      endwhile
+   endfor
 endfunction
 
 if has("gui_running") || &t_Co==256
@@ -241,13 +247,14 @@ if has("gui_running") || &t_Co==256
    call s:SetNamedColor('#F5F5F5','WhiteSmoke')
    call s:SetNamedColor('#9ACD32','YellowGreen')
 
-   0,$call s:PreviewCSSColorInLine()
+   1,$call s:PreviewCSSColorInLine()
 
    augroup plugin-syntax-css
       autocmd!
       autocmd CursorHold,CursorHoldI <buffer> silent call s:PreviewCSSColorInLine()
+      " FIXME cursor jumps after autocmd.
       autocmd InsertLeave <buffer> silent '[,']call s:PreviewCSSColorInLine()
-               \| silent exe "normal! ']" . col("']") . 'l'
+               \| silent exe "normal! ']0" . (col("']") - 1) . 'l'
    augroup END
    " set ut=100
 endif " has("gui_running") || &t_Co==256
