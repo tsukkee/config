@@ -405,7 +405,6 @@ call s:setCommentOperator('[Operator]b',       'alignBoth')
 call s:setCommentOperator('[Operator]n',       'nested')
 call s:setCommentOperator('[Operator]u',       'uncomment')
 
-
 " Align
 let g:loaded_AlignMapsPlugin = '1'
 
@@ -565,6 +564,18 @@ let html_number_lines = 0
 let html_use_css = 1
 let use_xhtml = 1
 let html_use_encoding = 'utf-8'
+
+" auto reloading vimrc
+" Reference: http://vim-users.jp/2009/09/hack74/
+augroup vimrc-autocmd
+    if has('gui_running')
+        autocmd BufWritePost .vimrc nested source $MYVIMRC
+        \|  source $MYGVIMRC
+        autocmd BufWritePost .gvimrc nested source $MYGVIMRC
+    else
+        autocmd BufWritePost .vimrc nested source $MYVIMRC
+    endif
+augroup END
 
 " Load private information
 if filereadable($HOME . '/.vimrc.local')
