@@ -220,6 +220,9 @@ endif
 " Use AlterCommand and Arpeggio
 call altercmd#load()
 call arpeggio#load()
+Arpeggioinoremap fj <Esc>
+Arpeggiocnoremap fj <Esc>
+Arpeggiovnoremap fj <Esc>
 
 " Prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
@@ -251,7 +254,9 @@ endfunction
 
 " Use display line
 NExchangeMap j gj
-NExchangeMap k gk
+" NExchangeMap k gk
+nnoremap <Plug>(arpeggio-default:k) gk
+nnoremap gk k
 NExchangeMap $ g$
 NExchangeMap 0 g0
 
@@ -331,6 +336,7 @@ endif
 
 command! GoToAlternateTab silent execute 'tabnext' g:AlternateTabNumber
 CommandMap g<C-^> GoToAlternateTab
+Arpeggionnoremap <silent> at :<C-u>GoToAlternateTab<CR>
 
 augroup vimrc-autocmd
     autocmd TabLeave * let g:AlternateTabNumber = tabpagenr()
@@ -469,6 +475,9 @@ function! s:kuMappings()
 
     " for MacVim
     imap <buffer> <silent> <D-CR> <Plug>(ku-choose-an-action)
+
+    " Arpeggio
+    Arpeggioimap <buffer> <silent> fj <Plug>(ku-cancel)
 endfunction
 
 call ku#custom_action('common', 'cd', s:SID_PREFIX() . 'kuCommonActionCd')
@@ -497,15 +506,17 @@ CommandMap [Prefix]km Ku mrufile
 CommandMap [Prefix]ks Ku source
 CommandMap [Prefix]kt Ku tags
 CommandMap [Prefix]h  Ku tags/help
-" Arpeggionmap kb :<C-u>Ku buffer<CR>
-" Arpeggionmap km :<C-u>Ku mrufile<CR>
+Arpeggionnoremap kb :<C-u>Ku buffer<CR>
+Arpeggionnoremap kf :<C-u>Ku file<CR>
+Arpeggionnoremap km :<C-u>Ku mrufile<CR>
+Arpeggionnoremap ke :<C-u>Ku tags/help<CR>
 
 " NERDTree
 let g:NERDTreeWinSize = 25
 CommandMap [Prefix]t     NERDTree
 CommandMap [Prefix]T     NERDTreeClose
 CommandMap [Prefix]<C-t> execute 'NERDTree' expand('%:p:h')
-" Arpeggionmap nt :<C-u>NERDTreeToggle<CR>
+Arpeggionmap nt :<C-u>NERDTreeToggle<CR>
 
 " add Tabpaged CD command to NERDTree
 augroup vimrc-autocmd
