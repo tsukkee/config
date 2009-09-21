@@ -152,7 +152,7 @@ let command_bookmarklet_prefix=""
 
 " sbmincsearch
 let sbmincsearch_service_name = "delicious"
-let sbmincsearch_max = 50
+let sbmincsearch_max = 15
 
 " migratestatusbar
 javascript <<EOM

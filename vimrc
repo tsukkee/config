@@ -560,10 +560,10 @@ if has('win32')
 endif
 
 " TOhtml
-let html_number_lines = 0
-let html_use_css = 1
-let use_xhtml = 1
-let html_use_encoding = 'utf-8'
+let g:html_number_lines = 0
+let g:html_use_css = 1
+let g:use_xhtml = 1
+let g:html_use_encoding = 'utf-8'
 
 " auto reloading vimrc
 " Reference: http://vim-users.jp/2009/09/hack74/
