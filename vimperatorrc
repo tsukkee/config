@@ -3,10 +3,10 @@ set activate=quickmark,paste
 set complete=sl
 set focuscontent
 set followhints=1
-set guioptions=BrbmN
+set guioptions=BrbN
 set hlsearch
 set showstatuslinks=2
-set wildoptions=auto
+set wildoptions=
 
 " emulate vim's "after"
 set runtimepath+=~/.vimperator/after,~/vimperator/after
@@ -63,7 +63,7 @@ js <<EOM
             if(guioptions.value != original)
                 guioptions.set(original);
             else
-                guioptions.set("TmBrbN");
+                guioptions.set("TBrbN");
         });
 })();
 EOM
@@ -169,12 +169,12 @@ liberator.globalVariables.migrate_elements = [
         dest:  'security-button',
         after: true,
     },
-    {
+    /*{
         // favicon of awesome bar
         id:    'page-proxy-stack',
         dest:  'liberator-statusline',
         after: false,
-    },
+    },*/
 ];
 EOM
 
