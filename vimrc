@@ -285,12 +285,16 @@ cnoremap <expr> <C-z> expand('%:p:r')
 " Copy and paste with fakeclip
 " Command-C and Command-V are also available in MacVim
 " see :help fakeclip-multibyte-on-mac
-map <C-y> "*y
-map <C-p> "*p
+map gy "*y
+map gp "*p
 if !empty($WINDOW)
-    map gy <Plug>(fakeclip-screen-y)
-    map gp <Plug>(fakeclip-screen-p)
+    map gY <Plug>(fakeclip-screen-y)
+    map gP <Plug>(fakeclip-screen-p)
 endif
+
+" Tab
+nnoremap <C-n> gt
+nnoremap <C-p> gT
 
 " Enable mouse wheel
 " In Mac, Only on iTerm.app, disable on Terminal.app

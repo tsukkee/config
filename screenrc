@@ -21,8 +21,11 @@ hardstatus string "%-w%{=b}%n %t%{-}%+w"
 # hardstatus alwayslastline "%{= wk}%-Lw%n%f* %t%{= wk}%+Lw %= %y/%m/%d %c "
 
 # prevent windows size change with iTerm
-# (prevent "Aborted because of window size chage")
-termcapinfo xterm* 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
+# (avoid "Aborted because of window size chage")
+# termcapinfo xterm* 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
+#
+# This setting is no longer needed. Instead of this,
+# check "Disable session-initiated window resizing" in Terminal Profiles
 
 # term
 defbce on
