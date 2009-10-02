@@ -460,6 +460,11 @@ PopupMap <Tab>   "\<C-n>"
 PopupMap <S-Tab> "\<C-p>"
 PopupMap <C-h>   neocomplcache#cancel_popup() . "\<C-h>"
 
+" vimshell
+augroup vimrc-autocmd
+    autocmd FileType vimshell nunmap <buffer> <C-d>
+augroup END
+
 " ku
 augroup vimrc-autocmd
     autocmd FileType ku
