@@ -1,10 +1,10 @@
 " ==================== Settings ==================== "
-" Define and reset augroup using in vimrc
+" Define and reset augroup used in vimrc
 augroup vimrc-autocmd
     autocmd!
 augroup END
 
-" get SID prefix of .vimrc
+" Get SID prefix of vimrc
 function! s:SID_PREFIX()
     return matchstr(expand('<sfile>'), '<SNR>\d\+_')
 endfunction
@@ -23,14 +23,13 @@ set smartindent " use smart indent
 set history=100 " number of command history
 
 " Input support
-set timeoutlen=500             " timeout for key mappings
-set backspace=indent,eol,start " to delete everything with backspace key
+set backspace=indent,eol,start " delete everything with backspace
 set formatoptions+=m           " add multibyte support
 set iskeyword+=-               " add keyword to '-'
-set nolinebreak                " don't auto line break
-set textwidth=0                " don't auto line break
-set iminsert=0                 " Disable input methods in insert mode
-set imsearch=0                 " Disable input methods in search mode
+set nolinebreak                " don't line break automatically
+set textwidth=0                " don't line break automatically
+set iminsert=0                 " disable input methods in insert mode
+set imsearch=0                 " disable input methods in search mode
 
 " Command completion
 set wildmenu                   " enhance command completion
@@ -42,11 +41,11 @@ set ignorecase " ignore case search
 set smartcase  " override 'ignorecase' if the search pattern contains upper case
 set incsearch  " incremental search
 set hlsearch   " highlight searched words
-nohlsearch     " avoid to highlight when reload vimrc
+nohlsearch     " avoid highlighting when reload vimrc
 
 " Reading and writing file
 set directory-=. " don't save tmp swap file in current directory
-set autoread     " auto reload when file rewrite other application
+set autoread     " auto re-read when the file is written by other application
 set hidden       " allow open other file without saving current file
 set tags=./tags; " search tag file recursively (see :h file-searching)
 
@@ -54,7 +53,7 @@ set tags=./tags; " search tag file recursively (see :h file-searching)
 set notitle                   " don't rewrite title string
 set showmatch                 " highlight correspods character
 set showcmd                   " show input command
-set number                    " show row number
+set number                    " show line number
 set wrap                      " wrap each lines
 set scrolloff=5               " minimal number of screen lines to keep above and below the cursor.
 set foldmethod=marker         " folding
@@ -166,6 +165,29 @@ set completeopt+=menuone " Display menu
 filetype indent on " to use filetype indent
 filetype plugin on " to use filetype plugin
 
+" Show quickfix automatically
+" Reference: http://webtech-walker.com/archive/2009/09/29213156.html
+augroup vimrc-autocmd
+    autocmd QuickfixCmdPost make,grep,grepadd,vimgrep
+    \   if len(getqflist()) != 0
+    \|      copen
+    \|  endif
+augroup END
+
+" Save and load fold settings automatically
+" Reference: http://vim-users.jp/2009/10/hack84/
+" Don't save options.
+set viewoptions-=options
+augroup vimrc-autocmd
+    autocmd BufWritePost *
+    \   if expand('%') != '' && &buftype !~ 'nofile'
+    \|      mkview
+    autocmd BufRead *
+    \   if expand('%') != '' && &buftype !~ 'nofile'
+    \|      silent loadview
+    \|  endif
+augroup END
+
 
 " ==================== Hightlight ==================== "
 augroup vimrc-autocmd
@@ -205,13 +227,13 @@ function! s:onColorScheme()
     endif
 endfunction
 
-syntax on " syntax coloring
+syntax on " enable syntax coloring
 
 " colorscheme
 if has('win32') && !has('gui')
     colorscheme desert
 else
-    " let g:zenburn_high_Contrast = 0
+    let g:zenburn_high_Contrast = 0
     colorscheme xoria256
 endif
 
@@ -252,7 +274,7 @@ function! s:commandMap(buffer, lhs, ...)
     execute 'nnoremap <silent>' buffer a:lhs ':<C-u>' . rhs . '<CR>'
 endfunction
 
-" Use display line
+" Use physical cursor movement
 NExchangeMap j gj
 " NExchangeMap k gk
 nnoremap <Plug>(arpeggio-default:k) gk
@@ -263,6 +285,11 @@ NExchangeMap 0 g0
 " Use beginning matches on command-line history
 CExchangeMap <C-p> <Up>
 CExchangeMap <C-n> <Down>
+
+" Allow undo for i_CTRL-u and i_CTRL-w
+" Reference: http://vim-users.jp/2009/10/hack81/
+inoremap <C-u> <C-g>u<C-u>
+inoremap <C-w> <C-g>u<C-w>
 
 " Folding
 " Reference: http://d.hatena.ne.jp/ns9tks/20080318/1205851539
@@ -504,6 +531,16 @@ function! s:kuCommonActionTabRight(item)
     CD
 endfunction
 
+call ku#custom_action('common', 'NERD_tree', s:SID_PREFIX() . 'kuCommonActionNERDTree')
+call ku#custom_key('common', 'n', 'NERD_tree')
+function! s:kuCommonActionNERDTree(item)
+    if isdirectory(a:item.word)
+        execute 'NERDTree' a:item.word
+    else
+        execute 'NERDTree' fnamemodify(a:item.word, ':h')
+    endif
+endfunction
+
 call ku#custom_prefix('common', '.vim', $HOME . '/.vim')
 call ku#custom_prefix('common', '~', $HOME)
 
@@ -525,16 +562,7 @@ let g:NERDTreeWinSize = 25
 CommandMap [Prefix]t     NERDTree
 CommandMap [Prefix]T     NERDTreeClose
 CommandMap [Prefix]<C-t> execute 'NERDTree' expand('%:p:h')
-Arpeggionmap nt :<C-u>NERDTreeToggle<CR>
-
-" add Tabpaged CD command to NERDTree
-augroup vimrc-autocmd
-    autocmd FileType nerdtree command! -buffer NERDTreeTabpageCd
-    \   let b:currentDir = NERDTreeGetCurrentPath().getDir().strForCd()
-    \|  echo 'TabpageCD to ' . b:currentDir
-    \|  execute 'TabpageCD' b:currentDir
-    autocmd FileType nerdtree CommandMap! ct NERDTreeTabpageCd
-augroup END
+Arpeggionmap <silent> nt :<C-u>NERDTreeToggle<CR>
 
 " Reload Firefox
 " Need MozRepl and +ruby
@@ -585,7 +613,7 @@ let g:html_use_css = 1
 let g:use_xhtml = 1
 let g:html_use_encoding = 'utf-8'
 
-" auto reloading vimrc
+" Auto reloading vimrc
 " Reference: http://vim-users.jp/2009/09/hack74/
 augroup vimrc-autocmd
     if has('gui_running')

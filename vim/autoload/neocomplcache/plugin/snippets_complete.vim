@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: snippets_complete.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 02 Oct 2009
+" Last Modified: 09 Oct 2009
 " Usage: Just source this file.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -23,9 +23,21 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 1.23, for Vim 7.0
+" Version: 1.25, for Vim 7.0
 "-----------------------------------------------------------------------------
 " ChangeLog: "{{{
+"   1.25:
+"    - Substitute tilde.
+"    - Fixed neocomplcache#plugin#snippets_complete#expandable()'s error.
+"    - Improved snippet menu.
+"    - Improved keymapping.
+"
+"   1.24:
+"    - Fixed fatal bug when snippet expand.
+"    - Fixed marker substitute bug.
+"    - Added NeoComplCacheEditRuntimeSnippets command.
+"    - Implemented filetype completion.
+"
 "   1.23:
 "    - Added select mode mappings.
 "    - Supported same filetype lists.
@@ -165,11 +177,12 @@ function! neocomplcache#plugin#snippets_complete#initialize()"{{{
     " Set snippets dir.
     let s:snippets_dir = split(globpath(&runtimepath, 'autoload/neocomplcache/plugin/snippets_complete'), '\n')
     if exists('g:NeoComplCache_SnippetsDir')
-        for dir in split(g:NeoComplCache_SnippetsDir, ',')
-            if !isdirectory(dir)
-                call mkdir(dir, 'p')
+        for l:dir in split(g:NeoComplCache_SnippetsDir, ',')
+            let l:dir = substitute(l:dir, '^\~', $HOME, '')
+            if !isdirectory(l:dir)
+                call mkdir(l:dir, 'p')
             endif
-            call add(s:snippets_dir, dir)
+            call add(s:snippets_dir, l:dir)
         endfor
     endif
 
@@ -184,8 +197,9 @@ function! neocomplcache#plugin#snippets_complete#initialize()"{{{
                     \'\${\d\+\%(:.\{-}\)\?\\\@<!}\|\$<\d\+\%(:.\{-}\)\?\\\@<!>\|\$\d\+'
     augroup END"}}}
 
-    command! -nargs=? NeoComplCacheEditSnippets call s:edit_snippets(<q-args>)
-    command! -nargs=? NeoComplCachePrintSnippets call s:print_snippets(<q-args>)
+    command! -nargs=? -complete=customlist,s:filetype_complete NeoComplCacheEditSnippets call s:edit_snippets(<q-args>, 0)
+    command! -nargs=? -complete=customlist,s:filetype_complete NeoComplCacheEditRuntimeSnippets call s:edit_snippets(<q-args>, 1)
+    command! -nargs=? -complete=customlist,s:filetype_complete NeoComplCachePrintSnippets call s:print_snippets(<q-args>)
 
     hi def link NeoComplCacheExpandSnippets Special
 
@@ -237,8 +251,12 @@ function! neocomplcache#plugin#snippets_complete#get_keyword_list(cur_keyword_st
         endfor
     endif
 
-    return sort(s:keyword_filter(l:snippets, a:cur_keyword_str), 'neocomplcache#compare_words')
+    return sort(s:keyword_filter(l:snippets, a:cur_keyword_str), 's:compare_words')
 endfunction"}}}
+
+function! s:compare_words(i1, i2)
+    return a:i1.menu > a:i2.menu ? 1 : a:i1.menu == a:i2.menu ? 0 : -1
+endfunction
 
 function! s:keyword_filter(list, cur_keyword_str)"{{{
     let l:keyword_escape = neocomplcache#keyword_escape(a:cur_keyword_str)
@@ -309,27 +327,18 @@ function! neocomplcache#plugin#snippets_complete#expandable()"{{{
         endfor
     endif
 
-    let l:cur_text = (col('.') < 2)? '' : getline('.')[: col('.')-2]
+    let l:cur_text = neocomplcache#get_cur_text()
     let l:cur_word = matchstr(l:cur_text, '\h\w*[^[:alnum:][:space:]]*$')
     return (has_key(l:snippets, l:cur_word) &&
-                \(l:snippets[l:cur_word].condition == 1 || eval(l:snippets[s:cur_word].condition)))
+                \(l:snippets[l:cur_word].condition == 1 || eval(l:snippets[l:cur_word].condition)))
                 \|| search('\${\d\+\%(:.\{-}\)\?\\\@<!}\|\$<\d\+\%(:.\{-}\)\?\\\@<!>', 'w') > 0
 endfunction"}}}
-
 function! neocomplcache#plugin#snippets_complete#get_cur_text()"{{{
-    if !exists('s:cur_text')
-        let s:cur_text = (col('.') < 2)? '' : getline('.')[: col('.')-2]
+    if mode() ==# 'i'
+        return matchstr(neocomplcache#get_cur_text(), '\h\w*[^[:alnum:][:space:]]*$')
+    else
+        return matchstr(s:cur_text, '\h\w*[^[:alnum:][:space:]]*$')
     endif
-
-    return s:cur_text
-endfunction"}}}
-
-function! s:get_cur_text()"{{{
-    let s:cur_text = (col('.') < 2)? '' : getline('.')[: col('.')-2]
-    let s:cur_word = matchstr(s:cur_text, '\h\w*[^[:alnum:][:space:]]*$')
-    let s:col = col('.')
-
-    return ''
 endfunction"}}}
 
 function! s:caching()"{{{
@@ -358,10 +367,13 @@ function! s:set_snippet_pattern(dict)"{{{
     let l:abbr_pattern = printf('%%.%ds..%%s', g:NeoComplCache_MaxKeywordWidth-10)
 
     let l:word = a:dict.word
-    if match(a:dict.word, '\${\d\+\%(:.\{-}\)\?\\\@<!}\|<\\n>') >= 0
+    if a:dict.word =~ '\${\d\+\%(:.\{-}\)\?\\\@<!}'
         let l:word .= '<expand>'
         let l:menu_pattern = '<Snip> %.'.g:NeoComplCache_MaxFilenameWidth.'s'
     else
+        if a:dict.word =~ '<\\n>'
+            let l:word .= '<expand>'
+        endif
         let l:menu_pattern = '[Snip] %.'.g:NeoComplCache_MaxFilenameWidth.'s'
     endif
     let l:abbr = has_key(a:dict, 'abbr')? a:dict.abbr : 
@@ -388,7 +400,14 @@ function! s:set_snippet_pattern(dict)"{{{
     return l:dict
 endfunction"}}}
 
-function! s:edit_snippets(filetype)"{{{
+function! s:filetype_complete(arglead, cmdline, cursorpos)"{{{
+    if len(split(a:cmdline)) > 1
+        return []
+    endif
+
+    return filter(keys(s:snippets), printf('v:val =~ "^%s"', a:arglead))
+endfunction"}}}
+function! s:edit_snippets(filetype, isruntime)"{{{
     if a:filetype == ''
         if &filetype == ''
             echo 'Filetype required'
@@ -402,7 +421,11 @@ function! s:edit_snippets(filetype)"{{{
 
     if !empty(s:snippets_dir)
         " Edit snippet file.
-        edit `=s:snippets_dir[-1].'/'.l:filetype.'.snip'`
+        if a:isruntime
+            edit `=s:snippets_dir[0].'/'.l:filetype.'.snip'`
+        else
+            edit `=s:snippets_dir[-1].'/'.l:filetype.'.snip'`
+        endif
     endif
 endfunction"}}}
 function! s:print_snippets(filetype)"{{{
@@ -506,7 +529,7 @@ function! s:load_snippets(snippets_file)"{{{
     return l:snippet
 endfunction"}}}
 
-function! s:snippets_expand()"{{{
+function! s:snippets_expand(cur_text, col)"{{{
     " Set buffer filetype.
     if &filetype == ''
         let l:ft = 'nothing'
@@ -528,10 +551,12 @@ function! s:snippets_expand()"{{{
         endfor
     endif
 
-    if has_key(l:snippets, s:cur_word)
-                \&& (l:snippets[s:cur_word].condition == 1 || eval(l:snippets[s:cur_word].condition))
-        let l:snippet = l:snippets[s:cur_word]
-        let l:cur_text = s:cur_text[: -1-len(s:cur_word)]
+    let l:cur_text = a:cur_text
+    let l:cur_word = matchstr(l:cur_text, '\h\w*[^[:alnum:][:space:]]*$')
+    if has_key(l:snippets, l:cur_word)
+                \&& (l:snippets[l:cur_word].condition == 1 || eval(l:snippets[l:cur_word].condition))
+        let l:snippet = l:snippets[l:cur_word]
+        let l:cur_text = l:cur_text[: -1-len(l:cur_word)]
 
         let l:snip_word = l:snippet.snip
         if l:snip_word =~ '`[^`]*`'
@@ -546,14 +571,14 @@ function! s:snippets_expand()"{{{
         let l:snippet.rank += 1
 
         " Insert snippets.
-        let l:next_line = getline('.')[s:col-1 :]
+        let l:next_line = getline('.')[a:col-1 :]
         call setline(line('.'), l:cur_text . l:snip_word . l:next_line)
         call setpos('.', [0, line('.'), len(l:cur_text)+len(l:snip_word)+1, 0])
         let l:old_col = len(l:cur_text)+len(l:snip_word)+1
 
         if l:snip_word =~ '<expand>$'
             call s:expand_newline()
-        elseif getline('.')[col('.')-1 :] != ''
+        elseif l:old_col < col('$')
             startinsert
         else
             startinsert!
@@ -580,7 +605,7 @@ function! s:snippets_expand()"{{{
         let s:end_snippet = 0
         let s:snippet_holder_cnt = 1
 
-        call s:search_outof_range()
+        call s:search_outof_range(a:col)
     endif
 
     let &iminsert = 0
@@ -635,17 +660,17 @@ function! s:search_snippet_range(start, end)"{{{
     while l:line <= a:end
         let l:match = match(getline(l:line), l:pattern)
         if l:match >= 0
-            let l:default = substitute(matchstr(getline(l:line), l:pattern2), '\\\(.\)', '\1', 'g')
+            let l:default = substitute(matchstr(getline(l:line), l:pattern2), '\\\ze.', '', 'g')
             let l:match_len2 = len(l:default)
 
             if s:search_sync_placeholder(a:start, a:end, s:snippet_holder_cnt)
                 " Substitute holder.
-                call setline(l:line, substitute(getline('.'), l:pattern, '\$<'.s:snippet_holder_cnt.':\1>', ''))
+                call setline(l:line, substitute(getline(l:line), l:pattern, '\$<'.s:snippet_holder_cnt.':'.escape(l:default, '\').'>', ''))
                 call setpos('.', [0, l:line, l:match+1 + len('$<'.s:snippet_holder_cnt.':'), 0])
                 let l:pos = l:match+1 + len('$<'.s:snippet_holder_cnt.':')
             else
                 " Substitute holder.
-                call setline(line('.'), substitute(getline('.'), l:pattern, escape(l:default, '\'), ''))
+                call setline(l:line, substitute(getline(l:line), l:pattern, escape(l:default, '\'), ''))
                 call setpos('.', [0, l:line, l:match+1, 0])
                 let l:pos = l:match+1
             endif
@@ -675,64 +700,27 @@ function! s:search_snippet_range(start, end)"{{{
 
     return 0
 endfunction"}}}
-function! s:search_sync_placeholder(start, end, number)"{{{
-    let l:line = a:start
-    let l:pattern = '\$'.a:number.'\%($\|[^[:digit:]]\)'
-
-    while l:line <= a:end
-        if getline(l:line) =~ l:pattern
-            return 1
-        endif
-
-        " Next line.
-        let l:line += 1
-    endwhile
-
-    return 0
-endfunction"}}}
-function! s:substitute_marker(start, end)"{{{
-    if s:snippet_holder_cnt > 1
-        let l:cnt = s:snippet_holder_cnt-1
-        let l:marker = '\$<'.l:cnt.'\%(:.\{-}\)\?\\\@<!>'
-        let l:line = a:start
-        while l:line <= a:end
-            if getline(l:line) =~ l:marker
-                let l:sub = escape(matchstr(getline(l:line), '\$<'.l:cnt.':\zs.*\ze\\\@<!>'), '/\')
-                silent! execute printf('%d,%ds/$%d\%($\|[^[:digit:]]\)/%s/g', 
-                            \a:start, a:end, l:cnt, l:sub)
-                silent! execute l:line.'s/'.l:marker.'/'.l:sub.'/'
-                break
-            endif
-
-            let l:line += 1
-        endwhile
-    elseif search('\$<\d\+\%(:.\{-}\)\?\\\@<!>', 'wb') > 0
-        let l:sub = escape(matchstr(getline('.'), '\$<\d\+:\zs.*\ze\\\@<!>'), '/\')
-        let l:cnt = matchstr(getline('.'), '\$<\zs\d\+\ze\%(:.\{-}\)\?\\\@<!>')
-        silent! execute printf('%%s/$%d\%($\|[^[:digit:]]\)/%s/g', l:cnt, l:sub)
-        silent! execute '%s/'.'\$<'.l:cnt.'\%(:.\{-}\)\?\\\@<!>'.'/'.l:sub.'/'
-    endif
-endfunction"}}}
-function! s:search_outof_range()"{{{
+function! s:search_outof_range(col)"{{{
     call s:substitute_marker(1, 0)
     
     let l:pattern = '\${\d\+\%(:.\{-}\)\?\\\@<!}'
     if search(l:pattern, 'w') > 0
-        let l:match = match(getline('.'), '\${\d\+\%(:.\{-}\)\?\\\@<!}')
-        let l:default = substitute(matchstr(getline(l:line), l:pattern2), '\\\(.\)', '\1', 'g')
-        let l:match_len2 = len(l:default)
         let l:line = line('.')
+        let l:match = match(getline(l:line), l:pattern)
+        let l:pattern2 = '\${\d\+:\zs.\{-}\ze\\\@<!}'
+        let l:default = substitute(matchstr(getline(l:line), l:pattern2), '\\\ze.', '', 'g')
+        let l:match_len2 = len(l:default)
 
         " Substitute holder.
-        let l:cnt = matchstr(getline('.'), '\${\zs\d\+\ze\%(:.\{-}\)\?\\\@<!}')
-        if search('\$'.l:cnt.'\%($\|[^[:digit:]]\)', 'nw') > 0
+        let l:cnt = matchstr(getline(l:line), '\${\zs\d\+\ze\%(:.\{-}\)\?\\\@<!}')
+        if search('\$'.l:cnt.'\d\@!', 'nw') > 0
             let l:pattern = '\${' . l:cnt . '\%(:.\{-}\)\?\\\@<!}'
-            call setline(l:line, substitute(getline('.'), l:pattern, '\$<'.s:snippet_holder_cnt.':\1>', ''))
+            call setline(l:line, substitute(getline(l:line), l:pattern, '\$<'.s:snippet_holder_cnt.':'.escape(l:default, '\').'>', ''))
             call setpos('.', [0, l:line, l:match+1 + len('$<'.l:cnt.':'), 0])
             let l:pos = l:match+1 + len('$<'.l:cnt.':')
         else
             " Substitute holder.
-            call setline(line('.'), substitute(getline('.'), l:pattern, escape(l:default, '\'), ''))
+            call setline(l:line, substitute(getline(l:line), l:pattern, escape(l:default, '\'), ''))
             call setpos('.', [0, l:line, l:match+1, 0])
             let l:pos = l:match+1
         endif
@@ -754,7 +742,58 @@ function! s:search_outof_range()"{{{
         else
             startinsert!
         endif
+    elseif a:col == 1
+        call setpos('.', [0, line('.'), 1, 0])
+        startinsert
+    elseif a:col == col('$')
+        startinsert!
+    else
+        call setpos('.', [0, line('.'), a:col+1, 0])
+        startinsert
     endif
+endfunction"}}}
+function! s:search_sync_placeholder(start, end, number)"{{{
+    let l:line = a:start
+    let l:pattern = '\$'.a:number.'\d\@!'
+
+    while l:line <= a:end
+        if getline(l:line) =~ l:pattern
+            return 1
+        endif
+
+        " Next line.
+        let l:line += 1
+    endwhile
+
+    return 0
+endfunction"}}}
+function! s:substitute_marker(start, end)"{{{
+    if s:snippet_holder_cnt > 1
+        let l:cnt = s:snippet_holder_cnt-1
+        let l:marker = '\$<'.l:cnt.'\%(:.\{-}\)\?\\\@<!>'
+        let l:line = a:start
+        while l:line <= a:end
+            if getline(l:line) =~ l:marker
+                let l:sub = escape(matchstr(getline(l:line), '\$<'.l:cnt.':\zs.\{-}\ze\\\@<!>'), '/\')
+                silent! execute printf('%d,%ds/$%d\d\@!/%s/g', 
+                            \a:start, a:end, l:cnt, l:sub)
+                silent! execute l:line.'s/'.l:marker.'/'.l:sub.'/'
+                break
+            endif
+
+            let l:line += 1
+        endwhile
+    elseif search('\$<\d\+\%(:.\{-}\)\?\\\@<!>', 'wb') > 0
+        let l:sub = escape(matchstr(getline('.'), '\$<\d\+:\zs.\{-}\ze\\\@<!>'), '/\')
+        let l:cnt = matchstr(getline('.'), '\$<\zs\d\+\ze\%(:.\{-}\)\?\\\@<!>')
+        silent! execute printf('%%s/$%d\d\@!/%s/g', l:cnt, l:sub)
+        silent! execute '%s/'.'\$<'.l:cnt.'\%(:.\{-}\)\?\\\@<!>'.'/'.l:sub.'/'
+    endif
+endfunction"}}}
+function! s:expand_trigger(function)"{{{
+    let l:cur_text = neocomplcache#get_cur_text()
+    let s:cur_text = l:cur_text
+    return printf("\<ESC>:call %s(%s,%d)\<CR>", a:function, string(l:cur_text), col('.'))
 endfunction"}}}
 
 function! s:SID_PREFIX()
@@ -762,7 +801,7 @@ function! s:SID_PREFIX()
 endfunction
 
 " Plugin key-mappings.
-execute 'inoremap <silent><expr> <Plug>(neocomplcache_snippets_expand)  ' . s:SID_PREFIX() . 'get_cur_text()."\<C-o>:\<C-u>call ".<SID>SID_PREFIX()."snippets_expand()\<CR>"'
-execute 'snoremap <silent><expr> <Plug>(neocomplcache_snippets_expand)  ' .  s:SID_PREFIX() . 'get_cur_text()."\<ESC>:\<C-u>call ".<SID>SID_PREFIX()."snippets_expand()\<CR>"'
+inoremap <silent><expr> <Plug>(neocomplcache_snippets_expand) <SID>expand_trigger(<SID>SID_PREFIX().'snippets_expand')
+snoremap <silent><expr> <Plug>(neocomplcache_snippets_expand) <SID>expand_trigger(<SID>SID_PREFIX().'snippets_expand')
 
 " vim: foldmethod=marker

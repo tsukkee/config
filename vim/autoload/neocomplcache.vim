@@ -83,7 +83,7 @@ function! neocomplcache#enable() "{{{
     call s:set_keyword_pattern('tex',
                 \'\v\\\a\{\a{1,2}}|\\[[:alpha:]@][[:alnum:]@]*[[{]?|\a[[:alnum:]:]*[*[{]?')
     call s:set_keyword_pattern('sh,zsh',
-                \'\v\$\w+|[[:alpha:]_.-][[:alnum:]_.-]*%(\s*[[(])?')
+                \'\v\$\w+|[[:alpha:]_.-][[:alnum:]_.-]*%(\s*\[|\s*\(\)?)?')
     call s:set_keyword_pattern('vimshell',
                 \'\v\$\$?\w*|[[:alpha:]_.-][[:alnum:]_.-]*|\d+%(\.\d+)+')
     call s:set_keyword_pattern('ps1',
@@ -115,7 +115,7 @@ function! neocomplcache#enable() "{{{
     call s:set_keyword_pattern('erlang',
                 \'\v^\s*-\h\w*[(]?|\h\w*%(:\h\w*)*%(\.|\(\)?)?')
     call s:set_keyword_pattern('html,xhtml,xml',
-                \'\v[[:alnum:]_-]*\>|\</?%([[:alnum:]_-]+\s*)?%(/?\>)?|\&\h%(\w*;)?|\h[[:alnum:]_-]*%(\=")?|\<[^>]+\>')
+                \'\v[[:alnum:]_:-]*\>|\</?%([[:alnum:]_:-]+\s*)?%(/?\>)?|\&\h%(\w*;)?|\h[[:alnum:]_:-]*%(\=")?|\<[^>]+\>')
     call s:set_keyword_pattern('css',
                 \'\v[[:alpha:]_-][[:alnum:]_-]*[:(]?|[@#:.][[:alpha:]_-][[:alnum:]_-]*')
     call s:set_keyword_pattern('tags',
@@ -130,6 +130,8 @@ function! neocomplcache#enable() "{{{
                 \'\v[%$.]?\h\w*%(\$\h\w*)?')
     call s:set_keyword_pattern('make',
                 \'\v[[:alpha:]_.-][[:alnum:]_.-]*')
+    call s:set_keyword_pattern('scala',
+                \'\v[.]?\h\w*%(\s*\(\)?|\[)?')
     "}}}
 
     " Initialize same file type lists."{{{
@@ -203,7 +205,7 @@ endfunction"}}}
 function! neocomplcache#manual_complete(findstart, base)"{{{
     if a:findstart
         " Get cursor word.
-        let l:cur_text = (col('.') < 2)? '' : getline('.')[: col('.')-2]
+        let l:cur_text = neocomplcache#get_cur_text()
 
         if !neocomplcache#plugin#buffer_complete#exists_current_source()
             let s:complete_words = []
@@ -437,7 +439,7 @@ function! neocomplcache#get_quickmatch_list(list, cur_keyword_pos, cur_keyword_s
             " Set prefix.
             let l:prefix = ''
             if a:type != 'keyword_complete' && a:type != s:prev_quickmatch_type
-                let l:cur_text = (col('.') < 2)? '' : getline('.')[: col('.')-2]
+                let l:cur_text = neocomplcache#get_cur_text()
                 let l:quick_keyword_pos = call(a:type . 'get_keyword_pos', [l:cur_text])
 
                 if l:quick_keyword_pos > a:cur_keyword_pos
@@ -466,7 +468,7 @@ function! neocomplcache#get_quickmatch_list(list, cur_keyword_pos, cur_keyword_s
                 " Set prefix.
                 let l:prefix = ''
                 if a:type != 'keyword_complete' && a:type != s:prev_quickmatch_type
-                    let l:cur_text = (col('.') < 2)? '' : getline('.')[: col('.')-2]
+                    let l:cur_text = neocomplcache#get_cur_text()
                     let l:quick_keyword_pos = call(a:type . 'get_keyword_pos', [l:cur_text])
 
                     if l:quick_keyword_pos > a:cur_keyword_pos
@@ -574,6 +576,12 @@ endfunction"}}}
 function! neocomplcache#caching_percent()"{{{
     return neocomplcache#plugin#buffer_complete#caching_percent("")
 endfunction"}}}
+
+function! neocomplcache#get_cur_text()"{{{
+    let l:pos = mode() ==# 'i' ? 2 : 1
+
+    return col('.') < l:pos ? '' : getline('.')[: col('.') - l:pos]
+endfunction"}}}
 "}}}
 
 " Complete internal functions."{{{
@@ -586,7 +594,7 @@ function! s:complete()"{{{
 
     if g:NeoComplCache_EnableSkipCompletion"{{{
         if split(reltimestr(reltime(s:prev_input_time)))[0] < g:NeoComplCache_SkipInputTime
-            let l:cur_text = (col('.') < 2)? '' : getline('.')[: col('.')-2]
+            let l:cur_text = neocomplcache#get_cur_text()
             let l:pattern = '\v%(' .  neocomplcache#plugin#buffer_complete#current_keyword_pattern() . ')$'
             let l:cur_keyword_str = matchstr(l:cur_text, l:pattern)
 
@@ -628,7 +636,7 @@ function! s:complete()"{{{
     endif
 
     " Get cursor word.
-    let l:cur_text = (col('.') < 2)? '' : getline('.')[: col('.')-2]
+    let l:cur_text = neocomplcache#get_cur_text()
     " Prevent infinity loop.
     " Not complete multi byte character for ATOK X3.
     if l:cur_text == s:old_text || l:cur_text == '' || char2nr(l:cur_text[-1]) >= 0x80
@@ -642,64 +650,68 @@ function! s:complete()"{{{
     " Reset quick match flag.
     let s:quickmatched = 0
 
+    " Set function.
+    let &l:completefunc = 'neocomplcache#auto_complete'
     " Try complfuncs completion."{{{
+    let l:cur_keyword_pos = -1
+    let l:complete_words = []
+    let s:skipped = 0
     for l:complfunc in s:complfuncs_func_table
-        let l:cur_keyword_pos = call(l:complfunc . 'get_keyword_pos', [l:cur_text])
+        let l:keyword_pos = call(l:complfunc . 'get_keyword_pos', [l:cur_text])
 
-        if l:cur_keyword_pos >= 0
-            let l:cur_keyword_str = l:cur_text[l:cur_keyword_pos :]
+        if l:keyword_pos >= 0 &&
+                    \(l:cur_keyword_pos == -1 || l:cur_keyword_pos == l:keyword_pos)
+            let l:keyword_str = l:cur_text[l:keyword_pos :]
 
             " Save options.
             let l:ignorecase_save = &ignorecase
 
-            if g:NeoComplCache_SmartCase && l:cur_keyword_str =~ '\u'
+            if g:NeoComplCache_SmartCase && l:keyword_str =~ '\u'
                 let &ignorecase = 0
             else
                 let &ignorecase = g:NeoComplCache_IgnoreCase
             endif
 
-            " Set function.
-            let &l:completefunc = 'neocomplcache#auto_complete'
+            let l:words = neocomplcache#get_quickmatch_list(call(l:complfunc . 'get_complete_words', [l:keyword_pos, l:keyword_str]),
+                    \ l:keyword_pos, l:keyword_str, l:complfunc)
 
-            let s:complete_words = neocomplcache#get_quickmatch_list(call(l:complfunc . 'get_complete_words', [l:cur_keyword_pos, l:cur_keyword_str]),
-                    \ l:cur_keyword_pos, l:cur_keyword_str, l:complfunc)
-            let s:complete_words = neocomplcache#remove_next_keyword(s:complete_words)
-
-            " Restore option.
             let &ignorecase = l:ignorecase_save
 
-            if !empty(s:complete_words)
-                " Start auto complete.
-                let s:cur_keyword_pos = l:cur_keyword_pos
-                let s:cur_keyword_str = l:cur_keyword_str
-                let s:skipped = 0
-
-                if s:quickmatched && len(s:complete_words) == 1
-                    call feedkeys("\<C-x>\<C-u>", 'n')
-                else
-                    call feedkeys("\<C-x>\<C-u>\<C-p>", 'n')
-                endif
+            if !empty(l:words)
+                let l:complete_words += neocomplcache#remove_next_keyword(l:words)
+                let l:cur_keyword_pos = l:keyword_pos
+                let l:cur_keyword_str = l:keyword_str
 
                 let s:prepre_quickmatch_type = s:prev_quickmatch_type
                 let s:prev_quickmatch_type = l:complfunc
-
-                return
             endif
-
-            let &l:completefunc = 'neocomplcache#manual_complete'
 
             if s:skipped
                 let s:prev_numbered_list = []
                 let s:prepre_numbered_list = []
+                return
             endif
-
-            return
         endif
     endfor
     "}}}
 
-    let s:prev_numbered_list = []
-    let s:prepre_numbered_list = []
+    if empty(l:complete_words)
+        let s:prev_numbered_list = []
+        let s:prepre_numbered_list = []
+        return
+    endif
+
+    " Start auto complete.
+    let s:cur_keyword_pos = l:cur_keyword_pos
+    let s:cur_keyword_str = l:cur_keyword_str
+    let s:skipped = 0
+    let s:complete_words = l:complete_words
+
+    if s:quickmatched && len(s:complete_words) == 1
+        call feedkeys("\<C-x>\<C-u>", 'n')
+    else
+        call feedkeys("\<C-x>\<C-u>\<C-p>", 'n')
+    endif
 endfunction"}}}
 
 " Fast filters.
@@ -829,7 +841,7 @@ function! neocomplcache#undo_completion()"{{{
     endif
 
     " Get cursor word.
-    let l:cur_text = (col('.') < 2)? '' : getline('.')[: col('.')-2]
+    let l:cur_text = neocomplcache#get_cur_text()
 
     if !neocomplcache#plugin#buffer_complete#exists_current_source()
         return ''
