@@ -51,49 +51,6 @@ nnoremap gh :nohl<CR>:offwordhighlight<CR>
 " toggle autopagerize
 nnoremap a :toggleautopagerize<CR>
 
-" toggle guioptions
-js <<EOM
-(function() {
-    let guioptions = options.get("guioptions");
-    let original = guioptions.value;
-
-    mappings.addUserMap([modes.NORMAL], ["I"],
-        "toggle guioptions",
-        function() {
-            if(guioptions.value != original)
-                guioptions.set(original);
-            else
-                guioptions.set("TBrbN");
-        });
-})();
-EOM
-
-" javascript
-js <<EOM
-commands.addUserCommand(["javascriptincontent", "jsc"],
-    "Run a JavaScript command in content context",
-    function (args)
-    {
-        try
-        {
-            let s = new Components.utils.Sandbox(buffer.URL);
-            s.window = content.window;
-            s.document = content.document;
-            // s.__proto__ = content.window.wrappedJSObject;
-            return Components.utils.evalInSandbox(args.string, s);
-        }
-        catch (e)
-        {
-            liberator.echoerr(e);
-        }
-    },
-    {
-        completer: function (context) completion.javascript(context),
-        hereDoc: true,
-        literal: 0
-    });
-EOM
-
 " dispatch mouse event
 js <<EOM
 (function() {
@@ -127,24 +84,6 @@ commands.addUserCommand(["offwordhighlight"],
 EOM
 
 
-" ==================== hints ==================== "
-js <<EOM
-hints.addMode("i", "Focus to input",
-    function(element) element.focus(),
-    function() "//input[not(@type='hidden')] | //textarea | //xhtml:input[not(@type='hidden')] | //xhtml:textarea"
-    );
-
-// require FireBug
-hints.addMode("x", "copy XPath",
-    function(element) {
-        let xpath = FBL.getElementXPath(element);
-        liberator.echo(xpath);
-        util.copyToClipboard(xpath);
-    },
-    function() "//*");
-EOM
-
-
 " ==================== plugin options ==================== "
 
 " commandBookmarklet
@@ -153,30 +92,6 @@ let command_bookmarklet_prefix=""
 " sbmincsearch
 let sbmincsearch_service_name = "delicious"
 let sbmincsearch_max = 15
-
-" migratestatusbar
-javascript <<EOM
-liberator.globalVariables.migrate_elements = [
-    {
-        // icon that show the existence of RSS and Atom on current page
-        id:    'feed-button',
-        dest:  'security-button',
-        after: true,
-    },
-    {
-        // star button of awesome bar
-        id:    'star-button',
-        dest:  'security-button',
-        after: true,
-    },
-    /*{
-        // favicon of awesome bar
-        id:    'page-proxy-stack',
-        dest:  'liberator-statusline',
-        after: false,
-    },*/
-];
-EOM
 
 
 " ==================== colorscheme ==================== "

@@ -245,3 +245,6 @@ key.setGlobalKey('C-r', function() {
     userscript.reload();
 }, '設定ファイルを再読み込み');
 
+key.setViewKey('o', function () {
+    command.focusToById("urlbar");
+}, 'ロケーションバーへフォーカス');

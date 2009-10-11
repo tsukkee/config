@@ -20,7 +20,8 @@ addMap(["gt"],
             gBrowser.mTabContainer.advanceSelectedTab(+1, true);
         }
     },
-    { flags: Mappings.flags.COUNT });
+    { count: true });
+    //{ flags: Mappings.flags.COUNT });
 
 addMap(["<C-n>", "<C-Tab>", "<C-PageDown>"],
     "Go to the next tab with skipping collapsed tab tree",
@@ -30,7 +31,8 @@ addMap(["<C-n>", "<C-Tab>", "<C-PageDown>"],
             gBrowser.mTabContainer.advanceSelectedTab(+1, true);
         }
     },
-    { flags: Mappings.flags.COUNT });
+    { count: true });
+    // { flags: Mappings.flags.COUNT });
 
 addMap(["gT", "<C-p>", "<C-S-Tab>", "<C-PageUp>"],
     "Go to the  previous tab with skipping collapsed tab tree",
@@ -40,7 +42,8 @@ addMap(["gT", "<C-p>", "<C-S-Tab>", "<C-PageUp>"],
             gBrowser.mTabContainer.advanceSelectedTab(-1, true);
         }
     },
-    { flags: Mappings.flags.COUNT });
+    { count: true });
+    // { flags: Mappings.flags.COUNT });
 
 addMap(["zc"], "Collapse Subtree", function() {
     gBrowser.treeStyleTab.collapseExpandSubtree(gBrowser.selectedTab, true);

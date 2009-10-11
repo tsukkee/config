@@ -1,8 +1,8 @@
 // vimperatorのstatuslineのurl表示をlocationbar2みたいにする
 (function() {
-    // setting 
+    // setting
     const liberatorNS = "http://vimperator.org/namespaces/liberator";
-    var separator_char = "/";
+    let separator_char = "/";
     updateSeparator();
 
     // services
@@ -12,33 +12,34 @@
         .getService(Ci.nsIEffectiveTLDService);
 
     // statusline
-    var statusline = document.getElementById("liberator-statusline");
+    let statusline = document.getElementById("liberator-statusline");
 
     // original
-    var field_url = document.getElementById("liberator-statusline-field-url");
+    let field_url = document.getElementById("liberator-statusline-field-url");
     field_url.style.display = "none";
 
     // colorized
-    var colorized_field_url = document.createElement("hbox");
+    let colorized_field_url = document.createElement("hbox");
     colorized_field_url.setAttribute("flex", 1);
     colorized_field_url.setAttribute("readonly", false);
     colorized_field_url.setAttribute("crop", "end");
+    colorized_field_url.setAttribute("class", "plain");
     setupNode(colorized_field_url, "");
 
     // build nodes
-    var nodes = {};
-    var structure = {
+    let nodes = {};
+    let structure = {
         prePath:  ["protocol", "subdomain", "domain", "port"],
         dirs:     [],
         postPath: ["separator", "file", "query", "fragment", "indicator"]
     };
-    
-    for(var hboxName in structure) {
-        var box = nodes[hboxName] = document.createElement("hbox");
+
+    for(let hboxName in structure) {
+        let box = nodes[hboxName] = document.createElement("hbox");
         setupNode(box, hboxName);
 
         structure[hboxName].forEach(function(name) {
-            var node = nodes[name] = document.createElement("label");
+            let node = nodes[name] = document.createElement("label");
             setupNode(node, name);
 
             nodes[hboxName].appendChild(node);
@@ -51,7 +52,7 @@
 
     // click event
     colorized_field_url.addEventListener("click", function(e) {
-        var target = e.target;
+        let target = e.target;
 
         if(target.href) {
             liberator.open(target.href, (e.button == 1 || e.ctrlKey || e.metaKey)
@@ -60,17 +61,18 @@
     }, false);
 
     // proto
-    var dirNodeProto = document.createElement("label");
+    let dirNodeProto = document.createElement("label");
     setupNode(dirNodeProto, "dir");
-    var separatorNodeProto = document.createElement("label");
+    let separatorNodeProto = document.createElement("label");
     setupNode(separatorNodeProto, "separator");
 
     // update
-    var update = function() {
-        var url = buffer.URL;
-        var pathSegments = "";
+    let update = function() {
+        let url = buffer.URL;
+        let pathSegments = "";
         let [, original_url, indicator] = field_url.value.match(/^\s*([^[]*)\s*(\[[^[]*\])?/);
-        var isHelp = false;
+        let isHelp = false;
+        let prePathHref = "";
 
         // about:*
         if(url.match(/^about:/)) {
@@ -84,7 +86,7 @@
 
             indicator = "[" + url.replace(/^about:/, "") + "]";
         }
-        
+
         // help
         else if(url.match(/^chrome:\/\/liberator\/locale\//)) {
             // clear
@@ -104,7 +106,7 @@
             updateSeparator();
 
             // create nsIURI object
-            var uri = null;
+            let uri = null;
             try {
                 uri = IOService.newURI(buffer.URL, null, null);
             }
@@ -116,18 +118,18 @@
             // protocol
             nodes["protocol"].value = uri.scheme + "://";
 
-            var host = uri.host; 
+            let host = uri.host;
             if(host) {
                 // subdomain
                 try {
-                    var baseDomain = TLDSercie.getBaseDomainFromHost(host);
+                    let baseDomain = TLDSercie.getBaseDomainFromHost(host);
                     nodes["subdomain"].value = host.substring(0, host.lastIndexOf(baseDomain));
                     host = baseDomain;
                 }
                 catch (e) {
-                    nodes["subdomain"].value = "";    
+                    nodes["subdomain"].value = "";
                 }
-                
+
                 // domain
                 nodes["domain"].value = host;
             }
@@ -145,7 +147,7 @@
             }
 
             // prePath href
-            var prePathHref = nodes.prePath.href
+            prePathHref = nodes.prePath.href
                 = nodes.protocol.value + nodes.subdomain.value 
                 + nodes.domain.value + nodes.port.value + "/";
 
@@ -157,7 +159,7 @@
         }
 
         // fragment
-        var iFragment = pathSegments.indexOf("#");
+        let iFragment = pathSegments.indexOf("#");
         if (iFragment > -1) {
             nodes["fragment"].value = pathSegments.substring(iFragment);
             pathSegments = pathSegments.substring(0, iFragment);
@@ -167,7 +169,7 @@
         }
 
         // query
-        var iQuery = pathSegments.indexOf("?");
+        let iQuery = pathSegments.indexOf("?");
         if (iQuery > -1) {
             nodes["query"].value = pathSegments.substring(iQuery);
             pathSegments = pathSegments.substring(0, iQuery);
@@ -185,20 +187,20 @@
         nodes["indicator"].value = indicator || "[ ]";
 
         // dirs
-        var dirs = nodes.dirs;
+        let dirs = nodes.dirs;
         while(dirs.childNodes.length > 0) {
             dirs.removeChild(dirs.firstChild);
         }
 
-        var href = prePathHref;
-        for (var i = 0, len = pathSegments.length; i < len; i++) {
+        let href = prePathHref;
+        for (let i = 0, len = pathSegments.length; i < len; i++) {
             // separator
-            var separator = separatorNodeProto.cloneNode(true);
+            let separator = separatorNodeProto.cloneNode(true);
             separator.value = separator_char;
             dirs.appendChild(separator);
 
             // dir
-            var dir = dirNodeProto.cloneNode(true);
+            let dir = dirNodeProto.cloneNode(true);
             dir.value = pathSegments[i];
             dir.href = (href += pathSegments[i] + "/");
             dirs.appendChild(dir);
@@ -243,13 +245,13 @@
 
         return highlightPrefix + name.charAt(0).toUpperCase() + name.substr(1);
     }
-    
+
     // highlight
     // default highlight
-    var css = <![CDATA[
+    let css = <![CDATA[
         ColorizeUrl                 margin-left: 5px; font-weight: normal;
-        ColorizeUrl>*               margin: 0; 
-        ColorizeUrl:hover             
+        ColorizeUrl>*               margin: 0;
+        ColorizeUrl:hover
         ColorizeUrlPrePath
         ColorizeUrlPrePath>*        margin: 0;
         ColorizeUrlPrePath:hover    text-decoration: underline;
@@ -260,7 +262,7 @@
         ColorizeUrlPostPath>*       margin: 0;
         ColorizeUrlPostPath:hover
         ColorizeUrlSeparator
-        ColorizeUrlSeparator:hover  
+        ColorizeUrlSeparator:hover
 
         ColorizeUrlProtocol
         ColorizeUrlProtocol:hover
@@ -278,11 +280,10 @@
         ColorizeUrlQuery:hover      text-decoration: underline
         ColorizeUrlFragment         color: #666;
         ColorizeUrlFragment:hover   text-decoration: underline
-        ColorizeUrlIndicator        margin-left: 5px; font-weight: bold; 
-        ColorizeUrlIndicator:hover  
+        ColorizeUrlIndicator        margin-left: 5px; font-weight: bold;
+        ColorizeUrlIndicator:hover
     ]]>.toString();
 
     // append plugins style
-    highlight.CSS = (Highlights.prototype.CSS += "\n" + css);
-    highlight.reload();
+    highlight.loadCSS(highlight.CSS + "\n" + css);
 })();
