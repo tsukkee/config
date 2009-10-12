@@ -367,7 +367,7 @@ endif
 
 command! GoToAlternateTab silent execute 'tabnext' g:AlternateTabNumber
 CommandMap g<C-^> GoToAlternateTab
-Arpeggionnoremap <silent> at :<C-u>GoToAlternateTab<CR>
+Arpeggionnoremap <silent> al :<C-u>GoToAlternateTab<CR>
 
 augroup vimrc-autocmd
     autocmd TabLeave * let g:AlternateTabNumber = tabpagenr()
@@ -552,10 +552,10 @@ CommandMap [Prefix]km Ku mrufile
 CommandMap [Prefix]ks Ku source
 CommandMap [Prefix]kt Ku tags
 CommandMap [Prefix]h  Ku tags/help
-Arpeggionnoremap kb :<C-u>Ku buffer<CR>
-Arpeggionnoremap kf :<C-u>Ku file<CR>
-Arpeggionnoremap km :<C-u>Ku mrufile<CR>
-Arpeggionnoremap ke :<C-u>Ku tags/help<CR>
+Arpeggionnoremap <silent> kb :<C-u>Ku buffer<CR>
+Arpeggionnoremap <silent> kf :<C-u>Ku file<CR>
+Arpeggionnoremap <silent> km :<C-u>Ku mrufile<CR>
+Arpeggionnoremap <silent> ke :<C-u>Ku tags/help<CR>
 
 " NERDTree
 let g:NERDTreeWinSize = 25
