@@ -296,11 +296,11 @@ inoremap <C-w> <C-g>u<C-w>
 " hold with 'h' if the cursor is on the head of line
 nnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zc' : 'h'
 " expand with 'l' if the cursor on the holded text
-nnoremap <expr> l foldclosed(line('.')) != -1 ? 'zo' : 'l'
+nnoremap <expr> <Plug>(arpeggio-default:l) foldclosed(line('.')) != -1 ? 'zo' : 'l'
 " hold with 'h' if the cursor is on the head of line in visual mode
 vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
 " expand with 'l' if the cursor on the holded text in visual mode
-vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
+vnoremap <expr> <Plug>(arpeggio-default:l) foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 
 " Delete highlight
 CommandMap gh nohlsearch

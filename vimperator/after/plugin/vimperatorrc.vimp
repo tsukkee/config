@@ -4,10 +4,10 @@ set complete=stIl
 
 " feedSomeKey
 autocmd LocationChange .* fmapc
-autocmd LocationChange reader\\.livedoor\\.com/reader fmap s a r c j k <Space> <S-Space> z b p o v > J < K
-autocmd LocationChange fastladder\\.com/reader fmap s a r c j k <Space> <S-Space> z b p o v > J < K
-autocmd LocationChange mail\\.google\\.com/mail fmap -d 4 u k j o <CR> p n c ? x s y e m ! #
-autocmd LocationChange www\\.tumblr\\.com/dashboard fmap -vkey -event keydown j k
+autocmd LocationChange 'reader\.livedoor\.com/reader' fmap! s a r c j k f,j F,k <Space> <S-Space> z b p o v > J < K
+autocmd LocationChange 'fastladder\.com/reader'       fmap! s a r c j k f,j F,k <Space> <S-Space> z b p o v > J < K
+autocmd LocationChange 'mail\.google\.com/mail'       fmap! -d 4 u k j o <CR> p n c ? x s y e m ! #
+autocmd LocationChange 'www\.tumblr\.com/dashboard'   fmap! -vkey -event keydown j k
 
 " arpeggio
 js <<EOF
