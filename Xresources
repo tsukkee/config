@@ -1,7 +1,0 @@
-! *inputMethod: kinput2_macim
-! kinput2_macim*OverTheSpotConversion*modeShell.borderWidth: 0
-! kinput2_macim*OverTheSpotConversion.useOverrideShellForMode: true
-! kinput2_macim*SeparateConversion.input: false
-! kinput2_macim*selectionShell.input: false
-! kinput2_macim*auxShell.input: false
-kinput2*ConversionStartKeys: Mod2<Key>space

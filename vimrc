@@ -495,6 +495,8 @@ augroup vimrc-autocmd
 augroup END
 
 " ku
+let g:ku_mrufile_size = 1000
+
 augroup vimrc-autocmd
     autocmd FileType ku
     \    call ku#default_key_mappings(1)

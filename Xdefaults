@@ -1,14 +1,12 @@
 URxvt.termName: rxvt-256color
 URxvt.foreground: White
 URxvt.background: Gray10
-URxvt.saveLines: 1000
-URxvt.scrollstyle: rxvt
-URxvt.scrollBar_right: true
 URxvt.geometry: 110x35
-URxvt.shading: 10
+URxvt.scrollBar: false
+URxvt.saveLines: 1000
 
 URxvt.font:\
-    xft:Monaco:style=Regular-Mono:size=10:antialias=true,\
+    xft:Monaco:size=10:antialias=true,\
     xft:Osaka:style=Regular-Mono:size=12:antialias=true
 URxvt.boldFont:\
     xft:Monaco:bold,\
@@ -19,5 +17,3 @@ URxvt.italicFont:\
 URxvt.boldItalicFont:\
     xft:Monaco:italic,\
     xft:Osaka:style=Regular-Mono:italic
-
-Xft*antialias: true
