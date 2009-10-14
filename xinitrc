@@ -44,7 +44,7 @@ fi
 
 # test -x /opt/local/bin/kinput2 && /opt/local/bin/kinput2 &
 # test -x /opt/local/bin/kinput2.macim && /opt/local/bin/kinput2.macim &
-/Library/Frameworks/UIM.framework/Versions/Current/bin/uim-xim --engine=prime &
+/Library/Frameworks/UIM.framework/Versions/Current/bin/uim-xim --engine=anthy &
 
 
 if [ -d /usr/X11/lib/X11/xinit/xinitrc.d ] ; then

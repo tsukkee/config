@@ -187,7 +187,9 @@ augroup vimrc-autocmd
     \|      silent loadview
     \|  endif
 augroup END
-
+if has('win32')
+    set viewdir=~/vimfiles/view
+endif
 
 " ==================== Hightlight ==================== "
 augroup vimrc-autocmd
@@ -230,11 +232,11 @@ endfunction
 syntax on " enable syntax coloring
 
 " colorscheme
-if has('win32') && !has('gui')
-    colorscheme desert
-else
+if &t_Co == 256 || has('gui')
     let g:zenburn_high_Contrast = 0
     colorscheme xoria256
+else
+    colorscheme torte
 endif
 
 
@@ -300,7 +302,7 @@ nnoremap <expr> <Plug>(arpeggio-default:l) foldclosed(line('.')) != -1 ? 'zo' : 
 " hold with 'h' if the cursor is on the head of line in visual mode
 vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
 " expand with 'l' if the cursor on the holded text in visual mode
-vnoremap <expr> <Plug>(arpeggio-default:l) foldclosed(line('.')) != -1 ? 'zogv' : 'l'
+vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 
 " Delete highlight
 CommandMap gh nohlsearch

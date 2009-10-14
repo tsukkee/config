@@ -4,24 +4,33 @@ URxvt.background: Gray10
 URxvt.saveLines: 1000
 URxvt.scrollstyle: rxvt
 URxvt.scrollBar_right: true
-URxvt.geometry: 100x35
+URxvt.geometry: 110x35
 URxvt.shading: 10
 
+! URxvt.font:\
+!     xft:M+1VM+IPAG circle:size=14:antialias=true, \
+!     xft:Hiragino Maru Gothic Pro, \
+!     xft:Monaco
+! URxvt.boldFont:\
+!     xft:M+1VM+IPAG circle:bold, \
+!     xft:Hiragino Maru Gothic Pro:bold, \
+!     xft:Monaco:bold
+! URxvt.italicFont:\
+!     xft:M+1VM+IPAG circle:italic, \
+!     xft:Hiragino Maru Gothic Pro:italic, \
+!     xft:Monaco:italic
+! URxvt.boldItalicFont:\
+!     xft:M+1VM+IPAG circle:italic, \
+!     xft:Hiragino Maru Gothic Pro:italic, \
+!     xft:Monaco:italic
+
 URxvt.font:\
-    xft:M+2VM+IPAG circle:size=14:antialias=true, \
-    xft:Hiragino Maru Gothic Pro, \
-    xft:Monaco
+    xft:Osaka:style=Regular-Mono:size=12:antialias=true
 URxvt.boldFont:\
-    xft:M+2VM+IPAG circle:bold, \
-    xft:Hiragino Maru Gothic Pro:bold, \
-    xft:Monaco:bold
+    xft:Osaka:style=Regular-Mono:bold
 URxvt.italicFont:\
-    xft:M+2VM+IPAG circle:italic, \
-    xft:Hiragino Maru Gothic Pro:italic, \
-    xft:Monaco:italic
+    xft:Osaka:style=Regular-Mono:italic
 URxvt.boldItalicFont:\
-    xft:M+2VM+IPAG circle:italic, \
-    xft:Hiragino Maru Gothic Pro:italic, \
-    xft:Monaco:italic
+    xft:Osaka:style=Regular-Mono:italic
 
 Xft*antialias: true

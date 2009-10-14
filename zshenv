@@ -51,5 +51,6 @@ BLOCKSIZE=k; export BLOCKSIZE
 LESS='--tabs=4 --no-init --LONG-PROMPT --ignore-case'; export LESS
 HREF_DATADIR=/usr/local/share/ref; export HREF_DATADIR
 GISTY_DIR="$HOME/Desktop/gisty"; export GISTY_DIR
+PYTHONPATH=$HOME/.hgext:$PYTHONPATH; export PYTHONPATH
 
 test -f $HOME/.zshenv.local && source $HOME/.zshenv.local

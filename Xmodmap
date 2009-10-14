@@ -1,6 +1,6 @@
 ! 円マークキー
 keycode 101 = backslash bar yen bar
-! 英数キー 
-keycode 110 = F3
+! 英数キー
+keycode 110 = Muhenkan
 ! かな/カナキー
-keycode 112 = F4
+keycode 112 = Henkan_Mode
