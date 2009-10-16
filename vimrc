@@ -25,7 +25,7 @@ set history=100 " number of command history
 " Input support
 set backspace=indent,eol,start " delete everything with backspace
 set formatoptions+=m           " add multibyte support
-set iskeyword+=-               " add keyword to '-'
+" set iskeyword+=-               " add keyword to '-'
 set nolinebreak                " don't line break automatically
 set textwidth=0                " don't line break automatically
 set iminsert=0                 " disable input methods in insert mode
@@ -210,6 +210,7 @@ function! s:onColorScheme()
     endif
 
     if g:colors_name == 'lucius'
+        highlight CursorLine cterm=none gui=none
         highlight SpecialKey ctermfg=172 guifg=#ffaa00
     endif
 
@@ -234,7 +235,7 @@ syntax on " enable syntax coloring
 " colorscheme
 if &t_Co == 256 || has('gui')
     let g:zenburn_high_Contrast = 0
-    colorscheme xoria256
+    colorscheme lucius
 else
     colorscheme torte
 endif
