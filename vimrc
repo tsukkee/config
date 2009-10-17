@@ -563,7 +563,7 @@ Arpeggionnoremap <silent> km :<C-u>Ku mrufile<CR>
 Arpeggionnoremap <silent> ke :<C-u>Ku tags/help<CR>
 
 " NERDTree
-let g:NERDTreeWinSize = 25
+let g:NERDTreeWinSize = 20
 CommandMap [Prefix]t     NERDTree
 CommandMap [Prefix]T     NERDTreeClose
 CommandMap [Prefix]<C-t> execute 'NERDTree' expand('%:p:h')

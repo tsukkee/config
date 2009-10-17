@@ -1,7 +1,8 @@
 " status line
-hi StatusLine color: black; -moz-appearance: statusbar
-hi StatusLineSecure color: green; -moz-appearance: statusbar
-hi StatusLineBroken color: red; -moz-appearance: statusbar
+hi StatusLine         color: black; -moz-appearance: statusbar
+hi StatusLineSecure   color: blue;  -moz-appearance: statusbar
+hi StatusLineBroken   color: red;   -moz-appearance: statusbar
+hi StatusLineExtended color: green; -moz-appearance: statusbar
 
 style -name statusbar chrome://* <<EOM
     #status-bar statusbarpanel { padding: 0 1px !important; }
@@ -9,23 +10,18 @@ style -name statusbar chrome://* <<EOM
 EOM
 
 " Completion
-hi CompTitle color: #1e46f3; background: white
-hi CompTitle>* border-bottom: 1px dashed #1e46f3
-hi GradientLeft background: #1e46f3
+hi CompTitle          color: #1e46f3; background: white
+hi CompTitle>*        border-bottom: 1px dashed #1e46f3
+hi GradientLeft       background: #1e46f3
 hi CompItem[selected] background: #1e46f3; color: white
 
 " Hint
-hi Hint -append background-color: #1e46f3; color: white; font-size: 12px; font-weight: normal
-hi HintElem -append background-color: #eeeeff; color: black
+hi Hint       -append background-color: #1e46f3; color: white
+hi HintElem   -append background-color: #eeeeff; color: black
 hi HintActive -append background-color: #aaaaff; color: black
-hi Title -append color: #1e46f3
+hi Title      -append color: #1e46f3
 
 " Tab
 hi TabText -append text-align: left
-
-" Tab Progress Bar
-style -name tabProgressBar chrome://* <<EOM
-    .tab-progress > .progress-bar { background-color: #1e46f3 !important; }
-EOM
 
 " vim: set ft=vimperator:

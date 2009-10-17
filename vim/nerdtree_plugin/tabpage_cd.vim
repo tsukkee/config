@@ -3,8 +3,8 @@ if exists("g:loaded_nerdtree_tabpage_cd")
 endif
 let g:loaded_nerdtree_tabpage_cd = 1
 
-if exists(':TabpageCD') != 2
-    echoerr 'This plugins need TabpageCD command'
+if !exists(':TabpageCD')
+    echoerr 'This plugin needs TabpageCD command'
     finish
 endif
 
@@ -20,6 +20,5 @@ call NERDTreeAddKeyMap({
 
 function! NERDTreeTabpageCd()
     let currentDir = g:NERDTreeFileNode.GetSelected().path.getDir().str({'format': 'Cd'})
-    echo 'TabpageCD to ' . currentDir
     execute 'TabpageCD' currentDir
 endfunction
