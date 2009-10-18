@@ -478,10 +478,17 @@ let g:NeoComplCache_EnableQuickMatch = 0
 let g:NeoComplCache_TagsAutoUpdate = 1
 let g:NeoComplCache_EnableUnderbarCompletion = 1
 let g:NeoComplCache_EnableCamelCaseCompletion = 1
+
 if !exists('g:NeoComplCache_SameFileTypeLists')
     let g:NeoComplCache_SameFileTypeLists = {}
 endif
 let g:NeoComplCache_SameFileTypeLists['vim'] = 'help'
+
+if !exists('g:NeoComplCache_DictionaryFileTypeLists')
+    let g:NeoComplCache_DictionaryFileTypeLists = {}
+endif
+let g:NeoComplCache_DictionaryFileTypeLists['vimshell'] = $HOME.'/.vimshell_hist'
+
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
 PopupMap <C-y>   neocomplcache#close_popup()
 PopupMap <C-e>   neocomplcache#cancel_popup()
