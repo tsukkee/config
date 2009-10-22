@@ -210,7 +210,6 @@ function! s:onColorScheme()
     endif
 
     if g:colors_name == 'lucius'
-        highlight CursorLine cterm=none gui=none
         highlight SpecialKey ctermfg=172 guifg=#ffaa00
     endif
 
