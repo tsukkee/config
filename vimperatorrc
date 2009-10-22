@@ -86,6 +86,13 @@ EOM
 
 
 " ==================== plugin options ==================== "
+set hintmatching=custom
+js <<EOM
+liberator.plugins.customHintMatcher = function(inputString){
+    let r = migemo.getRegExp(inputString);
+    return function(hintString) r.test(hintString);
+};
+EOM
 
 " commandBookmarklet
 let command_bookmarklet_prefix=""
@@ -106,8 +113,8 @@ style -name commandline-ime chrome://* #liberator-commandline-command input { im
 " load local file
 js <<EOM
 (function() {
-    var local = "~/.vimperatorrc.local";
-    var file = io.getFile(local);
+    let local = "~/.vimperatorrc.local";
+    let file = io.getFile(local);
     if(file.exists() && file.isReadable()) {
         io.source(local, true);
     }
