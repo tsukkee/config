@@ -87,7 +87,7 @@ zstyle ':vcs_info:*' formats '(%s)-[%b]'
 zstyle ':vcs_info:*' actionformats '(%s)-[%b|%a]'
 function _vsc_info() {
     psvar=()
-    vcs_info
+    LANG=en_US.UTF-8 vcs_info
     RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}"
 }
 _vsc_info

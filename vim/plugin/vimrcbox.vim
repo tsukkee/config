@@ -1,6 +1,7 @@
 " vimrcbox.vim
 " Author: Sora harakami <sora134@gmail.com>
-" Modified by: thinca <thinca@gmail.com>
+" Modified by: thinca <thinca+vim@gmail.com> thanks!
+" Modified by: Shougo <Shougo.Matsu@gmail.com> thanks!
 " Require: curl
 " Licence: MIT Licence
 
@@ -35,29 +36,29 @@ endif
 
 
 function! s:VrbUpdate(postfile, gvim)
-    let user = g:vimrcbox_user
-    let pass = g:vimrcbox_pass
+    if !executable('curl')
+        echoerr 'This script needs "curl". Please install.'
+    endif
 
-    let postfile = a:postfile != ''
-    \ ? a:postfile
-    \ : a:gvim
-    \   ? (g:vimrcbox_gvimrc != '' ? g:vimrcbox_gvimrc : $MYGVIMRC)
-    \   : (g:vimrcbox_vimrc  != '' ? g:vimrcbox_vimrc  : $MYVIMRC)
-
+    let user = !empty(g:vimrcbox_user)?  g:vimrcbox_user : input("Username: ")
     if user == ''
-        let user = input("Username: ")
-        if empty(user)
-            echo "Cancel"
-            return
-        endif
+        echo "Cancel"
+        return
     endif
+    let pass = !empty(g:vimrcbox_pass)?  g:vimrcbox_pass : inputsecret("Password: ")
     if pass == ''
-        let pass = inputsecret("Password: ")
-        if empty(pass)
-            echo "Cancel"
-            return
-        endif
+        echo "Cancel"
+        return
     endif
+
+    if a:postfile != ''
+        let postfile = a:postfile
+    else
+        let postfile = a:gvim ? 
+                    \(g:vimrcbox_gvimrc != '' ? g:vimrcbox_gvimrc : $MYGVIMRC)
+                    \: (g:vimrcbox_vimrc  != '' ? g:vimrcbox_vimrc  : $MYVIMRC)
+    endif
+
     "post
     let result = system('curl -s ' . join(values(map({
         \ 'vimrc': '@' . fnamemodify(expand(postfile), ':p'),
@@ -69,13 +70,12 @@ function! s:VrbUpdate(postfile, gvim)
     if result =~ '1'
         echo "Update success"
     else
-        echo "Update failure"
+        echoerr "Update failure: " . result
     end
 endfunction
 
-command! -nargs=? -complete=file RcbVimrc  :call s:VrbUpdate(<q-args>, 0)
-command! -nargs=? -complete=file RcbGVimrc :call s:VrbUpdate(<q-args>, 1)
+command! -nargs=? -complete=file RcbVimrc  call s:VrbUpdate(<q-args>, 0)
+command! -nargs=? -complete=file RcbGVimrc call s:VrbUpdate(<q-args>, 1)
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
-
