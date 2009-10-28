@@ -474,7 +474,6 @@ let g:NeoComplCache_MinSyntaxLength = 2
 let g:NeoComplCache_SmartCase = 1
 let g:NeoComplCache_EnableMFU = 1
 let g:NeoComplCache_EnableQuickMatch = 1
-let g:NeoComplCache_QuickMatchMaxList = 20
 let g:NeoComplCache_TagsAutoUpdate = 1
 let g:NeoComplCache_EnableUnderbarCompletion = 1
 let g:NeoComplCache_EnableCamelCaseCompletion = 1

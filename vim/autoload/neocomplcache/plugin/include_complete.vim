@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: include_complete.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 26 Oct 2009
+" Last Modified: 28 Oct 2009
 " Usage: Just source this file.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -23,12 +23,20 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 1.01, for Vim 7.0
+" Version: 1.02, for Vim 7.0
 "-----------------------------------------------------------------------------
 " ChangeLog: "{{{
+"   1.02:
+"    - Fixed keyword pattern error.
+"    - Added g:NeoComplCache_IncludeSuffixes option. 
+"    - Fixed empty filetype error.
+"    - Echo filename when caching.
+"
 "   1.01:
 "    - Fixed filter bug.
 "    - Fixed matchstr timing.
+"    - Fixed error when includeexpr is empty.
+"    - Don't caching readonly buffer.
 "
 "   1.00:
 "    - Initial version.
@@ -49,8 +57,25 @@ function! neocomplcache#plugin#include_complete#initialize()"{{{
     
     augroup neocomplcache
         " Caching events
-        autocmd FileType,BufWritePost * call s:check_buffer()
+        autocmd FileType * call s:check_buffer_all()
+        autocmd BufWritePost * call s:check_buffer(bufnr('%'))
     augroup END
+    
+    " Initialize include pattern."{{{
+    call s:set_include_pattern('java,haskell', '^import')
+    "}}}
+    " Initialize expr pattern."{{{
+    call s:set_expr_pattern('haskell', 'substitute(v:fname,''\\.'',''/'',''g'')')
+    "}}}
+    " Initialize path pattern."{{{
+    if executable('python')
+        call s:set_path_pattern('python',
+                    \system('python -', 'import sys;sys.stdout.write(",".join(sys.path))'))
+    endif
+    "}}}
+    " Initialize suffixes pattern."{{{
+    call s:set_suffixes_pattern('haskell', '.hs')
+    "}}}
     
     " Create cache directory.
     if !isdirectory(g:NeoComplCache_TemporaryDir . '/include_cache')
@@ -80,35 +105,55 @@ endfunction"}}}
 function! neocomplcache#plugin#include_complete#calc_prev_rank(cache_keyword_buffer_list, prev_word, prepre_word)"{{{
 endfunction"}}}
 
-function! s:check_buffer()"{{{
+function! s:check_buffer_all()"{{{
     let l:bufnumber = 1
 
     " Check buffer.
     while l:bufnumber <= bufnr('$')
         if buflisted(l:bufnumber)
-            " Check include.
-            call s:check_include(l:bufnumber)
+            call s:check_buffer(l:bufnumber)
         endif
 
         let l:bufnumber += 1
     endwhile
 endfunction"}}}
+function! s:check_buffer(bufnumber)"{{{
+    let l:bufname = fnamemodify(bufname(a:bufnumber), ':p')
+    if (g:NeoComplCache_CachingDisablePattern == '' || l:bufname !~ g:NeoComplCache_CachingDisablePattern)
+                \&& getbufvar(a:bufnumber, '&readonly') == 0
+        " Check include.
+        call s:check_include(a:bufnumber)
+    endif
+endfunction"}}}
 function! s:check_include(bufnumber)"{{{
     let l:filetype = getbufvar(a:bufnumber, '&filetype')
+    if l:filetype == ''
+        return
+    endif
+    let l:pattern = has_key(g:NeoComplCache_IncludePattern, l:filetype) ? 
+                \g:NeoComplCache_IncludePattern[l:filetype] : getbufvar(a:bufnumber, '&include')
+    if l:pattern == ''
+        return
+    endif
     let l:path = has_key(g:NeoComplCache_IncludePath, l:filetype) ? 
                 \g:NeoComplCache_IncludePath[l:filetype] : getbufvar(a:bufnumber, '&path')
     let l:expr = has_key(g:NeoComplCache_IncludeExpr, l:filetype) ? 
                 \g:NeoComplCache_IncludeExpr[l:filetype] : getbufvar(a:bufnumber, '&includeexpr')
-    let l:pattern = has_key(g:NeoComplCache_IncludePattern, l:filetype) ? 
-                \g:NeoComplCache_IncludePattern[l:filetype] : getbufvar(a:bufnumber, '&include')
+    if has_key(g:NeoComplCache_IncludeSuffixes, l:filetype)
+        let l:suffixes = &l:suffixesadd
+    endif
 
     let l:buflines = getbufline(a:bufnumber, 1, 100)
     let l:include_files = []
     for l:line in l:buflines"{{{
         if l:line =~ l:pattern
             let l:match_end = matchend(l:line, l:pattern)
-            let l:eval = substitute(l:expr, 'v:fname', string(matchstr(l:line[l:match_end :], '\f\+')), 'g')
-            let l:filename = fnamemodify(findfile(eval(l:eval), l:path), ':p')
+            if l:expr != ''
+                let l:eval = substitute(l:expr, 'v:fname', string(matchstr(l:line[l:match_end :], '\f\+')), 'g')
+                let l:filename = fnamemodify(findfile(eval(l:eval), l:path), ':p')
+            else
+                let l:filename = fnamemodify(findfile(matchstr(l:line[l:match_end :], '\f\+'), l:path), ':p')
+            endif
             if filereadable(l:filename)
                 call add(l:include_files, l:filename)
 
@@ -119,6 +164,11 @@ function! s:check_include(bufnumber)"{{{
             endif
         endif
     endfor"}}}
+    
+    " Restore option.
+    if has_key(g:NeoComplCache_IncludeSuffixes, l:filetype)
+        let &l:suffixesadd = l:suffixes
+    endif
     
     let s:include_list[a:bufnumber] = l:include_files
 endfunction"}}}
@@ -147,7 +197,7 @@ function! s:load_from_tags(filename)"{{{
     
     if l:max_lines > 1000
         redraw
-        echo 'Caching include files... please wait.'
+        echo 'Caching include files "' . a:filename . '"... please wait.'
     endif
     if l:max_lines > 10000
         let l:print_cache_percent = l:max_lines / 9
@@ -171,11 +221,11 @@ function! s:load_from_tags(filename)"{{{
         " Percentage check."{{{
         if l:line_cnt == 0
             if g:NeoComplCache_CachingPercentInStatusline
-                let &l:statusline = printf('Caching: %d%%', l:line_num*100 / l:max_lines)
+                let &l:statusline = printf('Caching(%s): %d%%', a:filename, l:line_num*100 / l:max_lines)
                 redrawstatus!
             else
                 redraw
-                echo printf('Caching: %d%%', l:line_num*100 / l:max_lines)
+                echo printf('Caching(%s): %d%%', a:filename, l:line_num*100 / l:max_lines)
             endif
             let l:line_cnt = l:print_cache_percent
         endif
@@ -257,7 +307,7 @@ function! s:load_from_file(filename)"{{{
     
     if l:max_lines > 1000
         redraw
-        echo 'Caching include files... please wait.'
+        echo 'Caching include files "' . a:filename . '"... please wait.'
     endif
     if l:max_lines > 10000
         let l:print_cache_percent = l:max_lines / 9
@@ -277,7 +327,11 @@ function! s:load_from_file(filename)"{{{
     let l:line_cnt = l:print_cache_percent
     
     let l:line_num = 1
-    let l:pattern = neocomplcache#plugin#buffer_complete#current_keyword_pattern()
+    let l:filetype = getbufvar(bufnr(a:filename), '&filetype')
+    if l:filetype == ''
+        return []
+    endif
+    let l:pattern = g:NeoComplCache_KeywordPatterns[l:filetype]
     let l:menu = printf('[I] %.' . g:NeoComplCache_MaxFilenameWidth . 's', fnamemodify(a:filename, ':t'))
     let l:keyword_list = {}
 
@@ -285,11 +339,11 @@ function! s:load_from_file(filename)"{{{
         " Percentage check."{{{
         if l:line_cnt == 0
             if g:NeoComplCache_CachingPercentInStatusline
-                let &l:statusline = printf('Caching: %d%%', l:line_num*100 / l:max_lines)
+                let &l:statusline = printf('Caching(%s): %d%%', a:filename, l:line_num*100 / l:max_lines)
                 redrawstatus!
             else
                 redraw
-                echo printf('Caching: %d%%', l:line_num*100 / l:max_lines)
+                echo printf('Caching(%s): %d%%', a:filename, l:line_num*100 / l:max_lines)
             endif
             let l:line_cnt = l:print_cache_percent
         endif
@@ -351,7 +405,7 @@ function! s:load_from_cache(filename)"{{{
     
     if l:max_lines > 3000
         redraw
-        echo 'Caching include files... please wait.'
+        echo 'Caching include files "' . a:filename . '"... please wait.'
     endif
     if l:max_lines > 10000
         let l:print_cache_percent = l:max_lines / 5
@@ -369,11 +423,11 @@ function! s:load_from_cache(filename)"{{{
         " Percentage check."{{{
         if l:line_cnt == 0
             if g:NeoComplCache_CachingPercentInStatusline
-                let &l:statusline = printf('Caching: %d%%', l:line_num*100 / l:max_lines)
+                let &l:statusline = printf('Caching(%s): %d%%', a:filename, l:line_num*100 / l:max_lines)
                 redrawstatus!
             else
                 redraw
-                echo printf('Caching: %d%%', l:line_num*100 / l:max_lines)
+                echo printf('Caching(%s): %d%%', a:filename, l:line_num*100 / l:max_lines)
             endif
             let l:line_cnt = l:print_cache_percent
         endif
@@ -412,15 +466,49 @@ function! s:save_cache(filename, keyword_list)"{{{
     call writefile(l:word_list, l:cache_name)
 endfunction"}}}
 
+" Set pattern helper."{{{
+function! s:set_include_pattern(filetype, pattern)"{{{
+    for ft in split(a:filetype, ',')
+        if !has_key(g:NeoComplCache_IncludePattern, ft) 
+            let g:NeoComplCache_IncludePattern[ft] = a:pattern
+        endif
+    endfor
+endfunction"}}}
+function! s:set_expr_pattern(filetype, pattern)"{{{
+    for ft in split(a:filetype, ',')
+        if !has_key(g:NeoComplCache_IncludeExpr, ft) 
+            let g:NeoComplCache_IncludeExpr[ft] = a:pattern
+        endif
+    endfor
+endfunction"}}}
+function! s:set_path_pattern(filetype, pattern)"{{{
+    for ft in split(a:filetype, ',')
+        if !has_key(g:NeoComplCache_IncludePath, ft) 
+            let g:NeoComplCache_IncludePath[ft] = a:pattern
+        endif
+    endfor
+endfunction"}}}
+function! s:set_suffixes_pattern(filetype, pattern)"{{{
+    for ft in split(a:filetype, ',')
+        if !has_key(g:NeoComplCache_IncludeSuffixes, ft) 
+            let g:NeoComplCache_IncludeSuffixes[ft] = a:pattern
+        endif
+    endfor
+endfunction"}}}
+"}}}
+
 " Global options definition."{{{
-if !exists('g:NeoComplCache_IncludePath')
-    let g:NeoComplCache_IncludePath = {}
+if !exists('g:NeoComplCache_IncludePattern')
+    let g:NeoComplCache_IncludePattern = {}
 endif
 if !exists('g:NeoComplCache_IncludeExpr')
     let g:NeoComplCache_IncludeExpr = {}
 endif
-if !exists('g:NeoComplCache_IncludePattern')
-    let g:NeoComplCache_IncludePattern = {}
+if !exists('g:NeoComplCache_IncludePath')
+    let g:NeoComplCache_IncludePath = {}
+endif
+if !exists('g:NeoComplCache_IncludeSuffixes')
+    let g:NeoComplCache_IncludeSuffixes = {}
 endif
 "}}}
 

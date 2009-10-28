@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: keyword_complete.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 23 Oct 2009
+" Last Modified: 28 Oct 2009
 " Usage: Just source this file.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -23,7 +23,7 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 3.05, for Vim 7.0
+" Version: 3.08, for Vim 7.0
 "-----------------------------------------------------------------------------
 " TODO: "{{{
 "     - Nothing.
@@ -60,7 +60,7 @@ function! neocomplcache#complfunc#keyword_complete#get_keyword_pos(cur_text)"{{{
     let l:cur_keyword_pos = match(a:cur_text, l:pattern)
     let l:cur_keyword_str = matchstr(a:cur_text, l:pattern)
 
-    if len(l:cur_keyword_str) >= g:NeoComplCache_MinKeywordLength && l:cur_keyword_str !~ '\d\+$'
+    if len(l:cur_keyword_str) >= g:NeoComplCache_MinKeywordLength
         " Check candidate.
         call neocomplcache#plugin#buffer_complete#check_candidate(l:cur_keyword_str)
     endif
@@ -71,18 +71,7 @@ function! neocomplcache#complfunc#keyword_complete#get_keyword_pos(cur_text)"{{{
     endif
 
     if l:cur_keyword_pos < 0 || len(l:cur_keyword_str) < g:NeoComplCache_KeywordCompletionStartLength
-        if g:NeoComplCache_EnableQuickMatch
-            " Search quick match.
-            let l:pattern = '\v\C\d{1,2}$|[ASDFGHJKLQWERTYUIOP]$'
-            let l:cur_keyword_pos = match(a:cur_text, l:pattern)
-            let l:cur_keyword_str = matchstr(a:cur_text, l:pattern)
-
-            if l:cur_keyword_str == ''
-                return -1
-            endif
-        else
-            return -1
-        endif
+        return -1
     endif
 
     return l:cur_keyword_pos
@@ -114,7 +103,7 @@ function! neocomplcache#complfunc#keyword_complete#get_complete_words(cur_keywor
             let l:is_empty = 0
         endif
     endfor
-    if l:is_empty && (!g:NeoComplCache_EnableQuickMatch || match(a:cur_keyword_str, '\d$') < 0)
+    if l:is_empty
         return []
     endif
 
@@ -165,20 +154,7 @@ function! neocomplcache#complfunc#keyword_complete#get_complete_words(cur_keywor
         let l:cache_keyword_list += l:cache_keyword_lists[l:plugin]
     endfor
 
-    " Sort.
-    let l:cache_keyword_filtered = sort(l:cache_keyword_list, l:order_func)
-
-    " Trunk too many item.
-    let l:cache_keyword_filtered = l:cache_keyword_filtered[:g:NeoComplCache_MaxList-1]
-
-    " Quick match.
-    let l:cache_keyword_filtered = neocomplcache#get_quickmatch_list(l:cache_keyword_filtered, a:cur_keyword_pos,
-                    \a:cur_keyword_str, 'keyword_complete')
-
-    " Remove next keyword.
-    let l:cache_keyword_filtered = neocomplcache#remove_next_keyword(l:cache_keyword_filtered)
-
-    return l:cache_keyword_filtered
+    return sort(l:cache_keyword_list, l:order_func)
 endfunction"}}}
 
 function! neocomplcache#complfunc#keyword_complete#manual_complete()"{{{
@@ -217,9 +193,8 @@ function! neocomplcache#complfunc#keyword_complete#manual_complete()"{{{
     " Set function.
     let &l:completefunc = 'neocomplcache#manual_complete'
 
-    let l:complete_words = neocomplcache#get_quickmatch_list(neocomplcache#complfunc#keyword_complete#get_complete_words(l:cur_keyword_pos, l:cur_keyword_str),
-                \ l:cur_keyword_pos, l:cur_keyword_str, 'keyword_complete')
-    let l:complete_words = neocomplcache#remove_next_keyword(l:complete_words)
+    let l:complete_words = neocomplcache#remove_next_keyword(
+                \neocomplcache#complfunc#keyword_complete#get_complete_words(l:cur_keyword_pos, l:cur_keyword_str))
 
     " Restore option.
     let &ignorecase = l:ignorecase_save

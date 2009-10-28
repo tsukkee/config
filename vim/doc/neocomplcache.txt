@@ -1,6 +1,6 @@
 *neocomplcache.txt*	Ultimate auto completion system for Vim
 
-Version: 3.07
+Version: 3.08
 Author : Shougo <Shougo.Matsu@gmail.com>
 License: MIT license  {{{
     Permission is hereby granted, free of charge, to any person obtaining
@@ -229,25 +229,11 @@ g:NeoComplCache_EnableWildCard				*g:NeoComplCache_EnableWildCard*
 	
 		Default value is 1.
 
-g:NeoComplCache_EnableQuickMatch			*g:NeoComplCache_EnableQuickMatch*
-		For input-saving, this variable controls whether you can choose a candidate
-		with a number displayed beside a candidate.
-	
-		Default value is 1.
-		It is necessary for menuone to be included in 'completeopt' to use this function.
-
 g:NeoComplCache_CalcRankRandomize			*g:NeoComplCache_CalcRankRandomize*
 		When neocomplcache calculate frequency again,
 		this variable controls whether neocomplcache use a random number.
 	
 		Default value is has ('reltime').
-
-g:NeoComplCache_QuickMatchMaxList			*g:NeoComplCache_QuickMatchMaxList*
-		At the time of|g:NeoComplCache_EnableQuickMatch|, this variable controls
-		the number of numbers to display beside a candidate.
-		Max value is 100.
-	
-		Default value is 100.
 
 g:NeoComplCache_EnableSkipCompletion			*g:NeoComplCache_EnableSkipCompletion*
 		This variable controls whether neocomplcache cancels automatic completion
@@ -260,12 +246,6 @@ g:NeoComplCache_SkipCompletionTime			*g:NeoComplCache_SkipCompletionTime*
 		This optional value must be character string.
 	
 		Default value is '0.2'.
-
-g:NeoComplCache_SkipInputTime				*g:NeoComplCache_SkipInputTime*
-		This variable defines continuation input time to cancel automatic completion by a second unit.
-		This optional value must be character string.
-	
-		Because the default value is '0.0', neocomplcache doesn't cancel completion by the consecutive input.
 
 g:NeoComplCache_PreviousKeywordCompletion		*g:NeoComplCache_PreviousKeywordCompletion*
 		This variable controls whether neocomplcache considers not only the appearance frequency of the word
@@ -431,8 +411,6 @@ EXAMPLES					*neocomplcache-examples*
 	let g:NeoComplCache_EnableUnderbarCompletion = 1
 	" Set minimum syntax keyword length.
 	let g:NeoComplCache_MinSyntaxLength = 3
-	" Set skip input time.
-	let g:NeoComplCache_SkipInputTime = '0.1'
 
 	" Define dictionary.
 	let g:NeoComplCache_DictionaryFileTypeLists = {
@@ -482,9 +460,6 @@ syntax_complete.vim					*syntax_complete*
 
 ==============================================================================
 TODO						*neocomplcache-todo*
-- Implement include completion.
-
-- Nested default value in snippet completion.
 
 ==============================================================================
 BUGS						*neocomplcache-bugs*
@@ -498,11 +473,27 @@ The ability of neocomplcache will spread by creating plugin by yourself.
 ==============================================================================
 CHANGELOG					*neocomplcache-changelog*
 
+   3.08:
+    - Fixed completion bug when using ku.
+    - Implemented NeoComplCacheCachingTags command.
+    - Disable auto caching in tags_complete.
+    - Echo filename when caching.
+    - Disabled quick match.
+    - Fixed wildcard bug when auto completion.
+    
 ChangeLog NeoComplCache 3.00-: {{{
    3.07:
     - Added snippet indent file.
     - Fixed filter bug in include_complete.
     - Fixed matchstr timing in include_complete.
+    - Fixed error when includeexpr is empty in include_complete.
+    - Don't caching readonly buffer in include_complete.
+    - Implemented CursorHoldI completion.
+    - Deleted g:NeoComplCache_SkipInputTime and g:NeoComplCache_QuickMatchMaxList option.
+    - Fixed keyword pattern error in include_complete.
+    - Fixed quickmatch.
+    - Improved caching timing.
+    - Added g:NeoComplCache_IncludeSuffixes option. 
 
    3.06:
     - Fixed disable completion bug.
