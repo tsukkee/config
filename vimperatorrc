@@ -7,7 +7,7 @@ set guioptions=BrbN
 set hlsearch
 set hintinputs+=name,image
 set showstatuslinks=2
-set wildoptions=
+set wildoptions=auto
 
 " emulate vim's "after"
 set runtimepath+=~/.vimperator/after,~/vimperator/after
@@ -49,6 +49,9 @@ nnoremap P <Nop>
 " ghでハイライトオフ
 nnoremap gh :nohl<CR>:offwordhighlight<CR>
 
+" Iでナビゲーションツールバーをトグル
+nnoremap I :toolbartoggle ナビゲーションツールバー<CR>
+
 " toggle autopagerize
 nnoremap a :toggleautopagerize<CR>
 
@@ -86,12 +89,25 @@ EOM
 
 
 " ==================== plugin options ==================== "
+" migemo hint
 set hintmatching=custom
 js <<EOM
 liberator.plugins.customHintMatcher = function(inputString){
     let r = migemo.getRegExp(inputString);
     return function(hintString) r.test(hintString);
 };
+EOM
+
+" migemo completion
+js <<EOM
+/*
+(function() {
+CompletionContext.prototype.match = function(str){
+    let migemoPattern = new RegExp(migemo.query(this.filter), "i");
+    return migemoPattern.test(str);
+};
+})();
+*/
 EOM
 
 " commandBookmarklet
