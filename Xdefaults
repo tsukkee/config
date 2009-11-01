@@ -1,23 +1,19 @@
 URxvt.termName: rxvt-256color
 URxvt.foreground: White
 URxvt.background: Gray10
-URxvt.geometry: 110x38
+URxvt.geometry: 120x38
 URxvt.scrollBar: false
 URxvt.saveLines: 1000
 
 URxvt.font:\
-    xft:Bitstream Vera Sans Mono:size=10:antialias=true,\
+    xft:M+ 2m:style=regular:size=11:antialias=true,\
     xft:Osaka:style=Regular-Mono
-!    xft:Monaco:size=14:antialias=true
 URxvt.boldFont:\
-    xft:Bitstream Vera Sans Mono:bold,\
-    xft:Osaka:style=Regular-Mono:bold
-!    xft:Monaco:bold,\
+    xft:M+ 2m:style=medium,\
+    xft:Osaka:style=Regular-Mono
 URxvt.italicFont:\
-    xft:Bitstream Vera Sans Mono:italic,\
-    xft:Osaka:style=Regular-Mono:italic
-!    xft:Monaco:italic,\
+    xft:M+ 2m::style=light,\
+    xft:Osaka:style=Regular-Mono
 URxvt.boldItalicFont:\
-    xft:Bitstream Vera Sans Mono:italic,\
-    xft:Osaka:style=Regular-Mono:italic
-!    xft:Monaco:italic,\
+    xft:M+ 2m::style=medium,\
+    xft:Osaka:style=Regular-Mono

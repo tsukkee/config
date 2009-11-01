@@ -10,8 +10,8 @@ set textwidth=0
 
 " gvim settings
 set linespace=1
-set columns=140
-set lines=40
+set columns=135
+set lines=38
 
 " This must be after 'columns' and 'lines',
 " and before 'transparency'
@@ -20,7 +20,7 @@ gui
 " ==================== Platform setting ==================== "
 " MacVim
 if has('gui_macvim')
-    set guifont=Osaka-Mono:h14
+    set guifont=M+\ 2m:h14
     set transparency=5 " (opaque) 0-100 (transparent)
     set guioptions-=e  " don't use gui tab apperance
     set guioptions-=T  " hide toolbar
