@@ -12,8 +12,8 @@ URxvt.boldFont:\
     xft:M+ 2m:style=medium,\
     xft:Osaka:style=Regular-Mono
 URxvt.italicFont:\
-    xft:M+ 2m::style=light,\
+    xft:M+ 2m:style=light,\
     xft:Osaka:style=Regular-Mono
 URxvt.boldItalicFont:\
-    xft:M+ 2m::style=medium,\
+    xft:M+ 2m:style=medium,\
     xft:Osaka:style=Regular-Mono

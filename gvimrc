@@ -10,7 +10,7 @@ set textwidth=0
 
 " gvim settings
 set linespace=1
-set columns=135
+set columns=138
 set lines=38
 
 " This must be after 'columns' and 'lines',

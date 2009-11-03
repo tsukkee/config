@@ -47,13 +47,13 @@ nnoremap p <Nop>
 nnoremap P <Nop>
 
 " ghでハイライトオフ
-nnoremap gh :nohl<CR>:offwordhighlight<CR>
+nnoremap <silent> gh :nohl<CR>:offwordhighlight<CR>
 
 " Iでナビゲーションツールバーをトグル
-nnoremap I :toolbartoggle ナビゲーションツールバー<CR>
+nnoremap <silent> I :toolbartoggle ナビゲーションツールバー<CR>
 
 " toggle autopagerize
-nnoremap a :toggleautopagerize<CR>
+nnoremap <silent> a :toggleautopagerize<CR>
 
 " dispatch mouse event
 js <<EOM
@@ -130,9 +130,9 @@ style -name commandline-ime chrome://* #liberator-commandline-command input { im
 js <<EOM
 (function() {
     let local = "~/.vimperatorrc.local";
-    let file = io.getFile(local);
-    if(file.exists() && file.isReadable()) {
+//    let file = io.getFile(local);
+//    if(file.exists() && file.isReadable()) {
         io.source(local, true);
-    }
+//    }
 })();
 EOM

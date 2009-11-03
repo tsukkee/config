@@ -64,7 +64,7 @@ set ambiwidth=double          " For multibyte characters, such as □, ○
 
 " Status line
 set laststatus=2 " always show statusine
-set statusline=%<%F\ %r%h%w%y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%m%v,%l/%L(%P:%n)
+set statusline=%<%F%r\ %y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%m%=%v,%l/%L(%P)
 
 " Tab line
 set showtabline=2                                  " always show tab bar
