@@ -247,6 +247,7 @@ call arpeggio#load()
 Arpeggioinoremap fj <Esc>
 Arpeggiocnoremap fj <Esc>
 Arpeggiovnoremap fj <Esc>
+let g:submode_timeoutlen=5000
 
 " Prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
@@ -288,6 +289,11 @@ NExchangeMap 0 g0
 CExchangeMap <C-p> <Up>
 CExchangeMap <C-n> <Down>
 
+" Re-open with specified encoding
+AlterCommand ++u edit\ ++enc=utf-8
+AlterCommand ++e edit\ ++enc=euc-jp
+AlterCommand ++s edit\ ++enc=cp932
+
 " Allow undo for i_CTRL-u and i_CTRL-w
 " Reference: http://vim-users.jp/2009/10/hack81/
 inoremap <C-u> <C-g>u<C-u>
@@ -321,9 +327,21 @@ if !empty($WINDOW)
     map gP <Plug>(fakeclip-screen-p)
 endif
 
-" Tab
-nnoremap <C-n> gt
-nnoremap <C-p> gT
+" Tab move
+call submode#enter_with('tabmove', 'n', '', 'gt')
+call submode#enter_with('tabmove', 'n', '', 'gT')
+call submode#map('tabmove', 'n', '', 't', 'gt')
+call submode#map('tabmove', 'n', '', 'T', 'gT')
+
+" Window resize
+call submode#enter_with('winsize', 'n', '', '<C-w>>')
+call submode#enter_with('winsize', 'n', '', '<C-w><')
+call submode#enter_with('winsize', 'n', '', '<C-w>+')
+call submode#enter_with('winsize', 'n', '', '<C-w>-')
+call submode#map('winsize', 'n', '', '>', '<C-w>>')
+call submode#map('winsize', 'n', '', '<', '<C-w><')
+call submode#map('winsize', 'n', '', '+', '<C-w>+')
+call submode#map('winsize', 'n', '', '-', '<C-w>-')
 
 " Enable mouse wheel
 " In Mac, Only on iTerm.app, disable on Terminal.app
