@@ -1,6 +1,6 @@
 *neocomplcache.txt*	Ultimate auto completion system for Vim
 
-Version: 3.09
+Version: 3.14
 Author : Shougo <Shougo.Matsu@gmail.com>
 License: MIT license  {{{
     Permission is hereby granted, free of charge, to any person obtaining
@@ -210,8 +210,14 @@ g:NeoComplCache_DisableAutoComplete			*g:NeoComplCache_DisableAutoComplete*
 		Default value is 0.
 
 g:NeoComplCache_EnableWildCard				*g:NeoComplCache_EnableWildCard*
-		This variable controls whether neocomplcache accept wild card character
-		such as '*' and '-' for input-saving.
+		This variable controls whether neocomplcache accept wild card character '*' for input-saving.
+	
+		Default value is 1.
+
+g:NeoComplCache_EnableQuickMatch			*g:NeoComplCache_EnableQuickMatch*
+		For input-saving, this variable controls whether you can choose a candidate
+		with a alphabet or number displayed beside a candidate after '-'.
+		When you input 'ho-a', neocomplcache will select candidate 'a'.
 	
 		Default value is 1.
 
@@ -233,15 +239,15 @@ g:NeoComplCache_SkipCompletionTime			*g:NeoComplCache_SkipCompletionTime*
 	
 		Default value is '0.2'.
 
+g:NeoComplCache_SkipInputTime				*g:NeoComplCache_SkipInputTime*
+		This variable defines continuation input time to cancel automatic completion by a second unit.
+		This optional value must be character string.
+	
+		Because the default value is '0.0', neocomplcache doesn't cancel completion by the consecutive input.
+
 g:NeoComplCache_PreviousKeywordCompletion		*g:NeoComplCache_PreviousKeywordCompletion*
 		This variable controls whether neocomplcache considers not only the appearance frequency of the word
 		but also the connection with the word of before and perform the equal thing substitute of the candidate.
-	
-		Default value is 1.
-
-g:NeoComplCache_TryFilenameCompletion			*g:NeoComplCache_TryFilenameCompletion*
-		When you input character string to become the file path,
-		this variable controls whether neocomplcache perform filename completion.
 	
 		Default value is 1.
 
@@ -408,6 +414,8 @@ EXAMPLES					*neocomplcache-examples*
 	let g:NeoComplCache_EnableUnderbarCompletion = 1
 	" Set minimum syntax keyword length.
 	let g:NeoComplCache_MinSyntaxLength = 3
+	" Set skip input time.
+	let g:NeoComplCache_SkipInputTime = '0.1'
 
 	" Define dictionary.
 	let g:NeoComplCache_DictionaryFileTypeLists = {
@@ -470,6 +478,56 @@ The ability of neocomplcache will spread by creating plugin by yourself.
 ==============================================================================
 CHANGELOG					*neocomplcache-changelog*
 
+   3.14: *Fatal: Fixed fatal buffer and dictionary cache bug. *
+    - Fixed disable auto completion bug if bugtype contains 'nofile'.
+    - Ignore no suffixes file in include_complete.
+    - Fixed snippet merge bug in snippets_complete.
+    - Fixed break buffer and dictionary cache bug.
+
+ChangeLog NeoComplCache 3.00-: {{{
+   3.13:
+    - Open popup menu when modified.
+    - Improved buffer caching timing.
+    - Skip completion if too many candidates.
+    - Fixed quickmatch dup bug.
+    - Fixed auto completion bug in filename_complete.
+    - Fixed executable bug in filename_complete.
+
+   3.12:
+    - Improved ctags arguments patterns.
+    - Allow dup and improved menu in omni_complete.
+    - Recognized snippets directory of snipMate automatically.
+    - Fixed eval snippet bug.
+    - Fixed tags caching bug.
+    - Deleted C omni completion support.
+    - Fixed menu in buffer_complete.
+    - Auto complete when CursorMovedI not CursorHoldI.
+    - Reimplemented g:NeoComplCache_SkipInputTime option.
+    - Fixed dup check bug in syntax_complete.
+    
+   3.11:
+    - Filtering same word.
+    - Implemented member filter.
+    - Changed cache file syntax.
+    - Print error when cache file is wrong.
+    - Improved keyword patterns.
+    - Reimplemented quickmatch.
+    - Disabled '-' wildcard.
+    - Allow dup in include_complete and tags_complete.
+    - Improved filename completion.
+    - implemented filename wildcard.
+
+   3.10:
+    - Optimized keyword_complete.
+    - Integrated complfuncs.
+    - Complfunc supported g:NeoComplCache_PluginCompletionLength option.
+    - Improved omni completion pattern.
+    - Improved html's keyword pattern.
+    - Fixed manual completion error.
+    - Improved remove next keyword.
+    - Implemented complfunc rank.
+    - Save error log when analyzing tags.
+
    3.09:
     - Improved wildcard behaivior.
     - Disabled partial match.
@@ -481,7 +539,6 @@ CHANGELOG					*neocomplcache-changelog*
     - Fixed filtering bug.
     - Print filename when caching.
     
-ChangeLog NeoComplCache 3.00-: {{{
    3.08:
     - Implemented NeoComplCacheCachingTags command.
     - Disable auto caching in tags_complete.

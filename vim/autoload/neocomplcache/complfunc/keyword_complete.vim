@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: keyword_complete.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 01 Nov 2009
+" Last Modified: 12 Nov 2009
 " Usage: Just source this file.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -23,14 +23,7 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 3.09, for Vim 7.0
-"-----------------------------------------------------------------------------
-" TODO: "{{{
-"     - Nothing.
-""}}}
-" Bugs"{{{
-"     - Nothing.
-""}}}
+" Version: 3.13, for Vim 7.0
 "=============================================================================
 
 function! neocomplcache#complfunc#keyword_complete#initialize()"{{{
@@ -70,10 +63,6 @@ function! neocomplcache#complfunc#keyword_complete#get_keyword_pos(cur_text)"{{{
     let l:cur_keyword_str = a:cur_text[l:cur_keyword_pos :]
 
     if l:cur_keyword_pos < 0 || len(l:cur_keyword_str) < g:NeoComplCache_KeywordCompletionStartLength
-        if len(l:cur_keyword_str) >= g:NeoComplCache_MinKeywordLength
-            " Check candidate.
-            call neocomplcache#plugin#buffer_complete#check_candidate(l:cur_keyword_str)
-        endif
         return -1
     endif
 
@@ -95,11 +84,11 @@ function! neocomplcache#complfunc#keyword_complete#get_complete_words(cur_keywor
     let l:is_empty = 1
     for l:plugin in keys(l:loaded_plugins)
         if has_key(g:NeoComplCache_PluginCompletionLength, l:plugin)
-        \&& len(a:cur_keyword_str) < g:NeoComplCache_PluginCompletionLength[l:plugin]
+                    \&& len(a:cur_keyword_str) < g:NeoComplCache_PluginCompletionLength[l:plugin]
             call remove(l:loaded_plugins, l:plugin)
             let l:cache_keyword_lists[l:plugin] = []
         else
-            let l:cache_keyword_lists[l:plugin] = deepcopy(call(l:loaded_plugins[l:plugin] . 'get_keyword_list', [a:cur_keyword_str]))
+            let l:cache_keyword_lists[l:plugin] = call(l:loaded_plugins[l:plugin] . 'get_keyword_list', [a:cur_keyword_str])
         endif
 
         if !empty(l:cache_keyword_lists[l:plugin])
@@ -131,11 +120,6 @@ function! neocomplcache#complfunc#keyword_complete#get_complete_words(cur_keywor
 
     let l:cache_keyword_filtered = []
 
-    " Get next keyword.
-    let l:next_keyword_str = matchstr('a'.getline('.')[col('.')-1 :],
-        \'\v^%(' . neocomplcache#plugin#buffer_complete#current_keyword_pattern() . ')')[1:]
-    let l:next_keyword_str = substitute(escape(l:next_keyword_str, '~" \.^$*[]'), "'", "''", 'g')
-
     " Previous keyword completion.
     if g:NeoComplCache_PreviousKeywordCompletion && !g:NeoComplCache_AlphabeticalOrder "{{{
         let [l:prev_word, l:prepre_word] = s:get_prev_word(a:cur_keyword_str)
@@ -160,10 +144,14 @@ function! neocomplcache#complfunc#keyword_complete#get_complete_words(cur_keywor
     return l:cache_keyword_filtered + sort(l:cache_keyword_list, l:order_func)
 endfunction"}}}
 
+function! neocomplcache#complfunc#keyword_complete#get_rank()"{{{
+    return 5
+endfunction"}}}
+
 function! neocomplcache#complfunc#keyword_complete#check_wildcard(cur_text, pattern, cur_keyword_pos)"{{{
     let l:cur_keyword_pos = a:cur_keyword_pos
 
-    while l:cur_keyword_pos > 1 && a:cur_text[l:cur_keyword_pos - 1] =~ '[*-]'
+    while l:cur_keyword_pos > 1 && a:cur_text[l:cur_keyword_pos - 1] =~ '[*]'
         let l:left_text = a:cur_text[: l:cur_keyword_pos - 2]
         if l:left_text !~ a:pattern
             break

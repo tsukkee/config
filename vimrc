@@ -486,10 +486,10 @@ endfunction
 " neocomplcache
 " Reference: :h neocomplcache
 let g:NeoComplCache_EnableAtStartup = 1
-let g:NeoComplCache_PartialCompletionStartLength = 2
 let g:NeoComplCache_MinKeywordLength = 2
 let g:NeoComplCache_MinSyntaxLength = 2
 let g:NeoComplCache_SmartCase = 1
+let g:NeoComplCache_EnableQuickMatch = 0
 let g:NeoComplCache_EnableCamelCaseCompletion = 1
 let g:NeoComplCache_EnableUnderbarCompletion = 1
 

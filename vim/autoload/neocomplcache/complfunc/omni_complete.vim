@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: omni_complete.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 01 Nov 2009
+" Last Modified: 10 Nov 2009
 " Usage: Just source this file.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -23,9 +23,18 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 1.03, for Vim 7.0
+" Version: 1.05, for Vim 7.0
 "-----------------------------------------------------------------------------
 " ChangeLog: "{{{
+"   1.05:
+"    - Allow dup.
+"    - Improved menu.
+"    - Deleted C support.
+"
+"   1.04:
+"    - Added rank.
+"    - Improved omni pattern.
+"
 "   1.03:
 "    - Fixed manual completion error.
 "
@@ -53,19 +62,17 @@ function! neocomplcache#complfunc#omni_complete#initialize()"{{{
         let g:NeoComplCache_OmniPatterns = {}
     endif
     if has('ruby')
-        call s:set_omni_pattern('ruby', '\v[^. *\t]%(\.|::)')
+        call s:set_omni_pattern('ruby', '\v[^. *\t]%(\.|::)\h\w*')
     endif
     if has('python')
-        call s:set_omni_pattern('python', '\v[^. \t]\.')
+        call s:set_omni_pattern('python', '\v[^. \t]\.\h\w*')
     endif
-    call s:set_omni_pattern('html,xhtml,xml', '\v\</?|\<[^>]+\s')
+    call s:set_omni_pattern('html,xhtml,xml', '\v\<[^>]*')
     call s:set_omni_pattern('css', '\v^\s+\w+|\w+[):;]?\s+|[@!]')
-    call s:set_omni_pattern('javascript', '\v[^. \t]\.')
-    call s:set_omni_pattern('actionscript', '\v[^. \t][.:]')
-    call s:set_omni_pattern('c', '\v[^. \t]%(\.|-\>)')
-    call s:set_omni_pattern('php', '\v[^. \t]%(-\>|::)')
-    call s:set_omni_pattern('java', '\v[^. \t]\.')
-    call s:set_omni_pattern('vim', '\v%(^\s*:).*')
+    call s:set_omni_pattern('javascript', '\v[^. \t]\.%(\h\w*)?')
+    call s:set_omni_pattern('actionscript', '\v[^. \t][.:]\h\w*')
+    call s:set_omni_pattern('php', '\v[^. \t]%(-\>|::)\h\w*')
+    call s:set_omni_pattern('java', '\v[^. \t]\.\h\w*')
     "}}}
 endfunction"}}}
 function! neocomplcache#complfunc#omni_complete#finalize()"{{{
@@ -121,17 +128,17 @@ function! neocomplcache#complfunc#omni_complete#get_complete_words(cur_keyword_p
     let l:list = []
     for l:omni in l:omni_list
         let l:dict = {
-                    \'word' : l:omni.word, 'menu' : '[O]', 
-                    \'icase' : 1, 'rank' : 5
+                    \'word' : l:omni.word, 'menu' : '[O]',
+                    \'icase' : 1, 'rank' : 5, 'dup' : 1,
                     \}
         if has_key(l:omni, 'abbr')
             let l:dict.abbr = l:omni.abbr
         endif
         if has_key(l:omni, 'kind')
-            let l:dict.menu = ' ' . l:omni.kind
+            let l:dict.kind = l:omni.kind
         endif
         if has_key(l:omni, 'menu')
-            let l:dict.menu = ' ' . l:omni.menu
+            let l:dict.menu = '[O] ' . l:omni.menu
         endif
         call add(l:list, l:dict)
     endfor
@@ -149,6 +156,10 @@ function! neocomplcache#complfunc#omni_complete#get_complete_words(cur_keyword_p
     endfor
 
     return l:list
+endfunction"}}}
+
+function! neocomplcache#complfunc#omni_complete#get_rank()"{{{
+    return 20
 endfunction"}}}
 
 function! s:set_omni_pattern(filetype, pattern)"{{{
