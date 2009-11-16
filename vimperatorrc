@@ -4,10 +4,11 @@ set complete=sl
 set focuscontent
 set followhints=1
 set guioptions=BrbN
-set hlsearch
-set hintinputs+=name,image
+set hintinputs+=name
 set showstatuslinks=2
 set wildoptions=auto
+set nextpattern+='次'
+set previouspattern+='前'
 
 " emulate vim's "after"
 set runtimepath+=~/.vimperator/after,~/vimperator/after
