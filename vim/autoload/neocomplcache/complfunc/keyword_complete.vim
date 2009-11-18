@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: keyword_complete.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 12 Nov 2009
+" Last Modified: 16 Nov 2009
 " Usage: Just source this file.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -23,7 +23,7 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 3.13, for Vim 7.0
+" Version: 3.15, for Vim 7.0
 "=============================================================================
 
 function! neocomplcache#complfunc#keyword_complete#initialize()"{{{
@@ -52,7 +52,7 @@ function! neocomplcache#complfunc#keyword_complete#finalize()"{{{
 endfunction"}}}
 
 function! neocomplcache#complfunc#keyword_complete#get_keyword_pos(cur_text)"{{{
-    let l:pattern = '\v%(' .  neocomplcache#plugin#buffer_complete#current_keyword_pattern() . ')$'
+    let l:pattern = '\v%(' .  neocomplcache#get_keyword_pattern() . ')$'
     let l:cur_keyword_pos = match(a:cur_text, l:pattern)
     let l:cur_keyword_str = a:cur_text[l:cur_keyword_pos :]
 
@@ -164,7 +164,7 @@ function! neocomplcache#complfunc#keyword_complete#check_wildcard(cur_text, patt
 endfunction"}}}
 
 function! s:get_prev_word(cur_keyword_str)"{{{
-    let l:keyword_pattern = neocomplcache#plugin#buffer_complete#current_keyword_pattern()
+    let l:keyword_pattern = neocomplcache#get_keyword_pattern()
     let l:line_part = getline('.')[: col('.')-1 - len(a:cur_keyword_str)]
     let l:prev_word_end = matchend(l:line_part, l:keyword_pattern)
     if l:prev_word_end > 0
