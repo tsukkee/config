@@ -1,9 +1,8 @@
 " ==================== basic options ==================== "
-set activate=quickmark,paste
 set complete=sl
 set focuscontent
 set followhints=1
-set guioptions=BrbN
+set guioptions=Brb
 set hintinputs+=name
 set showstatuslinks=2
 set wildoptions=auto
