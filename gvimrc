@@ -20,7 +20,7 @@ gui
 " ==================== Platform setting ==================== "
 " MacVim
 if has('gui_macvim')
-    set guifont=M+\ 2m:h14
+    set guifont=Menlo:h14
     set transparency=5 " (opaque) 0-100 (transparent)
     set guioptions-=e  " don't use gui tab apperance
     set guioptions-=T  " hide toolbar
