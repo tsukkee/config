@@ -328,16 +328,16 @@ if !empty($WINDOW)
 endif
 
 " Tab move
-call submode#enter_with('tabmove', 'n', '', 'gt')
-call submode#enter_with('tabmove', 'n', '', 'gT')
+call submode#enter_with('tabmove', 'n', '', 'gt', 'gt')
+call submode#enter_with('tabmove', 'n', '', 'gT', 'gT')
 call submode#map('tabmove', 'n', '', 't', 'gt')
 call submode#map('tabmove', 'n', '', 'T', 'gT')
 
 " Window resize
-call submode#enter_with('winsize', 'n', '', '<C-w>>')
-call submode#enter_with('winsize', 'n', '', '<C-w><')
-call submode#enter_with('winsize', 'n', '', '<C-w>+')
-call submode#enter_with('winsize', 'n', '', '<C-w>-')
+call submode#enter_with('winsize', 'n', '', '<C-w>>', '<C-w>>')
+call submode#enter_with('winsize', 'n', '', '<C-w><', '<C-w><')
+call submode#enter_with('winsize', 'n', '', '<C-w>+', '<C-w>+')
+call submode#enter_with('winsize', 'n', '', '<C-w>-', '<C-w>-')
 call submode#map('winsize', 'n', '', '>', '<C-w>>')
 call submode#map('winsize', 'n', '', '<', '<C-w><')
 call submode#map('winsize', 'n', '', '+', '<C-w>+')
@@ -486,9 +486,10 @@ endfunction
 " neocomplcache
 " Reference: :h neocomplcache
 let g:NeoComplCache_EnableAtStartup = 1
-let g:NeoComplCache_MinKeywordLength = 2
-let g:NeoComplCache_MinSyntaxLength = 2
+let g:NeoComplCache_MinKeywordLength = 3
+let g:NeoComplCache_MinSyntaxLength = 3
 let g:NeoComplCache_SmartCase = 1
+let g:NeoComplCache_EnableWildCard = 1
 let g:NeoComplCache_EnableQuickMatch = 0
 let g:NeoComplCache_EnableCamelCaseCompletion = 1
 let g:NeoComplCache_EnableUnderbarCompletion = 1
