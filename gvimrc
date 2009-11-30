@@ -5,7 +5,7 @@
 " override vimrc settings
 set title
 
-" reset vimrc settings (overridden anyware)
+" reset vimrc settings (overridden anyware?)
 set textwidth=0
 
 " gvim settings
@@ -13,9 +13,6 @@ set linespace=1
 set columns=138
 set lines=38
 
-" This must be after 'columns' and 'lines',
-" and before 'transparency'
-gui
 
 " ==================== Platform setting ==================== "
 " MacVim
@@ -32,6 +29,9 @@ endif
 
 " GVim(Windows)
 if has('win32')
+    " This must be after 'columns' and 'lines',
+    " and before 'transparency'
+    gui
     set guifont=M+2VM+IPAG_circle:h10:cSHIFTJIS
     set transparency=240 " (opaque) 255 - 0 (transparent)
     set guioptions-=e    " don't use gui tab apperance

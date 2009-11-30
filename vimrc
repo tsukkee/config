@@ -143,20 +143,16 @@ if has('iconv')
 endif
 
 " use 'fileencoding' for 'encoding' if the file don't contain multibyte characters
-augroup vimrc-autocmd
-    autocmd BufReadPost *
-    \   if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n') == 0
-    \|      let &fileencoding=&encoding
-    \|  endif
-augroup END
+autocmd vimrc-autocmd BufReadPost *
+\   if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n') == 0
+\|      let &fileencoding=&encoding
+\|  endif
 
 " line feed character
 set ffs=dos,unix,mac
 
 " use ff=unix for new file
-augroup vimrc-autocmd
-    autocmd BufNewFile * set ff=unix
-augroup END
+autocmd vimrc-autocmd BufNewFile * set ff=unix
 
 " Omni completion
 set completeopt+=menuone " Display menu
@@ -167,12 +163,10 @@ filetype plugin on " to use filetype plugin
 
 " Show quickfix automatically
 " Reference: http://webtech-walker.com/archive/2009/09/29213156.html
-augroup vimrc-autocmd
-    autocmd QuickfixCmdPost make,grep,grepadd,vimgrep
-    \   if len(getqflist()) != 0
-    \|      copen
-    \|  endif
-augroup END
+autocmd vimrc-autocmd QuickfixCmdPost make,grep,grepadd,vimgrep
+\   if len(getqflist()) != 0
+\|      copen
+\|  endif
 
 " Save and load fold settings automatically
 " Reference: http://vim-users.jp/2009/10/hack84/
@@ -197,9 +191,6 @@ augroup vimrc-autocmd
     autocmd VimEnter,WinEnter * match ZenkakuSpace /　/
 augroup END
 function! s:onColorScheme()
-    " Hightlight Zenkaku space
-    hi ZenkakuSpace ctermbg=77 guibg=#5fdf5f
-
     " Modify colorscheme
     if !exists('g:colors_name')
         return
@@ -207,25 +198,12 @@ function! s:onColorScheme()
 
     if g:colors_name == 'xoria256'
         highlight CursorLine cterm=none gui=none
+        highlight ZenkakuSpace ctermbg=77 guibg=#5fdf5f
     endif
 
     if g:colors_name == 'lucius'
         highlight SpecialKey ctermfg=172 guifg=#ffaa00
-    endif
-
-    if g:colors_name == 'zenburn'
-        highlight Function    ctermfg=230
-        highlight Function    guifg=#cdcd8f
-        highlight Search      ctermfg=229   ctermbg=240
-        highlight Search      guifg=#eded8f guibg=#6c8f6c
-        highlight TabLine     ctermfg=244   ctermbg=233   cterm=none
-        highlight TabLine     guifg=#9a9a9a guibg=#1c1c1b gui=bold
-        highlight TabLineFill ctermfg=187   ctermbg=233   cterm=none
-        highlight TabLineFill guifg=#cfcfaf guibg=#181818 gui=none
-        highlight TabLineSel  ctermfg=230   ctermbg=233   cterm=none
-        highlight TabLineSel  guifg=#b6bf98 guibg=#181818 gui=bold
-        highlight Comment                                 gui=none
-        highlight CursorLine                              gui=none
+        highlight ZenkakuSpace ctermbg=172 guibg=#ffaa00
     endif
 endfunction
 
@@ -354,13 +332,13 @@ endif
 " vim -b :edit binary using xxd-format!
 " Reference: http://jarp.does.notwork.org/diary/200606a.html#200606021
 augroup vimrc-autocmd
-    autocmd BufReadPre   *.bin,*.swf let &bin=1
-    autocmd BufReadPost  *.bin,*.swf if &bin | silent %!xxd -g 1
-    autocmd BufReadPost  *.bin,*.swf set ft=xxd | endif
-    autocmd BufWritePre  *.bin,*.swf if &bin | %!xxd -r
+    autocmd BufReadPre   *.bin,*.swf set binary
+    autocmd BufReadPost  *.bin,*.swf if &binary | silent %!xxd -g 1
+    autocmd BufReadPost  *.bin,*.swf set filetype=xxd | endif
+    autocmd BufWritePre  *.bin,*.swf if &binary | %!xxd -r
     autocmd BufWritePre  *.bin,*.swf endif
-    autocmd BufWritePost *.bin,*.swf if &bin | silent %!xxd -g 1
-    autocmd BufWritePost *.bin,*.swf set nomod | endif
+    autocmd BufWritePost *.bin,*.swf if &binary | silent %!xxd -g 1
+    autocmd BufWritePost *.bin,*.swf set nomodified |  endif
 augroup END
 
 " TabpageCD
@@ -403,6 +381,9 @@ command! CtagsR !ctags -R
 " ==================== Plugins settings ==================== "
 " FileType
 augroup vimrc-autocmd
+    " some ftplugins set 'textwidth'
+    autocmd FileType * setlocal textwidth=0
+
     " Ruby
     autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
 
