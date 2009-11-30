@@ -1,16 +1,21 @@
 " ==================== basic options ==================== "
+set activate=quickmark,paste
 set complete=sl
 set focuscontent
 set followhints=1
-set guioptions=Brb
+set guioptions=Bmrb
 set hintinputs+=name
+set hlsearch
 set showstatuslinks=2
 set wildoptions=auto
+
 set nextpattern+='次'
 set previouspattern+='前'
 
 " emulate vim's "after"
 set runtimepath+=~/.vimperator/after,~/vimperator/after
+
+set jsdebugger
 
 let mapleader=","
 
