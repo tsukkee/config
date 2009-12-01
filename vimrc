@@ -1,6 +1,6 @@
 " ==================== Settings ==================== "
 " Define and reset augroup used in vimrc
-augroup vimrc-autocmd
+augroup vimrc
     autocmd!
 augroup END
 
@@ -88,7 +88,7 @@ endfunction
 
 " Display cursorline only in active window
 " Reference: http://nanabit.net/blog/2007/11/03/vim-cursorline/
-augroup vimrc-autocmd
+augroup vimrc
     autocmd WinLeave * set nocursorline
     autocmd WinEnter,BufRead * set cursorline
 augroup END
@@ -143,7 +143,7 @@ if has('iconv')
 endif
 
 " use 'fileencoding' for 'encoding' if the file don't contain multibyte characters
-autocmd vimrc-autocmd BufReadPost *
+autocmd vimrc BufReadPost *
 \   if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n') == 0
 \|      let &fileencoding=&encoding
 \|  endif
@@ -152,7 +152,7 @@ autocmd vimrc-autocmd BufReadPost *
 set ffs=dos,unix,mac
 
 " use ff=unix for new file
-autocmd vimrc-autocmd BufNewFile * set ff=unix
+autocmd vimrc BufNewFile * set ff=unix
 
 " Omni completion
 set completeopt+=menuone " Display menu
@@ -163,7 +163,7 @@ filetype plugin on " to use filetype plugin
 
 " Show quickfix automatically
 " Reference: http://webtech-walker.com/archive/2009/09/29213156.html
-autocmd vimrc-autocmd QuickfixCmdPost make,grep,grepadd,vimgrep
+autocmd vimrc QuickfixCmdPost make,grep,grepadd,vimgrep
 \   if len(getqflist()) != 0
 \|      copen
 \|  endif
@@ -172,7 +172,7 @@ autocmd vimrc-autocmd QuickfixCmdPost make,grep,grepadd,vimgrep
 " Reference: http://vim-users.jp/2009/10/hack84/
 " Don't save options.
 set viewoptions-=options
-augroup vimrc-autocmd
+augroup vimrc
     autocmd BufWritePost *
     \   if expand('%') != '' && &buftype !~ 'nofile'
     \|      mkview
@@ -186,7 +186,7 @@ if has('win32')
 endif
 
 " ==================== Hightlight ==================== "
-augroup vimrc-autocmd
+augroup vimrc
     autocmd ColorScheme * call s:onColorScheme()
     autocmd VimEnter,WinEnter * match ZenkakuSpace /　/
 augroup END
@@ -331,7 +331,7 @@ endif
 " Binary (see :h xxd)
 " vim -b :edit binary using xxd-format!
 " Reference: http://jarp.does.notwork.org/diary/200606a.html#200606021
-augroup vimrc-autocmd
+augroup vimrc
     autocmd BufReadPre   *.bin,*.swf set binary
     autocmd BufReadPost  *.bin,*.swf if &binary | silent %!xxd -g 1
     autocmd BufReadPost  *.bin,*.swf set filetype=xxd | endif
@@ -350,13 +350,11 @@ command! -complete=file -nargs=? TabpageCD
 AlterCommand cd TabpageCD
 command! CD silent execute 'TabpageCD' expand('%:p:h')
 
-augroup vimrc-autocmd
-    autocmd VimEnter,TabEnter *
-    \   if !exists('t:cwd')
-    \|    let t:cwd = getcwd()
-    \|  endif
-    \|  execute 'cd' fnameescape(t:cwd)
-augroup END
+autocmd vimrc VimEnter,TabEnter *
+\   if !exists('t:cwd')
+\|    let t:cwd = getcwd()
+\|  endif
+\|  execute 'cd' fnameescape(t:cwd)
 
 " Go to alternate tab
 if !exists('g:AlternateTabNumber')
@@ -367,9 +365,7 @@ command! GoToAlternateTab silent execute 'tabnext' g:AlternateTabNumber
 CommandMap g<C-^> GoToAlternateTab
 Arpeggionnoremap <silent> al :<C-u>GoToAlternateTab<CR>
 
-augroup vimrc-autocmd
-    autocmd TabLeave * let g:AlternateTabNumber = tabpagenr()
-augroup END
+autocmd vimrc TabLeave * let g:AlternateTabNumber = tabpagenr()
 
 " Rename
 command! -nargs=1 -bang -complete=file Rename saveas<bang> <args> | call delete(expand('#'))
@@ -380,7 +376,7 @@ command! CtagsR !ctags -R
 
 " ==================== Plugins settings ==================== "
 " FileType
-augroup vimrc-autocmd
+augroup vimrc
     " some ftplugins set 'textwidth'
     autocmd FileType * setlocal textwidth=0
 
@@ -494,18 +490,16 @@ PopupMap <S-Tab> "\<C-p>"
 PopupMap <C-h>   neocomplcache#cancel_popup() . "\<C-h>"
 
 " vimshell
-augroup vimrc-autocmd
+augroup vimrc
     autocmd FileType vimshell nunmap <buffer> <C-d>
 augroup END
 
 " ku
 let g:ku_mrufile_size = 1000
 
-augroup vimrc-autocmd
-    autocmd FileType ku
-    \    call ku#default_key_mappings(1)
-    \|   call s:kuMappings()
-augroup END
+autocmd vimrc FileType ku
+\    call ku#default_key_mappings(1)
+\|   call s:kuMappings()
 function! s:kuMappings()
     inoremap <buffer> <silent> <Tab> <C-n>
     inoremap <buffer> <silent> <S-Tab> <C-p>
@@ -623,15 +617,15 @@ let g:html_use_encoding = 'utf-8'
 
 " Auto reloading vimrc
 " Reference: http://vim-users.jp/2009/09/hack74/
-augroup vimrc-autocmd
-    if has('gui_running')
-        autocmd BufWritePost .vimrc nested source $MYVIMRC
-        \|  source $MYGVIMRC
-        autocmd BufWritePost .gvimrc nested source $MYGVIMRC
-    else
-        autocmd BufWritePost .vimrc nested source $MYVIMRC
-    endif
-augroup END
+if has('gui_running')
+    autocmd vimrc BufWritePost .vimrc nested
+    \   source $MYVIMRC | source $MYGVIMRC
+    autocmd vimrc BufWritePost .gvimrc nested
+    \   source $MYGVIMRC
+else
+    autocmd vimrc BufWritePost .vimrc nested
+    \   source $MYVIMRC
+endif
 
 " Load private information
 if filereadable($HOME . '/.vimrc.local')

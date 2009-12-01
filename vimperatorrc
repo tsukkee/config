@@ -15,10 +15,9 @@ set previouspattern+='前'
 " emulate vim's "after"
 set runtimepath+=~/.vimperator/after,~/vimperator/after
 
-set jsdebugger
+" set jsdebugger
 
 let mapleader=","
-
 
 " ==================== Firefox options ==================== "
 " disable accesskey
