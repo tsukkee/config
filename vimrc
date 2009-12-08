@@ -185,6 +185,7 @@ if has('win32')
     set viewdir=~/vimfiles/view
 endif
 
+
 " ==================== Hightlight ==================== "
 augroup vimrc
     autocmd ColorScheme * call s:onColorScheme()
@@ -607,6 +608,7 @@ endif
 " Utility command for Windows
 if has('win32')
     command! Here silent execute '!explorer' expand('%:p:h')
+    command! This silent execute '!start cmd /c "%"'
 endif
 
 " TOhtml
