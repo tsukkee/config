@@ -487,7 +487,6 @@ PopupMap <C-e>   neocomplcache#cancel_popup()
 PopupMap <CR>    neocomplcache#close_popup() . "\<CR>"
 PopupMap <Tab>   "\<C-n>"
 PopupMap <S-Tab> "\<C-p>"
-PopupMap <C-h>   neocomplcache#cancel_popup() . "\<C-h>"
 
 " vimshell
 augroup vimrc
