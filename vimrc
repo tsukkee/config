@@ -59,7 +59,7 @@ set scrolloff=5               " minimal number of screen lines to keep above and
 set foldmethod=marker         " folding
 set foldcolumn=3              " display fold
 set list                      " show unprintable characters
-set listchars=tab:>\ ,trail:_ " strings to use in 'list'
+set listchars=tab:>\ ,trail:~ " strings to use in 'list'
 set ambiwidth=double          " For multibyte characters, such as □, ○
 
 " Status line
@@ -176,6 +176,7 @@ augroup vimrc
     autocmd BufWritePost *
     \   if expand('%') != '' && &buftype !~ 'nofile'
     \|      mkview
+    \|  endif
     autocmd BufRead *
     \   if expand('%') != '' && &buftype !~ 'nofile'
     \|      silent loadview
@@ -189,7 +190,7 @@ endif
 " ==================== Hightlight ==================== "
 augroup vimrc
     autocmd ColorScheme * call s:onColorScheme()
-    autocmd VimEnter,WinEnter * match ZenkakuSpace /　/
+    autocmd VimEnter,WinEnter * call matchadd('ZenkakuSpace', '　')
 augroup END
 function! s:onColorScheme()
     " Modify colorscheme
@@ -212,7 +213,6 @@ syntax on " enable syntax coloring
 
 " colorscheme
 if &t_Co == 256 || has('gui')
-    let g:zenburn_high_Contrast = 0
     colorscheme lucius
 else
     colorscheme torte
@@ -488,7 +488,6 @@ PopupMap <C-e>   neocomplcache#cancel_popup()
 PopupMap <CR>    neocomplcache#close_popup() . "\<CR>"
 PopupMap <Tab>   "\<C-n>"
 PopupMap <S-Tab> "\<C-p>"
-PopupMap <C-h>   neocomplcache#cancel_popup() . "\<C-h>"
 
 " vimshell
 augroup vimrc
