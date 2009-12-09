@@ -1,3 +1,40 @@
+let INFO =
+<plugin name="Tree Style Tab" version="0.0.1"
+        href=""
+        summary="manipulate Tree Style Tab extension"
+        xmlns="http://vimperator.org/namespaces/liberator">
+    <author email="takayuki0510@gmail.com">tsukkee</author>
+    <license href="http://www.mozilla.org/MPL/MPL-1.1.html">MPL 1.1</license>
+    <project name="Vimperator" minVersion="2.3"/>
+    <p>
+        Tree Style Tabを操作します
+    </p>
+    <item>
+        <tags><![CDATA[zc]]></tags>
+        <spec>zc</spec>
+        <description>
+            <p>Collapse Subtree</p>
+        </description>
+    </item>
+    <item>
+        <tags><![CDATA[zo]]></tags>
+        <spec>zo</spec>
+        <description>
+            <p>Expand Subtree</p>
+        </description>
+    </item>
+    <item>
+        <tags><![CDATA[zM]]></tags>
+        <spec>zM</spec>
+        <description>
+            <p>Collapse All Subtree</p>
+        </description>
+    </item>
+    <note>
+        既存のマッピングを適当に上書きするので注意
+    </note>
+</plugin>;
+
 (function() {
 if(!"TreeStyleTabService" in window) {
     liberator.echoerr("TreeStyleTab.js needs TreeStyleTab Extension");

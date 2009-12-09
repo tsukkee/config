@@ -1,4 +1,19 @@
-// vimperatorのstatuslineのurl表示をlocationbar2みたいにする
+let INFO =
+<plugin name="colorize_url" version="0.0.1"
+        href=""
+        summary="colorize url in statusline like Locationbar2 extension"
+        xmlns="http://vimperator.org/namespaces/liberator">
+    <author email="takayuki0510@gmail.com">tsukkee</author>
+    <license href="http://www.mozilla.org/MPL/MPL-1.1.html">MPL 1.1</license>
+    <project name="Vimperator" minVersion="2.3"/>
+    <p>
+        <link topic="http://en.design-noir.de/mozilla/locationbar2/">Locationbar2</link>のようにstatuslineのURL表示を色分け
+    </p>
+    <note>
+        set showstatusline=1がうまく動かないので2にしてください
+    </note>
+</plugin>;
+
 (function() {
     // setting
     const liberatorNS = "http://vimperator.org/namespaces/liberator";
@@ -11,18 +26,12 @@
     let TLDSercie = Cc["@mozilla.org/network/effective-tld-service;1"]
         .getService(Ci.nsIEffectiveTLDService);
 
-    // statusline
-    let statusline = document.getElementById("liberator-statusline");
-
-    // original
-    let field_url = document.getElementById("liberator-statusline-field-url");
-    field_url.style.display = "none";
+    // hide original url
+    statusline._urlWidget.style.display = "none";
 
     // colorized
     let colorized_field_url = document.createElement("hbox");
     colorized_field_url.setAttribute("flex", 1);
-    colorized_field_url.setAttribute("readonly", false);
-    colorized_field_url.setAttribute("crop", "end");
     colorized_field_url.setAttribute("class", "plain");
     setupNode(colorized_field_url, "");
 
@@ -48,7 +57,7 @@
         colorized_field_url.appendChild(box);
     }
 
-    statusline.insertBefore(colorized_field_url, field_url);
+    statusline._statuslineWidget.insertBefore(colorized_field_url, statusline._urlWidget);
 
     // click event
     colorized_field_url.addEventListener("click", function(e) {
@@ -70,7 +79,7 @@
     let update = function() {
         let url = buffer.URL;
         let pathSegments = "";
-        let [, original_url, indicator] = field_url.value.match(/^\s*([^[]*)\s*(\[[^[]*\])?/);
+        let [, original_url, indicator] = statusline._urlWidget.value.match(/^\s*([^[]*)\s*(\[[^[]*\])?/);
         let isHelp = false;
         let prePathHref = "";
 
@@ -110,7 +119,7 @@
             try {
                 uri = IOService.newURI(buffer.URL, null, null);
             }
-            catch(e) { 
+            catch(e) {
                 liberator.echoerr("colorize_url: url parse error");
                 return;
             }
@@ -148,7 +157,7 @@
 
             // prePath href
             prePathHref = nodes.prePath.href
-                = nodes.protocol.value + nodes.subdomain.value 
+                = nodes.protocol.value + nodes.subdomain.value
                 + nodes.domain.value + nodes.port.value + "/";
 
             structure.prePath.forEach(function(name) {
