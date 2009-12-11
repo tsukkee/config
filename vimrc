@@ -472,11 +472,6 @@ let g:NeoComplCache_EnableQuickMatch = 0
 let g:NeoComplCache_EnableCamelCaseCompletion = 1
 let g:NeoComplCache_EnableUnderbarCompletion = 1
 
-if !exists('g:NeoComplCache_SameFileTypeLists')
-    let g:NeoComplCache_SameFileTypeLists = {}
-endif
-let g:NeoComplCache_SameFileTypeLists['vim'] = 'help'
-
 if !exists('g:NeoComplCache_DictionaryFileTypeLists')
     let g:NeoComplCache_DictionaryFileTypeLists = {}
 endif

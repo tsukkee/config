@@ -9,8 +9,8 @@ set hlsearch
 set showstatuslinks=2
 set wildoptions=auto
 
-set nextpattern+='次'
-set previouspattern+='前'
+set nextpattern+='次','\bolder\b'
+set previouspattern+='前','\bnerwer\b'
 
 " emulate vim's "after"
 set runtimepath+=~/.vimperator/after,~/vimperator/after
