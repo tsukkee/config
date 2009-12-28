@@ -623,7 +623,17 @@ else
     \   source $MYVIMRC
 endif
 
-" Load private information
+" Reference: http://vim-users.jp/2009/12/hack112/
+" Load settings for eacy location.
+autocmd vimrc BufNewFile,BufReadPost * call s:vimrc_local(expand('<afile>:p:h'))
+
+function! s:vimrc_local(loc)
+  let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
+  for i in reverse(filter(files, 'filereadable(v:val)'))
+    source `=i`
+  endfor
+endfunction
+
 if filereadable($HOME . '/.vimrc.local')
     source ~/.vimrc.local
 endif
