@@ -64,15 +64,12 @@ nnoremap <silent> a :toggleautopagerize<CR>
 js <<EOM
 (function() {
 function dispatchMouseClickByXPath(xpath) {
-    let d = window.getBrowser().contentDocument;
-    let elements = d.evaluate(xpath ,d, null, 7, null);
+    let elements = util.evaluateXPath(xpath);
     if(elements.snapshotLength) {
-        let e = d.createEvent('MouseEvents');
-        e.initEvent('click', true, true);
-        elements.snapshotItem(0).dispatchEvent(e);
+        buffer.followLink(elements.snapshotItem(0));
     }
     else {
-        liberator.echoerr("not found: " + xpath);
+        liberator.echomsg("not found: " + xpath);
     }
 }
 
