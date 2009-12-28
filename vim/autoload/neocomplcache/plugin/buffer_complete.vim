@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: buffer_complete.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 16 Dec 2009
+" Last Modified: 27 Dec 2009
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -22,7 +22,7 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 4.03, for Vim 7.0
+" Version: 4.04, for Vim 7.0
 "=============================================================================
 
 " Important variables.
@@ -103,19 +103,20 @@ endfunction"}}}
 function! neocomplcache#plugin#buffer_complete#get_keyword_list(cur_keyword_str)"{{{
     let l:keyword_list = []
 
-    let l:key = tolower(a:cur_keyword_str[: s:completion_length-1])
     let l:current = bufnr('%')
-    if len(a:cur_keyword_str) < s:completion_length || neocomplcache#check_match_filter(l:key)
+    if len(a:cur_keyword_str) < s:completion_length ||
+                \neocomplcache#check_match_filter(a:cur_keyword_str, s:completion_length)
         for src in s:get_sources_list()
             let l:keyword_cache = neocomplcache#keyword_filter(
                         \neocomplcache#unpack_dictionary_dictionary(s:sources[src].keyword_cache), a:cur_keyword_str)
             if src == l:current
-                call s:calc_freauency(l:keyword_cache)
+                call s:calc_frequency(l:keyword_cache)
                 call s:calc_prev_frequencies(l:keyword_cache, a:cur_keyword_str)
             endif
             let l:keyword_list += l:keyword_cache
         endfor
     else
+        let l:key = tolower(a:cur_keyword_str[: s:completion_length-1])
         for src in s:get_sources_list()
             if has_key(s:sources[src].keyword_cache, l:key)
                 let l:keyword_cache = values(s:sources[src].keyword_cache[l:key])
@@ -124,7 +125,7 @@ function! neocomplcache#plugin#buffer_complete#get_keyword_list(cur_keyword_str)
                 endif
                 
                 if src == l:current
-                    call s:calc_freauency(l:keyword_cache)
+                    call s:calc_frequency(l:keyword_cache)
                     call s:calc_prev_frequencies(l:keyword_cache, a:cur_keyword_str)
                 endif
                 
@@ -170,7 +171,7 @@ function! neocomplcache#plugin#buffer_complete#caching_percent(number)"{{{
     endif
 endfunction"}}}
 
-function! s:calc_freauency(list)"{{{
+function! s:calc_frequency(list)"{{{
     if !neocomplcache#plugin#buffer_complete#exists_current_source() || g:NeoComplCache_AlphabeticalOrder
         return
     endif
