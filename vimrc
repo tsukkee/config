@@ -561,6 +561,15 @@ CommandMap [Prefix]T     NERDTreeClose
 CommandMap [Prefix]<C-t> execute 'NERDTree' expand('%:p:h')
 Arpeggionmap <silent> nt :<C-u>NERDTreeToggle<CR>
 
+" ref
+if has('mac')
+    let g:ref_refe_encoding = 'euc-jp'
+    let g:ref_phpmanual_path = expand('~/Documents/phpmanual')
+elseif has('win32')
+    let g:ref_refe_encoding = 'cp932'
+    let g:ref_phpmanual_path = expand('~/Documents/phpmanual')
+endif
+
 " Reload Firefox
 " Need MozRepl and +ruby
 function! ReloadFirefox()
