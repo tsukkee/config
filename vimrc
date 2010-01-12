@@ -570,6 +570,11 @@ elseif has('win32')
     let g:ref_phpmanual_path = expand('~/Documents/phpmanual')
 endif
 
+" lingr
+if has('mac')
+    let g:lingr_command_to_open_url = 'open -g %s'
+endif
+
 " Reload Firefox
 " Need MozRepl and +ruby
 function! ReloadFirefox()
