@@ -83,8 +83,11 @@ _colorize_prompt
 
 # rprompt
 autoload -Uz vcs_info
+zstyle ':vcs_info:*' enable git svn hg bzr
 zstyle ':vcs_info:*' formats '(%s)-[%b]'
 zstyle ':vcs_info:*' actionformats '(%s)-[%b|%a]'
+zstyle ':vcs_info:(svn|bzr):*' branchformat '%b:r%r'
+zstyle ':vcs_info:bzr:*' use-simple true
 function _vsc_info() {
     psvar=()
     LANG=en_US.UTF-8 vcs_info
