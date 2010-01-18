@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: neocomplcache.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 10 Jan 2010
+" Last Modified: 16 Jan 2010
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -22,7 +22,7 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 4.07, for Vim 7.0
+" Version: 4.08, for Vim 7.0
 "=============================================================================
 
 " Check vimproc.
@@ -225,15 +225,7 @@ function! neocomplcache#enable() "{{{
     if !exists('g:NeoComplCache_PluginCompletionLength')
         let g:NeoComplCache_PluginCompletionLength = {}
     endif
-    call neocomplcache#set_variable_pattern('g:NeoComplCache_PluginCompletionLength', 'omni_complete', 0)
     "}}}
-    
-    " Initialize assume file type lists."{{{
-    if !exists('g:NeoComplCache_NonBufferFileTypeDetect')
-        let g:NeoComplCache_NonBufferFileTypeDetect = {}
-    endif
-    " For test.
-    "let g:NeoComplCache_NonBufferFileTypeDetect['rb'] = 'ruby'"}}}
     
     " Add commands."{{{
     command! -nargs=0 NeoComplCacheDisable call neocomplcache#disable()
@@ -297,6 +289,7 @@ function! neocomplcache#manual_complete(findstart, base)"{{{
     if a:findstart
         " Get cursor word.
         let l:cur_text = s:get_cur_text()
+        let s:old_text = l:cur_text
 
         " Try complfuncs completion."{{{
         let l:complete_result = {}
@@ -494,51 +487,6 @@ function! neocomplcache#compare_words(i1, i2)
     return a:i1.word > a:i2.word ? 1 : a:i1.word == a:i2.word ? 0 : -1
 endfunction"}}}
 
-function! neocomplcache#assume_buffer_pattern(bufname)"{{{
-    let l:ft = getbufvar(a:bufname, '&filetype')
-    if l:ft == ''
-        let l:ft = 'nothing'
-    endif
-
-    if l:ft =~ '\.'
-        " Composite filetypes.
-        let l:keyword_array = []
-        let l:keyword_default = 0
-        for l:f in split(l:ft, '\.')
-            if has_key(g:NeoComplCache_KeywordPatterns, l:f)
-                call add(l:keyword_array, g:NeoComplCache_KeywordPatterns[l:f])
-            elseif !l:keyword_default
-                call add(l:keyword_array, g:NeoComplCache_KeywordPatterns['default'])
-                let l:keyword_default = 1
-            endif
-        endfor
-        let l:keyword_pattern = join(l:keyword_array, '|')
-    else
-        " Normal filetypes.
-        let l:keyword_pattern = neocomplcache#get_keyword_pattern(l:ft)
-    endif
-    
-    return l:keyword_pattern
-endfunction"}}}
-function! neocomplcache#assume_pattern(bufname)"{{{
-    " Extract extention.
-    let l:ext = fnamemodify(a:bufname, ':e')
-    if l:ext == ''
-        let l:ext = fnamemodify(a:bufname, ':t')
-    endif
-
-    if has_key(g:NeoComplCache_NonBufferFileTypeDetect, l:ext)
-        let l:filetype = g:NeoComplCache_NonBufferFileTypeDetect[l:ext]
-    elseif has_key(g:NeoComplCache_KeywordPatterns, l:ext)
-        let l:filetype = l:ext
-    else
-        " Not found.
-        let l:filetype = l:ext
-    endif
-    
-    return neocomplcache#get_keyword_pattern(l:filetype)
-endfunction "}}}
-
 function! neocomplcache#check_skip_time()"{{{
     if !g:NeoComplCache_EnableSkipCompletion || !neocomplcache#is_auto_complete()
         return 0
@@ -556,7 +504,8 @@ function! neocomplcache#rand(max)"{{{
     return (l:time < 0 ? -l:time : l:time)% (a:max + 1)
 endfunction"}}}
 function! neocomplcache#system(str, ...)"{{{
-    return s:is_vimproc ? vimproc#system(a:str, join(a:000)): system(a:str, join(a:000))
+    return s:is_vimproc ? (a:0 == 0 ? vimproc#system(a:str) : vimproc#system(a:str, join(a:000)))
+                \: (a:0 == 0 ? system(a:str) : system(a:str, join(a:000)))
 endfunction"}}}
 
 function! neocomplcache#caching_percent()"{{{
@@ -575,14 +524,19 @@ function! neocomplcache#get_completion_length(plugin_name)"{{{
     endif
 endfunction"}}}
 function! neocomplcache#get_keyword_pattern(...)"{{{
-    if empty(a:000)
+    if a:0 == 0
         let l:filetype = (&filetype == '')?  'nothing' : &filetype
     else
         let l:filetype = a:000[0]
     endif
 
-    return has_key(g:NeoComplCache_KeywordPatterns, l:filetype) ?
-                \ g:NeoComplCache_KeywordPatterns[l:filetype] : g:NeoComplCache_KeywordPatterns['default']
+    let l:keyword_patterns = []
+    for l:ft in split(l:filetype, '\.')
+        call add(l:keyword_patterns, has_key(g:NeoComplCache_KeywordPatterns, l:ft) ?
+                    \ g:NeoComplCache_KeywordPatterns[l:ft] : g:NeoComplCache_KeywordPatterns['default'])
+    endfor
+
+    return join(l:keyword_patterns, '\m\|')
 endfunction"}}}
 function! neocomplcache#get_next_keyword_pattern(...)"{{{
     if empty(a:000)
@@ -810,6 +764,7 @@ endfunction"}}}
 
 function! neocomplcache#start_manual_complete(complfunc_name)"{{{
     let l:cur_text = s:get_cur_text()
+    let s:old_text = l:cur_text
 
     " Set function.
     let &l:completefunc = 'neocomplcache#manual_complete'
@@ -949,14 +904,15 @@ function! s:complete()"{{{
     " Prevent infinity loop.
     " Not complete multi byte character for ATOK X3.
     if l:cur_text == s:old_text || l:cur_text == '' || char2nr(l:cur_text[-1:]) >= 0x80
+        let s:complete_words = []
         return
     endif
 
+    let l:save_old = s:old_text
     let s:old_text = l:cur_text
-    let l:use_previous_result = neocomplcache#head_match(l:cur_text, s:old_text)
     
     let l:quickmatch_pattern = s:get_quickmatch_pattern()
-    if g:NeoComplCache_EnableQuickMatch && l:cur_text =~ l:quickmatch_pattern.'[a-z0-9]$'
+    if g:NeoComplCache_EnableQuickMatch && l:cur_text =~ l:quickmatch_pattern.'[a-z0-9;,./]$'
         " Select quickmatch list.
         let l:complete_words = s:select_quickmatch_list(l:cur_text[-1:])
         
@@ -972,15 +928,23 @@ function! s:complete()"{{{
         
         let s:prev_numbered_list = []
         let l:is_quickmatch_list = 0
-    elseif g:NeoComplCache_EnableQuickMatch && l:cur_text =~ l:quickmatch_pattern.'$'
-        " Quickmatch list.
-        let l:is_quickmatch_list = 1
-        let l:cur_text = l:cur_text[: -len(matchstr(l:cur_text, l:quickmatch_pattern.'$'))-1]
-        let s:cur_text = l:cur_text
+    elseif g:NeoComplCache_EnableQuickMatch 
+                \&& !empty(s:complete_words)
+                \&& l:cur_text =~ l:quickmatch_pattern.'$'
+                \&& l:cur_text !~ l:quickmatch_pattern . l:quickmatch_pattern.'$'
+                \&& neocomplcache#head_match(l:cur_text, l:save_old)
+        " Print quickmatch list.
+        let l:norrowing = l:cur_text[len(l:save_old) : -len(l:quickmatch_pattern)-1]
+        let s:complete_words = s:make_quickmatch_list(s:complete_words, s:cur_keyword_str . l:norrowing) 
+
+        let &l:completefunc = 'neocomplcache#auto_complete'
+        call feedkeys("\<C-x>\<C-u>\<C-p>", 'n')
+        return
     else
         let s:prev_numbered_list = []
         let l:is_quickmatch_list = 0
     endif
+    let s:complete_words = []
     
     echo ''
     redraw
@@ -1046,10 +1010,6 @@ function! s:complete()"{{{
         return
     endif
 
-    if l:is_quickmatch_list
-       let l:complete_words = s:make_quickmatch_list(l:complete_words) 
-    endif
-    
     let [s:cur_keyword_pos, s:cur_keyword_str, s:complete_words] = [l:cur_keyword_pos, l:cur_keyword_str, l:complete_words]
 
     call feedkeys("\<C-x>\<C-u>\<C-p>", 'n')
@@ -1154,23 +1114,25 @@ let s:quickmatch_table = {
             \'z' : 20, 'x' : 21, 'c' : 22, 'v' : 23, 'b' : 24, 'n' : 25, 'm' : 26, ',' : 27, '.' : 28, '/' : 29,
             \'1' : 30, '2' : 31, '3' : 32, '4' : 33, '5' : 34, '6' : 35, '7' : 36, '8' : 37, '9' : 38, '0' : 39
             \}
-function! s:make_quickmatch_list(list)"{{{
+function! s:make_quickmatch_list(list, cur_keyword_str)"{{{
     " Check dup.
     let l:dup_check = {}
     let l:num = 0
     let l:qlist = []
     let l:key = 'asdfghjklqwertyuiopzxcvbnm1234567890'
-    for keyword in deepcopy(a:list[: len(s:quickmatch_table)])
-        if keyword.word != '' && (
-                    \!has_key(l:dup_check, keyword.word) ||
-                    \(has_key(keyword, 'dup') && keyword.dup))
+    for keyword in a:list
+        if keyword.word != '' && neocomplcache#head_match(keyword.word, a:cur_keyword_str) 
+                    \&& (!has_key(l:dup_check, keyword.word) || (has_key(keyword, 'dup') && keyword.dup))
             let l:dup_check[keyword.word] = 1
+            let l:keyword = deepcopy(l:keyword)
             let keyword.abbr = printf('%s: %s', l:key[l:num], keyword.abbr)
 
             call add(l:qlist, keyword)
             let l:num += 1
         endif
     endfor
+    " Trunk too many items.
+    let l:qlist = l:qlist[: len(s:quickmatch_table)]
 
     " Save numbered lists.
     let s:prev_numbered_list = l:qlist
