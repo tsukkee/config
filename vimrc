@@ -46,7 +46,7 @@ nohlsearch     " avoid highlighting when reload vimrc
 " Reading and writing file
 set directory-=. " don't save tmp swap file in current directory
 set autoread     " auto re-read when the file is written by other application
-set hidden       " allow open other file without saving current file
+" set hidden       " allow open other file without saving current file
 set tags=./tags; " search tag file recursively (see :h file-searching)
 
 " Display
@@ -390,6 +390,26 @@ augroup vimrc
     " CakePHP
     autocmd BufNewFile,BufRead *.thtml setfiletype php
     autocmd BufNewFile,BufRead *.ctp setfiletype php
+
+    " Scala
+    " Reference: http://d.hatena.ne.jp/tyru/20090406/1239015151
+    autocmd BufNewFile,BufRead *.scala setfiletype scala
+    autocmd FileType scala
+    \   setlocal softtabstop=2 shiftwidth=2 tabstop=2
+    \|  setlocal iskeyword+=@-@ " for javadoc
+    \|  setlocal includeexpr=substitute(v:fname,'\\.','/','g')
+    \|  setlocal suffixesadd=.scala
+    \|  setlocal suffixes+=.class
+    \|  setlocal comments& comments^=s0:*\ -,m0:*\ \ ,ex0:*/
+    \|  setlocal commentstring=//%s
+    \|  setlocal formatoptions-=t formatoptions+=croql
+
+    " Markdown
+    autocmd BufRead,BufNewFile *.mkd setfiletype mkd
+    autocmd BufRead,BufNewFile *.md setfiletype mkd
+
+    " Textile
+    autocmd BufRead,BufNewFile *.textile setfiletype textile
 augroup END
 
 " gist
