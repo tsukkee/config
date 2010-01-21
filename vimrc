@@ -201,11 +201,11 @@ function! s:onColorScheme()
     if g:colors_name == 'xoria256'
         highlight CursorLine cterm=none gui=none
         highlight ZenkakuSpace ctermbg=77 guibg=#5fdf5f
-    endif
-
-    if g:colors_name == 'lucius'
+    elseif g:colors_name == 'lucius'
         highlight SpecialKey ctermfg=172 guifg=#ffaa00
         highlight ZenkakuSpace ctermbg=172 guibg=#ffaa00
+    else
+        highlight ZenkakuSpace ctermbg=77
     endif
 endfunction
 
@@ -592,8 +592,9 @@ endif
 
 " lingr
 if has('mac')
-    let g:lingr_command_to_open_url = 'open -g %s'
+    let g:lingr_vim_command_to_open_url = 'open -g %s'
 endif
+let g:lingr_vim_time_format = "%Y/%m/%d %H:%M:%S"
 
 " Reload Firefox
 " Need MozRepl and +ruby

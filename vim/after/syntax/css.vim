@@ -88,13 +88,10 @@ function! s:PreviewCSSColorInLine(where)
       let color = substitute(foundcolor, '\(\x\)', '\1\1', 'g')
     elseif foundcolor =~ '^rgba\?([0-9 ,.]\+)$'
       let color = s:func2hex(foundcolor)
-      " let foundcolor = substitute(foundcolor, ',', '_', 'g')
-      " let foundcolor = substitute(foundcolor, '[ ()]', '', 'g')
     else
       let color = ''
     endif
     if color != ''
-      echomsg 'rgb(a):' color
       return s:SetMatcher(color,foundcolor)
     endif
   endif
@@ -270,11 +267,20 @@ if has("gui_running") || &t_Co==256
   endwhile
   unlet i
 
+  let b:currentLine = getline('.')
   augroup PreviewCSSColor
     autocmd!
     autocmd CursorHold *.css silent call s:PreviewCSSColorInLine('.')
     autocmd CursorHoldI *.css silent call s:PreviewCSSColorInLine('.')
-    autocmd InsertLeave *.css silent call s:PreviewCSSColorInLine('.')
+    autocmd CursorMoved *.css silent
+          \ if b:currentLine != getline('.')
+          \|  call s:PreviewCSSColorInLine('.')
+          \|  let b:currentLine = getline('.')
+          \|endif
+    autocmd InsertLeave *.css silent
+          \ for i in range(line("'["), line("']"))
+          \|  call s:PreviewCSSColorInLine(i)
+          \|endfor
   augroup END
 endif  " has("gui_running")
 
