@@ -82,7 +82,15 @@ function! s:tabline()
         let s .= '  '
     endfor
     let tabpaged_cwd = exists('t:cwd') ? '[' . t:cwd . ']' : ''
-    let s .= '%#TabLineFill#%T%=' . tabpaged_cwd
+    let lingr_has_unread = lingr#has_unread()
+    if lingr_has_unread == 1
+        let lingr_unread = "%#ErrorMsg#(*)"
+    elseif lingr_has_unread == 0
+        let lingr_unread = "()"
+    else
+        let lingr_unread = ""
+    endif
+    let s .= '%#TabLineFill#%T%=' . tabpaged_cwd . lingr_unread
     return s
 endfunction
 
@@ -227,6 +235,10 @@ Arpeggioinoremap fj <Esc>
 Arpeggiocnoremap fj <Esc>
 Arpeggiovnoremap fj <Esc>
 let g:submode_timeoutlen=5000
+
+" Mappings for miss typing
+nnoremap q: :q
+nnoremap Q: q: " I don't use Ex mode
 
 " Prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
