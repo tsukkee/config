@@ -82,10 +82,10 @@ function! s:tabline()
         let s .= '  '
     endfor
     let tabpaged_cwd = exists('t:cwd') ? '[' . t:cwd . ']' : ''
-    let lingr_has_unread = lingr#has_unread()
-    if lingr_has_unread == 1
-        let lingr_unread = "%#ErrorMsg#(*)"
-    elseif lingr_has_unread == 0
+    let lingr_unread_count = lingr#unread_count()
+    if lingr_unread_count > 0
+        let lingr_unread = "%#ErrorMsg#(" . lingr_unread_count . ")"
+    elseif lingr_unread_count == 0
         let lingr_unread = "()"
     else
         let lingr_unread = ""
