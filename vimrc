@@ -97,8 +97,8 @@ endfunction
 " Display cursorline only in active window
 " Reference: http://nanabit.net/blog/2007/11/03/vim-cursorline/
 augroup vimrc
-    autocmd WinLeave * set nocursorline
-    autocmd WinEnter,BufRead * set cursorline
+    autocmd WinLeave * setlocal nocursorline
+    autocmd WinEnter,BufRead * setlocal cursorline
 augroup END
 
 " Use set encoding=utf-8 in Windows
@@ -217,7 +217,7 @@ function! s:onColorScheme()
     endif
 endfunction
 
-syntax on " enable syntax coloring
+syntax enable " enable syntax coloring
 
 " colorscheme
 if &t_Co == 256 || has('gui')
@@ -237,8 +237,9 @@ Arpeggiovnoremap fj <Esc>
 let g:submode_timeoutlen=5000
 
 " Mappings for miss typing
+" I don't use Ex mode
 nnoremap q: :q
-nnoremap Q: q: " I don't use Ex mode
+nnoremap Q: q:
 
 " Prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
@@ -284,6 +285,9 @@ CExchangeMap <C-n> <Down>
 AlterCommand ++u edit\ ++enc=utf-8
 AlterCommand ++e edit\ ++enc=euc-jp
 AlterCommand ++s edit\ ++enc=cp932
+
+" write file easely
+nnoremap [Prefix]w :<C-u>update<CR>
 
 " Allow undo for i_CTRL-u and i_CTRL-w
 " Reference: http://vim-users.jp/2009/10/hack81/
@@ -681,6 +685,6 @@ function! s:vimrc_local(loc)
   endfor
 endfunction
 
-if filereadable($HOME . '/.vimrc.local')
+if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
 endif
