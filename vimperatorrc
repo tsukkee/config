@@ -13,9 +13,6 @@ set wildoptions=auto
 set nextpattern+='次','\bolder\b'
 set previouspattern+='前','\bnerwer\b'
 
-" emulate vim's "after"
-set runtimepath+=~/.vimperator/after,~/vimperator/after
-
 " set jsdebugger
 
 let mapleader=","
@@ -33,6 +30,16 @@ set! browser.tabs.loadDivertedInBackground=true
 set! dom.popup_maximum=1000
 " allow control sidebar position
 " set! layout.scrollbar.side=1
+" show tab preview
+set! browser.allTabs.previews=true
+set! browser.ctrlTab.previews=true
+" change new tab position
+set! browser.tabs.insertRelatedAfterCurrent=false
+" change behaviour on open folder
+set! browser.tabs.loadFolderAndReplace=false
+" use mousewheel acceleration
+set! mousewheel.acceleration.factor=5
+set! mousewheel.acceleration.start=3
 
 
 " ==================== key mappings ==================== "
@@ -42,19 +49,19 @@ nnoremap k 5k
 nnoremap h 3h
 nnoremap l 3l
 
-" enable to select completion list by <C-p> and <C-n>
-cnoremap <C-p> <S-Tab>
-cnoremap <C-n> <Tab>
+" Use beginning matches on command-line history
+cnoremap <C-p> <Up>
+cnoremap <C-n> <Down>
 
 " avoid unintended paste
 " only use "gP"
 nnoremap p <Nop>
 nnoremap P <Nop>
 
-" ghでハイライトオフ
+" disable highlight
 nnoremap <silent> gh :nohl<CR>:offwordhighlight<CR>
 
-" Iでナビゲーションツールバーをトグル
+" toggle "ナビゲーションバー"
 nnoremap <silent> I :toolbartoggle ナビゲーションツールバー<CR>
 
 " toggle autopagerize
@@ -100,25 +107,38 @@ liberator.plugins.customHintMatcher = function(inputString){
 };
 EOM
 
-" migemo completion
-js <<EOM
-/*
-(function() {
-CompletionContext.prototype.match = function(str){
-    let migemoPattern = new RegExp(migemo.query(this.filter), "i");
-    return migemoPattern.test(str);
-};
-})();
-*/
-EOM
-
 " commandBookmarklet
 let command_bookmarklet_prefix=""
 
 " sbmincsearch
 let sbmincsearch_service_name = "delicious"
 let sbmincsearch_max = 15
+runtime! plugin/sbm_incsearch.js
+set complete=stIl
 
+" colorize_url
+runtime! plugin/colorize_url.js
+hi ColorizeUrlSubdomain color: #333;
+hi ColorizeUrlPort      color: #333;
+hi ColorizeUrlFragment  color: #333;
+
+" feedSomeKeys
+runtime! plugin/feedSomeKeys_2.js
+autocmd LocationChange .* fmapc
+autocmd LocationChange 'reader\.livedoor\.com/reader' fmap! s a r c j k f,j F,k <Space> <S-Space> z b p o v > J < K
+autocmd LocationChange 'fastladder\.com/reader'       fmap! s a r c j k f,j F,k <Space> <S-Space> z b p o v > J < K
+autocmd LocationChange 'mail\.google\.com/mail/#'     fmap! u k j o <CR> p n c ? x s y e m ! #
+autocmd LocationChange 'www\.tumblr\.com/dashboard'   fmap! -vkey -event keydown j k
+
+" arpeggio
+" runtime! plugin/arpeggio.js
+js <<EOF
+/*
+liberator.plugins.arpeggioMap(modes.NORMAL, true, "asd", function() {
+    alert("asd");
+});
+*/
+EOF
 
 " ==================== colorscheme ==================== "
 colorscheme mac
@@ -129,12 +149,4 @@ style -name commandline-ime chrome://* #liberator-commandline-command input { im
 
 " ==================== others ==================== "
 " load local file
-js <<EOM
-(function() {
-    let local = "~/.vimperatorrc.local";
-//    let file = io.getFile(local);
-//    if(file.exists() && file.isReadable()) {
-        io.source(local, true);
-//    }
-})();
-EOM
+source! ~/.vimperatorrc.local
