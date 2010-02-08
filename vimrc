@@ -241,6 +241,9 @@ let g:submode_timeoutlen=5000
 nnoremap q: :q
 nnoremap Q: q:
 
+" Modify
+nnoremap Y y$
+
 " Prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
 nnoremap [Prefix] <Nop>
@@ -507,6 +510,7 @@ let g:NeoComplCache_EnableWildCard = 1
 let g:NeoComplCache_EnableQuickMatch = 0
 let g:NeoComplCache_EnableCamelCaseCompletion = 1
 let g:NeoComplCache_EnableUnderbarCompletion = 1
+let g:NeoComplCache_CachingDisablePattern = "\.log$\|\.zsh_history$"
 
 if !exists('g:NeoComplCache_DictionaryFileTypeLists')
     let g:NeoComplCache_DictionaryFileTypeLists = {}
