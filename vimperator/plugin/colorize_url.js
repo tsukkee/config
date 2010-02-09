@@ -15,6 +15,11 @@ let INFO =
 </plugin>;
 
 (function() {
+    const className = "liberator-colorize_url";
+    // block double loading
+    if(document.getElementsByClassName(className).length > 0)
+        return
+
     // setting
     const liberatorNS = "http://vimperator.org/namespaces/liberator";
     let separator_char = "/";
@@ -243,8 +248,6 @@ let INFO =
     }
 
     function setupNode(node, name) {
-        const className = "liberator-colorize_url";
-
         node.setAttribute("class", (name != "" ? className + "-" + name + " " : "") + className);
         node.setAttributeNS(liberatorNS, "highlight", toHi(name));
     }
