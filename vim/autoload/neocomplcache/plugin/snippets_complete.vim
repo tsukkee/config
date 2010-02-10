@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: snippets_complete.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 11 Jun 2010
+" Last Modified: 19 Jun 2010
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -22,9 +22,16 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 1.36, for Vim 7.0
+" Version: 1.37, for Vim 7.0
 "-----------------------------------------------------------------------------
 " ChangeLog: "{{{
+"   1.37:
+"    - Improved syntax detect.
+"    - Improved NeoComplCachePrintSnippets command.
+"    - Fixed snippet newline expand.
+"    - Improved syntax highlight.
+"    - Deleted expand marker.
+"
 "   1.36:
 "    - Improved snippet alias.
 "    - Improved command completion.
@@ -237,7 +244,7 @@ function! neocomplcache#plugin#snippets_complete#initialize()"{{{
         " Recaching events
         autocmd BufWritePost *.snip,*.snippets call s:caching_snippets(expand('<afile>:t:r')) 
         " Detect syntax file.
-        autocmd BufNewFile,BufWinEnter *.snip,*.snippets setfiletype snippet
+        autocmd BufNewFile,BufRead *.snip,*.snippets set filetype=snippet
         autocmd BufNewFile,BufWinEnter * syn match   NeoComplCacheExpandSnippets         
                     \'\${\d\+\%(:.\{-}\)\?\\\@<!}\|\$<\d\+\%(:.\{-}\)\?\\\@<!>\|\$\d\+'
     augroup END"}}}
@@ -368,18 +375,10 @@ function! s:set_snippet_pattern(dict)"{{{
     let l:abbr_pattern = printf('%%.%ds..%%s', g:NeoComplCache_MaxKeywordWidth-10)
 
     let l:word = a:dict.word
-    if a:dict.word =~ '\${\d\+\%(:.\{-}\)\?\\\@<!}'
-        let l:word .= '<expand>'
-        let l:menu_pattern = '<Snip> '
-    else
-        if a:dict.word =~ '<\\n>'
-            let l:word .= '<expand>'
-        endif
-        let l:menu_pattern = '[Snip] '
-    endif
+    let l:menu_pattern = a:dict.word =~ '\${\d\+\%(:.\{-}\)\?\\\@<!}' ? '<Snip> ' : '[Snip] '
     
     let l:abbr = has_key(a:dict, 'abbr')? a:dict.abbr : 
-                \substitute(a:dict.word, '\${\d\+\%(:.\{-}\)\?\\\@<!}\|\$<\d\+\%(:.\{-}\)\?\\\@<!>\|\$\d\+\|<\%(\\n\|expand\|\\t\)>\|\s\+', ' ', 'g')
+                \substitute(a:dict.word, '\${\d\+\%(:.\{-}\)\?\\\@<!}\|\$<\d\+\%(:.\{-}\)\?\\\@<!>\|\$\d\+\|<\%(\\n\|\\t\)>\|\s\+', ' ', 'g')
     let l:abbr = (len(l:abbr) > g:NeoComplCache_MaxKeywordWidth)? 
                 \ printf(l:abbr_pattern, l:abbr, l:abbr[-8:]) : l:abbr
     let l:name = (len(a:dict.name) > g:NeoComplCache_MaxKeywordWidth)? 
@@ -455,8 +454,10 @@ function! s:print_snippets(filetype)"{{{
     for snip in sort(l:list, 'neocomplcache#compare_words')
         echohl String
         echo snip.word
+        echohl Special
+        echo snip.menu
         echohl None
-        echo snip.abbr
+        echo snip.snip
         echo ' '
     endfor
 
@@ -594,7 +595,7 @@ function! s:snippets_expand(cur_text, col)"{{{
             let l:snip_word = s:eval_snippet(l:snip_word)
         endif
         if l:snip_word =~ '\n'
-            let snip_word = substitute(l:snip_word, '\n', '<\\n>', 'g') . '<expand>'
+            let snip_word = substitute(l:snip_word, '\n', '<\\n>', 'g')
         endif
 
         " Insert snippets.
@@ -603,19 +604,18 @@ function! s:snippets_expand(cur_text, col)"{{{
         call setpos('.', [0, line('.'), len(l:cur_text)+len(l:snip_word)+1, 0])
         let l:old_col = len(l:cur_text)+len(l:snip_word)+1
 
-        if l:snip_word =~ '<expand>$'
-            if l:snip_word =~ '<\\t>'
-                call s:expand_tabline()
-            else
-                call s:expand_newline()
-            endif
-            
-            call s:snippets_jump(a:cur_text, a:col)
-        elseif l:old_col < col('$')
+        if l:snip_word =~ '<\\t>'
+            call s:expand_tabline()
+        else
+            call s:expand_newline()
+        endif
+        if l:old_col < col('$')
             startinsert
         else
             startinsert!
         endif
+
+        call s:snippets_jump(a:cur_text, a:col)
 
         let &l:iminsert = 0
         let &l:imsearch = 0
@@ -625,9 +625,6 @@ function! s:snippets_expand(cur_text, col)"{{{
     call s:snippets_jump(a:cur_text, a:col)
 endfunction"}}}
 function! s:expand_newline()"{{{
-    " Substitute expand marker.
-    silent! s/<expand>//
-
     let l:match = match(getline('.'), '<\\n>')
     let s:snippet_holder_cnt = 1
     let s:begin_snippet = line('.')
@@ -657,9 +654,6 @@ function! s:expand_newline()"{{{
     let &l:formatoptions = l:formatoptions
 endfunction"}}}
 function! s:expand_tabline()"{{{
-    " Substitute expand marker.
-    silent! s/<expand>//
-
     let l:tablines = split(getline('.'), '<\\n>')
 
     let l:indent = matchstr(l:tablines[0], '^\s\+')
