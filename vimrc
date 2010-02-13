@@ -64,7 +64,14 @@ set ambiwidth=double          " For multibyte characters, such as □, ○
 
 " Status line
 set laststatus=2 " always show statusine
-set statusline=%<%F%r\ %y%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%m%=%v,%l/%L(%P)
+let &statusline = '%!' . s:SID_PREFIX() . 'statusline()'
+function! s:statusline()
+    let s = '%2*%w%r%*%y'
+    let s .= '[' . (&fenc != '' ? &fenc : &enc) . ']'
+    let s .= '[' . &ff . ']'
+    let s .= ' %<%F%1*%m%*%= %v,%l/%L(%P)'
+    return s
+endfunction
 
 " Tab line
 set showtabline=2                                  " always show tab bar
@@ -212,6 +219,12 @@ function! s:onColorScheme()
     elseif g:colors_name == 'lucius'
         highlight SpecialKey ctermfg=172 guifg=#ffaa00
         highlight ZenkakuSpace ctermbg=172 guibg=#ffaa00
+        " based on ErrorMsg
+        highlight User1 ctermbg=237 ctermfg=196 cterm=bold
+        \               guibg=#363946 guifg=#e5786d gui=bold
+        " based on ModeMsg
+        highlight User2 ctermbg=237 ctermfg=117 cterm=bold
+        \               guibg=#363946 guifg=#76d5f8 gui=bold
     else
         highlight ZenkakuSpace ctermbg=77
     endif
@@ -234,7 +247,7 @@ call arpeggio#load()
 Arpeggioinoremap fj <Esc>
 Arpeggiocnoremap fj <Esc>
 Arpeggiovnoremap fj <Esc>
-let g:submode_timeoutlen=5000
+let g:submode_timeoutlen=600
 
 " Mappings for miss typing
 " I don't use Ex mode
@@ -515,7 +528,7 @@ let g:NeoComplCache_CachingDisablePattern = "\.log$\|\.zsh_history$"
 if !exists('g:NeoComplCache_DictionaryFileTypeLists')
     let g:NeoComplCache_DictionaryFileTypeLists = {}
 endif
-let g:NeoComplCache_DictionaryFileTypeLists['vimshell'] = $HOME.'/.vimshell_hist'
+let g:NeoComplCache_DictionaryFileTypeLists['vimshell'] = expand('~/.vimshell_hist')
 
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
 PopupMap <C-y>   neocomplcache#close_popup()
@@ -680,14 +693,13 @@ endif
 
 " Reference: http://vim-users.jp/2009/12/hack112/
 " Load settings for eacy location.
-autocmd vimrc BufNewFile,BufReadPost * call s:vimrc_local(expand('<afile>:p:h'))
-
-function! s:vimrc_local(loc)
-  let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
-  for i in reverse(filter(files, 'filereadable(v:val)'))
-    source `=i`
-  endfor
-endfunction
+" autocmd vimrc BufNewFile,BufReadPost * call s:vimrc_local(expand('<afile>:p:h'))
+" function! s:vimrc_local(loc)
+  " let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
+  " for i in reverse(filter(files, 'filereadable(v:val)'))
+    " source `=i`
+  " endfor
+" endfunction
 
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
