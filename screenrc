@@ -14,23 +14,20 @@ defencoding utf-8
 bell_msg "Bell in window %."
 activity "Activity in window %."
 
-# status line
-hardstatus on
-hardstatus alwayslastline
-hardstatus string "%-w%{=b}%n %t%{-}%+w"
-# hardstatus alwayslastline "%{= wk}%-Lw%n%f* %t%{= wk}%+Lw %= %y/%m/%d %c "
+# caption and hardstatus
+caption always "%?%F%{= Bk}%:%{= Kw}%? %-Lw%40L>%?%F%{b db}%:%{b kW}%? %n %t %{-}%+Lw%="
+hardstatus alwayslastline "%{= gk} %?%h%:Screen #%n %t in %S%?%=%Y/%m/%d %c:%s  "
 
 # prevent windows size change with iTerm
 # (avoid "Aborted because of window size chage")
-# termcapinfo xterm* 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
-#
 # This setting is no longer needed. Instead of this,
 # check "Disable session-initiated window resizing" in Terminal Profiles
+termcapinfo xterm* 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
 
 # term
 defbce on
-# term xterm-256color
-term rxvt-256color
+term xterm-256color
+# term rxvt-256color
 
 # key bindings
 bind U eval "encoding utf-8" "!!!echo 'export LANG=ja_JP.UTF-8'"
@@ -39,6 +36,14 @@ bind S eval "encoding sjis" "!!!echo 'export LANG=ja_JP.Shift_JIS'"
 
 bind s eval split focus screen
 bind v eval "split -v" focus screen
+
+bind = resize =
+bind - resize -1
+bind + resize +1
+bind _ resize max
+bind ^R command -c region
+bind -c region + eval 'resize +3' 'command -c region'
+bind -c region - eval 'resize -3' 'command -c region'
 
 bind N eval "number $WINDOW+1"
 bind P eval "number $WINDOW-1"
