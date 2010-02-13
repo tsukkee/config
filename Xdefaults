@@ -17,3 +17,15 @@ URxvt.italicFont:\
 URxvt.boldItalicFont:\
     xft:Menlo:style=Bold Italic,\
     xft:Osaka:style=Regular-Mono
+
+XTerm*termName: xterm-256color
+XTerm*utf8: 1
+XTerm*metaSendsEscape: true
+XTerm*foreground: White
+XTerm*background: Gray10
+XTerm*geometry: 120x38
+XTerm*saveLines: 1000
+XTerm*faceName: Menlo
+XTerm*faceNameDoublesize: Osaka
+XTerm*faceSize: 11
+XTerm*cjkWidth: true
