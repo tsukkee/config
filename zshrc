@@ -83,7 +83,7 @@ _colorize_prompt
 
 # rprompt
 autoload -Uz vcs_info
-zstyle ':vcs_info:*' enable git svn hg bzr
+zstyle ':vcs_info:*' enable git svn hg bzr cvs
 zstyle ':vcs_info:*' formats '(%s)-[%b]'
 zstyle ':vcs_info:*' actionformats '(%s)-[%b|%a]'
 zstyle ':vcs_info:(svn|bzr):*' branchformat '%b:r%r'
@@ -125,6 +125,7 @@ set complete_aliases
 # test -x /opt/local/bin/jexctags && alias ctags=jexctags
 alias ls="ls -GF"
 alias scr="screen -xR"
+alias tm="tmux attach-session || tmux"
 alias -g C="| iconv -f utf-8 -t sjis | pbcopy"
 alias -g Csjis="| pbcopy"
 alias -g Ceuc="| iconv -f euc-jp -t sjis | pbcopy"

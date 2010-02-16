@@ -1,7 +1,6 @@
 " ==================== basic options ==================== "
 set activate=quickmark,paste
 set complete=sl
-set editor='/usr/local/bin/mvim -f'
 set focuscontent
 set followhints=1
 set guioptions=Bmrb

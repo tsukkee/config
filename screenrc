@@ -16,7 +16,7 @@ activity "Activity in window %."
 
 # caption and hardstatus
 caption always "%?%F%{= Bk}%:%{= Kw}%? %-Lw%40L>%?%F%{b db}%:%{b kW}%? %n %t %{-}%+Lw%="
-hardstatus alwayslastline "%{= gk} %?%h%:Screen #%n %t in %S%?%=%Y/%m/%d %c:%s  "
+hardstatus alwayslastline "%{= kG} %?%h%:Screen #%n %t in %S%?%=%Y/%m/%d %c:%s  "
 
 # prevent windows size change with iTerm
 # (avoid "Aborted because of window size chage")
@@ -42,8 +42,8 @@ bind - resize -1
 bind + resize +1
 bind _ resize max
 bind ^R command -c region
-bind -c region + eval 'resize +3' 'command -c region'
-bind -c region - eval 'resize -3' 'command -c region'
+bind -c region + eval 'resize +1' 'command -c region'
+bind -c region - eval 'resize -1' 'command -c region'
 
 bind N eval "number $WINDOW+1"
 bind P eval "number $WINDOW-1"

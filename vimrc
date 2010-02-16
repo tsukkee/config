@@ -97,7 +97,7 @@ function! s:tabline()
     else
         let lingr_unread = ""
     endif
-    let s .= '%#TabLineFill#%T%=' . tabpaged_cwd . lingr_unread
+    let s .= '%#TabLineFill#%T%=%<' . tabpaged_cwd . lingr_unread
     return s
 endfunction
 
@@ -442,6 +442,9 @@ augroup vimrc
 
     " Textile
     autocmd BufRead,BufNewFile *.textile setfiletype textile
+
+    " tmux
+    autocmd BufRead,BufNewFile .tmux.conf*,tmux.conf* setfiletype tmux
 augroup END
 
 " gist
