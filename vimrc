@@ -333,7 +333,7 @@ cnoremap <expr> <C-z> expand('%:p:r')
 " see :help fakeclip-multibyte-on-mac
 map gy "*y
 map gp "*p
-if !empty($WINDOW)
+if !empty($WINDOW) || !empty($TMUX)
     map gY <Plug>(fakeclip-screen-y)
     map gP <Plug>(fakeclip-screen-p)
 endif

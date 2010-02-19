@@ -7,16 +7,16 @@ URxvt.saveLines: 1000
 
 URxvt.font:\
     xft:Menlo:style=Normal:size=10:antialias=true,\
-    xft:Osaka:style=Regular-Mono
+    xft:TakaoGothic:style=Regular
 URxvt.boldFont:\
     xft:Menlo:style=Bold,\
-    xft:Osaka:style=Regular-Mono
+    xft:TakaoGothic:style=Regular
 URxvt.italicFont:\
     xft:Menlo:style=Italic,\
-    xft:Osaka:style=Regular-Mono
+    xft:TakaoGothic:style=Regular
 URxvt.boldItalicFont:\
     xft:Menlo:style=Bold Italic,\
-    xft:Osaka:style=Regular-Mono
+    xft:TakaoGothic:style=Regular
 
 XTerm*termName: xterm-256color
 XTerm*utf8: 1
