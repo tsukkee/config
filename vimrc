@@ -249,11 +249,6 @@ Arpeggiocnoremap fj <Esc>
 Arpeggiovnoremap fj <Esc>
 let g:submode_timeoutlen=600
 
-" Mappings for miss typing
-" I don't use Ex mode
-nnoremap q: :q
-nnoremap Q: q:
-
 " Modify
 nnoremap Y y$
 
@@ -298,9 +293,9 @@ CExchangeMap <C-p> <Up>
 CExchangeMap <C-n> <Down>
 
 " Re-open with specified encoding
-AlterCommand ++u edit\ ++enc=utf-8
-AlterCommand ++e edit\ ++enc=euc-jp
-AlterCommand ++s edit\ ++enc=cp932
+command! Utf8 edit ++enc=utf-8
+command! Euc edit ++enc=euc-jp
+command! Cp932 edit ++enc=cp932
 
 " write file easely
 nnoremap [Prefix]w :<C-u>update<CR>
@@ -338,11 +333,14 @@ if !empty($WINDOW) || !empty($TMUX)
     map gP <Plug>(fakeclip-screen-p)
 endif
 
+" smartchr
+inoremap <expr> = smartchr#one_of(" = ", " == ", " === ", "=")
+cnoremap <expr> \ smartchr#loop('~/', '\', {'ctype': ':'})
+cnoremap <expr> ( smartchr#loop('\(', '(', {'ctype': '/?'})
+
 " Tab move
-call submode#enter_with('tabmove', 'n', '', 'gt', 'gt')
-call submode#enter_with('tabmove', 'n', '', 'gT', 'gT')
-call submode#map('tabmove', 'n', '', 't', 'gt')
-call submode#map('tabmove', 'n', '', 'T', 'gT')
+nnoremap <C-n> gt
+nnoremap <C-p> gT
 
 " Window resize
 call submode#enter_with('winsize', 'n', '', '<C-w>>', '<C-w>>')
@@ -485,7 +483,7 @@ function! s:doCommentCommand(motion_wiseness)
 endfunction
 
 call s:setCommentOperator('[Operator]c',       'norm')
-call s:setCommentOperator('[Operator]<Scace>', 'toggle')
+call s:setCommentOperator('[Operator]<Space>', 'toggle')
 call s:setCommentOperator('[Operator]m',       'minimal')
 call s:setCommentOperator('[Operator]s',       'sexy')
 call s:setCommentOperator('[Operator]i',       'invert')
