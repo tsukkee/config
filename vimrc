@@ -328,15 +328,13 @@ cnoremap <expr> <C-z> expand('%:p:r')
 " see :help fakeclip-multibyte-on-mac
 map gy "*y
 map gp "*p
-if !empty($WINDOW) || !empty($TMUX)
+if exists('$WINDOW') || exists('$TMUX')
     map gY <Plug>(fakeclip-screen-y)
     map gP <Plug>(fakeclip-screen-p)
 endif
 
 " smartchr
-inoremap <expr> = smartchr#one_of(" = ", " == ", " === ", "=")
 cnoremap <expr> \ smartchr#loop('~/', '\', {'ctype': ':'})
-cnoremap <expr> ( smartchr#loop('\(', '(', {'ctype': '/?'})
 
 " Tab move
 nnoremap <C-n> gt
