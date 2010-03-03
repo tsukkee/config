@@ -97,6 +97,9 @@ EOM
 
 
 " ==================== plugin options ==================== "
+" Lazy
+command! -nargs=+ lazy autocmd VimperatorEnter .* <args>
+
 " migemo hint
 set hintmatching=custom
 js <<EOM
@@ -112,22 +115,17 @@ let command_bookmarklet_prefix=""
 " sbmincsearch
 let sbmincsearch_service_name = "delicious"
 let sbmincsearch_max = 15
-runtime! plugin/sbm_incsearch.js
-set complete=stIl
+lazy set complete=stIl
 
 " colorize_url
-runtime! plugin/colorize_url.js
-hi ColorizeUrlSubdomain color: #333;
-hi ColorizeUrlPort      color: #333;
-hi ColorizeUrlFragment  color: #333;
+lazy hi ColorizeUrlSubdomain color: #333;
+lazy hi ColorizeUrlPort      color: #333;
+lazy hi ColorizeUrlFragment  color: #333;
 
 " feedSomeKeys
-runtime! plugin/feedSomeKeys_2.js
-autocmd LocationChange .* fmapc
-autocmd LocationChange 'reader\.livedoor\.com/reader' fmap! s a r c j k f,j F,k <Space> <S-Space> z b p o v > J < K
-autocmd LocationChange 'fastladder\.com/reader'       fmap! s a r c j k f,j F,k <Space> <S-Space> z b p o v > J < K
-autocmd LocationChange 'mail\.google\.com/mail/#'     fmap! u k j o <CR> p n c ? x s y e m ! #
-autocmd LocationChange 'www\.tumblr\.com/dashboard'   fmap! -vkey -event keydown j k
+lazy fmaps -u='(fastladder|reader\.livedoor)\.com/reader' s a r c j k f,j F,k <Space> <S-Space> z b p o v > J < K
+lazy fmaps -u='mail.google\.com/mail' u k j o <CR p n c ? x s y e m ! #
+lazy fmaps -u='www\.tumblr\.com/dashboard' -events=vkeydown j k
 
 " arpeggio
 " runtime! plugin/arpeggio.js
