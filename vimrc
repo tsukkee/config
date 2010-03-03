@@ -628,6 +628,12 @@ if has('mac')
 endif
 let g:lingr_vim_time_format = "%Y/%m/%d %H:%M:%S"
 
+" zencoding
+let g:user_zen_settings = {
+\    'indentation': '    ',
+\    'lang': 'ja'
+\}
+
 " Reload Firefox
 " Need MozRepl and +ruby
 function! ReloadFirefox()
