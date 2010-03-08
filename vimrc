@@ -684,6 +684,29 @@ let g:html_use_css = 1
 let g:use_xhtml = 1
 let g:html_use_encoding = 'utf-8'
 
+" ColorScheme selecter
+" Reference: http://vim.g.hatena.ne.jp/tyru/20100226
+fun! s:SelectColorS()
+    30vnew
+
+    let files = split(globpath(&rtp, 'colors/*.vim'), "\n")
+    for idx in range(0, len(files) - 1)
+        let file = files[idx]
+        let name = matchstr(file , '\w\+\(\.vim\)\@=')
+        call setline(idx + 1, name)
+    endfor
+
+    file ColorSchemeSelector
+    setlocal bufhidden=wipe
+    setlocal buftype=nofile
+    setlocal nonu
+    setlocal nomodifiable
+    setlocal cursorline
+    nmap <buffer>  <Enter>  :<C-u>exec 'colors' getline('.')<CR>
+    nmap <buffer>  q        :<C-u>close<CR>
+endf
+com! SelectColorS :cal s:SelectColorS()
+
 " Auto reloading vimrc
 " Reference: http://vim-users.jp/2009/09/hack74/
 if has('gui_running')
