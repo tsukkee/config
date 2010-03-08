@@ -39,7 +39,7 @@ let PLUGIN_INFO =
   <name lang="ja">feedSomeKeys 3</name>
   <description>feed some defined key events into the Web content</description>
   <description lang="ja">キーイベントをWebコンテンツ側に送る</description>
-  <version>1.5.2</version>
+  <version>1.7.2</version>
   <author mail="anekos@snca.net" homepage="http://d.hatena.ne.jp/nokturnalmortum/">anekos</author>
   <license>new BSD License (Please read the source code comments of this plugin)</license>
   <license lang="ja">修正BSDライセンス (ソースコードのコメントを参照してください)</license>
@@ -78,83 +78,98 @@ lazy fmaps -u='http://code.google.com/p/vimperator-labs/issues/detail' u
 </VimperatorPlugin>;
 // }}}
 // INFO {{{
-let INFO =
-<plugin name="feedSomeKeys" version="1.5.2"
-        href="http://svn.coderepos.org/share/lang/javascript/vimperator-plugins/trunk/feedSomeKeys_3.js"
-        summary="Feed some defined key events into the Web content"
-        xmlns="http://vimperator.org/namespaces/liberator">
-  <author email="anekos@snca.net">anekos</author>
-  <license>New BSD License</license>
-  <project name="Vimperator" minVersion="2.3"/>
-  <p>
-    Feed key events directly into web contents.
-  </p>
-  <item>
-    <tags>:fmap</tags>
-    <spec>:fmap <oa>-e<oa>vents</oa>=<a>event-name-list</a></oa> <oa>-urls=<a>urlpattern</a></oa> <a>lhs</a> <a>rhs</a></spec>
-    <description>
-      <p>
-        Define one mapping.
-      </p>
-      <p>
-        If <a>-urls=<a>urlpattern</a></a> is given,
-        the mappings becomes effective mappings only on the page specifed by <a>urlpattern</a>.
-      </p>
-    </description>
-  </item>
-  <item>
-    <tags>:fmaps</tags>
-    <spec>:fmaps <oa>-e<oa>vents</oa>=<a>event-name-list</a></oa> <oa>-urls=<a>urlpattern</a></oa> <a>mapping-pair</a> ....</spec>
-    <description>
-      <p>
-        Two or more mappings are defined at once.
-        <a>mapping-pair</a> is a pair of key names separated by ",".
-        <p>e.g. "&lt;Leader>&lt;S-j>,j"</p>
-      </p>
-      <p>
-        If <a>-urls=<a>urlpattern</a></a> is given,
-        the mappings becomes effective mappings only on the page specifed by <a>urlpattern</a>.
-      </p>
-    </description>
-  </item>
-  <item>
-    <tags>:fmapc</tags>
-    <spec>:fmapc<oa>!</oa> <oa>url-pattern</oa></spec>
-    <description>
-      <p>
-        Remove the mappings matched with <oa>url-pattern</oa>.
-        If "!" is given, remove all mappings.
-      </p>
-    </description>
-  </item>
-  <item>
-    <tags>:funmap</tags>
-    <spec>:funmap <oa>-urls=<a>urlpattern</a></oa> <a>lhs</a></spec>
-    <description>
-      <p>
-        Remove the mappings.
-      </p>
-      <p>
-        If you wish to remove url-local mappings, give <a>-urls=<a>urlpattern</a></a>.
-      </p>
-    </description>
-  </item>
-  <h3 tag="fmap-event-names">event-name</h3>
-  <p>
-    <a>event-name-list</a> option follows a list of below values.
-    <ul>
-      <li>keypress</li>
-      <li>keydown</li>
-      <li>keyup</li>
-      <li>vkeypress</li>
-      <li>vkeydown</li>
-      <li>vkeyup</li>
-    </ul>
-    "v-" values use virtual key code.
-  </p>
-  <h3 tag="fmaps-examples">fmaps examples for .vimperatorrc</h3>
-  <p>If you input directly these commands in vimperator commandline, remove the ":lazy".</p>
-  <code><ex>
+let INFO = <>
+  <plugin name="feedSomeKeys" version="1.7.2"
+          href="http://svn.coderepos.org/share/lang/javascript/vimperator-plugins/trunk/feedSomeKeys_3.js"
+          summary="Feed some defined key events into the Web content"
+          lang="en-US"
+          xmlns="http://vimperator.org/namespaces/liberator">
+    <author email="anekos@snca.net">anekos</author>
+    <license>New BSD License</license>
+    <project name="Vimperator" minVersion="2.3"/>
+    <p>
+      Feed key events directly into web contents.
+    </p>
+    <item>
+      <tags>:fmap</tags>
+      <spec>:fmap <oa>-e<oa>vents</oa>=<a>eventnamelist</a></oa> <oa>-urls=<a>urlpattern</a></oa> <a>lhs</a> <a>rhs</a></spec>
+      <description>
+        <p>
+          Define one mapping.
+        </p>
+        <p>
+          If <a>-urls=<a>urlpattern</a></a> is given,
+          the mappings becomes effective mappings only on the page specifed by <a>urlpattern</a>.
+        </p>
+      </description>
+    </item>
+    <item>
+      <tags>:fmaps</tags>
+      <spec>:fmaps <oa>-e<oa>vents</oa>=<a>eventnamelist</a></oa> <oa>-urls=<a>urlpattern</a></oa> <a>mappingpair</a> ....</spec>
+      <description>
+        <p>
+          Two or more mappings are defined at once.
+          <a>mappingpair</a> is a pair of key names separated by ",".
+          <p>e.g. "&lt;Leader>&lt;S-j>,j"</p>
+        </p>
+        <p>
+          If <a>-urls=<a>urlpattern</a></a> is given,
+          the mappings becomes effective mappings only on the page specifed by <a>urlpattern</a>.
+        </p>
+      </description>
+    </item>
+    <item>
+      <tags>:fmapc</tags>
+      <spec>:fmapc<oa>!</oa> <oa>urlpattern</oa></spec>
+      <description>
+        <p>
+          Remove the mappings matched with <oa>urlpattern</oa>.
+          If "!" is given, remove all mappings.
+        </p>
+      </description>
+    </item>
+    <item>
+      <tags>:funmap</tags>
+      <spec>:funmap <oa>-urls=<a>urlpattern</a></oa> <a>lhs</a></spec>
+      <description>
+        <p>
+          Remove the mappings.
+        </p>
+        <p>
+          If you wish to remove url-local mappings, give <a>-urls=<a>urlpattern</a></a>.
+        </p>
+      </description>
+    </item>
+    <h3 tag="fmap-url-pattern">urlpattern</h3>
+    <p>
+      The value of <a>urlpattern</a> should be regular expression.
+    </p>
+    <h3 tag="fmap-xpath">xpath</h3>
+    <p>
+      The XPath for a target element.
+    </p>
+    <h3 tag="fmap-frame-number">framenumber</h3>
+    <p>
+      The number of a target frame.
+      Refer the completion for this number.
+    </p>
+    <h3 tag="fmap-event-name-list">eventnamelist</h3>
+    <p>
+      <a>eventnamelist</a> is a list of below values.
+      <ul>
+        <li>keypress</li>
+        <li>keydown</li>
+        <li>keyup</li>
+        <li>vkeypress</li>
+        <li>vkeydown</li>
+        <li>vkeyup</li>
+      </ul>
+      <p>"v-" values use virtual key code.</p>
+      <p>The default value of this option is "keypress".</p>
+    </p>
+    <h3 tag="fmaps-examples">fmaps examples for .vimperatorrc</h3>
+    <p>If you input directly these commands in vimperator commandline, remove the ":lazy".</p>
+    <code><ex>
 :command! -nargs=+ lazy autocmd VimperatorEnter .* &lt;args>
 :lazy fmaps -u='mail\.google\.com/mail' c / j k n p o u e x s r a # [ ] ? gi gs gt gd ga gc
 :lazy fmaps -u='mail\.google\.com/mail/.*/[0-9a-f]+$' c / j,n k,p n,j p,k o u e x s r a # [ ] ? gi gs gt gd ga gc
@@ -163,14 +178,118 @@ let INFO =
 :lazy fmaps -u='https?://www\.rememberthemilk\.com/home/' j k m i c t ? d F,f G,g S,s L,l Y,y H,h M,m &lt;Del> &lt;C-S-Left> &lt;C-S-Right>
 :lazy fmaps -u='http://code.google.com/p/vimperator-labs/issues/list' o j k
 :lazy fmaps -u='http://code.google.com/p/vimperator-labs/issues/detail' u
-  </ex></code>
-</plugin>;
+    </ex></code>
+  </plugin>
+  <plugin name="feedSomeKeys" version="1.7.2"
+          href="http://svn.coderepos.org/share/lang/javascript/vimperator-plugins/trunk/feedSomeKeys_3.js"
+          summary="Feed some defined key events into the Web content"
+          lang="ja"
+          xmlns="http://vimperator.org/namespaces/liberator">
+    <author email="anekos@snca.net">anekos</author>
+    <license>New BSD License</license>
+    <project name="Vimperator" minVersion="2.3"/>
+    <p>
+      Web コンテンツに直接キーイベントを送ります。
+    </p>
+    <item>
+      <tags>:fmap</tags>
+      <spec>:fmap <oa>-e<oa>vents</oa>=<a>eventnamelist</a></oa> <oa>-x<oa>path</oa>=<a>xpath</a></oa> <oa>-f<oa>rame</oa>=<a>framenumber</a></oa> <oa>-urls=<a>urlpattern</a></oa> <a>lhs</a> <a>rhs</a></spec>
+      <description>
+        <p>
+          マッピングを一つ定義します。
+        </p>
+        <p>
+          <a>-urls=<a>urlpattern</a></a> が与えられたとき、
+          そのマッピングは <a>urlpattern</a> で指定されたページのみで有効になります。
+        </p>
+      </description>
+    </item>
+    <item>
+      <tags>:fmaps</tags>
+      <spec>:fmaps <oa>-e<oa>vents</oa>=<a>eventnamelist</a></oa> <oa>-x<oa>path</oa>=<a>xpath</a></oa> <oa>-f<oa>rame</oa>=<a>framenumber</a></oa> <oa>-urls=<a>urlpattern</a></oa> <a>mappingpair</a> ....</spec>
+      <description>
+        <p>
+          一度に複数のマッピングを定義できます。
+          <a>mappingpair</a> は、"," で区切られたキー名の組です。
+          <p>例: "&lt;Leader>&lt;S-j>,j"</p>
+        </p>
+        <p>
+          <a>-urls=<a>urlpattern</a></a> が与えられたとき、
+          そのマッピングは <a>urlpattern</a> で指定されたページのみで有効になります。
+        </p>
+      </description>
+    </item>
+    <item>
+      <tags>:fmapc</tags>
+      <spec>:fmapc<oa>!</oa> <oa>urlpattern</oa></spec>
+      <description>
+        <p>
+          <oa>urlpattern</oa> のマッピングを削除します。
+           "!" が与えられたときは、全てのマッピングが削除されます。
+        </p>
+      </description>
+    </item>
+    <item>
+      <tags>:funmap</tags>
+      <spec>:funmap <oa>-urls=<a>urlpattern</a></oa> <a>lhs</a></spec>
+      <description>
+        <p>
+          マッピングを削除します。
+        </p>
+        <p>
+          <a>urlpattern</a> 付きのマッピングを削除するときは、<oa>-urls</oa> を指定する必要があります。
+        </p>
+      </description>
+    </item>
+    <h3 tag="fmap-url-pattern">urlpattern</h3>
+    <p>
+      <a>urlpattern</a> の値は正規表現でなければいけません。
+    </p>
+    <h3 tag="fmap-event-name-list">eventnamelist</h3>
+    <p>
+      <a>eventnamelist</a> は以下の値のリストです。
+      <ul>
+        <li>keypress</li>
+        <li>keydown</li>
+        <li>keyup</li>
+        <li>vkeypress</li>
+        <li>vkeydown</li>
+        <li>vkeyup</li>
+      </ul>
+      <p>"v-" のものは、仮想キーコードでイベントを発行します。</p>
+      <p>このオプションのデフォルト値は "keypress" です。</p>
+    </p>
+    <h3 tag="fmap-xpath">xpath</h3>
+    <p>
+      キーイベントを送るべき要素を指定するための XPath。
+    </p>
+    <h3 tag="fmap-frame-number">framenumber</h3>
+    <p>
+      キーイベントを送るべきフレームの番号。
+      番号は、補完を参考にしてください。
+    </p>
+    <h3 tag="fmaps-examples">.vimperatorrc 用の fmaps サンプル</h3>
+    <p>コマンドラインで直接に入力するときは、":lazy" を除いてください。</p>
+    <code><ex>
+:command! -nargs=+ lazy autocmd VimperatorEnter .* &lt;args>
+:lazy fmaps -u='mail\.google\.com/mail' c / j k n p o u e x s r a # [ ] ? gi gs gt gd ga gc
+:lazy fmaps -u='mail\.google\.com/mail/.*/[0-9a-f]+$' c / j,n k,p n,j p,k o u e x s r a # [ ] ? gi gs gt gd ga gc
+:lazy fmaps -u='www\.google\.co\.jp/reader' -events=vkeypress j k n p m s v A r S N P X O gh ga gs gt gu u / ? J K
+:lazy fmaps -u='(fastladder|livedoor)\.com/reader' j k s a p o v c i,p &lt;Space> &lt;S-Space> z b &lt; > q w e,g
+:lazy fmaps -u='https?://www\.rememberthemilk\.com/home/' j k m i c t ? d F,f G,g S,s L,l Y,y H,h M,m &lt;Del> &lt;C-S-Left> &lt;C-S-Right>
+:lazy fmaps -u='http://code.google.com/p/vimperator-labs/issues/list' o j k
+:lazy fmaps -u='http://code.google.com/p/vimperator-labs/issues/detail' u
+    </ex></code>
+  </plugin>
+</>;
+
 // }}}
 
 (function () {
 
   const EVENTS = 'keypress keydown keyup'.split(/\s+/);
   const EVENTS_WITH_V = EVENTS.concat(['v' + n for each (n in EVENTS)]);
+  const IGNORE_URLS = /<ALL>/;
 
   const VKeys = {
     '0': KeyEvent.DOM_VK_0,
@@ -229,15 +348,14 @@ let INFO =
     v;
 
   function or (list, func)
-    let ([head, tail] = list)
-      ((func || v)(head) || (tail && or(tail, func)));
+    (list.length && let ([head,] = list) (func(head) || or(list.slice(1), func)));
 
   function getFrames () {
     function bodyCheck (content)
       (content.document.body.localName.toLowerCase() === 'body');
 
     function get (content)
-      (bodyCheck(content) && result.push(content), Array.slice(content.frames).forEach(get))
+      (bodyCheck(content) && result.push(content), Array.slice(content.frames).forEach(get));
 
     let result = [];
     get(content);
@@ -301,44 +419,50 @@ let INFO =
     return false;
   }
 
+  function xpathValidator (expr) {
+    try {
+      document.evaluate(expr, document, null, null, null);
+      return true;
+    } catch (e) {}
+    return false;
+  }
+
   function makeListValidator (list)
     function (values)
       (values && !values.some(function (value) !list.some(function (event) event === value)));
 
-  function unmap (filter, patternOrUrl, ignoreUrls) {
-    let result = 0;
-
+  function findMappings ({all, filter, urls, ignoreUrls, not, result}) {
     function match (map) {
       let r = (
         map.feedSomeKeys &&
-        (!filter || filter === map.names[0]) &&
-        (ignoreUrls || mappings._matchingUrlsTest(map, patternOrUrl))
+        (all ||
+         (!filter || filter === map.names[0]) &&
+         (ignoreUrls || urls === IGNORE_URLS || mappings._matchingUrlsTest(map, urls)))
       );
-      result++;
-      return r;
+      if (result && r) {
+        if (typeof result.matched === 'number')
+          result.matched++;
+        else
+          result.matched = 1;
+      }
+      return !!r ^ !!not;
     }
 
-    let mode = modes.NORMAL;
-    mappings._user[mode] = [
-      map
-      for each (map in mappings._user[mode])
-      if (!match(map))
-    ];
-    return result;
-  }
-
-  function gets (filter) {
     if (filter)
       filter = mappings._expandLeader(filter);
-    return [
-      map
-      for (map in mappings._mappingsIterator([modes.NORMAL], mappings._user))
-        if (map.feedSomeKeys && (!filter || map.names[0] == filter))
-    ];
+    if (urls)
+      urls = RegExp(urls);
+
+    return mappings._user[modes.NORMAL].filter(match);
   }
 
-  function list (filter) {
-    let maps = gets(filter);
+  function unmap (condition) {
+    condition.not = true;
+    mappings._user[modes.NORMAL] = findMappings(condition);
+  }
+
+  function list (condition) {
+    let maps = findMappings(condition);
     let template = modules.template;
     let list =
       <table>
@@ -346,8 +470,8 @@ let INFO =
           template.map(maps, function (map)
             template.map(map.names, function (name)
             <tr>
-              <td>{name}</td>
-              <td>{map.feedSomeKeys.rhs}</td>
+              <td style="font-weight: bold">{name}</td>
+              <td style="font-weight: bold">{map.feedSomeKeys.rhs}</td>
               <td>{map.matchingUrls ? map.matchingUrls : '[Global]'}</td>
             </tr>))
         }
@@ -364,20 +488,41 @@ let INFO =
     context.title = ['name', 'rhs & url'];
     context.completions = [
       [
-        map.names[0],
-        map.feedSomeKeys.rhs + ' for ' + (map.matchingUrls ? map.matchingUrls : 'Global')
+        <span style="font-weight: bold">{map.names[0]}</span>,
+        <span>
+          <span style="font-weight: bold">{map.feedSomeKeys.rhs}</span>
+          <span>{
+            args['-ignoreurls']
+              ? <><span> for </span><span>{map.matchingUrls ? map.matchingUrls : 'Global'}</span></>
+              : ''
+          }</span>
+        </span>
       ]
-      for each (map in gets())
+      for each (map in findMappings({urls: args['-urls'], ignoreUrls: args['-ignoreurls']}))
     ];
   }
 
-  function urlCompleter (context, args) {
-    let maps = gets();
-    let uniq = {};
+  function urlCompleter ({currentURL}) {
+    return function (context, args) {
+      let maps = findMappings({all: true});
+      let uniq = {};
+      let result = [
+        (uniq[map.matchingUrls] = 1, [map.matchingUrls.source, map.names])
+        for each (map in maps)
+        if (map.matchingUrls && !uniq[map.matchingUrls])
+      ];
+      if (currentURL) {
+        result.unshift([util.escapeRegex(buffer.URL), 'Current URL']);
+        result.unshift([util.escapeRegex(content.document.domain), 'Current domain']);
+      }
+      return result;
+    };
+  }
+
+  function frameCompleter (context, args) {
     return [
-      (uniq[map.matchingUrls] = 1, [map.matchingUrls.source, map.names])
-      for each (map in maps)
-      if (map.matchingUrls && !uniq[map.matchingUrls])
+      [i, frame.document.location]
+      for each ([i, frame] in Iterator(getFrames()))
     ];
   }
 
@@ -389,6 +534,9 @@ let INFO =
     function action (multi) {
       return function (args) {
         function add ([lhs, rhs]) {
+          if (!lhs)
+            return;
+
           rhs = rhs || lhs;
           mappings.addUserMap(
             [modes.NORMAL],
@@ -400,6 +548,7 @@ let INFO =
 
               let win = document.commandDispatcher.focusedWindow;
               let frames = getFrames();
+
               let elem = body(win);
 
               if (typeof args['-frame'] !== 'undefined') {
@@ -407,15 +556,16 @@ let INFO =
                 elem = body(frames[0]);
               }
 
-              if (args['-xpath'])
-                elem = or(frames, function (f) fromXPath(f, args['-xpath'])) || elem;
+              if (args['-xpath']) {
+                elem = or(frames, function (f) fromXPath(f.document, args['-xpath'])) || elem;
+              }
 
               feed(rhs, args['-events'] || ['keypress'], elem);
             },
             {
               matchingUrls: args['-urls'],
               feedSomeKeys: {
-                rhs: rhs
+                rhs: rhs,
               }
             },
             true
@@ -428,7 +578,11 @@ let INFO =
         } else {
           let [, lhs, rhs] = args.literalArg.match(/^(\S+)\s+(.*)$/) || args.literalArg;
           if (!rhs) {
-            list(args.literalArg.trim());
+            list({
+              filter: args.literalArg.trim(),
+              urls: args['-urls'],
+              ignoreUrls: !args['-urls']
+            });
           } else {
             add([lhs, rhs]);
           }
@@ -443,9 +597,10 @@ let INFO =
       {
         literal: 0,
         options: [
-          [['-urls', '-u'], commands.OPTION_STRING, regexpValidator, urlCompleter],
+          [['-urls', '-u'], commands.OPTION_STRING, regexpValidator, urlCompleter({currentURL: true})],
           [['-desc', '-description'], commands.OPTION_STRING],
-          [['-frame', '-f'], commands.OPTION_INT],
+          [['-frame', '-f'], commands.OPTION_INT, null, frameCompleter],
+          [['-xpath', '-x'], commands.OPTION_STRING, xpathValidator],
           [
             ['-events', '-e'],
             commands.OPTION_LIST,
@@ -467,15 +622,12 @@ let INFO =
     'Clear fmappings',
     function (args) {
       if (args.bang) {
-        unmap(null, null, true);
-        liberator.log('All fmappings were removed');
+        unmap({ignoreUrls: true});
+        liberator.log('All fmappings were removed.');
       } else {
-        let urls = args.literalArg;
-        liberator.echo(
-          unmap(null, urls && RegExp(urls), false) ?
-            'Some fmappings were removed' :
-            'Not found specifed fmappings'
-        );
+        let result = {};
+        unmap({urls: args.literalArg, result: result});
+        liberator.echo(result.matched ? 'Some fmappings were removed.' : 'Not found specifed fmappings.');
       }
     },
     {
@@ -483,7 +635,7 @@ let INFO =
       bang: true,
       completer: function (context) {
         context.title = ['URL Pattern'];
-        context.completions = urlCompleter(context);
+        context.completions = urlCompleter({})(context);
       }
     },
     true
@@ -498,16 +650,14 @@ let INFO =
       if (!name)
         return liberator.echoerr('E471: Argument required');
 
-      liberator.echo(
-        unmap(name, urls && RegExp(urls), args['-ignoreurls']) ?
-          'Some fmappings were removed' :
-          'Not found specifed fmappings'
-      );
+      let result = {};
+      unmap({filter: name, urls: urls, ignoreUrls: args['-ignoreurls'], result: result});
+      liberator.echo(result.matched ?  'Some fmappings were removed.' : 'Not found specifed fmappings.');
     },
     {
       literal: 0,
       options: [
-        [['-urls', '-u'], commands.OPTION_STRING, regexpValidator, urlCompleter],
+        [['-urls', '-u'], commands.OPTION_STRING, regexpValidator, urlCompleter({})],
         [['-ignoreurls', '-iu'], commands.OPTION_NOARG]
       ],
       completer: fmapCompleter
@@ -527,7 +677,7 @@ let INFO =
   );
 
   __context__.API =
-    'VKeys feed getFrames fromXPath virtualize'.split(/\s+/).reduce(
+    'VKeys feed getFrames fromXPath virtualize unmap findMappings list'.split(/\s+/).reduce(
       function (result, name)
         (result[name] = eval(name), result),
       {}
