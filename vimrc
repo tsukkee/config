@@ -615,7 +615,8 @@ Arpeggionmap <silent> nt :<C-u>NERDTreeToggle<CR>
 
 " ref
 if has('mac')
-    let g:ref_refe_encoding = 'euc-jp'
+    let g:ref_refe_cmd = '/opt/local/bin/refe-1_8_7'
+    let g:ref_refe_encoding = 'utf-8'
     let g:ref_phpmanual_path = expand('~/Documents/phpmanual')
 elseif has('win32')
     let g:ref_refe_encoding = 'cp932'
@@ -707,6 +708,14 @@ fun! s:SelectColorS()
 endf
 com! SelectColorS :cal s:SelectColorS()
 
+" Alternate grep
+" Reference: http://vim-users.jp/2010/03/hack130/
+command! -complete=file -nargs=+ Grep call s:grep([<f-args>])
+function! s:grep(args)
+    execute 'vimgrep' '/'.a:args[-1].'/' join(a:args[:-2])
+endfunction
+AlterCommand gr[ep] Grep
+
 " Auto reloading vimrc
 " Reference: http://vim-users.jp/2009/09/hack74/
 if has('gui_running')
@@ -718,6 +727,13 @@ else
     autocmd vimrc BufWritePost .vimrc nested
     \   source $MYVIMRC
 endif
+
+" metarw
+call metarw#define_wrapper_commands(1)
+AlterCommand e[dit] Edit
+AlterCommand r[ead] Read
+AlterCommand w[rite] Write
+AlterCommand so[urce] Source
 
 " Reference: http://vim-users.jp/2009/12/hack112/
 " Load settings for eacy location.

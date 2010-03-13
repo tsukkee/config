@@ -126,14 +126,11 @@ set complete_aliases
 alias ls="ls -GF"
 alias scr="screen -xR"
 alias tm="tmux attach-session || tmux"
+alias refe="refe-1_8_7"
 alias -g C="| iconv -f utf-8 -t sjis | pbcopy"
 alias -g Csjis="| pbcopy"
 alias -g Ceuc="| iconv -f euc-jp -t sjis | pbcopy"
 alias -g EU="| iconv -f euc-jp -t utf-8"
 alias -g SU="| iconv -f sjis -t utf-8"
-
-function refe() {
-    /opt/local/bin/refe $1 | iconv -f euc-jp -t utf-8 | cat
-}
 
 test -f $HOME/.zshrc.local && source $HOME/.zshrc.local
