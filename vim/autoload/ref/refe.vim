@@ -50,7 +50,9 @@ endfunction
 
 
 function! ref#refe#complete(query)  " {{{2
-  return split(system(g:ref_refe_cmd . ' -l -s ' . a:query), "\n")
+  let refe_version = matchstr(system(g:ref_refe_cmd . ' --version'), '[0-9.]\+')
+  let option = (refe_version == 2 ? ' -l ' : ' -l -s ')
+  return split(system(g:ref_refe_cmd . option . a:query), "\n")
 endfunction
 
 
