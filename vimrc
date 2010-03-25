@@ -4,7 +4,7 @@ augroup vimrc
     autocmd!
 augroup END
 
-" Get SID prefix of vimrc
+" Get SID prefix of vimrc (see :h <SID>)
 function! s:SID_PREFIX()
     return matchstr(expand('<sfile>'), '<SNR>\d\+_')
 endfunction
@@ -26,10 +26,10 @@ set history=100 " number of command history
 set backspace=indent,eol,start " delete everything with backspace
 set formatoptions+=m           " add multibyte support
 " set iskeyword+=-               " add keyword to '-'
-set nolinebreak                " don't line break automatically
-set textwidth=0                " don't line break automatically
-set iminsert=0                 " disable input methods in insert mode
-set imsearch=0                 " disable input methods in search mode
+set nolinebreak                " don't break line automatically
+set textwidth=0                " don't break line automatically
+set iminsert=0                 " disable input method control in insert mode
+set imsearch=0                 " disable input method control in search mode
 
 " Command completion
 set wildmenu                   " enhance command completion
@@ -41,11 +41,11 @@ set ignorecase " ignore case search
 set smartcase  " override 'ignorecase' if the search pattern contains upper case
 set incsearch  " incremental search
 set hlsearch   " highlight searched words
-nohlsearch     " avoid highlighting when reload vimrc
+nohlsearch     " avoid highlighting when reloading vimrc
 
 " Reading and writing file
 set directory-=. " don't save tmp swap file in current directory
-set autoread     " auto re-read when the file is written by other application
+set autoread     " auto re-read when the file is written by other applications
 " set hidden       " allow open other file without saving current file
 set tags=./tags; " search tag file recursively (see :h file-searching)
 
@@ -54,13 +54,13 @@ set notitle                   " don't rewrite title string
 set showmatch                 " highlight correspods character
 set showcmd                   " show input command
 set number                    " show line number
-set wrap                      " wrap each lines
-set scrolloff=5               " minimal number of screen lines to keep above and below the cursor.
-set foldmethod=marker         " folding
-set foldcolumn=3              " display fold
+set wrap                      " wrap long lines
+set scrolloff=5               " minimal number of screen lines to keep above and below the cursor
+set foldmethod=marker         " use marker for folding
+set foldcolumn=3              " display folds
 set list                      " show unprintable characters
 set listchars=tab:>\ ,trail:~ " strings to use in 'list'
-set ambiwidth=double          " For multibyte characters, such as □, ○
+set ambiwidth=double          " for multibyte characters, such as □, ○
 
 " Status line
 set laststatus=2 " always show statusine
@@ -74,8 +74,8 @@ function! s:statusline()
 endfunction
 
 " Tab line
-set showtabline=2                                  " always show tab bar
-let &tabline = '%!' . s:SID_PREFIX() . 'tabline()' " set custom tabline
+set showtabline=2 " always show tab bar
+let &tabline = '%!' . s:SID_PREFIX() . 'tabline()'
 function! s:tabline()
     let s = ''
     for i in range(1, tabpagenr('$'))
@@ -88,12 +88,17 @@ function! s:tabline()
         let s .= '%' . i . 'T[' . i . '] ' . title
         let s .= '  '
     endfor
+
     let tabpaged_cwd = exists('t:cwd') ? '[' . t:cwd . ']' : ''
-    let lingr_unread_count = lingr#unread_count()
-    if lingr_unread_count > 0
-        let lingr_unread = "%#ErrorMsg#(" . lingr_unread_count . ")"
-    elseif lingr_unread_count == 0
-        let lingr_unread = "()"
+    if exists('*lingr#unread_count')
+        let lingr_unread_count = lingr#unread_count()
+        if lingr_unread_count > 0
+            let lingr_unread = "%#ErrorMsg#(" . lingr_unread_count . ")"
+        elseif lingr_unread_count == 0
+            let lingr_unread = "()"
+        else
+            let lingr_unread = ""
+        endif
     else
         let lingr_unread = ""
     endif
@@ -310,6 +315,7 @@ inoremap <C-w> <C-g>u<C-w>
 " hold with 'h' if the cursor is on the head of line
 nnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zc' : 'h'
 " expand with 'l' if the cursor on the holded text
+" nnoremap <expr> l foldclosed(line('.')) != -1 ? 'zo' : 'l'
 nnoremap <expr> <Plug>(arpeggio-default:l) foldclosed(line('.')) != -1 ? 'zo' : 'l'
 " hold with 'h' if the cursor is on the head of line in visual mode
 vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
@@ -334,7 +340,7 @@ if exists('$WINDOW') || exists('$TMUX')
 endif
 
 " smartchr
-cnoremap <expr> \ smartchr#loop('~/', '\', {'ctype': ':'})
+" cnoremap <expr> \ smartchr#loop('~/', '\', {'ctype': ':'})
 
 " Tab move
 nnoremap <C-n> gt
@@ -359,15 +365,10 @@ endif
 
 " Binary (see :h xxd)
 " vim -b :edit binary using xxd-format!
-" Reference: http://jarp.does.notwork.org/diary/200606a.html#200606021
+" Reference: http://vim-users.jp/2010/03/hack133/
 augroup vimrc
-    autocmd BufReadPre   *.bin,*.swf set binary
-    autocmd BufReadPost  *.bin,*.swf if &binary | silent %!xxd -g 1
-    autocmd BufReadPost  *.bin,*.swf set filetype=xxd | endif
-    autocmd BufWritePre  *.bin,*.swf if &binary | %!xxd -r
-    autocmd BufWritePre  *.bin,*.swf endif
-    autocmd BufWritePost *.bin,*.swf if &binary | silent %!xxd -g 1
-    autocmd BufWritePost *.bin,*.swf set nomodified |  endif
+    autocmd BufReadPost,BufNewFile *.bin,*.exe,*.dll,*.swf setlocal filetype=xxd
+    autocmd BufReadPost * if &l:binary | setlocal filetype=xxd | endif
 augroup END
 
 " TabpageCD
