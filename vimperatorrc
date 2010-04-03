@@ -127,6 +127,9 @@ lazy fmaps -u='(fastladder|reader\.livedoor)\.com/reader' s a r c j k f,j F,k <S
 lazy fmaps -u='mail.google\.com/mail' u k j o <CR p n c ? x s y e m ! #
 lazy fmaps -u='www\.tumblr\.com/dashboard' -events=vkeydown j k
 
+" spatial navigation
+let g:spatial_navigation_mappings='<C-h> <C-j> <C-k> <C-l>'
+
 " arpeggio
 " runtime! plugin/arpeggio.js
 js <<EOF
