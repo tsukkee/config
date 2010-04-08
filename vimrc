@@ -297,6 +297,12 @@ NExchangeMap 0 g0
 CExchangeMap <C-p> <Up>
 CExchangeMap <C-n> <Down>
 
+" cmdwin
+set cmdwinheight=3
+augroup vimrc
+    autocmd CmdwinEnter * startinsert!
+augroup END
+
 " Re-open with specified encoding
 command! Utf8 edit ++enc=utf-8
 command! Euc edit ++enc=euc-jp

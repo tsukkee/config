@@ -1,10 +1,9 @@
 #!/bin/sh
-# $Xorg: xinitrc.cpp,v 1.3 2000/08/17 19:54:30 cpqbld Exp $
 
 userresources=$HOME/.Xresources
 usermodmap=$HOME/.Xmodmap
-sysresources=/usr/X11/lib/X11/xinit/.Xresources
-sysmodmap=/usr/X11/lib/X11/xinit/.Xmodmap
+sysresources=/opt/X11/lib/X11/xinit/.Xresources
+sysmodmap=/opt/X11/lib/X11/xinit/.Xmodmap
 
 # merge in defaults and keymaps
 
@@ -44,8 +43,10 @@ fi
 /Library/Frameworks/UIM.framework/Versions/Current/bin/uim-xim --engine=anthy-utf8 &
 
 
-if [ -d /usr/X11/lib/X11/xinit/xinitrc.d ] ; then
-	for f in /usr/X11/lib/X11/xinit/xinitrc.d/*.sh ; do
+
+
+if [ -d /opt/X11/lib/X11/xinit/xinitrc.d ] ; then
+	for f in /opt/X11/lib/X11/xinit/xinitrc.d/*.sh ; do
 		[ -x "$f" ] && . "$f"
 	done
 	unset f

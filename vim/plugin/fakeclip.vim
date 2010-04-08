@@ -1,7 +1,7 @@
 " fakeclip - pseude clipboard register for non-GUI version of Vim
-" Version: 0.2.6
-" Copyright (C) 2007-2009 kana <http://whileimautomaton.net/>
-" License: MIT license  {{{
+" Version: 0.2.7
+" Copyright (C) 2007-2010 kana <http://whileimautomaton.net/>
+" License: So-called MIT/X license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
 "     "Software"), to deal in the Software without restriction, including

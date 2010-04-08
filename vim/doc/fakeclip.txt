@@ -1,9 +1,9 @@
 *fakeclip.txt*	pseudo clipboard register for non-GUI version of Vim
 
-Version 0.2.6
+Version 0.2.7
 Script ID: 2098
-Copyright (C) 2007-2009 kana <http://whileimautomaton.net/>
-License: MIT license  {{{
+Copyright (C) 2007-2010 kana <http://whileimautomaton.net/>
+License: So-called MIT/X license  {{{
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the
     "Software"), to deal in the Software without restriction, including
@@ -61,7 +61,7 @@ Requirements:
 - Vim 7.0 or later
 
 Latest version:
-http://github.com/kana/config/commits/vim-fakeclip
+http://github.com/kana/vim-fakeclip
 
 Document in HTML format:
 http://kana.github.com/config/vim/fakeclip.html
@@ -241,6 +241,11 @@ http://developer.apple.com/documentation/CoreFoundation/Reference/CFStringRef/
 
 ==============================================================================
 CHANGELOG					*fakeclip-changelog*
+
+0.2.7	2010-04-02T21:27:16+09:00		*fakeclip-changelog-0.2.7*
+	- Fix to read/write the paste buffer of GNU screen outside a session.
+	  Old versions allow to read/write the paste buffer only if Vim is
+	  running in a session of GNU screen.
 
 0.2.6	2009-11-16T20:49:35+09:00		*fakeclip-changelog-0.2.6*
 	- Fix improper error message on putting to paste buffer.  (Thanks
