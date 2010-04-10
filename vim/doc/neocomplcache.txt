@@ -609,6 +609,25 @@ ability of neocomplcache will spread by creating plugin by yourself.
 ==============================================================================
 CHANGELOG					*neocomplcache-changelog*
 
+2010-04-11
+    * Improved command completion text.
+    * Improved command prototype dictionary in vim_complete.
+    * Completed prototype dictionary.
+    * Improved command name search.
+
+2010-04-10
+    * Improved command completion in vim_complete.
+    * Skip head digits in vim_complete.
+    * Highlight color when print prototype.
+
+2010-04-09
+    * Improved _ snippets.
+
+2010-04-06
+    * Improved mappings dictionary.
+    * Lazy caching environment variables.
+    * Added variables dictionary.
+
 2010-04-01
     * Fixed quickmatch bug.
 
