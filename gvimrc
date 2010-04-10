@@ -14,8 +14,8 @@ set lines=38
 " ==================== Platform setting ==================== "
 " MacVim
 if has('gui_macvim')
-    set guifont=Menlo:h14
-    set guifontwide=M+2P+IPAG_circle
+    set guifont=Menlo:h15
+    set guifontwide=M+2VM+IPAG_circle
     set transparency=5 " (opaque) 0-100 (transparent)
     set guioptions-=e  " don't use gui tab apperance
     set guioptions-=T  " hide toolbar
@@ -36,6 +36,21 @@ if has('win32')
     gui
     set guifont=M+2VM+IPAG_circle:h11:w6
     set transparency=240 " (opaque) 255 - 0 (transparent)
+    set guioptions-=e    " don't use gui tab apperance
+    set guioptions-=T    " hide toolbar
+    set guioptions-=m    " hide menubar
+    set guioptions-=r    " don't show scrollbars
+    set guioptions-=l    " don't show scrollbars
+    set guioptions-=R    " don't show scrollbars
+    set guioptions-=L    " don't show scrollbars
+endif
+
+" GVim(Gtk2)
+if has('gui_gtk2')
+    set guifont=Menlo\ 12
+    set guifontwide=M+2VM+IPAG\ circle\ 12
+    set linespace=2
+
     set guioptions-=e    " don't use gui tab apperance
     set guioptions-=T    " hide toolbar
     set guioptions-=m    " hide menubar
