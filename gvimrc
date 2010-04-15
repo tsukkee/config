@@ -14,7 +14,7 @@ set lines=38
 " ==================== Platform setting ==================== "
 " MacVim
 if has('gui_macvim')
-    set guifont=Menlo:h15
+    set guifont=Menlo:h14
     set guifontwide=M+2VM+IPAG_circle
     set transparency=5 " (opaque) 0-100 (transparent)
     set guioptions-=e  " don't use gui tab apperance

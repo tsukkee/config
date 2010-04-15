@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: neocomplcache.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 10 Feb 2010
+" Last Modified: 15 Apr 2010
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -22,7 +22,7 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 4.10, for Vim 7.0
+" Version: 4.30, for Vim 7.0
 "=============================================================================
 
 if v:version < 700
@@ -58,7 +58,7 @@ if !exists('g:NeoComplCache_MinKeywordLength')
     let g:NeoComplCache_MinKeywordLength = 4
 endif
 if !exists('g:NeoComplCache_IgnoreCase')
-    let g:NeoComplCache_IgnoreCase = 1
+    let g:NeoComplCache_IgnoreCase = &ignorecase
 endif
 if !exists('g:NeoComplCache_SmartCase')
     let g:NeoComplCache_SmartCase = 0
