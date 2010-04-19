@@ -26,6 +26,7 @@ XTerm*background: Gray10
 XTerm*geometry: 120x38
 XTerm*saveLines: 1000
 XTerm*faceName: Menlo
+# XTerm*faceNameDoublesize: M+2VM+IPAG circle
 XTerm*faceNameDoublesize: Osaka
 XTerm*faceSize: 11
 XTerm*cjkWidth: true
