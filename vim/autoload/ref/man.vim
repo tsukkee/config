@@ -1,5 +1,5 @@
 " A ref source for manpage.
-" Version: 0.1.2
+" Version: 0.3.0
 " Author : thinca <thinca+vim@gmail.com>
 " License: Creative Commons Attribution 2.1 Japan License
 "          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
@@ -9,76 +9,97 @@ set cpo&vim
 
 
 
-if !exists('g:ref_man_cmd')
+" config. {{{1
+if !exists('g:ref_man_cmd')  " {{{2
   let g:ref_man_cmd = executable('man') ? 'man' : ''
 endif
 
-
-if !exists('g:ref_man_use_escape_sequence')
+if !exists('g:ref_man_use_escape_sequence')  " {{{2
   let g:ref_man_use_escape_sequence = 0
 endif
 
-
-
-if !exists('g:ref_man_highlight_limit')
+if !exists('g:ref_man_highlight_limit')  " {{{2
   let g:ref_man_highlight_limit = 1000
+endif
+
+if !exists('g:ref_man_lang')  " {{{2
+  let g:ref_man_lang = ''
 endif
 
 
 
-function! ref#man#available()  " {{{2
-  return g:ref_man_cmd != ''
+let s:source = {'name': 'man'}  " {{{1
+
+function! s:source.available()  " {{{2
+  return len(g:ref_man_cmd)
 endfunction
 
 
 
-function! ref#man#get_body(query)  " {{{2
-  let body = system(g:ref_man_cmd . ' ' . a:query)
-  if !v:shell_error
+function! s:source.get_body(query)  " {{{2
+  let [query, sec] = s:parse(a:query)
+  let q = sec =~ '\d' ? [sec, query] : [query]
+
+  if !empty(g:ref_man_lang)
+    let lang = $LANG
+    let $LANG = g:ref_man_lang
+  endif
+  let res = ref#system(s:to_array(g:ref_man_cmd) + q)
+  if exists('lang')
+    let $LANG = lang
+  endif
+  if !res.result
+    let body = res.stdout
+    if &termencoding != '' && &encoding != '' && &termencoding !=# &encoding
+      let encoded = iconv(body, &termencoding, &encoding)
+      if encoded != ''
+        let body = encoded
+      endif
+    endif
     return body
   endif
-  let list = ref#man#complete(a:query)
+  let list = self.complete(a:query)
   if !empty(list)
     return list
   endif
-  throw matchstr(body, '^\_s*\zs.\{-}\ze\_s*$')
+  throw matchstr(res.stderr, '^\_s*\zs.\{-}\ze\_s*$')
 endfunction
 
 
 
-function! ref#man#opened(query)  " {{{2
+function! s:source.opened(query)  " {{{2
   if g:ref_man_use_escape_sequence && line ('$') <= g:ref_man_highlight_limit
     call s:highlight_escape_sequence()
   else
-    silent! execute "% substitute/\<ESC>\\[[0-9;]*m//ge"
-    call histdel('/', -1)
+    let body = join(getline(1, '$'), "\n")
+    let body = substitute(body, '.\b', '', 'g')
+    let body = substitute(body, '\e\[[0-9;]*m', '', 'g')
+    silent! % delete _
+    silent! 0put =body
+    silent! $ delete _
+
 
     call s:syntax()
   endif
+  1
 endfunction
 
 
 
-function! ref#man#get_keyword()  " {{{2
+function! s:source.get_keyword()  " {{{2
   let isk = &l:iskeyword
   setlocal isk& isk+=. isk+=- isk+=: isk+=( isk+=)
   let word = expand('<cword>')
   setlocal isk& isk+=. isk+=- isk+=:
-  let m = matchlist(word, '\(\k\+\)\%((\(\d\))\)\?')
-  let keyword = m[1]
-  if m[2] != ''
-    let keyword = m[2] . ' ' . keyword
-  endif
   let &l:iskeyword = isk
-  return keyword
+  return word
 endfunction
 
 
 
-let s:complcache = {}
-function! ref#man#complete(query)  " {{{2
-  let sec = matchstr(a:query, '^\d') - 0
-  let query = matchstr(a:query, '\v^%(\d\s+)?\zs.*')
+function! s:source.complete(query)  " {{{2
+  let [query, sec] = s:parse(a:query)
+  let sec -= 0  " to number
 
   return filter(copy(ref#cache('man', sec, s:gathers[sec])),
   \             'v:val =~# "^\\V" . query')
@@ -87,7 +108,7 @@ endfunction
 
 
 
-function! ref#man#leave()  " {{{2
+function! s:source.leave()  " {{{2
   syntax clear
   unlet! b:current_syntax
 endfunction
@@ -101,6 +122,27 @@ function! s:uniq(list)  " {{{2
   endfor
   return sort(keys(d))
 endfunction
+
+
+
+function! s:to_array(expr)  " {{{2
+  return type(a:expr) != type([]) ? [a:expr] : a:expr
+endfunction
+
+
+
+function! s:parse(query)  " {{{2
+  let l = matchlist(a:query, '\([^[:space:]()]\+\)\s*(\(\d\))$')
+  if !empty(l)
+    return l[1 : 2]
+  endif
+  let l = matchlist(a:query, '\(\d\)\s\+\(\S*\)')
+  if !empty(l)
+    return [l[2], l[1]]
+  endif
+  return [a:query, '']
+endfunction
+
 
 
 
@@ -216,9 +258,9 @@ endfunction
 
 
 
-function! s:build_gathers()
+function! s:build_gathers()  " {{{2
   let d = {}
-  function! d.call()
+  function! d.call(name)
     let list = []
     if self.sec is 0
       for n in range(1, 9)
@@ -226,7 +268,8 @@ function! s:build_gathers()
       endfor
 
     else
-      for path in split(system('manpath')[0 : -2], ':')
+      let manpath = ref#system('manpath').stdout
+      for path in split(matchstr(manpath, '^.\{-}\ze\s*$'), ':')
         let dir = path . '/man' . self.sec
         if isdirectory(dir)
           let list += map(split(glob(dir . '*/*'), "\n"),
@@ -242,6 +285,12 @@ function! s:build_gathers()
 endfunction
 
 let s:gathers = s:build_gathers()
+
+
+
+function! ref#man#define()  " {{{2
+  return s:source
+endfunction
 
 
 

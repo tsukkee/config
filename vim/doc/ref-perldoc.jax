@@ -1,6 +1,6 @@
 *ref-perldoc.txt*	perldoc 用の ref ソース。
 
-Version: 0.1.1
+Version: 0.3.0
 Author : thinca <thinca+vim@gmail.com>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
@@ -24,6 +24,7 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
 
 
 要件:
+- |ref| 0.3.0 以降
 - perldoc
 
 
@@ -32,8 +33,15 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
 カスタマイズ					*ref-perldoc-customizing*
 
 g:ref_perldoc_cmd				*g:ref_perldoc_cmd*
-			perldoc コマンドを指定します。
-			デフォルト値は "perldoc" です。
+			perldoc コマンドを指定します。コマンドとその引数を含む
+			|List| も指定できます。
+			デフォルト値は、実行可能ならば "perldoc" です。そうで
+			なければ "" です。
+
+g:ref_perldoc_complete_head			*g:ref_perldoc_complete_head*
+			モジュールを補完する際にパッケージ名単位で候補を表示し
+			ます。
+			デフォルト値は 0 です。
 
 
 
@@ -78,6 +86,19 @@ b:ref_perldoc_word				*b:ref_perldoc_word*
 
 ==============================================================================
 更新履歴					*ref-perldoc-changelog*
+
+0.3.0	2010-04-18
+	- |ref| 0.3.0 に対応。
+	- |g:ref_perldoc_complete_head| オプションを追加。
+
+0.2.0	2010-01-28
+	- |ref| 0.2.0 に対応。
+	- -f オプションが使えないバグを修正。
+	- |g:ref_perldoc_cmd| が |List| だと動作しないバグを修正。
+
+0.1.2	2010-01-20
+	- |ref#system()| を使うようにした。
+	- -m オプションが使えないバグを修正。
 
 0.1.1	2009-12-22
 	- |ref#cache()| を使うようにした。

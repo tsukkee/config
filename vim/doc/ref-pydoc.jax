@@ -1,6 +1,6 @@
 *ref-pydoc.txt*	pydoc 用の ref ソース。
 
-Version: 0.1.1
+Version: 0.3.0
 Author : thinca <thinca+vim@gmail.com>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
@@ -22,16 +22,25 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
 
 
 要件:
+- |ref| 0.3.0 以降
 - pydoc
+
 
 
 ==============================================================================
 カスタマイズ					*ref-pydoc-customizing*
 
 g:ref_pydoc_cmd					*g:ref_pydoc_cmd*
-			pydoc コマンドを指定します。
+			pydoc コマンドを指定します。コマンドとその引数を含む
+			|List| も指定できます。
 			デフォルト値は、実行可能ならば "pydoc" です。そうでな
 			ければ "" です。
+
+g:ref_pydoc_complete_head			*g:ref_pydoc_complete_head*
+			モジュールを補完する際にモジュール名単位で候補を表示し
+			ます。
+			デフォルト値は 0 です。
+
 
 
 ==============================================================================
@@ -41,8 +50,19 @@ g:ref_pydoc_cmd					*g:ref_pydoc_cmd*
 - 補完時や一致リストの表示時の初回は非常に重い。
 
 
+
 ==============================================================================
 更新履歴					*ref-pydoc-changelog*
+
+0.3.0	2010-04-18
+	- |ref| 0.3.0 に対応。
+	- |g:ref_pydoc_complete_head| オプションを追加。
+
+0.2.0	2010-01-28
+	- |g:ref_perldoc_cmd| が |List| だと動作しないバグを修正。
+
+0.1.2	2010-01-21
+	- |ref#system()| を使うようにした。
 
 0.1.1	2009-12-22
 	- |ref#cache()| を使うようにした。
