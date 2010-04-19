@@ -17,13 +17,15 @@ if has('gui_macvim')
     set guifont=Menlo:h14
     set guifontwide=M+2VM+IPAG_circle
     set transparency=5 " (opaque) 0-100 (transparent)
-    set guioptions-=e  " don't use gui tab apperance
-    set guioptions-=T  " hide toolbar
-    set guioptions-=r  " don't show scrollbars
-    set guioptions-=l  " don't show scrollbars
-    set guioptions-=R  " don't show scrollbars
-    set guioptions-=L  " don't show scrollbars
     set noimdisable
+
+    set guioptions-=e " don't use gui tab apperance
+    set guioptions-=T " hide toolbar
+    set guioptions-=r " don't show scrollbars
+    set guioptions-=l " don't show scrollbars
+    set guioptions-=R " don't show scrollbars
+    set guioptions-=L " don't show scrollbars
+    set guioptions+=c " use console dialog rather than popup dialog
 
     noremap <silent> gw :macaction selectNextWindow:<CR>
     noremap <silent> gW :macaction selectPreviousWindow:<CR>
@@ -36,13 +38,15 @@ if has('win32')
     gui
     set guifont=M+2VM+IPAG_circle:h11:w6
     set transparency=240 " (opaque) 255 - 0 (transparent)
-    set guioptions-=e    " don't use gui tab apperance
-    set guioptions-=T    " hide toolbar
-    set guioptions-=m    " hide menubar
-    set guioptions-=r    " don't show scrollbars
-    set guioptions-=l    " don't show scrollbars
-    set guioptions-=R    " don't show scrollbars
-    set guioptions-=L    " don't show scrollbars
+
+    set guioptions-=e " don't use gui tab apperance
+    set guioptions-=T " hide toolbar
+    set guioptions-=m " hide menubar
+    set guioptions-=r " don't show scrollbars
+    set guioptions-=l " don't show scrollbars
+    set guioptions-=R " don't show scrollbars
+    set guioptions-=L " don't show scrollbars
+    set guioptions+=c " use console dialog rather than popup dialog
 endif
 
 " GVim(Gtk2)
@@ -51,11 +55,12 @@ if has('gui_gtk2')
     set guifontwide=M+2VM+IPAG\ circle\ 12
     set linespace=2
 
-    set guioptions-=e    " don't use gui tab apperance
-    set guioptions-=T    " hide toolbar
-    set guioptions-=m    " hide menubar
-    set guioptions-=r    " don't show scrollbars
-    set guioptions-=l    " don't show scrollbars
-    set guioptions-=R    " don't show scrollbars
-    set guioptions-=L    " don't show scrollbars
+    set guioptions-=e " don't use gui tab apperance
+    set guioptions-=T " hide toolbar
+    set guioptions-=m " hide menubar
+    set guioptions-=r " don't show scrollbars
+    set guioptions-=l " don't show scrollbars
+    set guioptions-=R " don't show scrollbars
+    set guioptions-=L " don't show scrollbars
+    set guioptions+=c " use console dialog rather than popup dialog
 endif
