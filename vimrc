@@ -11,9 +11,9 @@ endfunction
 
 " Generate help tags
 if has('mac')
-    helptags ~/.vim/doc/
+    helptags ~/.vim/doc
 elseif has('win32')
-    helptags ~/vimfiles/doc/
+    helptags ~/vimfiles/doc
 endif
 
 " Tab

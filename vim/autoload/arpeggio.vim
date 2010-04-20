@@ -1,7 +1,7 @@
 " arpeggio - Mappings for simultaneously pressed keys
-" Version: 0.0.5
-" Copyright (C) 2008 kana <http://whileimautomaton.net/>
-" License: MIT license  {{{
+" Version: 0.0.6
+" Copyright (C) 2008-2010 kana <http://whileimautomaton.net/>
+" License: So-called MIT/X license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
 "     "Software"), to deal in the Software without restriction, including
@@ -197,7 +197,7 @@ function! s:do_map(mode, options, remap_p, keys, rhs)  "{{{2
     endif
   endfor
   if a:options =~# 'u' && already_mapped_p
-    echoer 'Abort to map because of the above reason'
+    echoerr 'Abort to map because of the above reason'
     return
   endif
 
@@ -234,7 +234,10 @@ endfunction
 
 
 function! s:do_unmap(mode, options, keys)  "{{{2
-  " FIXME: How about temporary key mappings "<SID>work:"?
+  " FIXME: Mediate key mappings "<SID>work:" should be removed.
+  "        But they may be used by other arpeggio key mappings and it's hard
+  "        to determine whether a given mediate key mappng is still used or
+  "        not in fast and exact way.  So that they aren't removed currently.
   let opt_buffer = a:options =~# 'b' ? '<buffer>' : ''
 
   for key in a:keys

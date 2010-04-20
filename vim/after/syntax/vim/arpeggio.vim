@@ -1,7 +1,7 @@
 " Vim additional syntax: vim/arpeggio - highlight :Arpeggio commands
-" Version: 0.0.5
-" Copyright (C) 2008 kana <http://whileimautomaton.net/>
-" License: MIT license  {{{
+" Version: 0.0.6
+" Copyright (C) 2008-2010 kana <http://whileimautomaton.net/>
+" License: So-called MIT/X license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
 "     "Software"), to deal in the Software without restriction, including
@@ -28,22 +28,16 @@ syntax keyword vimArpeggioCommand
 
 syntax match vimArpeggioCommand
 \      /\<Arpeggio[cilnosvx]\(\|nore\|un\)map\>/
-\      contains=vimArpeggioCommandInside
 \      skipwhite nextgroup=vimMapBang,vimMapMod,vimMapLhs
 
 syntax match vimArpeggioCommand
 \      /\<Arpeggio\%(\|nore\|un\)map\>!\?/
-\      contains=vimArpeggioCommandInside
 \      skipwhite nextgroup=vimMapMod,vimMapLhs
 
-syntax match vimArpeggioCommandInside /\<Arpeggio\zs\l*map!\?/
-\      contained
 
 
 
-
-highlight default link vimArpeggioCommand  NONE
-highlight default link vimArpeggioCommandInside  vimCommand
+highlight default link vimArpeggioCommand  vimCommand
 
 " __END__
 " vim: foldmethod=marker

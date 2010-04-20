@@ -1,7 +1,7 @@
 " arpeggio - Mappings for simultaneously pressed keys
-" Version: 0.0.5
-" Copyright (C) 2008 kana <http://whileimautomaton.net/>
-" License: MIT license  {{{
+" Version: 0.0.6
+" Copyright (C) 2008-2010 kana <http://whileimautomaton.net/>
+" License: So-called MIT/X license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
 "     "Software"), to deal in the Software without restriction, including
@@ -39,12 +39,12 @@ endif
 
 
 
-command! -bar -complete=command -nargs=+ Arpeggio  call arpeggio#_do(<q-args>)
+command! -complete=command -nargs=+ Arpeggio  call arpeggio#_do(<q-args>)
 
 
 function! s:_(...)
   execute call('printf',
-  \            ['command! %s -bar -complete=mapping -nargs=* Arpeggio%s'
+  \            ['command! %s -complete=mapping -nargs=* Arpeggio%s'
   \             . '  call arpeggio#_map_or_list(%s, %s, <q-args>)']
   \            + a:000)
 endfunction
@@ -72,7 +72,7 @@ call s:_('', 'xnoremap', '"x"', 0)
 
 function! s:_(...)
   execute call('printf',
-  \            ['command! %s -bar -complete=mapping -nargs=* Arpeggio%s'
+  \            ['command! %s -complete=mapping -nargs=* Arpeggio%s'
   \             . '  call arpeggio#_unmap(%s, <q-args>)']
   \            + a:000)
 endfunction
