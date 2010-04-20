@@ -742,6 +742,10 @@ AlterCommand r[ead] Read
 AlterCommand w[rite] Write
 AlterCommand so[urce] Source
 
+" Quickrun
+let g:quickrun_no_default_key_mappings = 1
+nmap <Space>q <Plug>(quickrun)
+
 " Reference: http://vim-users.jp/2009/12/hack112/
 " Load settings for eacy location.
 " autocmd vimrc BufNewFile,BufReadPost * call s:vimrc_local(expand('<afile>:p:h'))
