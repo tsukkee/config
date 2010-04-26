@@ -15,7 +15,7 @@ set lines=38
 " MacVim
 if has('gui_macvim')
     set guifont=Menlo:h14
-    set guifontwide=M+2VM+IPAG_circle
+    set guifontwide=M+1M+IPAG
     set transparency=5 " (opaque) 0-100 (transparent)
     set noimdisable
 
@@ -36,7 +36,8 @@ if has('win32')
     " This must be after 'columns' and 'lines',
     " and before 'transparency'
     gui
-    set guifont=M+2VM+IPAG_circle:h11:w6
+    set guifont=Dejavu\ Sans\ Mono:h12:w7
+    set guifontwide=M+1M+IPAG
     set transparency=240 " (opaque) 255 - 0 (transparent)
 
     set guioptions-=e " don't use gui tab apperance
@@ -51,8 +52,8 @@ endif
 
 " GVim(Gtk2)
 if has('gui_gtk2')
-    set guifont=Menlo\ 12
-    set guifontwide=M+2VM+IPAG\ circle\ 12
+    set guifont=Dejavu\ Sans\ Mono:h12:w7
+    set guifontwide=M+1M+IPAG
     set linespace=2
 
     set guioptions-=e " don't use gui tab apperance

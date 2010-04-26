@@ -72,6 +72,8 @@ bind -c layout n eval 'layout next' 'layout show'
 bind -c layout ^N eval 'layout next' 'layout show'
 bind -c layout p eval 'layout prev' 'layout show'
 bind -c layout ^P eval 'layout prev' 'layout show'
+bind -c layout x eval 'layout remove' 'layout show'
+bind -c layout ^X eval 'layout remove' 'layout show'
 bind -c layout s layout show
 bind -c layout ^S layout show
 

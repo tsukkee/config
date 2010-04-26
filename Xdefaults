@@ -6,17 +6,17 @@ URxvt.scrollBar: false
 URxvt.saveLines: 1000
 
 URxvt.font:\
-    xft:Menlo:style=Normal:size=10:antialias=true,\
-    xft:TakaoGothic:style=Regular
+    xft:Menlo:style=Normal:size=11:antialias=true,\
+    xft:M+2VM+IPAG circle:style=Regular
 URxvt.boldFont:\
     xft:Menlo:style=Bold,\
-    xft:TakaoGothic:style=Regular
+    xft:M+2VM+IPAG circle:style=Regular
 URxvt.italicFont:\
     xft:Menlo:style=Italic,\
-    xft:TakaoGothic:style=Regular
+    xft:M+2VM+IPAG circle:style=Regular
 URxvt.boldItalicFont:\
     xft:Menlo:style=Bold Italic,\
-    xft:TakaoGothic:style=Regular
+    xft:M+2VM+IPAG circle:style=Regular
 
 XTerm*termName: xterm-256color
 XTerm*utf8: 1
