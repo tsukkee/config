@@ -624,11 +624,13 @@ Arpeggionmap <silent> nt :<C-u>NERDTreeToggle<CR>
 if has('mac')
     let g:ref_refe_cmd = '/opt/local/bin/refe-1_8_7'
     let g:ref_refe_encoding = 'utf-8'
+    let g:ref_refe_rsense_cmd = '/usr/local/lib/rsense-0.2/bin/rsense'
     let g:ref_phpmanual_path = expand('~/Documents/phpmanual')
 elseif has('win32')
     let g:ref_refe_encoding = 'cp932'
     let g:ref_phpmanual_path = expand('~/Documents/phpmanual')
 endif
+let g:ref_alc_use_cache = 1
 
 " lingr
 if has('mac')
