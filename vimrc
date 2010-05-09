@@ -4,6 +4,8 @@ augroup vimrc
     autocmd!
 augroup END
 
+call pathogen#runtime_append_all_bundles()
+
 " Get SID prefix of vimrc (see :h <SID>)
 function! s:SID_PREFIX()
     return matchstr(expand('<sfile>'), '<SNR>\d\+_')
@@ -15,6 +17,7 @@ if has('mac')
 elseif has('win32')
     helptags ~/vimfiles/doc
 endif
+call pathogen#helptags()
 
 " Tab
 set tabstop=4 shiftwidth=4 softtabstop=4 " set tab width
@@ -239,7 +242,7 @@ syntax enable " enable syntax coloring
 
 " colorscheme
 if &t_Co == 256 || has('gui')
-    colorscheme lucius
+    colorscheme xoria256
 else
     colorscheme torte
 endif
@@ -344,9 +347,6 @@ if exists('$WINDOW') || exists('$TMUX')
     map gY <Plug>(fakeclip-screen-y)
     map gP <Plug>(fakeclip-screen-p)
 endif
-
-" smartchr
-" cnoremap <expr> \ smartchr#loop('~/', '\', {'ctype': ':'})
 
 " Tab move
 nnoremap <C-n> gt
@@ -544,6 +544,7 @@ PopupMap <Tab>   "\<C-n>"
 PopupMap <S-Tab> "\<C-p>"
 
 " vimshell
+let g:VimShell_EnableInteractive = 1
 augroup vimrc
     autocmd FileType vimshell nunmap <buffer> <C-d>
 augroup END
@@ -761,3 +762,56 @@ nmap <Space>q <Plug>(quickrun)
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
 endif
+
+command! -nargs=? -complete=dir VimBallHere call s:vimBallHere(<f-args>)
+function! s:vimBallHere(...)
+    let path = a:0 ? expand(a:1) : expand('%:p:h')
+    if !isdirectory(path)
+        echomsg 'create directory:' path
+        call mkdir(path, 'p')
+    endif
+
+    let old_runtimepath = &runtimepath
+    let &runtimepath = path . ',' . &runtimepath
+    source %
+    let &runtimepath = old_runtimepath
+endfunction
+
+" using plugins
+" align              : http://www.vim.org/scripts/script.php?script_id=294
+" altercmd           : http://www.vim.org/scripts/script.php?script_id=2332
+" arpeggio           : http://www.vim.org/scripts/script.php?script_id=2425
+" cocoa              : http://www.vim.org/scripts/script.php?script_id=2674
+" errormarker        : http://www.vim.org/scripts/script.php?script_id=1861
+" fakeclip           : http://www.vim.org/scripts/script.php?script_id=2098
+" fontzoom           : http://www.vim.org/scripts/script.php?script_id=2931
+" gist               : http://www.vim.org/scripts/script.php?script_id=2423
+" javascript(syntax) : http://www.vim.org/scripts/script.php?script_id=1491
+"                    : http://www.vim.org/scripts/script.php?script_id=2802
+" ku                 : http://www.vim.org/scripts/script.php?script_id=2337
+" lingr-vim          : http://github.com/tsukkee/lingr-vim
+" macports           : http://svn.macports.org/repository/macports/contrib/mpvim/
+" matchit            : http://www.vim.org/scripts/script.php?script_id=39
+" metarw             : http://www.vim.org/scripts/script.php?script_id=2335
+" metarw-git         : http://www.vim.org/scripts/script.php?script_id=2336
+" muttator           : https://vimperator-labs.googlecode.com/hg/muttator/contrib/vim/
+" omnicppcomplete    : http://www.vim.org/scripts/script.php?script_id=1520
+" NERD_commenter     : http://www.vim.org/scripts/script.php?script_id=1218
+" NERD_tree          : http://www.vim.org/scripts/script.php?script_id=1658
+" neocomplcache      : http://github.com/Shougo/neocomplcache.git
+" operator-user      : http://www.vim.org/scripts/script.php?script_id=2692
+" pathogen           : http://www.vim.org/scripts/script.php?script_id=2332
+" qfreplace          : http://github.com/thinca/vim-qfreplace
+" quickrun           : http://github.com/thinca/vim-quickrun.git
+" ref                : http://www.vim.org/scripts/script.php?script_id=3067
+" submode            : http://www.vim.org/scripts/script.php?script_id=2467
+" SudoEdit           : http://www.vim.org/scripts/script.php?script_id=2709
+" surround           : http://github.com/kana/vim-surround.git
+" textobj-comment    : http://gist.github.com/99234
+" textobj-indent     : http://www.vim.org/scripts/script.php?script_id=2484
+" textobj-user       : http://www.vim.org/scripts/script.php?script_id=2100
+" vimperator         : https://vimperator-labs.googlecode.com/hg/vimperator/contrib/vim/
+" vimproc            : http://github.com/Shougo/vimproc.git
+" vimshell           : http://github.com/Shougo/vimshell.git
+" web-indent         : http://www.vim.org/scripts/script.php?script_id=3081
+" zencoding          : http://www.vim.org/scripts/script.php?script_id=2332
