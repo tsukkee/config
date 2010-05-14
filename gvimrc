@@ -8,7 +8,7 @@ set title
 " gvim settings
 set linespace=1
 set columns=138
-set lines=38
+set lines=42
 
 
 " ==================== Platform setting ==================== "

@@ -334,6 +334,9 @@ vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 " Delete highlight
 CommandMap gh nohlsearch
 
+"
+nnoremap gc `[V`]
+
 " Input path in command mode
 cnoremap <expr> <C-x> expand('%:p:h') . "/"
 cnoremap <expr> <C-z> expand('%:p:r')
@@ -544,7 +547,6 @@ PopupMap <Tab>   "\<C-n>"
 PopupMap <S-Tab> "\<C-p>"
 
 " vimshell
-let g:VimShell_EnableInteractive = 1
 augroup vimrc
     autocmd FileType vimshell nunmap <buffer> <C-d>
 augroup END
@@ -765,7 +767,7 @@ endif
 
 command! -nargs=? -complete=dir VimBallHere call s:vimBallHere(<f-args>)
 function! s:vimBallHere(...)
-    let path = a:0 ? expand(a:1) : expand('%:p:h')
+    let path = a:0 ? expand(a:1) : getcwd()
     if !isdirectory(path)
         echomsg 'create directory:' path
         call mkdir(path, 'p')
@@ -814,4 +816,4 @@ endfunction
 " vimproc            : http://github.com/Shougo/vimproc.git
 " vimshell           : http://github.com/Shougo/vimshell.git
 " web-indent         : http://www.vim.org/scripts/script.php?script_id=3081
-" zencoding          : http://www.vim.org/scripts/script.php?script_id=2332
+" zencoding          : http://www.vim.org/scripts/script.php?script_id=2981
