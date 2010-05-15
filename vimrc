@@ -2,26 +2,28 @@
 " Define and reset augroup used in vimrc
 augroup vimrc
     autocmd!
+    autocmd VimEnter * let g:vim_has_launched = 1
 augroup END
 
-call pathogen#runtime_append_all_bundles()
+" Append 'runtimepath' and generate helptags
+if !exists('g:vim_has_launched')
+    call pathogen#runtime_append_all_bundles()
+    if has('mac')
+        helptags ~/.vim/doc
+    elseif has('win32')
+        helptags ~/vimfiles/doc
+    endif
+    call pathogen#helptags()
+endif
 
 " Get SID prefix of vimrc (see :h <SID>)
 function! s:SID_PREFIX()
     return matchstr(expand('<sfile>'), '<SNR>\d\+_')
 endfunction
 
-" Generate help tags
-if has('mac')
-    helptags ~/.vim/doc
-elseif has('win32')
-    helptags ~/vimfiles/doc
-endif
-call pathogen#helptags()
-
 " Tab
 set tabstop=4 shiftwidth=4 softtabstop=4 " set tab width
-set expandtab   " use space instead of tab
+set expandtab   " use space rather than tab
 set smartindent " use smart indent
 set history=100 " number of command history
 
@@ -257,7 +259,7 @@ Arpeggiocnoremap fj <Esc>
 Arpeggiovnoremap fj <Esc>
 let g:submode_timeoutlen=600
 
-" Modify
+" Use more logical mapping (see :h Y)
 nnoremap Y y$
 
 " Prefix
@@ -334,8 +336,8 @@ vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 " Delete highlight
 CommandMap gh nohlsearch
 
-"
-nnoremap gc `[V`]
+" Select last changed or yanked text
+nnoremap gc `[v`]
 
 " Input path in command mode
 cnoremap <expr> <C-x> expand('%:p:h') . "/"
@@ -352,8 +354,10 @@ if exists('$WINDOW') || exists('$TMUX')
 endif
 
 " Tab move
-nnoremap <C-n> gt
-nnoremap <C-p> gT
+nnoremap <silent> <C-f>n gt
+nnoremap <silent> <C-f><C-n> gt
+nnoremap <silent> <C-f>p gT
+nnoremap <silent> <C-f><C-p> gT
 
 " Window resize
 call submode#enter_with('winsize', 'n', '', '<C-w>>', '<C-w>>')
@@ -412,12 +416,69 @@ command! -nargs=1 -bang -complete=file Rename saveas<bang> <args> | call delete(
 " ctags
 command! CtagsR !ctags -R
 
+" ColorScheme selecter
+" Reference: http://vim.g.hatena.ne.jp/tyru/20100226
+fun! s:SelectColorS()
+    30vnew
+
+    let files = split(globpath(&rtp, 'colors/*.vim'), "\n")
+    for idx in range(0, len(files) - 1)
+        let file = files[idx]
+        let name = matchstr(file , '\w\+\(\.vim\)\@=')
+        call setline(idx + 1, name)
+    endfor
+
+    file ColorSchemeSelector
+    setlocal bufhidden=wipe
+    setlocal buftype=nofile
+    setlocal nonu
+    setlocal nomodifiable
+    setlocal cursorline
+    nnoremap <buffer>  <Enter>  :<C-u>exec 'colors' getline('.')<CR>
+    nnoremap <buffer>  q        :<C-u>close<CR>
+endf
+command! SelectColorS call s:SelectColorS()
+
+" Alternate grep
+" Reference: http://vim-users.jp/2010/03/hack130/
+command! -complete=file -nargs=+ Grep call s:grep([<f-args>])
+function! s:grep(args)
+    execute 'vimgrep' '/'.a:args[-1].'/' join(a:args[:-2])
+endfunction
+AlterCommand gr[ep] Grep
+
+" Expand VimBall
+command! -nargs=? -complete=dir VimBallHere call s:vimBallHere(<f-args>)
+function! s:vimBallHere(...)
+    let path = a:0 ? expand(a:1) : getcwd()
+    if !isdirectory(path)
+        echomsg 'create directory:' path
+        call mkdir(path, 'p')
+    endif
+
+    let old_runtimepath = &runtimepath
+    let &runtimepath = path . ',' . &runtimepath
+    source %
+    let &runtimepath = old_runtimepath
+endfunction
+
+" Growl for Mac
+if executable("growlnotify")
+    command! -nargs=+ Growl call s:growl(<f-args>)
+    function! s:growl(title, ...)
+        execute  printf('silent !growlnotify -t "%s" -m "%s"', shellescape(a:title), shellescape(join(a:000)))
+    endfunction
+endif
+
 
 " ==================== Plugins settings ==================== "
 " FileType
 augroup vimrc
     " some ftplugins set 'textwidth'
     autocmd FileType * setlocal textwidth=0
+
+    " Vim
+    autocmd FileType vim nnoremap <buffer> K :<C-u>help <C-r>=expand('<cword>')<CR><CR>
 
     " Ruby
     autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
@@ -532,7 +593,7 @@ let g:NeoComplCache_EnableWildCard = 1
 let g:NeoComplCache_EnableQuickMatch = 0
 let g:NeoComplCache_EnableCamelCaseCompletion = 1
 let g:NeoComplCache_EnableUnderbarCompletion = 1
-let g:NeoComplCache_CachingDisablePattern = "\.log$\|\.zsh_history$"
+let g:NeoComplCache_CachingDisablePattern = "\.log$\|\.zsh_history"
 
 if !exists('g:NeoComplCache_DictionaryFileTypeLists')
     let g:NeoComplCache_DictionaryFileTypeLists = {}
@@ -635,9 +696,24 @@ elseif has('win32')
 endif
 let g:ref_alc_use_cache = 1
 
-" lingr
+" Lingr-Vim
 if has('mac')
     let g:lingr_vim_command_to_open_url = 'open -g %s'
+    augroup vimrc
+        autocmd User plugin-lingr-message
+        \   let s:temp = lingr#get_last_message()
+        \|  if !empty(s:temp)
+        \|      call s:growl(s:temp.nickname, s:temp.text)
+        \|  endif
+        \|  unlet s:temp
+
+        autocmd User plugin-lingr-presence
+        \   let s:temp = lingr#get_last_member()
+        \|  if !empty(s:temp)
+        \|      call s:growl(s:temp.name, (s:temp.presence ? 'online' : 'offline'))
+        \|  endif
+        \|  unlet s:temp
+    augroup END
 endif
 let g:lingr_vim_time_format = "%Y/%m/%d %H:%M:%S"
 
@@ -697,36 +773,29 @@ let g:html_use_css = 1
 let g:use_xhtml = 1
 let g:html_use_encoding = 'utf-8'
 
-" ColorScheme selecter
-" Reference: http://vim.g.hatena.ne.jp/tyru/20100226
-fun! s:SelectColorS()
-    30vnew
 
-    let files = split(globpath(&rtp, 'colors/*.vim'), "\n")
-    for idx in range(0, len(files) - 1)
-        let file = files[idx]
-        let name = matchstr(file , '\w\+\(\.vim\)\@=')
-        call setline(idx + 1, name)
-    endfor
+" metarw
+call metarw#define_wrapper_commands(1)
+AlterCommand e[dit] Edit
+AlterCommand r[ead] Read
+AlterCommand w[rite] Write
+AlterCommand so[urce] Source
 
-    file ColorSchemeSelector
-    setlocal bufhidden=wipe
-    setlocal buftype=nofile
-    setlocal nonu
-    setlocal nomodifiable
-    setlocal cursorline
-    nmap <buffer>  <Enter>  :<C-u>exec 'colors' getline('.')<CR>
-    nmap <buffer>  q        :<C-u>close<CR>
-endf
-com! SelectColorS :cal s:SelectColorS()
+" Quickrun
+let g:quickrun_no_default_key_mappings = 1
+nmap <Space>q <Plug>(quickrun)
 
-" Alternate grep
-" Reference: http://vim-users.jp/2010/03/hack130/
-command! -complete=file -nargs=+ Grep call s:grep([<f-args>])
-function! s:grep(args)
-    execute 'vimgrep' '/'.a:args[-1].'/' join(a:args[:-2])
-endfunction
-AlterCommand gr[ep] Grep
+
+" ==================== Loading vimrc ==================== "
+" Reference: http://vim-users.jp/2009/12/hack112/
+" Load settings for eacy location.
+" autocmd vimrc BufNewFile,BufReadPost * call s:vimrc_local(expand('<afile>:p:h'))
+" function! s:vimrc_local(loc)
+  " let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
+  " for i in reverse(filter(files, 'filereadable(v:val)'))
+    " source `=i`
+  " endfor
+" endfunction
 
 " Auto reloading vimrc
 " Reference: http://vim-users.jp/2009/09/hack74/
@@ -740,46 +809,12 @@ else
     \   source $MYVIMRC
 endif
 
-" metarw
-call metarw#define_wrapper_commands(1)
-AlterCommand e[dit] Edit
-AlterCommand r[ead] Read
-AlterCommand w[rite] Write
-AlterCommand so[urce] Source
-
-" Quickrun
-let g:quickrun_no_default_key_mappings = 1
-nmap <Space>q <Plug>(quickrun)
-
-" Reference: http://vim-users.jp/2009/12/hack112/
-" Load settings for eacy location.
-" autocmd vimrc BufNewFile,BufReadPost * call s:vimrc_local(expand('<afile>:p:h'))
-" function! s:vimrc_local(loc)
-  " let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
-  " for i in reverse(filter(files, 'filereadable(v:val)'))
-    " source `=i`
-  " endfor
-" endfunction
-
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
 endif
 
-command! -nargs=? -complete=dir VimBallHere call s:vimBallHere(<f-args>)
-function! s:vimBallHere(...)
-    let path = a:0 ? expand(a:1) : getcwd()
-    if !isdirectory(path)
-        echomsg 'create directory:' path
-        call mkdir(path, 'p')
-    endif
 
-    let old_runtimepath = &runtimepath
-    let &runtimepath = path . ',' . &runtimepath
-    source %
-    let &runtimepath = old_runtimepath
-endfunction
-
-" using plugins
+" ==================== Plugins ==================== "
 " align              : http://www.vim.org/scripts/script.php?script_id=294
 " altercmd           : http://www.vim.org/scripts/script.php?script_id=2332
 " arpeggio           : http://www.vim.org/scripts/script.php?script_id=2425

@@ -6,9 +6,11 @@
 set title
 
 " gvim settings
-set linespace=1
-set columns=138
-set lines=42
+if !exists('g:vim_has_launched')
+    set linespace=1
+    set columns=138
+    set lines=42
+endif
 
 
 " ==================== Platform setting ==================== "
@@ -29,6 +31,14 @@ if has('gui_macvim')
 
     noremap <silent> gw :macaction selectNextWindow:<CR>
     noremap <silent> gW :macaction selectPreviousWindow:<CR>
+
+    " Reference: http://github.com/kana/config/blob/c21dfc660dd789e14b0c194315773b71815f3ef0/vim/personal/dot.vimrc#L657
+    function! s:activate_terminal()
+        silent !open -a Terminal
+        " silent !open -a iTerm
+    endfunction
+    command! ActivateTerminal call <SID>activate_terminal()
+    nnoremap <silent> <C-f>m :<C-u>call <SID>activate_terminal()<CR>
 endif
 
 " GVim(Windows)
