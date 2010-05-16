@@ -5,14 +5,17 @@ augroup vimrc
     autocmd VimEnter * let g:vim_has_launched = 1
 augroup END
 
+" Default runtime directory
+if has('win32')
+    let s:runtimepath = expand('~/vimfiles')
+else
+    let s:runtimepath = expand('~/.vim')
+endif
+
 " Append 'runtimepath' and generate helptags
 if !exists('g:vim_has_launched')
     call pathogen#runtime_append_all_bundles()
-    if has('mac')
-        helptags ~/.vim/doc
-    elseif has('win32')
-        helptags ~/vimfiles/doc
-    endif
+    execute 'helptags' s:runtimepath . '/doc'
     call pathogen#helptags()
 endif
 
@@ -514,6 +517,13 @@ augroup vimrc
     autocmd BufRead,BufNewFile .tmux.conf*,tmux.conf* setfiletype tmux
 augroup END
 
+" vimproc
+if has('mac')
+    let g:vimproc_dll_path = s:runtimepath . '/bundle/vimproc/autoload/proc_mac.so'
+elseif has('unix')
+    let g:vimproc_dll_path = s:runtimepath . '/bundle/vimproc/autoload/proc_gcc.so'
+endif
+
 " gist
 if has('mac')
     let g:gist_clip_command = 'pbcopy'
@@ -700,19 +710,19 @@ let g:ref_alc_use_cache = 1
 if has('mac')
     let g:lingr_vim_command_to_open_url = 'open -g %s'
     augroup vimrc
-        autocmd User plugin-lingr-message
-        \   let s:temp = lingr#get_last_message()
-        \|  if !empty(s:temp)
-        \|      call s:growl(s:temp.nickname, s:temp.text)
-        \|  endif
-        \|  unlet s:temp
+        " autocmd User plugin-lingr-message
+        " \   let s:temp = lingr#get_last_message()
+        " \|  if !empty(s:temp)
+        " \|      call s:growl(s:temp.nickname, s:temp.text)
+        " \|  endif
+        " \|  unlet s:temp
 
-        autocmd User plugin-lingr-presence
-        \   let s:temp = lingr#get_last_member()
-        \|  if !empty(s:temp)
-        \|      call s:growl(s:temp.name, (s:temp.presence ? 'online' : 'offline'))
-        \|  endif
-        \|  unlet s:temp
+        " autocmd User plugin-lingr-presence
+        " \   let s:temp = lingr#get_last_member()
+        " \|  if !empty(s:temp)
+        " \|      call s:growl(s:temp.name, (s:temp.presence ? 'online' : 'offline'))
+        " \|  endif
+        " \|  unlet s:temp
     augroup END
 endif
 let g:lingr_vim_time_format = "%Y/%m/%d %H:%M:%S"
