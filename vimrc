@@ -14,6 +14,7 @@ endif
 
 " Append 'runtimepath' and generate helptags
 if !exists('g:vim_has_launched')
+    let &runtimepath = &runtimepath . ',' . s:runtimepath . '/bundle/pathogen'
     call pathogen#runtime_append_all_bundles()
     execute 'helptags' s:runtimepath . '/doc'
     call pathogen#helptags()
@@ -469,7 +470,8 @@ endfunction
 if executable("growlnotify")
     command! -nargs=+ Growl call s:growl(<f-args>)
     function! s:growl(title, ...)
-        execute  printf('silent !growlnotify -t "%s" -m "%s"', shellescape(a:title), shellescape(join(a:000)))
+        execute printf('silent !growlnotify -H localhost -t %s -m %s',
+        \   shellescape(a:title), shellescape(join(a:000)))
     endfunction
 endif
 
@@ -480,8 +482,8 @@ augroup vimrc
     " some ftplugins set 'textwidth'
     autocmd FileType * setlocal textwidth=0
 
-    " Vim
-    autocmd FileType vim nnoremap <buffer> K :<C-u>help <C-r>=expand('<cword>')<CR><CR>
+    " Vim (to use :help for K, see :h K)
+    autocmd FileType vim setlocal keywordprg=''
 
     " Ruby
     autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
@@ -710,19 +712,19 @@ let g:ref_alc_use_cache = 1
 if has('mac')
     let g:lingr_vim_command_to_open_url = 'open -g %s'
     augroup vimrc
-        " autocmd User plugin-lingr-message
-        " \   let s:temp = lingr#get_last_message()
-        " \|  if !empty(s:temp)
-        " \|      call s:growl(s:temp.nickname, s:temp.text)
-        " \|  endif
-        " \|  unlet s:temp
+        autocmd User plugin-lingr-message
+        \   let s:temp = lingr#get_last_message()
+        \|  if !empty(s:temp)
+        \|      call s:growl(s:temp.nickname, s:temp.text)
+        \|  endif
+        \|  unlet s:temp
 
-        " autocmd User plugin-lingr-presence
-        " \   let s:temp = lingr#get_last_member()
-        " \|  if !empty(s:temp)
-        " \|      call s:growl(s:temp.name, (s:temp.presence ? 'online' : 'offline'))
-        " \|  endif
-        " \|  unlet s:temp
+        autocmd User plugin-lingr-presence
+        \   let s:temp = lingr#get_last_member()
+        \|  if !empty(s:temp)
+        \|      call s:growl(s:temp.name, (s:temp.presence ? 'online' : 'offline'))
+        \|  endif
+        \|  unlet s:temp
     augroup END
 endif
 let g:lingr_vim_time_format = "%Y/%m/%d %H:%M:%S"
@@ -834,9 +836,10 @@ endif
 " fontzoom           : http://www.vim.org/scripts/script.php?script_id=2931
 " gist               : http://www.vim.org/scripts/script.php?script_id=2423
 " javascript(syntax) : http://www.vim.org/scripts/script.php?script_id=1491
-"                    : http://www.vim.org/scripts/script.php?script_id=2802
+" javascript(syntax) : http://www.vim.org/scripts/script.php?script_id=2802
 " ku                 : http://www.vim.org/scripts/script.php?script_id=2337
 " lingr-vim          : http://github.com/tsukkee/lingr-vim
+" lucius             : http://www.vim.org/scripts/script.php?script_id=2536
 " macports           : http://svn.macports.org/repository/macports/contrib/mpvim/
 " matchit            : http://www.vim.org/scripts/script.php?script_id=39
 " metarw             : http://www.vim.org/scripts/script.php?script_id=2335
@@ -845,20 +848,22 @@ endif
 " omnicppcomplete    : http://www.vim.org/scripts/script.php?script_id=1520
 " NERD_commenter     : http://www.vim.org/scripts/script.php?script_id=1218
 " NERD_tree          : http://www.vim.org/scripts/script.php?script_id=1658
-" neocomplcache      : http://github.com/Shougo/neocomplcache.git
+" neocomplcache      : http://github.com/Shougo/neocomplcache
 " operator-user      : http://www.vim.org/scripts/script.php?script_id=2692
 " pathogen           : http://www.vim.org/scripts/script.php?script_id=2332
 " qfreplace          : http://github.com/thinca/vim-qfreplace
-" quickrun           : http://github.com/thinca/vim-quickrun.git
+" quickrun           : http://github.com/thinca/vim-quickrun
 " ref                : http://www.vim.org/scripts/script.php?script_id=3067
 " submode            : http://www.vim.org/scripts/script.php?script_id=2467
 " SudoEdit           : http://www.vim.org/scripts/script.php?script_id=2709
-" surround           : http://github.com/kana/vim-surround.git
+" surround           : http://github.com/kana/vim-surround
 " textobj-comment    : http://gist.github.com/99234
 " textobj-indent     : http://www.vim.org/scripts/script.php?script_id=2484
 " textobj-user       : http://www.vim.org/scripts/script.php?script_id=2100
 " vimperator         : https://vimperator-labs.googlecode.com/hg/vimperator/contrib/vim/
-" vimproc            : http://github.com/Shougo/vimproc.git
-" vimshell           : http://github.com/Shougo/vimshell.git
+" vimproc            : http://github.com/Shougo/vimproc
+" vimrcbox           : http://github.com/sorah/sandbox/blob/master/vim/vimrcbox.vim
+" vimshell           : http://github.com/Shougo/vimshell
 " web-indent         : http://www.vim.org/scripts/script.php?script_id=3081
+" xoria256           : http://www.vim.org/scripts/script.php?script_id=2140
 " zencoding          : http://www.vim.org/scripts/script.php?script_id=2981

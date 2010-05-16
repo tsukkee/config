@@ -62,8 +62,8 @@ endif
 
 " GVim(Gtk2)
 if has('gui_gtk2')
-    set guifont=Dejavu\ Sans\ Mono:h12:w7
-    set guifontwide=M+1M+IPAG
+    set guifont=Dejavu\ Sans\ Mono 10
+    set guifontwide=TakaoGothic\ 10
     set linespace=2
 
     set guioptions-=e " don't use gui tab apperance

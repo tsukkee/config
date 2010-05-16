@@ -1,6 +1,6 @@
 # Keybind
-# bindkey -v # like vi
-bindkey -e # like emacs
+bindkey -v # like vi
+# bindkey -e # like emacs
 
 # history completion
 autoload history-search-end
