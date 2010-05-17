@@ -177,10 +177,11 @@ autocmd vimrc BufReadPost *
 \|  endif
 
 " line feed character
-set ffs=dos,unix,mac
-
-" use ff=unix for new file
-autocmd vimrc BufNewFile * set ff=unix
+if has('unix')
+    set ffs=unix,dos
+elseif has('win32')
+    set ffs=dos,unix
+endif
 
 " Omni completion
 set completeopt+=menuone " Display menu
@@ -453,23 +454,15 @@ AlterCommand gr[ep] Grep
 " Expand VimBall
 command! -bang -nargs=? -complete=dir VimBallHere call s:vimBallHere(<bang>0, <f-args>)
 function! s:vimBallHere(force_mkdir, ...)
-    if exists('g:vimball_home')
-        let vimball_home_save = g:vimball_home
+    let ffs_save = &ffs
+    set ffs=unix
+    let home = a:0 ? expand(a:1) : getcwd()
+    if !isdirectory(home) && a:force_mkdir
+        echomsg 'create directory:' home
+        call mkdir(home, 'p')
     endif
-
-    " see :h g:vimball_home
-    let g:vimball_home = a:0 ? expand(a:1) : getcwd()
-    if !isdirectory(g:vimball_home) && a:force_mkdir
-        echomsg 'create directory:' g:vimball_home
-        call mkdir(g:vimball_home, 'p')
-    endif
-    source %
-
-    if exists('vimball_home_save')
-        let g:vimball_home = vimball_home_save
-    else
-        unlet g:vimball_home
-    endif
+    UseVimball `=home`
+    let &ffs = ffs_save
 endfunction
 
 " Growl for Mac
@@ -477,11 +470,11 @@ if executable("growlnotify")
     command! -nargs=+ Growl call s:growl(<f-args>)
     function! s:growl(title, ...)
         execute printf('silent !growlnotify -H localhost -t %s -m %s',
-        \   shellescape(a:title), shellescape(join(a:000)))
+        \   shellescape(a:title, 1), shellescape(join(a:000), 1))
     endfunction
     function! s:growl_lingr(title, ...)
         execute printf('silent !growlnotify -H localhost -t %s -m %s -I /Applications/LingrRadar.app',
-        \   shellescape(a:title), shellescape(join(a:000)))
+        \   shellescape(a:title, 1), shellescape(join(a:000), 1))
     endfunction
 endif
 
@@ -491,16 +484,16 @@ if executable("qlmanage")
     function! s:quicklook(...)
         let file = a:0 ? expand(a:1) : expand('%:p')
         execute printf('silent !qlmanage -p %s >& /dev/null',
-        \   shellescape(file))
+        \   shellescape(file, 1))
     endfunction
 
     if executable('curl')
         command! -nargs=1 QuicklookRemote call s:quicklook_remote(<f-args>)
         function! s:quicklook_remote(url)
             let fragment = split(a:url, '/')
-            let name = tempname() . fragment[len(fragment) - 1]
+            let name = tempname() . fragment[-1]
             execute printf('silent !curl -o %s -O %s',
-            \   shellescape(name), shellescape(a:url))
+            \   shellescape(name, 1), shellescape(a:url, 1))
             call s:quicklook(name)
         endfunction
 
