@@ -16,7 +16,6 @@ endif
 if !exists('g:vim_has_launched')
     let &runtimepath = &runtimepath . ',' . s:runtimepath . '/bundle/pathogen'
     call pathogen#runtime_append_all_bundles()
-    execute 'helptags' s:runtimepath . '/doc'
     call pathogen#helptags()
 endif
 
@@ -391,7 +390,7 @@ augroup END
 " TabpageCD
 " Reference: kana's vimrc
 command! -complete=file -nargs=? TabpageCD
-\   execute 'cd' fnameescape(<q-args>)
+\   cd `=fnameescape(<q-args>)`
 \|  let t:cwd = getcwd()
 
 AlterCommand cd TabpageCD
@@ -401,7 +400,7 @@ autocmd vimrc VimEnter,TabEnter *
 \   if !exists('t:cwd')
 \|    let t:cwd = getcwd()
 \|  endif
-\|  execute 'cd' fnameescape(t:cwd)
+\|  cd `=fnameescape(t:cwd)`
 
 " Go to alternate tab
 if !exists('g:AlternateTabNumber')
@@ -452,18 +451,25 @@ endfunction
 AlterCommand gr[ep] Grep
 
 " Expand VimBall
-command! -nargs=? -complete=dir VimBallHere call s:vimBallHere(<f-args>)
-function! s:vimBallHere(...)
-    let path = a:0 ? expand(a:1) : getcwd()
-    if !isdirectory(path)
-        echomsg 'create directory:' path
-        call mkdir(path, 'p')
+command! -bang -nargs=? -complete=dir VimBallHere call s:vimBallHere(<bang>0, <f-args>)
+function! s:vimBallHere(force_mkdir, ...)
+    if exists('g:vimball_home')
+        let vimball_home_save = g:vimball_home
     endif
 
-    let old_runtimepath = &runtimepath
-    let &runtimepath = path . ',' . &runtimepath
+    " see :h g:vimball_home
+    let g:vimball_home = a:0 ? expand(a:1) : getcwd()
+    if !isdirectory(g:vimball_home) && a:force_mkdir
+        echomsg 'create directory:' g:vimball_home
+        call mkdir(g:vimball_home, 'p')
+    endif
     source %
-    let &runtimepath = old_runtimepath
+
+    if exists('vimball_home_save')
+        let g:vimball_home = vimball_home_save
+    else
+        unlet g:vimball_home
+    endif
 endfunction
 
 " Growl for Mac
@@ -483,7 +489,7 @@ augroup vimrc
     autocmd FileType * setlocal textwidth=0
 
     " Vim (to use :help for K, see :h K)
-    autocmd FileType vim setlocal keywordprg=''
+    autocmd FileType vim setlocal keywordprg=""
 
     " Ruby
     autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
@@ -497,7 +503,6 @@ augroup vimrc
 
     " Scala
     " Reference: http://d.hatena.ne.jp/tyru/20090406/1239015151
-    autocmd BufNewFile,BufRead *.scala setfiletype scala
     autocmd FileType scala
     \   setlocal softtabstop=2 shiftwidth=2 tabstop=2
     \|  setlocal iskeyword+=@-@ " for javadoc
@@ -507,10 +512,6 @@ augroup vimrc
     \|  setlocal comments& comments^=s0:*\ -,m0:*\ \ ,ex0:*/
     \|  setlocal commentstring=//%s
     \|  setlocal formatoptions-=t formatoptions+=croql
-
-    " Markdown
-    autocmd BufRead,BufNewFile *.mkd setfiletype mkd
-    autocmd BufRead,BufNewFile *.md setfiletype mkd
 
     " Textile
     autocmd BufRead,BufNewFile *.textile setfiletype textile
@@ -693,7 +694,7 @@ Arpeggionnoremap <silent> ke :<C-u>Ku tags/help<CR>
 let g:NERDTreeWinSize = 20
 CommandMap [Prefix]t     NERDTree
 CommandMap [Prefix]T     NERDTreeClose
-CommandMap [Prefix]<C-t> execute 'NERDTree' expand('%:p:h')
+CommandMap [Prefix]<C-t> NERDTree `=expand('%:p:h')`
 Arpeggionmap <silent> nt :<C-u>NERDTreeToggle<CR>
 
 " ref
@@ -800,14 +801,14 @@ nmap <Space>q <Plug>(quickrun)
 
 " ==================== Loading vimrc ==================== "
 " Reference: http://vim-users.jp/2009/12/hack112/
-" Load settings for eacy location.
-" autocmd vimrc BufNewFile,BufReadPost * call s:vimrc_local(expand('<afile>:p:h'))
-" function! s:vimrc_local(loc)
-  " let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
-  " for i in reverse(filter(files, 'filereadable(v:val)'))
-    " source `=i`
-  " endfor
-" endfunction
+" Load settings for each location.
+autocmd vimrc BufNewFile,BufReadPost * call s:vimrc_local(expand('<afile>:p:h'))
+function! s:vimrc_local(loc)
+    let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
+    for i in reverse(filter(files, 'filereadable(v:val)'))
+        source `=i`
+    endfor
+endfunction
 
 " Auto reloading vimrc
 " Reference: http://vim-users.jp/2009/09/hack74/
@@ -841,6 +842,7 @@ endif
 " lingr-vim          : http://github.com/tsukkee/lingr-vim
 " lucius             : http://www.vim.org/scripts/script.php?script_id=2536
 " macports           : http://svn.macports.org/repository/macports/contrib/mpvim/
+" markdown(syntax)   : http://www.vim.org/scripts/script.php?script_id=2882
 " matchit            : http://www.vim.org/scripts/script.php?script_id=39
 " metarw             : http://www.vim.org/scripts/script.php?script_id=2335
 " metarw-git         : http://www.vim.org/scripts/script.php?script_id=2336
@@ -851,15 +853,20 @@ endif
 " neocomplcache      : http://github.com/Shougo/neocomplcache
 " operator-user      : http://www.vim.org/scripts/script.php?script_id=2692
 " pathogen           : http://www.vim.org/scripts/script.php?script_id=2332
+" php53(syntax)      : http://www.vim.org/scripts/script.php?script_id=2874
 " qfreplace          : http://github.com/thinca/vim-qfreplace
 " quickrun           : http://github.com/thinca/vim-quickrun
 " ref                : http://www.vim.org/scripts/script.php?script_id=3067
+" scala              : https://lampsvn.epfl.ch/trac/scala/browser/scala-tool-support/trunk/src/vim
 " submode            : http://www.vim.org/scripts/script.php?script_id=2467
 " SudoEdit           : http://www.vim.org/scripts/script.php?script_id=2709
 " surround           : http://github.com/kana/vim-surround
+" taskpaper          : http://www.vim.org/scripts/script.php?script_id=2027
+" textile            : http://www.vim.org/scripts/script.php?script_id=2305
 " textobj-comment    : http://gist.github.com/99234
 " textobj-indent     : http://www.vim.org/scripts/script.php?script_id=2484
 " textobj-user       : http://www.vim.org/scripts/script.php?script_id=2100
+" tmux(syntax)       : http://tmux.cvs.sourceforge.net/viewvc/tmux/tmux/examples/tmux.vim
 " vimperator         : https://vimperator-labs.googlecode.com/hg/vimperator/contrib/vim/
 " vimproc            : http://github.com/Shougo/vimproc
 " vimrcbox           : http://github.com/sorah/sandbox/blob/master/vim/vimrcbox.vim
