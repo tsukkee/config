@@ -479,6 +479,43 @@ if executable("growlnotify")
         execute printf('silent !growlnotify -H localhost -t %s -m %s',
         \   shellescape(a:title), shellescape(join(a:000)))
     endfunction
+    function! s:growl_lingr(title, ...)
+        execute printf('silent !growlnotify -H localhost -t %s -m %s -I /Applications/LingrRadar.app',
+        \   shellescape(a:title), shellescape(join(a:000)))
+    endfunction
+endif
+
+" Quicklook for Mac
+if executable("qlmanage")
+    command! -nargs=? -complete=file Quicklook call s:quicklook(<f-args>)
+    function! s:quicklook(...)
+        let file = a:0 ? expand(a:1) : expand('%:p')
+        execute printf('silent !qlmanage -p %s >& /dev/null',
+        \   shellescape(file))
+    endfunction
+
+    if executable('curl')
+        command! -nargs=1 QuicklookRemote call s:quicklook_remote(<f-args>)
+        function! s:quicklook_remote(url)
+            let fragment = split(a:url, '/')
+            let name = tempname() . fragment[len(fragment) - 1]
+            execute printf('silent !curl -o %s -O %s',
+            \   shellescape(name), shellescape(a:url))
+            call s:quicklook(name)
+        endfunction
+
+        " for Lingr-Vim (should use :python?)
+        autocmd vimrc FileType lingr-messages nnoremap <silent> <buffer> O :<C-u>call <SID>lingr_vim_quicklook()<CR>
+        function! s:lingr_vim_quicklook()
+            let pattern = '^https\?://[^ ]*\.\(png\|jpe\?g\|gif\)$'
+            let candidate = expand('<cWORD>')
+            if match(candidate, pattern) == 0
+                echo 'opening' candidate '...'
+                call s:quicklook_remote(candidate)
+                echo
+            endif
+        endfunction
+    endif
 endif
 
 
@@ -716,14 +753,14 @@ if has('mac')
         autocmd User plugin-lingr-message
         \   let s:temp = lingr#get_last_message()
         \|  if !empty(s:temp)
-        \|      call s:growl(s:temp.nickname, s:temp.text)
+        \|      call s:growl_lingr(s:temp.nickname, s:temp.text)
         \|  endif
         \|  unlet s:temp
 
         autocmd User plugin-lingr-presence
         \   let s:temp = lingr#get_last_member()
         \|  if !empty(s:temp)
-        \|      call s:growl(s:temp.name, (s:temp.presence ? 'online' : 'offline'))
+        \|      call s:growl_lingr(s:temp.name, (s:temp.presence ? 'online' : 'offline'))
         \|  endif
         \|  unlet s:temp
     augroup END
@@ -785,7 +822,6 @@ let g:html_number_lines = 0
 let g:html_use_css = 1
 let g:use_xhtml = 1
 let g:html_use_encoding = 'utf-8'
-
 
 " metarw
 call metarw#define_wrapper_commands(1)

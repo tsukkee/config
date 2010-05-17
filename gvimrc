@@ -17,7 +17,7 @@ endif
 " MacVim
 if has('gui_macvim')
     set guifont=Menlo:h14
-    set guifontwide=M+1M+IPAG
+    set guifontwide=M+1M+IPAG:h14
     set transparency=5 " (opaque) 0-100 (transparent)
     set noimdisable
 
