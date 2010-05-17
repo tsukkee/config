@@ -82,6 +82,7 @@ function _colorize_prompt {
 _colorize_prompt
 
 # rprompt
+vi_mode_str="%{$fg[green]%}--INSERT--%{$reset_color%}"
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable git svn hg bzr cvs
 zstyle ':vcs_info:*' formats '(%s)-[%b]'
@@ -91,20 +92,35 @@ zstyle ':vcs_info:bzr:*' use-simple true
 function _vsc_info() {
     psvar=()
     LANG=en_US.UTF-8 vcs_info
-    RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}"
+    RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}[$vi_mode_str]"
 }
 _vsc_info
 
-# set directory name to screen
+function zle-line-init zle-keymap-select {
+    case $KEYMAP in
+        vicmd)
+        vi_mode_str="%{$fg[red]%}--NORMAL--%{$reset_color%}"
+        ;;
+        main|viins)
+        vi_mode_str="%{$fg[green]%}--INSERT--%{$reset_color%}"
+        ;;
+    esac
+    RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}[$vi_mode_str]"
+    zle reset-prompt
+}
+zle -N zle-line-init
+zle -N zle-keymap-select
+
+# set directory name to screen or tmux
 function _screen_dirname() {
-    if [ $WINDOW ]; then
+    if [ "$WINDOW" != '' -o "$TMUX" != '' ]; then
         echo -ne "\ek$(basename $(pwd))\e\\"
     fi
 }
 
-# set command name to screen
+# set command name to screen or tmux
 function _screen_cmdname() {
-    if [ $WINDOW ]; then
+    if [ "$WINDOW" != '' -o "$TMUX" != '' ]; then
         echo -ne "\ek# $1\e\\"
     fi
 }
