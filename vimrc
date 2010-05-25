@@ -171,8 +171,9 @@ if has('iconv')
 endif
 
 " use 'fileencoding' for 'encoding' if the file don't contain multibyte characters
+" give up searching multibyte characters when searching time is over 500 ms
 autocmd vimrc BufReadPost *
-\   if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n') == 0
+\   if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n', 0, 500) == 0
 \|      let &fileencoding=&encoding
 \|  endif
 
@@ -231,7 +232,6 @@ function! s:onColorScheme()
         highlight CursorLine cterm=none gui=none
         highlight ZenkakuSpace ctermbg=77 guibg=#5fdf5f
     elseif g:colors_name == 'lucius'
-        highlight SpecialKey ctermfg=172 guifg=#ffaa00
         highlight ZenkakuSpace ctermbg=172 guibg=#ffaa00
         " based on ErrorMsg
         highlight User1 ctermbg=237 ctermfg=196 cterm=bold
@@ -248,7 +248,7 @@ syntax enable " enable syntax coloring
 
 " colorscheme
 if &t_Co == 256 || has('gui')
-    colorscheme xoria256
+    colorscheme lucius
 else
     colorscheme torte
 endif
@@ -802,12 +802,14 @@ CommandMap [Prefix]rs call ReloadSafari()
 if has('mac')
     command! Here silent execute '!open' expand('%:p:h')
     command! This silent execute '!open %'
+    command! -nargs=1 -complete=file Open silent execute '!open' shellescape(expand(<f-args>), 1)
 endif
 
 " Utility command for Windows
 if has('win32')
     command! Here silent execute '!explorer' expand('%:p:h')
     command! This silent execute '!start cmd /c "%"'
+    command! -nargs=1 -complete=file Open silent execute '!explorer' shellescape(expand(<f-args>), 1)
 endif
 
 " TOhtml
@@ -854,6 +856,8 @@ endif
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
 endif
+
+set secure
 
 
 " ==================== Plugins ==================== "
