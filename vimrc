@@ -37,7 +37,7 @@ set formatoptions+=m           " add multibyte support
 set nolinebreak                " don't break line automatically
 set textwidth=0                " don't break line automatically
 set iminsert=0                 " disable input method control in insert mode
-set imsearch=0                 " disable input method control in search mode
+set imsearch=-1                " use same value with 'iminsert' for search mode
 
 " Command completion
 set wildmenu                   " enhance command completion
@@ -276,6 +276,7 @@ map , [Operator]
 " Mapping command
 command! -nargs=+ NExchangeMap call s:exchangeMap('n', <f-args>)
 command! -nargs=+ CExchangeMap call s:exchangeMap('c', <f-args>)
+command! -nargs=+ VExchangeMap call s:exchangeMap('v', <f-args>)
 function! s:exchangeMap(mode, a, b)
     execute a:mode . 'noremap' a:a a:b
     execute a:mode . 'noremap' a:b a:a
@@ -296,11 +297,15 @@ endfunction
 
 " Use physical cursor movement
 NExchangeMap j gj
+VExchangeMap j gj
 " NExchangeMap k gk
 nnoremap <Plug>(arpeggio-default:k) gk
 nnoremap gk k
+VExchangeMap gk k
 NExchangeMap $ g$
+VExchangeMap $ g$
 NExchangeMap 0 g0
+VExchangeMap 0 g0
 
 " Use beginning matches on command-line history
 CExchangeMap <C-p> <Up>
@@ -644,11 +649,9 @@ endif
 let g:NeoComplCache_DictionaryFileTypeLists['vimshell'] = expand('~/.vimshell_hist')
 
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
-PopupMap <C-y>   neocomplcache#close_popup()
-PopupMap <C-e>   neocomplcache#cancel_popup()
-PopupMap <CR>    neocomplcache#close_popup() . "\<CR>"
 PopupMap <Tab>   "\<C-n>"
 PopupMap <S-Tab> "\<C-p>"
+PopupMap <CR>    "\<C-y>\<CR>"
 
 " vimshell
 augroup vimrc
@@ -721,7 +724,7 @@ Arpeggionnoremap <silent> km :<C-u>Ku mrufile<CR>
 Arpeggionnoremap <silent> ke :<C-u>Ku tags/help<CR>
 
 " NERDTree
-let g:NERDTreeWinSize = 20
+let g:NERDTreeWinSize = 21
 CommandMap [Prefix]t     NERDTree
 CommandMap [Prefix]T     NERDTreeClose
 CommandMap [Prefix]<C-t> NERDTree `=expand('%:p:h')`

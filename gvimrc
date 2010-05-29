@@ -5,17 +5,14 @@
 " override vimrc settings
 set title
 
-" gvim settings
-if !exists('g:vim_has_launched')
-    set linespace=1
-    set columns=138
-    set lines=42
-endif
-
 
 " ==================== Platform setting ==================== "
 " MacVim
 if has('gui_macvim')
+    set columns=154
+    set lines=52
+    set linespace=1
+
     set guifont=Menlo:h14
     set guifontwide=M+1M+IPAG:h14
     set transparency=5 " (opaque) 0-100 (transparent)
@@ -37,15 +34,19 @@ if has('gui_macvim')
         silent !open -a Terminal
         " silent !open -a iTerm
     endfunction
-    command! ActivateTerminal call <SID>activate_terminal()
     nnoremap <silent> <C-f>m :<C-u>call <SID>activate_terminal()<CR>
 endif
 
 " GVim(Windows)
 if has('win32')
+    set columns=138
+    set lines=42
+    set linespace=1
+
     " This must be after 'columns' and 'lines',
     " and before 'transparency'
     gui
+
     set guifont=Dejavu\ Sans\ Mono:h12:w7
     set guifontwide=M+1M+IPAG
     set transparency=240 " (opaque) 255 - 0 (transparent)
