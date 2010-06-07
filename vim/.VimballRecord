@@ -1,2 +1,0 @@
-muttator.vba: call delete('/Users/tsukkee/.vim/syntax/muttator.vim')|call delete('/Users/tsukkee/.vim/ftdetect/muttator.vim')
-vimperator.vba: call delete('/Users/tsukkee/.vim/syntax/vimperator.vim')|call delete('/Users/tsukkee/.vim/ftdetect/vimperator.vim')

@@ -3,8 +3,9 @@ set activate=quickmark,paste
 set complete=sl
 set focuscontent
 set followhints=1
-set guioptions=Bmrb
+set guioptions=BmrbN
 set hintinputs+=name
+set hintchars=hjklasdfgyuiopqwertnmzxcv
 set hlsearch
 set showstatuslinks=2
 set wildoptions=auto
