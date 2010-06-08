@@ -213,7 +213,7 @@ augroup vimrc
     \|  endif
 augroup END
 if has('win32')
-    set viewdir=~/vimfiles/view
+    let &viewdir = s:runtimepath . '\view'
 endif
 
 
@@ -297,7 +297,9 @@ endfunction
 
 " Use physical cursor movement
 NExchangeMap j gj
-VExchangeMap j gj
+" VExchangeMap j gj
+vnoremap <Plug>(arpeggio-default:j) gj
+vnoremap gj j
 " NExchangeMap k gk
 nnoremap <Plug>(arpeggio-default:k) gk
 nnoremap gk k
