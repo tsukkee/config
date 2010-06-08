@@ -635,22 +635,23 @@ endfunction
 
 " neocomplcache
 " Reference: :h neocomplcache
-let g:NeoComplCache_EnableAtStartup = 1
-let g:NeoComplCache_MinKeywordLength = 3
-let g:NeoComplCache_MinSyntaxLength = 3
-let g:NeoComplCache_SmartCase = 1
-let g:NeoComplCache_EnableWildCard = 1
-let g:NeoComplCache_EnableQuickMatch = 0
-let g:NeoComplCache_EnableCamelCaseCompletion = 1
-let g:NeoComplCache_EnableUnderbarCompletion = 1
-let g:NeoComplCache_CachingDisablePattern = "\.log$\|\.zsh_history"
+let g:neocomplcache_enable_at_startup = 1
+let g:neocomplcache_min_keyword_length = 3
+let g:neocomplcache_min_syntax_length = 3
+let g:neocomplcache_ignore_case = 0
+let g:neocomplcache_enable_smart_case = 1
+let g:neocomplcache_enable_camel_case_completion = 1
+let g:neocomplcache_enable_underbar_completion = 1
+let g:neocomplcache_disable_caching_buffer_name_pattern = "\.log$\|\.zsh_history"
 
-if !exists('g:NeoComplCache_DictionaryFileTypeLists')
-    let g:NeoComplCache_DictionaryFileTypeLists = {}
+if !exists('g:neocomplcache_dictionary_filetype_lists')
+    let g:neocomplcache_dictionary_filetype_lists = {}
 endif
-let g:NeoComplCache_DictionaryFileTypeLists['vimshell'] = expand('~/.vimshell_hist')
+let g:neocomplcache_dictionary_filetype_lists['vimshell'] = expand('~/.vimshell_hist')
 
 imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
+smap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
+" inoremap <expr> <C-l>     neocomplcache#complete_common_string()
 PopupMap <Tab>   "\<C-n>"
 PopupMap <S-Tab> "\<C-p>"
 PopupMap <CR>    "\<C-y>\<CR>"

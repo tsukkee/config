@@ -36,7 +36,7 @@ let INFO =
 </plugin>;
 
 (function() {
-if(!"TreeStyleTabService" in window) {
+if(!("TreeStyleTabService" in window)) {
     liberator.echoerr("TreeStyleTab.js needs TreeStyleTab Extension");
     return;
 }

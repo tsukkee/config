@@ -1,5 +1,5 @@
 (function() {
-if(!"MultipleTabService" in window) {
+if(!("MultipleTabService" in window)) {
     liberator.echoerr("MultipleTabHandler.js needs MultipleTabHandler extension");
     return;
 }
