@@ -539,9 +539,10 @@ augroup vimrc
     autocmd BufNewFile,BufRead *.rb
     \   unlet b:current_syntax
     \|  syn include @rubyData syntax/haml.vim
-    \|  syn region rubyDataHaml matchgroup=rubyData start="^__END__$" keepend end="\%$" contains=@rubyData
-    \|  syn match inFileTemplateName "^@@\w\+" containedin=rubyData
+    \|  syn region rubyDataHaml matchgroup=rubyData start="^__END__$" keepend end="\%$" contains=@rubyData 
+    \|  syn match inFileTemplateName '^@@\w\+' containedin=rubyDataHaml 
     \|  hi def link inFileTemplateName Type
+    \|  let b:current_syntax = "ruby"
 
     " CakePHP
     autocmd BufNewFile,BufRead *.thtml setfiletype php
@@ -859,9 +860,9 @@ endfunction
 " Auto reloading vimrc
 " Reference: http://vim-users.jp/2009/09/hack74/
 if has('gui_running')
-    autocmd vimrc BufWritePost .vimrc nested
+    autocmd vimrc BufWritePost .vimrc,_vimrc,vimrc nested
     \   source $MYVIMRC | source $MYGVIMRC
-    autocmd vimrc BufWritePost .gvimrc nested
+    autocmd vimrc BufWritePost .gvimrc,_gvimrc,gvimrc nested
     \   source $MYGVIMRC
 else
     autocmd vimrc BufWritePost .vimrc nested
