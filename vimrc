@@ -530,6 +530,7 @@ augroup vimrc
 
     " Ruby
     autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
+    autocmd BufNewFile,BufRead *.ru setfiletype ruby
 
     " less
     autocmd BufNewFile,BufRead *.less setfiletype css
