@@ -535,6 +535,14 @@ augroup vimrc
     " less
     autocmd BufNewFile,BufRead *.less setfiletype css
 
+    " haml (inline)
+    autocmd BufNewFile,BufRead *.rb
+    \   unlet b:current_syntax
+    \|  syn include @rubyData syntax/haml.vim
+    \|  syn region rubyDataHaml matchgroup=rubyData start="^__END__$" keepend end="\%$" contains=@rubyData
+    \|  syn match inFileTemplateName "^@@\w\+" containedin=rubyData
+    \|  hi def link inFileTemplateName Type
+
     " CakePHP
     autocmd BufNewFile,BufRead *.thtml setfiletype php
     autocmd BufNewFile,BufRead *.ctp setfiletype php
@@ -876,6 +884,7 @@ set secure
 " fakeclip           : http://www.vim.org/scripts/script.php?script_id=2098
 " fontzoom           : http://www.vim.org/scripts/script.php?script_id=2931
 " gist               : http://www.vim.org/scripts/script.php?script_id=2423
+" haml               : http://github.com/tpope/vim-haml
 " javascript(syntax) : http://www.vim.org/scripts/script.php?script_id=1491
 " javascript(syntax) : http://www.vim.org/scripts/script.php?script_id=2802
 " ku                 : http://www.vim.org/scripts/script.php?script_id=2337
