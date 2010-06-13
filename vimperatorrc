@@ -5,7 +5,7 @@ set focuscontent
 set followhints=1
 set guioptions=BmrbN
 set hintinputs+=name
-set hintchars=hjklasdfgyuiopqwertnmzxcv
+set hintchars=hjklgfdsa
 set hlsearch
 set showstatuslinks=2
 set wildoptions=auto

@@ -232,13 +232,23 @@ function! s:onColorScheme()
         highlight CursorLine cterm=none gui=none
         highlight ZenkakuSpace ctermbg=77 guibg=#5fdf5f
     elseif g:colors_name == 'lucius'
-        highlight ZenkakuSpace ctermbg=172 guibg=#ffaa00
+        " based on SpecialKey
+        highlight ZenkakuSpace ctermbg=239 guibg=#405060
         " based on ErrorMsg
         highlight User1 ctermbg=237 ctermfg=196 cterm=bold
         \               guibg=#363946 guifg=#e5786d gui=bold
         " based on ModeMsg
         highlight User2 ctermbg=237 ctermfg=117 cterm=bold
         \               guibg=#363946 guifg=#76d5f8 gui=bold
+    elseif g:colors_name == 'fu'
+        " based on SpecialKey
+        highlight ZenkakuSpace ctermbg=77 guibg=#5fd75f
+        " based on ErrorMsg
+        highlight User1 ctermbg=232 ctermfg=196 cterm=bold
+        \               guibg=#080808 guifg=#ff0000 gui=bold
+        " based on ModeMsg
+        highlight User2 ctermbg=232 ctermfg=220 cterm=bold
+        \               guibg=#080808 guifg=#ffd700 gui=bold
     else
         highlight ZenkakuSpace ctermbg=77
     endif
@@ -282,11 +292,11 @@ function! s:exchangeMap(mode, a, b)
     execute a:mode . 'noremap' a:b a:a
 endfunction
 
-command! -nargs=+ PopupMap call s:popupMap(<f-args>)
-function! s:popupMap(lhs, ...)
-    let rhs = join(a:000, ' ')
-    execute 'inoremap <silent> <expr>' a:lhs 'pumvisible() ?' rhs ': "' . a:lhs . '"'
-endfunction
+" command! -nargs=+ PopupMap call s:popupMap(<f-args>)
+" function! s:popupMap(lhs, ...)
+    " let rhs = join(a:000, ' ')
+    " execute 'inoremap <silent> <expr>' a:lhs 'pumvisible() ?' rhs ': "' . a:lhs . '"'
+" endfunction
 
 command! -bang -nargs=+ CommandMap call s:commandMap('<bang>', <f-args>)
 function! s:commandMap(buffer, lhs, ...)
@@ -653,18 +663,16 @@ let g:neocomplcache_enable_smart_case = 1
 let g:neocomplcache_enable_camel_case_completion = 1
 let g:neocomplcache_enable_underbar_completion = 1
 let g:neocomplcache_disable_caching_buffer_name_pattern = "\.log$\|\.zsh_history"
-
 if !exists('g:neocomplcache_dictionary_filetype_lists')
     let g:neocomplcache_dictionary_filetype_lists = {}
 endif
 let g:neocomplcache_dictionary_filetype_lists['vimshell'] = expand('~/.vimshell_hist')
 
-imap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
-smap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
-" inoremap <expr> <C-l>     neocomplcache#complete_common_string()
-PopupMap <Tab>   "\<C-n>"
-PopupMap <S-Tab> "\<C-p>"
-PopupMap <CR>    "\<C-y>\<CR>"
+inoremap <expr> <C-e> neocomplcache#cancel_popup()
+inoremap <expr> <C-y> neocomplcache#close_popup()
+inoremap <expr> <C-l> neocomplcache#complete_common_string()
+imap <silent> <C-s> <Plug>(neocomplcache_snippets_expand)
+smap <silent> <C-s> <Plug>(neocomplcache_snippets_expand)
 
 " vimshell
 augroup vimrc
@@ -678,20 +686,11 @@ autocmd vimrc FileType ku
 \    call ku#default_key_mappings(1)
 \|   call s:kuMappings()
 function! s:kuMappings()
-    inoremap <buffer> <silent> <Tab> <C-n>
-    inoremap <buffer> <silent> <S-Tab> <C-p>
-
-    " for Vim
+    " Cancel by Escape key
     imap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
-    imap <buffer> <silent> <Esc><CR> <Plug>(ku-choose-an-action)
+    nmap <buffer> <silent> <Esc> <Plug>(ku-cancel)
 
-    " for GVim, MacVim
-    imap <buffer> <silent> <A-CR> <Plug>(ku-choose-an-action)
-
-    " for MacVim
-    imap <buffer> <silent> <D-CR> <Plug>(ku-choose-an-action)
-
-    " Arpeggio
+    " Cancel by Arpeggio
     Arpeggioimap <buffer> <silent> fj <Plug>(ku-cancel)
 endfunction
 
@@ -884,6 +883,7 @@ set secure
 " errormarker        : http://www.vim.org/scripts/script.php?script_id=1861
 " fakeclip           : http://www.vim.org/scripts/script.php?script_id=2098
 " fontzoom           : http://www.vim.org/scripts/script.php?script_id=2931
+" fu                 : http://www.vim.org/scripts/script.php?script_id=3117
 " gist               : http://www.vim.org/scripts/script.php?script_id=2423
 " haml               : http://github.com/tpope/vim-haml
 " javascript(syntax) : http://www.vim.org/scripts/script.php?script_id=1491
