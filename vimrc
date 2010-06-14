@@ -89,7 +89,11 @@ function! s:tabline()
     for i in range(1, tabpagenr('$'))
         let list = tabpagebuflist(i)
         let nr = tabpagewinnr(i)
-        let title = fnamemodify(bufname(list[nr - 1]), ':t')
+        if exists('*gettabvar')
+            let title = fnamemodify(gettabvar(i, 'cwd'), ':t') . '/'
+        else
+            let title = fnamemodify(bufname(list[nr - 1]), ':t')
+        endif
         let title = empty(title) ? '[No Name]' : title
 
         let s .= i == tabpagenr() ? '%#TabLineSel#' : '%#TabLine#'
@@ -292,18 +296,19 @@ function! s:exchangeMap(mode, a, b)
     execute a:mode . 'noremap' a:b a:a
 endfunction
 
+command! -bang -nargs=+ CommandMap call s:commandMap('nnoremap', <bang>0, <f-args>)
+command! -bang -nargs=+ ArpeggioCommandMap call s:commandMap('Arpeggionnoremap', <bang>0, <f-args>)
+function! s:commandMap(command, buffer, lhs, ...)
+    let rhs = join(a:000, ' ')
+    let buffer = a:buffer ? '<buffer>' : ''
+    execute a:command '<silent>' buffer a:lhs ':<C-u>' . rhs . '<CR>'
+endfunction
+
 " command! -nargs=+ PopupMap call s:popupMap(<f-args>)
 " function! s:popupMap(lhs, ...)
     " let rhs = join(a:000, ' ')
     " execute 'inoremap <silent> <expr>' a:lhs 'pumvisible() ?' rhs ': "' . a:lhs . '"'
 " endfunction
-
-command! -bang -nargs=+ CommandMap call s:commandMap('<bang>', <f-args>)
-function! s:commandMap(buffer, lhs, ...)
-    let rhs = join(a:000, ' ')
-    let buffer = a:buffer == '!' ? '<buffer>' : ''
-    execute 'nnoremap <silent>' buffer a:lhs ':<C-u>' . rhs . '<CR>'
-endfunction
 
 " Use physical cursor movement
 NExchangeMap j gj
@@ -427,7 +432,7 @@ endif
 
 command! GoToAlternateTab silent execute 'tabnext' g:AlternateTabNumber
 CommandMap g<C-^> GoToAlternateTab
-Arpeggionnoremap <silent> al :<C-u>GoToAlternateTab<CR>
+ArpeggioCommandMap al GoToAlternateTab
 
 autocmd vimrc TabLeave * let g:AlternateTabNumber = tabpagenr()
 
@@ -730,17 +735,17 @@ CommandMap [Prefix]km Ku mrufile
 CommandMap [Prefix]ks Ku source
 CommandMap [Prefix]kt Ku tags
 CommandMap [Prefix]h  Ku tags/help
-Arpeggionnoremap <silent> kb :<C-u>Ku buffer<CR>
-Arpeggionnoremap <silent> kf :<C-u>Ku file<CR>
-Arpeggionnoremap <silent> km :<C-u>Ku mrufile<CR>
-Arpeggionnoremap <silent> ke :<C-u>Ku tags/help<CR>
+ArpeggioCommandMap kb Ku buffer
+ArpeggioCommandMap kf Ku file
+ArpeggioCommandMap km Ku mrufile
+ArpeggioCommandMap ke Ku tags/help
 
 " NERDTree
 let g:NERDTreeWinSize = 21
 CommandMap [Prefix]t     NERDTree
 CommandMap [Prefix]T     NERDTreeClose
 CommandMap [Prefix]<C-t> NERDTree `=expand('%:p:h')`
-Arpeggionmap <silent> nt :<C-u>NERDTreeToggle<CR>
+ArpeggioCommandMap nt NERDTreeToggle
 
 " ref
 if has('mac')
@@ -844,6 +849,11 @@ AlterCommand so[urce] Source
 let g:quickrun_no_default_key_mappings = 1
 nmap <Space>q <Plug>(quickrun)
 
+" ==================== Vim 7.3 features ==================== "
+if has('persistent_undo')
+    set undofile
+    let &undodir = s:runtimepath . '/undo'
+endif
 
 " ==================== Loading vimrc ==================== "
 " Reference: http://vim-users.jp/2009/12/hack112/
