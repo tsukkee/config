@@ -2,7 +2,6 @@
 " Define and reset augroup used in vimrc
 augroup vimrc
     autocmd!
-    autocmd VimEnter * let g:vim_has_launched = 1
 augroup END
 
 " Default runtime directory
@@ -13,7 +12,7 @@ else
 endif
 
 " Append 'runtimepath' and generate helptags
-if !exists('g:vim_has_launched')
+if has('vim_starting')
     let &runtimepath = &runtimepath . ',' . s:runtimepath . '/bundle/pathogen'
     call pathogen#runtime_append_all_bundles()
     call pathogen#helptags()
@@ -196,11 +195,7 @@ filetype indent on " to use filetype indent
 filetype plugin on " to use filetype plugin
 
 " Show quickfix automatically
-" Reference: http://webtech-walker.com/archive/2009/09/29213156.html
-autocmd vimrc QuickfixCmdPost make,grep,grepadd,vimgrep
-\   if len(getqflist()) != 0
-\|      copen
-\|  endif
+" autocmd vimrc QuickfixCmdPost * if !empty(getqflist()) | cwindow | endif
 
 " Save and load fold settings automatically
 " Reference: http://vim-users.jp/2009/10/hack84/
@@ -332,6 +327,8 @@ CExchangeMap <C-n> <Down>
 set cmdwinheight=3
 augroup vimrc
     autocmd CmdwinEnter * startinsert!
+    \|   Arpeggionnoremap <buffer> fj :<C-u>q<CR>
+    \|   Arpeggioinoremap <buffer> fj <Esc>:<C-u>q<CR>
 augroup END
 
 " Re-open with specified encoding
@@ -384,6 +381,32 @@ nnoremap <silent> <C-f>n gt
 nnoremap <silent> <C-f><C-n> gt
 nnoremap <silent> <C-f>p gT
 nnoremap <silent> <C-f><C-p> gT
+
+" Merge tabpage into a tab
+" Reference: http://gist.github.com/434502
+function! s:exists_tab(tabpagenr)
+    return 1 <= a:tabpagenr && a:tabpagenr <= tabpagenr('$')
+endfunction
+
+function! s:merge_tab_into_tab(from_tabpagenr, to_tabpagenr)
+    if !s:exists_tab(a:from_tabpagenr)
+    \   || !s:exists_tab(a:to_tabpagenr)
+    \   || a:from_tabpagenr == a:to_tabpagenr
+        return
+    endif
+
+    execute 'tabnext' a:to_tabpagenr
+    for bufnr in tabpagebuflist(a:from_tabpagenr)
+        split
+        execute bufnr 'buffer'
+    endfor
+
+    execute 'tabclose' a:from_tabpagenr
+endfunction
+
+nnoremap [Prefix]mh :<C-u>call <SID>merge_tab_into_tab(tabpagenr(), tabpagenr() - 1)<CR>
+nnoremap [Prefix]ml :<C-u>call <SID>merge_tab_into_tab(tabpagenr(), tabpagenr() + 1)<CR>
+nnoremap [Prefix]m  :<C-u>call <SID>merge_tab_into_tab(tabpagenr(), input('tab number:'))<CR>
 
 " Window resize
 call submode#enter_with('winsize', 'n', '', '<C-w>>', '<C-w>>')
@@ -672,12 +695,17 @@ if !exists('g:neocomplcache_dictionary_filetype_lists')
     let g:neocomplcache_dictionary_filetype_lists = {}
 endif
 let g:neocomplcache_dictionary_filetype_lists['vimshell'] = expand('~/.vimshell_hist')
+if !exists('g:neocomplcache_vim_completefuncs')
+   let g:neocomplcache_vim_completefuncs = {}
+endif
+let g:neocomplcache_vim_completefuncs.Ref = 'ref#complete'
 
 inoremap <expr> <C-e> neocomplcache#cancel_popup()
 inoremap <expr> <C-y> neocomplcache#close_popup()
-inoremap <expr> <C-l> neocomplcache#complete_common_string()
-imap <silent> <C-s> <Plug>(neocomplcache_snippets_expand)
-smap <silent> <C-s> <Plug>(neocomplcache_snippets_expand)
+imap <expr> <C-l> neocomplcache#plugin#snippets_complete#expandable()
+\   ? "\<Plug>(neocomplcache_snippets_expand)"
+\   : neocomplcache#complete_common_string()
+smap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
 
 " vimshell
 augroup vimrc

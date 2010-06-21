@@ -2,6 +2,10 @@
 bindkey -v # like vi
 # bindkey -e # like emacs
 
+# vi mode
+bindkey -a 'q' push-line
+bindkey -a 'H' run-help
+
 # history completion
 autoload history-search-end
 zle -N history-beginning-search-backward-end history-search-end

@@ -6,7 +6,7 @@ URxvt.scrollBar: false
 URxvt.saveLines: 1000
 
 URxvt.font:\
-    xft:Menlo:style=Normal:size=11:antialias=true,\
+    xft:Menlo:style=Normal:size=12:antialias=true,\
     xft:M+2VM+IPAG circle:style=Regular
 URxvt.boldFont:\
     xft:Menlo:style=Bold,\
