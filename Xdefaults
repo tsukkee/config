@@ -18,6 +18,10 @@ URxvt.boldItalicFont:\
     xft:Menlo:style=Bold Italic,\
     xft:M+2VM+IPAG circle:style=Regular
 
+URxvt.perl-ext-common: default,macosx-clipboard-native
+URxvt.keysym.M-c: perl:macosx-clipboard:copy
+URxvt.keysym.M-v: perl:macosx-clipboard:paste
+
 XTerm*termName: xterm-256color
 XTerm*utf8: 1
 XTerm*metaSendsEscape: true

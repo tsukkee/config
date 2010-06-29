@@ -436,17 +436,17 @@ augroup END
 " TabpageCD
 " Reference: kana's vimrc
 command! -complete=file -nargs=? TabpageCD
-\   cd `=fnameescape(<q-args>)`
+\   execute 'cd' fnameescape(<q-args>)
 \|  let t:cwd = getcwd()
 
 AlterCommand cd TabpageCD
-command! CD silent execute 'TabpageCD' expand('%:p:h')
+command! CD silent execute 'TabpageCD' fnameescape(expand('%:p:h'))
 
 autocmd vimrc VimEnter,TabEnter *
 \   if !exists('t:cwd')
 \|    let t:cwd = getcwd()
 \|  endif
-\|  cd `=fnameescape(t:cwd)`
+\|  execute 'cd' fnameescape(t:cwd)
 
 " Go to alternate tab
 if !exists('g:AlternateTabNumber')
@@ -514,11 +514,11 @@ endfunction
 if executable("growlnotify")
     command! -nargs=+ Growl call s:growl(<f-args>)
     function! s:growl(title, ...)
-        execute printf('silent !growlnotify -H localhost -t %s -m %s',
+        execute printf('silent !growlnotify -t %s -m %s -H localhost',
         \   shellescape(a:title, 1), shellescape(join(a:000), 1))
     endfunction
     function! s:growl_lingr(title, ...)
-        execute printf('silent !growlnotify -H localhost -t %s -m %s -I /Applications/LingrRadar.app',
+        execute printf('silent !growlnotify -t %s -m %s -H localhost -I /Applications/LingrRadar.app',
         \   shellescape(a:title, 1), shellescape(join(a:000), 1))
     endfunction
 endif
@@ -559,6 +559,7 @@ endif
 
 " ==================== Plugins settings ==================== "
 " FileType
+let g:python_highlight_all = 1
 augroup vimrc
     " some ftplugins set 'textwidth'
     autocmd FileType * setlocal textwidth=0
@@ -699,6 +700,12 @@ if !exists('g:neocomplcache_vim_completefuncs')
    let g:neocomplcache_vim_completefuncs = {}
 endif
 let g:neocomplcache_vim_completefuncs.Ref = 'ref#complete'
+if !exists('g:neocomplcache_filetype_include_lists')
+    let g:neocomplcache_filetype_include_lists = {}
+endif
+let g:neocomplcache_filetype_include_lists['html'] =
+\   [{'filetype': 'javascript', 'start': '\s*<script[^>]*>', 'end': '\s*</script>'},
+\    {'filetype': 'css'       , 'start': '\s*<style[^>]*>',  'end': '\s*</style>'}]
 
 inoremap <expr> <C-e> neocomplcache#cancel_popup()
 inoremap <expr> <C-y> neocomplcache#close_popup()
@@ -738,7 +745,7 @@ endfunction
 
 call ku#custom_action('common', 'tab-Right', s:SID_PREFIX() . 'kuCommonActionTabRight')
 function! s:kuCommonActionTabRight(item)
-    execute 'tabe' a:item.word
+    execute 'tabe' fnameescape(a:item.word)
     CD
 endfunction
 
@@ -746,9 +753,9 @@ call ku#custom_action('common', 'NERD_tree', s:SID_PREFIX() . 'kuCommonActionNER
 call ku#custom_key('common', 'n', 'NERD_tree')
 function! s:kuCommonActionNERDTree(item)
     if isdirectory(a:item.word)
-        execute 'NERDTree' a:item.word
+        execute 'NERDTree' fnameescape(a:item.word)
     else
-        execute 'NERDTree' fnamemodify(a:item.word, ':h')
+        execute 'NERDTree' fnameescape(fnamemodify(a:item.word, ':h'))
     endif
 endfunction
 
