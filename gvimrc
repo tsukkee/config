@@ -26,13 +26,14 @@ if has('gui_macvim')
     set guioptions-=L " don't show scrollbars
     set guioptions+=c " use console dialog rather than popup dialog
 
-    noremap <silent> gw :macaction selectNextWindow:<CR>
-    noremap <silent> gW :macaction selectPreviousWindow:<CR>
+    nnoremap <silent> gw :<C-u>macaction selectNextWindow:<CR>
+    nnoremap <silent> gW :<C-u>macaction selectPreviousWindow:<CR>
 
     " Reference: http://github.com/kana/config/blob/c21dfc660dd789e14b0c194315773b71815f3ef0/vim/personal/dot.vimrc#L657
     function! s:activate_terminal()
-        silent !open -a Terminal
+        " silent !open -a Terminal
         " silent !open -a iTerm
+        silent !open -a XQuartz
     endfunction
     nnoremap <silent> <C-f>m :<C-u>call <SID>activate_terminal()<CR>
 endif

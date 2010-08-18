@@ -80,7 +80,7 @@ colors
 
 # prompt
 function _colorize_prompt {
-    PROMPT="%{%(?.$fg[green].$fg[red])%}%n@%m $reset_color$fg[yellow]%~%{$reset_color%}
+    PROMPT="%{%(?.$fg[green].$fg[red])%}%n@%m %D{%m/%d %H:%M:%S} $reset_color$fg[yellow]%~%{$reset_color%}
 %# "
 }
 _colorize_prompt

@@ -5,9 +5,9 @@
 " Licence:      No Warranties. Do whatever you want with this. But please tell me!
 " Version:      0.6
 
-" Modified Date:    2009 Dec 8
+" Modified Date:    2010 Jan 19
 " Original Version: 0.7
-" Current Version:  0.7.1
+" Current Version:  0.7.2
 
 function! s:FGforBG(bg)
   " takes a 6hex color code and returns a matching color that is visible
@@ -260,27 +260,24 @@ if has("gui_running") || &t_Co==256
   call s:SetNamedColor('#F5F5F5','WhiteSmoke')
   call s:SetNamedColor('#9ACD32','YellowGreen')
 
-  let i = 1
-  while i <= line("$")
+  for i in range(1, line("$"))
     call s:PreviewCSSColorInLine(i)
-    let i = i+1
-  endwhile
-  unlet i
+  endfor
 
   let b:currentLine = getline('.')
   augroup PreviewCSSColor
     autocmd!
     autocmd CursorHold *.css silent call s:PreviewCSSColorInLine('.')
     autocmd CursorHoldI *.css silent call s:PreviewCSSColorInLine('.')
+    autocmd InsertLeave *.css silent
+          \ for i in range(line("'["), line("']"))
+          \|  call s:PreviewCSSColorInLine(i)
+          \|endfor
     autocmd CursorMoved *.css silent
           \ if b:currentLine != getline('.')
           \|  call s:PreviewCSSColorInLine('.')
           \|  let b:currentLine = getline('.')
           \|endif
-    autocmd InsertLeave *.css silent
-          \ for i in range(line("'["), line("']"))
-          \|  call s:PreviewCSSColorInLine(i)
-          \|endfor
   augroup END
 endif  " has("gui_running")
 

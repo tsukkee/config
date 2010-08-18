@@ -6,21 +6,24 @@ URxvt.scrollBar: false
 URxvt.saveLines: 1000
 
 URxvt.font:\
-    xft:Menlo:style=Normal:size=12:antialias=true,\
-    xft:M+2VM+IPAG circle:style=Regular
+    xft:Menlo:style=Regular:size=11:antialias=true,\
+    xft:M+2VM+IPAG circle:style=regular
 URxvt.boldFont:\
     xft:Menlo:style=Bold,\
-    xft:M+2VM+IPAG circle:style=Regular
+    xft:M+2VM+IPAG circle:style=regular
 URxvt.italicFont:\
     xft:Menlo:style=Italic,\
-    xft:M+2VM+IPAG circle:style=Regular
+    xft:M+2VM+IPAG circle:style=regular
 URxvt.boldItalicFont:\
     xft:Menlo:style=Bold Italic,\
-    xft:M+2VM+IPAG circle:style=Regular
+    xft:M+2VM+IPAG circle:style=regular
 
-URxvt.perl-ext-common: default,macosx-clipboard-native
+URxvt.perl-ext-common: default,macosx-clipboard
 URxvt.keysym.M-c: perl:macosx-clipboard:copy
 URxvt.keysym.M-v: perl:macosx-clipboard:paste
+
+URxvt.color4: #a9cdeb
+URxvt.color12: #ccfbff
 
 XTerm*termName: xterm-256color
 XTerm*utf8: 1
