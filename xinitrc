@@ -40,8 +40,8 @@ if [ -f "$usermodmap" ]; then
 fi
 
 # start some nice programs
-/Library/Frameworks/UIM.framework/Versions/Current/bin/uim-xim --engine=anthy-utf8 &
-# /Library/Frameworks/UIM.framework/Versions/Current/bin/uim-xim --engine=mozc &
+# /Library/Frameworks/UIM.framework/Versions/Current/bin/uim-xim --engine=anthy-utf8 &
+/Library/Frameworks/UIM.framework/Versions/Current/bin/uim-xim --engine=mozc &
 
 
 if [ -d /opt/X11/lib/X11/xinit/xinitrc.d ] ; then

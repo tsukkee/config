@@ -58,6 +58,9 @@ cnoremap <C-n> <Down>
 nnoremap p <Nop>
 nnoremap P <Nop>
 
+" instapaper bookmarklet
+nnoremap <silent> <C-r> :readlater<CR>
+
 " disable highlight
 nnoremap <silent> gh :nohl<CR>:offwordhighlight<CR>
 
@@ -102,10 +105,12 @@ nnoremap -urls '^http://www\.nicovideo\.jp/watch' . :nicomove +10<CR>
 nnoremap -urls '^http://www\.nicovideo\.jp/watch' , :nicomove -10<CR>
 nnoremap -urls '^http://www\.nicovideo\.jp/watch' > :nicomove +60<CR>
 nnoremap -urls '^http://www\.nicovideo\.jp/watch' < :nicomove -60<CR>
+nnoremap -urls '^http://www\.nicovideo\.jp/watch' 0 :nicogoto<CR>
 nnoremap -urls '^http://www\.nicovideo\.jp/watch' ] :nicovolume +20<CR>
 nnoremap -urls '^http://www\.nicovideo\.jp/watch' [ :nicovolume -20<CR>
 nnoremap -urls '^http://www\.nicovideo\.jp/watch' M :nicomute<CR>
-nnoremap -urls '^http://www\.nicovideo\.jp/watch' C :nicomment
+nnoremap -urls '^http://www\.nicovideo\.jp/watch' C :nicomment 
+
 
 " ==================== plugin options ==================== "
 " Lazy
@@ -139,7 +144,7 @@ lazy fmaps -u='mail.google\.com/mail' u k j o <CR p n c ? x s y e m ! # h
 lazy fmaps -u='www\.tumblr\.com/dashboard' -events=vkeydown j k
 
 " spatial navigation
-let g:spatial_navigation_mappings='<C-h> <C-j> <C-k> <C-l>'
+let spatial_navigation_mappings='<C-h> <C-j> <C-k> <C-l>'
 
 " arpeggio
 " runtime! plugin/arpeggio.js

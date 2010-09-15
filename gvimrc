@@ -11,10 +11,10 @@ set title
 if has('gui_macvim')
     set columns=154
     set lines=52
-    set linespace=1
+    set linespace=2
 
-    set guifont=Menlo:h14
-    set guifontwide=M+1M+IPAG:h14
+    set guifont=Inconsolata:h16
+    set guifontwide=M+1M+IPAG
     set transparency=5 " (opaque) 0-100 (transparent)
     set noimdisable
 

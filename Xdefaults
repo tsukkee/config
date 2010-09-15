@@ -1,26 +1,31 @@
 URxvt.termName: rxvt-256color
 URxvt.foreground: White
 URxvt.background: Gray10
-URxvt.geometry: 120x38
+URxvt.geometry: 130x45
 URxvt.scrollBar: false
 URxvt.saveLines: 1000
 
 URxvt.font:\
-    xft:Menlo:style=Regular:size=11:antialias=true,\
-    xft:M+2VM+IPAG circle:style=regular
+    xft:Inconsolata:style=Medium:size=13:antialias=true,\
+    xft:Osaka:style=Regular-Mono
 URxvt.boldFont:\
-    xft:Menlo:style=Bold,\
-    xft:M+2VM+IPAG circle:style=regular
+    xft:Inconsolata,\
+    xft:Osaka:style=Regular-Mono
 URxvt.italicFont:\
-    xft:Menlo:style=Italic,\
-    xft:M+2VM+IPAG circle:style=regular
+    xft:Inconsolata,\
+    xft:Osaka:style=Regular-Mono
 URxvt.boldItalicFont:\
-    xft:Menlo:style=Bold Italic,\
-    xft:M+2VM+IPAG circle:style=regular
+    xft:Inconsolata,\
+    xft:Osaka:style=Regular-Mono
 
 URxvt.perl-ext-common: default,macosx-clipboard
 URxvt.keysym.M-c: perl:macosx-clipboard:copy
 URxvt.keysym.M-v: perl:macosx-clipboard:paste
+
+# C-, -> F9
+URxvt.keysym.C-0x2c: \033[20~
+# C-, -> F10
+URxvt.keysym.C-0x2e: \033[21~
 
 URxvt.color4: #a9cdeb
 URxvt.color12: #ccfbff
@@ -33,7 +38,6 @@ XTerm*background: Gray10
 XTerm*geometry: 120x38
 XTerm*saveLines: 1000
 XTerm*faceName: Menlo
-# XTerm*faceNameDoublesize: M+2VM+IPAG circle
 XTerm*faceNameDoublesize: Osaka
 XTerm*faceSize: 11
 XTerm*cjkWidth: true

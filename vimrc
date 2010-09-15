@@ -882,7 +882,7 @@ AlterCommand so[urce] Source
 
 " Quickrun
 let g:quickrun_no_default_key_mappings = 1
-nmap <Space>q <Plug>(quickrun)
+nmap [Prefix]q <Plug>(quickrun)
 
 " ==================== Vim 7.3 features ==================== "
 if has('persistent_undo')
