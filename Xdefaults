@@ -18,7 +18,7 @@ URxvt.boldItalicFont:\
     xft:Inconsolata,\
     xft:Osaka:style=Regular-Mono
 
-URxvt.perl-ext-common: default,macosx-clipboard
+URxvt.perl-ext-common: default,macosx-clipboard-open
 URxvt.keysym.M-c: perl:macosx-clipboard:copy
 URxvt.keysym.M-v: perl:macosx-clipboard:paste
 
