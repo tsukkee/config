@@ -4,6 +4,7 @@
 " ==================== Display setting ==================== "
 " override vimrc settings
 set title
+set ambiwidth=double
 
 
 " ==================== Platform setting ==================== "
@@ -14,6 +15,7 @@ if has('gui_macvim')
     set linespace=2
 
     set guifont=Inconsolata:h16
+    " set guifont=Menlo:h14
     set guifontwide=M+1M+IPAG
     set transparency=5 " (opaque) 0-100 (transparent)
     set noimdisable

@@ -5,6 +5,21 @@ URxvt.geometry: 130x45
 URxvt.scrollBar: false
 URxvt.saveLines: 1000
 
+! Menlo
+!URxvt.font:\
+!    xft:Menlo:style=Regular:size=11:antialias=true,\
+!    xft:Osaka:style=Regular-Mono
+!URxvt.boldFont:\
+!    xft:Menlo:style=Bold,\
+!    xft:Osaka:style=Regular-Mono
+!URxvt.italicFont:\
+!    xft:Menlo:style=Italic,\
+!    xft:Osaka:style=Regular-Mono
+!URxvt.boldItalicFont:\
+!    xft:Menlo:style=Bold Italic,\
+!    xft:Osaka:style=Regular-Mono
+
+! Inconsolata
 URxvt.font:\
     xft:Inconsolata:style=Medium:size=13:antialias=true,\
     xft:Osaka:style=Regular-Mono
@@ -17,6 +32,20 @@ URxvt.italicFont:\
 URxvt.boldItalicFont:\
     xft:Inconsolata,\
     xft:Osaka:style=Regular-Mono
+
+! Bitstream Vera Sans Mono
+!URxvt.font:\
+!    xft:Bitstream Vera Sans Mono:style=Roman:size=11:antialias=true,\
+!    xft:Osaka:style=Regular-Mono
+!URxvt.boldFont:\
+!    xft:Bitstream Vera Sans Mono:style=Bold,\
+!    xft:Osaka:style=Regular-Mono
+!URxvt.italicFont:\
+!    xft:Bitstream Vera Sans Mono:style=Oblique,\
+!    xft:Osaka:style=Regular-Mono
+!URxvt.boldItalicFont:\
+!    xft:Bitstream Vera Sans Mono:style=Bold Oblique,\
+!    xft:Osaka:style=Regular-Mono
 
 URxvt.perl-ext-common: default,macosx-clipboard-pbcopy
 URxvt.keysym.M-c: perl:macosx-clipboard:copy

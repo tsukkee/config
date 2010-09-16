@@ -67,7 +67,8 @@ set foldmethod=marker         " use marker for folding
 set foldcolumn=3              " display folds
 set list                      " show unprintable characters
 set listchars=tab:>\ ,trail:~ " strings to use in 'list'
-set ambiwidth=double          " for multibyte characters, such as □, ○
+" set ambiwidth=double          " for multibyte characters, such as □, ○
+set ambiwidth=single          " use single width in urxvt
 
 " Status line
 set laststatus=2 " always show statusine
