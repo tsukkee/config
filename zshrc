@@ -1,10 +1,58 @@
-# Keybind
-bindkey -v # like vi
-# bindkey -e # like emacs
+# ==================== Modules ==================== "
+# completion
+autoload -U compinit
+compinit
 
-# vi mode
-bindkey -a 'q' push-line
-bindkey -a 'H' run-help
+# colorize
+zstyle ':completion:*' list-colors ''
+# ignore case
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+# sudo
+zstyle ':completion:*:sudo:*' command-path /opt/local/bin /opt/local/sbin \
+    /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin
+# completer for auto-fu
+zstyle ':completion:*' completer _oldlist _complete
+
+# color
+autoload -U colors
+colors
+
+
+# ==================== Events ==================== "
+typeset -ga chpwd_functions
+typeset -ga precmd_functions
+typeset -ga preexec_functions
+
+
+# ==================== Settings ==================== "
+setopt print_eight_bit   #
+setopt auto_pushd        # cd history
+setopt pushd_ignore_dups #
+setopt list_packed       # compact list display
+setopt nolistbeep        # no beep
+setopt auto_list         # show completion list automatically
+setopt auto_menu         # completion with Tab key
+setopt brace_ccl         # expand brace such as {a-za-z}
+setopt multios           # use muliple redirect and pipe
+setopt ignore_eof        # ignore <C-d>
+
+# history
+HISTFILE=$HOME/.zsh_history
+HISTSIZE=100000
+SAVEHIST=100000
+setopt hist_ignore_dups
+setopt hist_ignore_all_dups
+setopt hist_reduce_blanks
+setopt share_history
+
+
+# ==================== Keybind ==================== "
+# like vi
+bindkey -v
+
+# Normal mode
+bindkey -a "q" push-line
+bindkey -a "^H" run-help
 
 # history completion
 autoload history-search-end
@@ -19,12 +67,6 @@ zle -N insert-last-word smart-insert-last-word
 zstyle :insert-last-word match \
     '*([^[:space:]][:alpha:]/\\]|[[:alpha:]/\\][^[:space:]])*'
 bindkey '^]' insert-last-word
-
-# completion setting
-autoload -U compinit
-compinit
-
-# zstyle ':completion:*:default' menu select=1
 
 # quote previous word in single or double quote
 autoload -U modify-current-argument
@@ -42,65 +84,40 @@ _quote-previous-word-in-double() {
 zle -N _quote-previous-word-in-double
 bindkey '^[d' _quote-previous-word-in-double
 
-# colorize
-zstyle ':completion:*' list-colors ''
-# ignore case
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-# sudo
-zstyle ':completion:*:sudo:*' command-path /opt/local/bin /opt/local/sbin \
-    /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin
 
-# autoload predict-on
-# predict-on
-
-setopt print_eight_bit
-setopt auto_pushd  # cd history
-setopt pushd_ignore_dups
-# setopt correct     # correct command
-setopt list_packed # compact list display
-setopt nolistbeep  # no beep
-setopt auto_list   # show completion list automatically
-setopt auto_menu   # completion with Tab key
-setopt brace_ccl   # expand brace such as {a-za-z}
-setopt multios     # use muliple redirect and pipe
-setopt ignore_eof  # ignore <C-d>
-
-# history
-HISTFILE=$HOME/.zsh_history
-HISTSIZE=100000
-SAVEHIST=100000
-setopt hist_ignore_dups
-setopt hist_ignore_all_dups
-setopt hist_reduce_blanks
-setopt share_history
-
-# color
-autoload -U colors
-colors
-
-# prompt
+# ==================== Prompt ==================== "
+# PROMPT
 function _colorize_prompt {
     PROMPT="%{%(?.$fg[green].$fg[red])%}%n@%m %D{%m/%d %H:%M:%S} $reset_color$fg[yellow]%~%{$reset_color%}
 %# "
 }
 _colorize_prompt
+precmd_functions+=_colorize_prompt
 
-# rprompt
+# RPROMPT
 vi_mode_str="%{$fg[green]%}--INSERT--%{$reset_color%}"
+function _set_rprompt {
+    RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}[$vi_mode_str]"
+}
+
+# vcs_info
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable git svn hg bzr cvs
 zstyle ':vcs_info:*' formats '(%s)-[%b]'
 zstyle ':vcs_info:*' actionformats '(%s)-[%b|%a]'
 zstyle ':vcs_info:(svn|bzr):*' branchformat '%b:r%r'
 zstyle ':vcs_info:bzr:*' use-simple true
-function _vsc_info() {
+
+function _vsc_info {
     psvar=()
     LANG=en_US.UTF-8 vcs_info
-    RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}[$vi_mode_str]"
+    _set_rprompt
 }
 _vsc_info
+precmd_functions+=_vsc_info
 
-function zle-line-init zle-keymap-select {
+# show vi mode
+function _vi_rprompt {
     case $KEYMAP in
         vicmd)
         vi_mode_str="%{$fg[red]%}--NORMAL--%{$reset_color%}"
@@ -109,40 +126,38 @@ function zle-line-init zle-keymap-select {
         vi_mode_str="%{$fg[green]%}--INSERT--%{$reset_color%}"
         ;;
     esac
-    RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}[$vi_mode_str]"
+    _set_rprompt
     zle reset-prompt
+}
+function zle-line-init {
+    _vi_rprompt
+    # auto-fu-init
+}
+function zle-keymap-select {
+    _vi_rprompt
 }
 zle -N zle-line-init
 zle -N zle-keymap-select
 
-# set directory name to screen or tmux
+
+# ==================== screen/tmux ==================== "
 function _screen_dirname() {
     if [ "$WINDOW" != '' -o "$TMUX" != '' ]; then
         echo -ne "\ek$(basename $(pwd))\e\\"
     fi
 }
+precmd_functions+=_screen_dirname
 
-# set command name to screen or tmux
 function _screen_cmdname() {
     if [ "$WINDOW" != '' -o "$TMUX" != '' ]; then
         echo -ne "\ek# $1\e\\"
     fi
 }
-
-# auto commands
-typeset -ga chpwd_functions
-typeset -ga precmd_functions
-typeset -ga preexec_functions
-
-precmd_functions+=_colorize_prompt
-precmd_functions+=_vsc_info
-precmd_functions+=_screen_dirname
 preexec_functions+=_screen_cmdname
 
-# aliases
+
+# ==================== Aliases ==================== "
 set complete_aliases
-# test -x /opt/local/bin/lv && alias less=/opt/local/bin/lv
-# test -x /opt/local/bin/jexctags && alias ctags=jexctags
 alias ls="ls -GF"
 alias scr="screen -xR"
 alias tm="tmux attach-session || tmux"
@@ -153,4 +168,18 @@ alias -g Ceuc="| iconv -f euc-jp -t sjis | pbcopy"
 alias -g EU="| iconv -f euc-jp -t utf-8"
 alias -g SU="| iconv -f sjis -t utf-8"
 
+
+# ==================== Ohters ==================== "
+# auto-fu
+# source $HOME/.zsh.d/auto-fu.zsh/auto-fu.zsh
+
+# cdd
+source $HOME/.zsh.d/cdd.sh
+export CDD_PWD_FILE=$HOME/.zsh.d/cdd_pwd_list
+chpwd_functions+=_reg_pwd_screennum
+
+# visual mode
+source ~/.zsh.d/visualmode.sh
+
+# load loadl settings
 test -f $HOME/.zshrc.local && source $HOME/.zshrc.local
