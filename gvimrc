@@ -48,8 +48,8 @@ if has('win32')
     " and before 'transparency'
     gui
 
-    set guifont=Dejavu\ Sans\ Mono:h12:w7
-    set guifontwide=M+1M+IPAG
+    set guifont=Consolas:h13
+    set guifontwide=TakaoGothic
     set transparency=240 " (opaque) 255 - 0 (transparent)
 
     set guioptions-=e " don't use gui tab apperance
