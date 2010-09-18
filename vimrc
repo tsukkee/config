@@ -378,10 +378,10 @@ if exists('$WINDOW') || exists('$TMUX')
 endif
 
 " Tab move
-nnoremap <silent> <C-f>n gt
-nnoremap <silent> <C-f><C-n> gt
-nnoremap <silent> <C-f>p gT
-nnoremap <silent> <C-f><C-p> gT
+call submode#enter_with('tabmove', 'n', '', 'g.', 'gt')
+call submode#enter_with('tabmove', 'n', '', 'g,', 'gT')
+call submode#map('tabmove', 'n', '', '.', 'gt')
+call submode#map('tabmove', 'n', '', ',', 'gT')
 
 " Merge tabpage into a tab
 " Reference: http://gist.github.com/434502
@@ -565,8 +565,8 @@ augroup vimrc
     " some ftplugins set 'textwidth'
     autocmd FileType * setlocal textwidth=0
 
-    " Vim (to use :help for K, see :h K)
-    autocmd FileType vim setlocal keywordprg=""
+    " Vim (use :help)
+    autocmd FileType vim setlocal keywordprg=:help
 
     " Ruby
     autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
@@ -686,6 +686,7 @@ endfunction
 " neocomplcache
 " Reference: :h neocomplcache
 let g:neocomplcache_enable_at_startup = 1
+let g:neocomplcache_auto_completion_start_length = 2
 let g:neocomplcache_min_keyword_length = 3
 let g:neocomplcache_min_syntax_length = 3
 let g:neocomplcache_ignore_case = 0
@@ -708,12 +709,14 @@ let g:neocomplcache_filetype_include_lists['html'] =
 \   [{'filetype': 'javascript', 'start': '\s*<script[^>]*>', 'end': '\s*</script>'},
 \    {'filetype': 'css'       , 'start': '\s*<style[^>]*>',  'end': '\s*</style>'}]
 
+inoremap <expr> <C-y> neocomplcache#smart_close_popup()
 inoremap <expr> <C-e> neocomplcache#cancel_popup()
-inoremap <expr> <C-y> neocomplcache#close_popup()
-imap <expr> <C-l> neocomplcache#plugin#snippets_complete#expandable()
+imap <expr> <C-l> neocomplcache#sources#snippets_complete#expandable()
 \   ? "\<Plug>(neocomplcache_snippets_expand)"
 \   : neocomplcache#complete_common_string()
 smap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
+CommandMap [Prefix]ne NeoComplCacheEnable
+CommandMap [Prefix]nd NeoComplCacheDisable
 
 " vimshell
 augroup vimrc
@@ -775,6 +778,18 @@ ArpeggioCommandMap kb Ku buffer
 ArpeggioCommandMap kf Ku file
 ArpeggioCommandMap km Ku mrufile
 ArpeggioCommandMap ke Ku tags/help
+
+" Unite
+let g:unite_update_time = 50
+let g:unite_enable_start_insert = 1
+CommandMap [Prefix]u Unite buffer file_mru file register
+ArpeggioCommandMap ue Unite buffer file_mru file register
+
+autocmd vimrc FileType unite call s:unite_settings()
+function! s:unite_settings()
+    Arpeggionmap <buffer> <silent> fj <Plug>(unite_exit)
+    Arpeggioimap <buffer> <silent> fj <Plug>(unite_insert_leave)<Plug>(unite_exit)
+endfunction
 
 " NERDTree
 let g:NERDTreeWinSize = 21

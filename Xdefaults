@@ -52,9 +52,9 @@ URxvt.keysym.M-c: perl:macosx-clipboard:copy
 URxvt.keysym.M-v: perl:macosx-clipboard:paste
 
 # C-, -> F9
-URxvt.keysym.C-0x2c: \033[20~
+URxvt.keysym.C-0x2e: \033[20~
 # C-, -> F10
-URxvt.keysym.C-0x2e: \033[21~
+URxvt.keysym.C-0x2c: \033[21~
 
 URxvt.color4: #a9cdeb
 URxvt.color12: #ccfbff

@@ -174,9 +174,9 @@ alias -g SU="| iconv -f sjis -t utf-8"
 # source $HOME/.zsh.d/auto-fu.zsh/auto-fu.zsh
 
 # cdd
-source $HOME/.zsh.d/cdd.sh
-export CDD_PWD_FILE=$HOME/.zsh.d/cdd_pwd_list
-chpwd_functions+=_reg_pwd_screennum
+# source $HOME/.zsh.d/cdd.sh
+# export CDD_PWD_FILE=$HOME/.zsh.d/cdd_pwd_list
+# chpwd_functions+=_reg_pwd_screennum
 
 # visual mode
 source ~/.zsh.d/visualmode.sh
