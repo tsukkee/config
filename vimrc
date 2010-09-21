@@ -67,8 +67,12 @@ set foldmethod=marker         " use marker for folding
 set foldcolumn=3              " display folds
 set list                      " show unprintable characters
 set listchars=tab:>\ ,trail:~ " strings to use in 'list'
-" set ambiwidth=double          " for multibyte characters, such as □, ○
-set ambiwidth=single          " use single width in urxvt
+" for multibyte characters, such as □, ○
+if !empty($X11_PREFS_DOMAIN)
+    set ambiwidth=single      " use single width in urxvt
+else
+    set ambiwidth=double      " otherwise use double width
+endif
 
 " Status line
 set laststatus=2 " always show statusine
@@ -378,10 +382,8 @@ if exists('$WINDOW') || exists('$TMUX')
 endif
 
 " Tab move
-call submode#enter_with('tabmove', 'n', '', 'g.', 'gt')
-call submode#enter_with('tabmove', 'n', '', 'g,', 'gT')
-call submode#map('tabmove', 'n', '', '.', 'gt')
-call submode#map('tabmove', 'n', '', ',', 'gT')
+nnoremap L gt
+nnoremap H gT
 
 " Merge tabpage into a tab
 " Reference: http://gist.github.com/434502
@@ -780,7 +782,7 @@ ArpeggioCommandMap km Ku mrufile
 ArpeggioCommandMap ke Ku tags/help
 
 " Unite
-let g:unite_update_time = 50
+let g:unite_update_time = 100
 let g:unite_enable_start_insert = 1
 CommandMap [Prefix]u Unite buffer file_mru file register
 ArpeggioCommandMap ue Unite buffer file_mru file register
@@ -788,7 +790,7 @@ ArpeggioCommandMap ue Unite buffer file_mru file register
 autocmd vimrc FileType unite call s:unite_settings()
 function! s:unite_settings()
     Arpeggionmap <buffer> <silent> fj <Plug>(unite_exit)
-    Arpeggioimap <buffer> <silent> fj <Plug>(unite_insert_leave)<Plug>(unite_exit)
+    Arpeggioimap <buffer> <silent> fj <Plug>(unite_exit)
 endfunction
 
 " NERDTree

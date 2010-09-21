@@ -1,1 +1,1 @@
-"\e3~": delete-char
+"\e[3~": delete-char
