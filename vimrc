@@ -791,6 +791,12 @@ autocmd vimrc FileType unite call s:unite_settings()
 function! s:unite_settings()
     Arpeggionmap <buffer> <silent> fj <Plug>(unite_exit)
     Arpeggioimap <buffer> <silent> fj <Plug>(unite_exit)
+
+    imap <buffer> <silent> <C-n> <Plug>(unite_insert_leave)
+    nnoremap <buffer> <silent> <C-n> j
+    nnoremap <buffer> <silent> <C-p> k
+    nmap <buffer> <silent> <C-u> <Plug>(unite_append_end)<Plug>(unite_delete_backward_line)
+    nmap <buffer> <silent> <C-Space> <Plug>(unite_toggle_mark_current_candidate)
 endfunction
 
 " NERDTree
