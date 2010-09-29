@@ -259,6 +259,7 @@ function! s:onColorScheme()
 endfunction
 
 syntax enable " enable syntax coloring
+set synmaxcol=500
 
 " colorscheme
 if &t_Co == 256 || has('gui')
@@ -787,6 +788,8 @@ let g:unite_enable_start_insert = 1
 CommandMap [Prefix]u Unite buffer file_mru file register
 ArpeggioCommandMap ue Unite buffer file_mru file register
 
+call unite#set_substitute_pattern('files', '[[:alnum:]]', '*\0')
+
 autocmd vimrc FileType unite call s:unite_settings()
 function! s:unite_settings()
     Arpeggionmap <buffer> <silent> fj <Plug>(unite_exit)
@@ -855,7 +858,7 @@ function! ReloadFirefox()
         telnet.puts('content.location.reload(true)')
         telnet.close
 EOF
-    elss
+    else
         echoerr 'need has("ruby")'
     endif
 endfunction

@@ -1,0 +1,68 @@
+" ==================== basic options ==================== "
+set activate=quickmark,paste
+set complete=sl
+set followhints=1
+set guioptions=TBmrb
+set hintinputs+=name
+set hintkeys=hjklgfdsa
+set hlsearch
+set showstatuslinks=2
+
+set nextpattern+='次','\bolder\b'
+set previouspattern+='前','\bnerwer\b'
+
+set jsdebugger
+
+let mapleader=","
+
+" ==================== Firefox options ==================== "
+" disable accesskey
+set! ui.key.generalAccessKey=0
+" hide close button
+set! browser.tabs.closeButtons=2
+" open bookmarks in background
+set! browser.tabs.loadBookmarksInBackground=true
+" open tabs by javascript in background
+set! browser.tabs.loadDivertedInBackground=true
+" allow lots of popups for ldr
+set! dom.popup_maximum=1000
+" allow control sidebar position
+" set! layout.scrollbar.side=1
+" show tab preview
+set! browser.allTabs.previews=true
+set! browser.ctrlTab.previews=true
+" change new tab position
+set! browser.tabs.insertRelatedAfterCurrent=false
+" change behaviour on open folder
+set! browser.tabs.loadFolderAndReplace=false
+" use mousewheel acceleration
+set! mousewheel.acceleration.factor=5
+set! mousewheel.acceleration.start=3
+" error console
+set! devtools.errorconsole.enabled=true
+
+
+" ==================== key mappings ==================== "
+" increase j, k, h, l
+nnoremap j 5j
+nnoremap k 5k
+nnoremap h 3h
+nnoremap l 3l
+
+" Use beginning matches on command-line history
+cnoremap <C-p> <Up>
+cnoremap <C-n> <Down>
+
+" avoid unintended paste
+" only use "gP"
+nnoremap p <Nop>
+nnoremap P <Nop>
+
+" disable highlight
+nnoremap <silent> gh :nohl<CR>
+
+" ==================== others ==================== "
+" load local file
+source! ~/.pentadactylrc.local
+
+" vim: set ft=pentadactyl:
