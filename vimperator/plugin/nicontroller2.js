@@ -13,6 +13,7 @@ Commands
 ニコニコ動画2010/7版API
 cf.) http://d.hatena.ne.jp/ofk/20100726/1280139013 
      http://miya2000.jottit.com/niconico
+     http://d.hatena.ne.jp/kiyo_hoge/20100819/1282240857
 ext_play(boolean)
     trueなら再生。falseなら停止。
 ext_setPlayheadTime(number)

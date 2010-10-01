@@ -200,7 +200,7 @@ filetype indent on " to use filetype indent
 filetype plugin on " to use filetype plugin
 
 " Show quickfix automatically
-" autocmd vimrc QuickfixCmdPost * if !empty(getqflist()) | cwindow | endif
+autocmd vimrc QuickfixCmdPost * if !empty(getqflist()) | cwindow | endif
 
 " Save and load fold settings automatically
 " Reference: http://vim-users.jp/2009/10/hack84/
@@ -259,7 +259,6 @@ function! s:onColorScheme()
 endfunction
 
 syntax enable " enable syntax coloring
-set synmaxcol=500
 
 " colorscheme
 if &t_Co == 256 || has('gui')
@@ -273,9 +272,9 @@ endif
 " Use AlterCommand and Arpeggio
 call altercmd#load()
 call arpeggio#load()
-Arpeggioinoremap fj <Esc>
-Arpeggiocnoremap fj <Esc>
-Arpeggiovnoremap fj <Esc>
+Arpeggioimap fj <Esc>
+Arpeggiocmap fj <Esc>
+Arpeggiovmap fj <Esc>
 let g:submode_timeoutlen=600
 
 " Use more logical mapping (see :h Y)
@@ -459,7 +458,6 @@ endif
 
 command! GoToAlternateTab silent execute 'tabnext' g:AlternateTabNumber
 CommandMap g<C-^> GoToAlternateTab
-ArpeggioCommandMap al GoToAlternateTab
 
 autocmd vimrc TabLeave * let g:AlternateTabNumber = tabpagenr()
 
@@ -736,9 +734,6 @@ function! s:kuMappings()
     " Cancel by Escape key
     imap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
     nmap <buffer> <silent> <Esc> <Plug>(ku-cancel)
-
-    " Cancel by Arpeggio
-    Arpeggioimap <buffer> <silent> fj <Plug>(ku-cancel)
 endfunction
 
 call ku#custom_action('common', 'cd', s:SID_PREFIX() . 'kuCommonActionCd')
@@ -777,16 +772,11 @@ CommandMap [Prefix]km Ku mrufile
 CommandMap [Prefix]ks Ku source
 CommandMap [Prefix]kt Ku tags
 CommandMap [Prefix]h  Ku tags/help
-ArpeggioCommandMap kb Ku buffer
-ArpeggioCommandMap kf Ku file
-ArpeggioCommandMap km Ku mrufile
-ArpeggioCommandMap ke Ku tags/help
 
 " Unite
 let g:unite_update_time = 100
 let g:unite_enable_start_insert = 1
-CommandMap [Prefix]u Unite buffer file_mru file register
-ArpeggioCommandMap ue Unite buffer file_mru file register
+ArpeggioCommandMap km Unite buffer file_mru file register
 
 call unite#set_substitute_pattern('files', '[[:alnum:]]', '*\0')
 

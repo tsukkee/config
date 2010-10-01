@@ -14,6 +14,7 @@ hi CompTitle          color: #1e46f3; background: white
 hi CompTitle>*        border-bottom: 1px dashed #1e46f3
 hi GradientLeft       background: #1e46f3
 hi CompItem[selected] background: #1e46f3; color: white
+hi Filter             color: #1e46f3; font-weight: bold
 
 " Hint
 hi Hint       -append background-color: #1e46f3; color: white; text-transform: none; font-size: 14px
