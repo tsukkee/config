@@ -4,14 +4,14 @@ augroup vimrc
     autocmd!
 augroup END
 
-" Default runtime directory
-if has('win32')
-    let s:runtimepath = expand('~/vimfiles')
-else
-    let s:runtimepath = expand('~/.vim')
-endif
+" Platform detection
+let s:is_mac = has('macunix') || (executable('uname') && system('uname') =~? '^darwin')
+let s:is_win = has('win32') || has('win64')
 
-" Append 'runtimepath' and generate helptags
+" Default runtime directory
+let s:runtimepath = expand(s:is_win ? '~/vimfiles' : '~/.vim')
+
+" generate 'runtimepath' and helptags using pathogen
 if has('vim_starting')
     let &runtimepath = &runtimepath . ',' . s:runtimepath . '/bundle/pathogen'
     call pathogen#runtime_append_all_bundles()
@@ -32,34 +32,31 @@ set history=100 " number of command history
 " Input support
 set backspace=indent,eol,start " delete everything with backspace
 set formatoptions+=m           " add multibyte support
-" set iskeyword+=-               " add keyword to '-'
 set nolinebreak                " don't break line automatically
-set textwidth=0                " don't break line automatically
-set iminsert=0                 " disable input method control in insert mode
-set imsearch=-1                " use same value with 'iminsert' for search mode
 
 " Command completion
 set wildmenu                   " enhance command completion
-set wildmode=list:longest,full " first 'list:lingest' and second 'full'
+set wildmode=list:longest,full " use 'list:longest' at first and then use 'full'
 
 " Search
 set wrapscan   " search wrap around the end of the file
-set ignorecase " ignore case search
+set ignorecase " use ignore case search
 set smartcase  " override 'ignorecase' if the search pattern contains upper case
-set incsearch  " incremental search
+set incsearch  " use incremental search
 set hlsearch   " highlight searched words
 nohlsearch     " avoid highlighting when reloading vimrc
 
 " Reading and writing file
-set directory-=. " don't save tmp swap file in current directory
-set autoread     " auto re-read when the file is written by other applications
-" set hidden       " allow open other file without saving current file
-set tags=./tags; " search tag file recursively (see :h file-searching)
+set directory-=.    " don't save tmp swap file in current directory
+set autoread        " auto re-read when the file is modified by other applications
+set hidden          " allow opening other buffer without saving current buffer
+set tags=./tags;    " search tag file recursively (see :h file-searching)
 
 " Display
 set notitle                   " don't rewrite title string
-set showmatch                 " highlight correspods character
+set showmatch                 " highlight corresponds character
 set showcmd                   " show input command
+set noshowmode                " for echodoc
 set number                    " show line number
 set wrap                      " wrap long lines
 set scrolloff=5               " minimal number of screen lines to keep above and below the cursor
@@ -67,14 +64,9 @@ set foldmethod=marker         " use marker for folding
 set foldcolumn=3              " display folds
 set list                      " show unprintable characters
 set listchars=tab:>\ ,trail:~ " strings to use in 'list'
-" for multibyte characters, such as □, ○
-if !empty($X11_PREFS_DOMAIN)
-    set ambiwidth=single      " use single width in urxvt
-else
-    set ambiwidth=double      " otherwise use double width
-endif
+set ambiwidth=double          " use double width for Eastern Asian Ambiguous characters
 
-" Status line
+" Statusline
 set laststatus=2 " always show statusine
 let &statusline = '%!' . s:SID_PREFIX() . 'statusline()'
 function! s:statusline()
@@ -85,10 +77,11 @@ function! s:statusline()
     return s
 endfunction
 
-" Tab line
-set showtabline=2 " always show tab bar
+" Tabline
+set showtabline=2 " always show tabline
 let &tabline = '%!' . s:SID_PREFIX() . 'tabline()'
 function! s:tabline()
+    " show each tab
     let s = ''
     for i in range(1, tabpagenr('$'))
         let list = tabpagebuflist(i)
@@ -105,19 +98,21 @@ function! s:tabline()
         let s .= '  '
     endfor
 
+    " show cwd for current tab
     let tabpaged_cwd = exists('t:cwd') ? '[' . t:cwd . ']' : ''
+
+    " show lingr unread count
+    let lingr_unread = ""
     if exists('*lingr#unread_count')
         let lingr_unread_count = lingr#unread_count()
         if lingr_unread_count > 0
             let lingr_unread = "%#ErrorMsg#(" . lingr_unread_count . ")"
         elseif lingr_unread_count == 0
             let lingr_unread = "()"
-        else
-            let lingr_unread = ""
         endif
-    else
-        let lingr_unread = ""
     endif
+
+    " build tabline
     let s .= '%#TabLineFill#%T%=%<' . tabpaged_cwd . lingr_unread
     return s
 endfunction
@@ -132,64 +127,71 @@ augroup END
 " Use set encoding=utf-8 in Windows
 " needs ja.po with utf-8 encoding as $VIMRUNTIME/lang/ja_JP.UTF-8/LC_MESSAGES/vim.mo
 " Reference: http://d.hatena.ne.jp/thinca/20090111/1231684962
-if has('win32') && has('gui')
+if s:is_win && has('gui')
     let $LANG='ja_JP.UTF-8'
     set encoding=utf-8
 endif
 
-" Autodetect charset
+" detect charset automatically
 " Reference: http://www.kawaz.jp/pukiwiki/?vim#cb691f26
-if &encoding !=# 'utf-8'
-    set encoding=japan
-    set fileencoding=japan
+if &encoding ==# 'utf-8'
+    set fileencodings=iso-2022-jp,euc-jp,cp932,ucs-bom,utf-8,default,latin1
+else
+    set fileencodings=ucs-bom,iso-2022-jp,utf-8,ucs-2le,ucs-2,euc-jp
 endif
-if has('iconv')
-    " Reset (see :h fencs)
-    if &encoding ==# 'utf-8'
-        set fileencodings=ucs-bom,utf-8,default,latin1
-    else
-        set fileencodings=ucs-bom
-    endif
+" {{{
+" if &encoding !=# 'utf-8'
+"     set encoding=japan
+"     set fileencoding=japan
+" endif
+" if has('iconv')
+"     " Reset (see :h fencs)
+"     if &encoding ==# 'utf-8'
+"         set fileencodings=ucs-bom,utf-8,default,latin1
+"     else
+"         set fileencodings=ucs-bom
+"     endif
+" 
+"     " check iconv supports eucJP-ms
+"     if iconv("\x87\x64\x87\x6a", 'cp932', 'eucjp-ms') ==# "\xad\xc5\xad\xcb"
+"         let s:enc_euc = 'eucjp-ms'
+"         let s:enc_jis = 'iso-2022-jp-3'
+"     " check iconv supports JISX0213
+"     elseif iconv("\x87\x64\x87\x6a", 'cp932', 'euc-jisx0213') ==# "\xad\xc5\xad\xcb"
+"         let s:enc_euc = 'euc-jisx0213'
+"         let s:enc_jis = 'iso-2022-jp-3'
+"     else
+"         let s:enc_euc = 'euc-jp'
+"         let s:enc_jis = 'iso-2022-jp'
+"     endif
+" 
+"     " build fileencodings (ignore euc-jp environment)
+"     " encoding=utf-8
+"     if &encoding ==# 'utf-8'
+"         let &fileencodings = join([s:enc_jis, s:enc_euc, 'cp932', &fileencodings], ",")
+"     " encoding=sjis
+"     else
+"         let &fileencodings =
+"         \   join([&fileencodings, s:enc_jis, 'utf-8', 'ucs-2le', 'ucs-2', s:enc_euc], ",")
+"     endif
+" 
+"     unlet s:enc_euc
+"     unlet s:enc_jis
+" endif
+" }}}
 
-    " check iconv supports eucJP-ms
-    if iconv("\x87\x64\x87\x6a", 'cp932', 'eucjp-ms') ==# "\xad\xc5\xad\xcb"
-        let s:enc_euc = 'eucjp-ms'
-        let s:enc_jis = 'iso-2022-jp-3'
-    " check iconv supports JISX0213
-    elseif iconv("\x87\x64\x87\x6a", 'cp932', 'euc-jisx0213') ==# "\xad\xc5\xad\xcb"
-        let s:enc_euc = 'euc-jisx0213'
-        let s:enc_jis = 'iso-2022-jp-3'
-    else
-        let s:enc_euc = 'euc-jp'
-        let s:enc_jis = 'iso-2022-jp'
-    endif
-
-    " build fileencodings (ignore euc-jp environment)
-    " encoding=utf-8
-    if &encoding ==# 'utf-8'
-        let &fileencodings = join([s:enc_jis, s:enc_euc, 'cp932', &fileencodings], ",")
-    " encoding=sjis
-    else
-        let &fileencodings =
-        \   join([&fileencodings, s:enc_jis, 'utf-8', 'ucs-2le', 'ucs-2', s:enc_euc], ",")
-    endif
-
-    unlet s:enc_euc
-    unlet s:enc_jis
-endif
-
-" use 'fileencoding' for 'encoding' if the file don't contain multibyte characters
+" use 'fileencoding' for 'encoding' if the file doesn't contain multibyte characters
 " give up searching multibyte characters when searching time is over 500 ms
 autocmd vimrc BufReadPost *
 \   if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n', 0, 500) == 0
 \|      let &fileencoding=&encoding
 \|  endif
 
-" line feed character
-if has('unix')
-    set ffs=unix,dos
-elseif has('win32')
+" detect line feed character
+if s:is_win
     set ffs=dos,unix
+else
+    set ffs=unix,dos
 endif
 
 " Omni completion
@@ -216,7 +218,7 @@ augroup vimrc
     \|      silent loadview
     \|  endif
 augroup END
-if has('win32')
+if s:is_win
     let &viewdir = s:runtimepath . '\view'
 endif
 
@@ -264,7 +266,7 @@ syntax enable " enable syntax coloring
 if &t_Co == 256 || has('gui')
     colorscheme lucius
 else
-    colorscheme torte
+    colorscheme desert
 endif
 
 
@@ -272,9 +274,12 @@ endif
 " Use AlterCommand and Arpeggio
 call altercmd#load()
 call arpeggio#load()
+
 Arpeggioimap fj <Esc>
 Arpeggiocmap fj <Esc>
 Arpeggiovmap fj <Esc>
+
+" submode
 let g:submode_timeoutlen=600
 
 " Use more logical mapping (see :h Y)
@@ -304,11 +309,11 @@ function! s:commandMap(command, buffer, lhs, ...)
     execute a:command '<silent>' buffer a:lhs ':<C-u>' . rhs . '<CR>'
 endfunction
 
-" command! -nargs=+ PopupMap call s:popupMap(<f-args>)
-" function! s:popupMap(lhs, ...)
-    " let rhs = join(a:000, ' ')
-    " execute 'inoremap <silent> <expr>' a:lhs 'pumvisible() ?' rhs ': "' . a:lhs . '"'
-" endfunction
+command! -nargs=+ PopupMap call s:popupMap(<f-args>)
+function! s:popupMap(lhs, ...)
+    let rhs = join(a:000, ' ')
+    execute 'inoremap <silent> <expr>' a:lhs 'pumvisible() ?' rhs ': "' . a:lhs . '"'
+endfunction
 
 " Use physical cursor movement
 NExchangeMap j gj
@@ -336,13 +341,8 @@ augroup vimrc
     \|   Arpeggioinoremap <buffer> fj <Esc>:<C-u>q<CR>
 augroup END
 
-" Re-open with specified encoding
-command! Utf8 edit ++enc=utf-8
-command! Euc edit ++enc=euc-jp
-command! Cp932 edit ++enc=cp932
-
-" write file easely
-nnoremap [Prefix]w :<C-u>update<CR>
+" Write file easely
+CommandMap [Prefix]w update
 
 " Allow undo for i_CTRL-u and i_CTRL-w
 " Reference: http://vim-users.jp/2009/10/hack81/
@@ -423,7 +423,7 @@ call submode#map('winsize', 'n', '', '-', '<C-w>-')
 
 " Enable mouse wheel
 " In Mac, Only on iTerm.app, disable on Terminal.app
-if has('mac')
+if s:is_mac
     set mouse=a
     set ttymouse=xterm2
 endif
@@ -485,8 +485,8 @@ fun! s:SelectColorS()
     setlocal nonu
     setlocal nomodifiable
     setlocal cursorline
-    nnoremap <buffer>  <Enter>  :<C-u>exec 'colors' getline('.')<CR>
-    nnoremap <buffer>  q        :<C-u>close<CR>
+    nnoremap <buffer> <Enter> :<C-u>exec 'colors' getline('.')<CR>
+    nnoremap <buffer> q       :<C-u>close<CR>
 endf
 command! SelectColorS call s:SelectColorS()
 
@@ -609,14 +609,14 @@ augroup vimrc
 augroup END
 
 " vimproc
-if has('mac')
+if s:is_mac
     let g:vimproc_dll_path = s:runtimepath . '/bundle/vimproc/autoload/proc_mac.so'
 elseif has('unix')
     let g:vimproc_dll_path = s:runtimepath . '/bundle/vimproc/autoload/proc_gcc.so'
 endif
 
 " gist
-if has('mac')
+if s:is_mac
     let g:gist_clip_command = 'pbcopy'
 endif
 let g:gist_detect_filetype = 1
@@ -706,9 +706,8 @@ let g:neocomplcache_vim_completefuncs.Ref = 'ref#complete'
 if !exists('g:neocomplcache_filetype_include_lists')
     let g:neocomplcache_filetype_include_lists = {}
 endif
-let g:neocomplcache_filetype_include_lists['html'] =
-\   [{'filetype': 'javascript', 'start': '\s*<script[^>]*>', 'end': '\s*</script>'},
-\    {'filetype': 'css'       , 'start': '\s*<style[^>]*>',  'end': '\s*</style>'}]
+let g:neocomplcache_filetype_include_lists['php'] =
+\   [{'filetype': 'html', 'start': '?>', 'end': '<?'}]
 
 inoremap <expr> <C-y> neocomplcache#smart_close_popup()
 inoremap <expr> <C-e> neocomplcache#cancel_popup()
@@ -718,6 +717,9 @@ imap <expr> <C-l> neocomplcache#sources#snippets_complete#expandable()
 smap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
 CommandMap [Prefix]ne NeoComplCacheEnable
 CommandMap [Prefix]nd NeoComplCacheDisable
+
+" echodoc
+let g:echodoc_enable_at_startup = 1
 
 " vimshell
 augroup vimrc
@@ -786,33 +788,30 @@ function! s:unite_settings()
     Arpeggioimap <buffer> <silent> fj <Plug>(unite_exit)
 
     imap <buffer> <silent> <C-n> <Plug>(unite_insert_leave)
-    nnoremap <buffer> <silent> <C-n> j
-    nnoremap <buffer> <silent> <C-p> k
+    nmap <buffer> <silent> <C-n> <Plug>(unite_loop_cursor_down)
+    nmap <buffer> <silent> <C-p> <Plug>(unite_loop_cursor_up)
     nmap <buffer> <silent> <C-u> <Plug>(unite_append_end)<Plug>(unite_delete_backward_line)
-    nmap <buffer> <silent> <C-Space> <Plug>(unite_toggle_mark_current_candidate)
 endfunction
 
 " NERDTree
 let g:NERDTreeWinSize = 21
 CommandMap [Prefix]t     NERDTree
-CommandMap [Prefix]T     NERDTreeClose
-CommandMap [Prefix]<C-t> NERDTree `=expand('%:p:h')`
 ArpeggioCommandMap nt NERDTreeToggle
 
 " ref
-if has('mac')
+if s:is_mac
     let g:ref_refe_cmd = '/opt/local/bin/refe-1_8_7'
     let g:ref_refe_encoding = 'utf-8'
     let g:ref_refe_rsense_cmd = '/usr/local/lib/rsense-0.2/bin/rsense'
     let g:ref_phpmanual_path = expand('~/Documents/phpmanual')
-elseif has('win32')
+elseif s:is_win
     let g:ref_refe_encoding = 'cp932'
     let g:ref_phpmanual_path = expand('~/Documents/phpmanual')
 endif
 let g:ref_alc_use_cache = 1
 
-" Lingr-Vim
-if has('mac')
+" lingr.vim
+if s:is_mac
     let g:lingr_vim_command_to_open_url = 'open -g %s'
     augroup vimrc
         autocmd User plugin-lingr-message
@@ -833,8 +832,12 @@ endif
 let g:lingr_vim_time_format = "%Y/%m/%d %H:%M:%S"
 
 " zencoding
+let s:zencoding_indent = ''
+for i in range(&tabstop)
+    let s:zencoding_indent .= ' '
+endfor
 let g:user_zen_settings = {
-\    'indentation': '    ',
+\    'indentation': s:zencoding_indent,
 \    'lang': 'ja'
 \}
 
@@ -844,7 +847,7 @@ function! ReloadFirefox()
     if has('ruby')
         ruby <<EOF
         require 'net/telnet'
-        telnet = Net::Telnet.new({'Host' => 'localhost', 'Port' => 4242})
+        telnet = Net::Telnet.new('Host' => 'localhost', 'Port' => 4242)
         telnet.puts('content.location.reload(true)')
         telnet.close
 EOF
@@ -857,7 +860,7 @@ CommandMap [Prefix]rf call ReloadFirefox()
 " Reload Safari
 " Need RubyOSA and +ruby
 function! ReloadSafari()
-    if has('ruby') && has('mac')
+    if has('ruby') && s:is_mac
         ruby <<EOF
         require 'rubygems'
         require 'rbosa'
@@ -871,14 +874,14 @@ endfunction
 CommandMap [Prefix]rs call ReloadSafari()
 
 " Utility command for Mac
-if has('mac')
+if s:is_mac
     command! Here silent execute '!open' expand('%:p:h')
     command! This silent execute '!open %'
     command! -nargs=1 -complete=file Open silent execute '!open' shellescape(expand(<f-args>), 1)
 endif
 
 " Utility command for Windows
-if has('win32')
+if s:is_win
     command! Here silent execute '!explorer' expand('%:p:h')
     command! This silent execute '!start cmd /c "%"'
     command! -nargs=1 -complete=file Open silent execute '!explorer' shellescape(expand(<f-args>), 1)
