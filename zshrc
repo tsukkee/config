@@ -19,7 +19,7 @@ colors
 
 
 # ==================== Events ==================== "
-typeset -ga chpwd_functions
+# typeset -ga chpwd_functions
 typeset -ga precmd_functions
 typeset -ga preexec_functions
 
@@ -97,7 +97,8 @@ precmd_functions+=_colorize_prompt
 # RPROMPT
 vi_mode_str="%{$fg[green]%}--INSERT--%{$reset_color%}"
 function _set_rprompt {
-    RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}[$vi_mode_str]"
+    # RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}[$vi_mode_str]"
+    RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}"
 }
 
 # vcs_info
@@ -130,8 +131,8 @@ function _vi_rprompt {
     zle reset-prompt
 }
 function zle-line-init {
+    auto-fu-init
     _vi_rprompt
-    # auto-fu-init
 }
 function zle-keymap-select {
     _vi_rprompt
@@ -172,14 +173,27 @@ alias -g SU="| iconv -f sjis -t utf-8"
 # ==================== Ohters ==================== "
 # auto-fu
 # source $HOME/.zsh.d/auto-fu.zsh/auto-fu.zsh
+{ . ~/.zsh.d/auto-fu; auto-fu-install; }
+zstyle ':auto-fu:highlight' input bold
+zstyle ':auto-fu:highlight' completion fg=black,bold
+zstyle ':auto-fu:highlight' completion/one fg=white,bold,underline
+zstyle ':auto-fu:var' postdisplay $'\n-azfu-'
+bindkey -M afu "^P" history-beginning-search-backward-end
+bindkey -M afu "^N" history-beginning-search-forward-end
+bindkey -M afu "^]" insert-last-word
+bindkey -M afu "^[s" _quote-previous-word-in-single
+bindkey -M afu "^[d" _quote-previous-word-in-double
 
 # cdd
-# source $HOME/.zsh.d/cdd.sh
-# export CDD_PWD_FILE=$HOME/.zsh.d/cdd_pwd_list
+source $HOME/.zsh.d/cdd.sh
+export CDD_PWD_FILE=$HOME/.zsh.d/cdd_pwd_list
 # chpwd_functions+=_reg_pwd_screennum
+function chpwd() {
+    _reg_pwd_screennum
+}
 
 # visual mode
-source ~/.zsh.d/visualmode.sh
+# source ~/.zsh.d/visualmode.sh
 
 # load loadl settings
 test -f $HOME/.zshrc.local && source $HOME/.zshrc.local
