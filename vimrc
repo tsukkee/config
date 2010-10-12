@@ -288,7 +288,9 @@ nnoremap Y y$
 " Prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
 nnoremap [Prefix] <Nop>
+vnoremap [Prefix] <Nop>
 nmap <Space> [Prefix]
+vmap <Space> [Prefix]
 noremap [Operator] <Nop>
 map , [Operator]
 
@@ -778,6 +780,8 @@ CommandMap [Prefix]h  Ku tags/help
 " Unite
 let g:unite_update_time = 100
 let g:unite_enable_start_insert = 1
+let g:unite_enable_split_vertically = 1
+let g:unite_cd_command = 'TabpageCD'
 ArpeggioCommandMap km Unite buffer file_mru file register
 
 call unite#set_substitute_pattern('files', '[[:alnum:]]', '*\0')
@@ -840,6 +844,10 @@ let g:user_zen_settings = {
 \    'indentation': s:zencoding_indent,
 \    'lang': 'ja'
 \}
+
+" swap
+vmap [Prefix]s <Plug>SwapSwapOperands
+vmap [Prefix]S <Plug>SwapSwapPivotOperands
 
 " Reload Firefox
 " Need MozRepl and +ruby

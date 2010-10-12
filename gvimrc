@@ -4,7 +4,6 @@
 " ==================== Display setting ==================== "
 " override vimrc settings
 set title
-set ambiwidth=double
 
 
 " ==================== Platform setting ==================== "
@@ -14,11 +13,11 @@ if has('gui_macvim')
     set lines=52
     set linespace=2
 
-    set guifont=Inconsolata:h16
-    " set guifont=Menlo:h14
-    set guifontwide=M+1M+IPAG
+    set guifont=Menlo:h14
+    set guifontwide=Osaka-Mono
+
     set transparency=5 " (opaque) 0-100 (transparent)
-    set noimdisable
+    set noimdisable    " use IM control
 
     set guioptions-=e " don't use gui tab apperance
     set guioptions-=T " hide toolbar
@@ -34,8 +33,8 @@ if has('gui_macvim')
     " Reference: http://github.com/kana/config/blob/c21dfc660dd789e14b0c194315773b71815f3ef0/vim/personal/dot.vimrc#L657
     function! s:activate_terminal()
         " silent !open -a Terminal
-        " silent !open -a iTerm
-        silent !open -a XQuartz
+        silent !open -a iTerm
+        " silent !open -a XQuartz
     endfunction
     nnoremap <silent> <C-f>m :<C-u>call <SID>activate_terminal()<CR>
 endif
@@ -52,6 +51,7 @@ if has('win32')
 
     set guifont=Consolas:h13
     set guifontwide=TakaoGothic
+
     set transparency=240 " (opaque) 255 - 0 (transparent)
 
     set guioptions-=e " don't use gui tab apperance
@@ -66,9 +66,10 @@ endif
 
 " GVim(Gtk2)
 if has('gui_gtk2')
+    set linespace=2
+
     set guifont=Dejavu\ Sans\ Mono 10
     set guifontwide=TakaoGothic\ 10
-    set linespace=2
 
     set guioptions-=e " don't use gui tab apperance
     set guioptions-=T " hide toolbar
