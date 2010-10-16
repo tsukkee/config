@@ -138,52 +138,11 @@ if s:is_win && has('gui')
 endif
 
 " detect charset automatically
-" Reference: http://www.kawaz.jp/pukiwiki/?vim#cb691f26
 if &encoding ==# 'utf-8'
-    set fileencodings=iso-2022-jp,euc-jp,cp932,ucs-bom,utf-8,default,latin1
+    set fileencodings=iso-2022-jp,euc-jp,cp932,utf-8,latin1
 else
-    set fileencodings=ucs-bom,iso-2022-jp,utf-8,ucs-2le,ucs-2,euc-jp
+    set fileencodings=iso-2022-jp,utf-8,euc-jp,cp932,latin1
 endif
-" {{{
-" if &encoding !=# 'utf-8'
-"     set encoding=japan
-"     set fileencoding=japan
-" endif
-" if has('iconv')
-"     " Reset (see :h fencs)
-"     if &encoding ==# 'utf-8'
-"         set fileencodings=ucs-bom,utf-8,default,latin1
-"     else
-"         set fileencodings=ucs-bom
-"     endif
-" 
-"     " check iconv supports eucJP-ms
-"     if iconv("\x87\x64\x87\x6a", 'cp932', 'eucjp-ms') ==# "\xad\xc5\xad\xcb"
-"         let s:enc_euc = 'eucjp-ms'
-"         let s:enc_jis = 'iso-2022-jp-3'
-"     " check iconv supports JISX0213
-"     elseif iconv("\x87\x64\x87\x6a", 'cp932', 'euc-jisx0213') ==# "\xad\xc5\xad\xcb"
-"         let s:enc_euc = 'euc-jisx0213'
-"         let s:enc_jis = 'iso-2022-jp-3'
-"     else
-"         let s:enc_euc = 'euc-jp'
-"         let s:enc_jis = 'iso-2022-jp'
-"     endif
-" 
-"     " build fileencodings (ignore euc-jp environment)
-"     " encoding=utf-8
-"     if &encoding ==# 'utf-8'
-"         let &fileencodings = join([s:enc_jis, s:enc_euc, 'cp932', &fileencodings], ",")
-"     " encoding=sjis
-"     else
-"         let &fileencodings =
-"         \   join([&fileencodings, s:enc_jis, 'utf-8', 'ucs-2le', 'ucs-2', s:enc_euc], ",")
-"     endif
-" 
-"     unlet s:enc_euc
-"     unlet s:enc_jis
-" endif
-" }}}
 
 " use 'fileencoding' for 'encoding' if the file doesn't contain multibyte characters
 " give up searching multibyte characters when searching time is over 500 ms
@@ -227,6 +186,12 @@ if s:is_win
     let &viewdir = s:runtimepath . '\view'
 endif
 
+" Persistent undo
+if has('persistent_undo')
+    set undofile
+    let &undodir = s:runtimepath . '/undo'
+endif
+
 
 " ==================== Hightlight ==================== "
 augroup vimrc
@@ -239,10 +204,7 @@ function! s:onColorScheme()
         return
     endif
 
-    if g:colors_name == 'xoria256'
-        highlight CursorLine cterm=none gui=none
-        highlight ZenkakuSpace ctermbg=77 guibg=#5fdf5f
-    elseif g:colors_name == 'lucius'
+    if g:colors_name == 'lucius'
         " based on SpecialKey
         highlight ZenkakuSpace ctermbg=239 guibg=#405060
         " based on ErrorMsg
@@ -251,15 +213,6 @@ function! s:onColorScheme()
         " based on ModeMsg
         highlight User2 ctermbg=237 ctermfg=117 cterm=bold
         \               guibg=#363946 guifg=#76d5f8 gui=bold
-    elseif g:colors_name == 'fu'
-        " based on SpecialKey
-        highlight ZenkakuSpace ctermbg=77 guibg=#5fd75f
-        " based on ErrorMsg
-        highlight User1 ctermbg=232 ctermfg=196 cterm=bold
-        \               guibg=#080808 guifg=#ff0000 gui=bold
-        " based on ModeMsg
-        highlight User2 ctermbg=232 ctermfg=220 cterm=bold
-        \               guibg=#080808 guifg=#ffd700 gui=bold
     else
         highlight ZenkakuSpace ctermbg=77
     endif
@@ -361,8 +314,7 @@ inoremap <C-w> <C-g>u<C-w>
 " hold with 'h' if the cursor is on the head of line
 nnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zc' : 'h'
 " expand with 'l' if the cursor on the holded text
-" nnoremap <expr> l foldclosed(line('.')) != -1 ? 'zo' : 'l'
-nnoremap <expr> <Plug>(arpeggio-default:l) foldclosed(line('.')) != -1 ? 'zo' : 'l'
+nnoremap <expr> l foldclosed(line('.')) != -1 ? 'zo' : 'l'
 " hold with 'h' if the cursor is on the head of line in visual mode
 vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
 " expand with 'l' if the cursor on the holded text in visual mode
@@ -389,9 +341,7 @@ if exists('$WINDOW') || exists('$TMUX')
 endif
 
 " Tab move
-nnoremap L gt
 nnoremap <C-n> gt
-nnoremap H gT
 nnoremap <C-p> gT
 
 " Merge tabpage into a tab
@@ -739,7 +689,6 @@ augroup END
 let g:unite_update_time = 100
 let g:unite_enable_start_insert = 1
 let g:unite_enable_split_vertically = 0
-let g:unite_cd_command = 'TabpageCD'
 
 call unite#set_substitute_pattern('files', '^\$VIM', substitute(substitute($VIM, '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
 call unite#set_substitute_pattern('files', '^.vim', $HOME . '/.vim', -100)
@@ -775,7 +724,7 @@ endfunction
 
 " NERDTree
 let g:NERDTreeWinSize = 21
-CommandMap [Prefix]t     NERDTree
+CommandMap [Prefix]t NERDTree
 ArpeggioCommandMap nt NERDTreeToggle
 
 " ref
@@ -894,11 +843,6 @@ let g:quickrun_config._ = {
 \}
 nmap [Prefix]q <Plug>(quickrun)
 
-" ==================== Vim 7.3 features ==================== "
-if has('persistent_undo')
-    set undofile
-    let &undodir = s:runtimepath . '/undo'
-endif
 
 " ==================== Loading vimrc ==================== "
 " Reference: http://vim-users.jp/2009/12/hack112/
@@ -935,10 +879,10 @@ set secure
 " altercmd           : http://www.vim.org/scripts/script.php?script_id=2332
 " arpeggio           : http://www.vim.org/scripts/script.php?script_id=2425
 " cocoa              : http://www.vim.org/scripts/script.php?script_id=2674
+" echodoc            : http://github.com/Shougo/echodoc
 " errormarker        : http://www.vim.org/scripts/script.php?script_id=1861
 " fakeclip           : http://www.vim.org/scripts/script.php?script_id=2098
 " fontzoom           : http://www.vim.org/scripts/script.php?script_id=2931
-" fu                 : http://www.vim.org/scripts/script.php?script_id=3117
 " gist               : http://www.vim.org/scripts/script.php?script_id=2423
 " haml               : http://github.com/tpope/vim-haml
 " javascript(syntax) : http://www.vim.org/scripts/script.php?script_id=1491
@@ -952,10 +896,11 @@ set secure
 " metarw             : http://www.vim.org/scripts/script.php?script_id=2335
 " metarw-git         : http://www.vim.org/scripts/script.php?script_id=2336
 " muttator           : https://vimperator-labs.googlecode.com/hg/muttator/contrib/vim/
-" omnicppcomplete    : http://www.vim.org/scripts/script.php?script_id=1520
+" neocomplcache      : http://github.com/Shougo/neocomplcache
 " NERD_commenter     : http://www.vim.org/scripts/script.php?script_id=1218
 " NERD_tree          : http://www.vim.org/scripts/script.php?script_id=1658
-" neocomplcache      : http://github.com/Shougo/neocomplcache
+" omnicppcomplete    : http://www.vim.org/scripts/script.php?script_id=1520
+" operator-replace   : http://www.vim.org/scripts/script.php?script_id=2782
 " operator-user      : http://www.vim.org/scripts/script.php?script_id=2692
 " pathogen           : http://www.vim.org/scripts/script.php?script_id=2332
 " php53(syntax)      : http://www.vim.org/scripts/script.php?script_id=2874
@@ -966,12 +911,14 @@ set secure
 " submode            : http://www.vim.org/scripts/script.php?script_id=2467
 " SudoEdit           : http://www.vim.org/scripts/script.php?script_id=2709
 " surround           : http://github.com/kana/vim-surround
+" swap               : http://www.vim.org/scripts/script.php?script_id=3250
 " taskpaper          : http://www.vim.org/scripts/script.php?script_id=2027
 " textile            : http://www.vim.org/scripts/script.php?script_id=2305
 " textobj-comment    : http://gist.github.com/99234
 " textobj-indent     : http://www.vim.org/scripts/script.php?script_id=2484
 " textobj-user       : http://www.vim.org/scripts/script.php?script_id=2100
 " tmux(syntax)       : http://tmux.cvs.sourceforge.net/viewvc/tmux/tmux/examples/tmux.vim
+" unite              : http://github.com/Shougo/unite.vim
 " vimperator         : https://vimperator-labs.googlecode.com/hg/vimperator/contrib/vim/
 " vimproc            : http://github.com/Shougo/vimproc
 " vimrcbox           : http://github.com/sorah/sandbox/blob/master/vim/vimrcbox.vim
