@@ -23,6 +23,11 @@ function! s:SID_PREFIX()
     return matchstr(expand('<sfile>'), '<SNR>\d\+_')
 endfunction
 
+" Get dirname
+function! s:dirname(path)
+    return isdirectory(a:path) ? a:path : fnamemodify(a:path, ':p:h')
+endfunction
+
 " Tab
 set tabstop=4 shiftwidth=4 softtabstop=4 " set tab width
 set expandtab   " use space rather than tab
@@ -339,7 +344,7 @@ CExchangeMap <C-n> <Down>
 set cmdwinheight=3
 augroup vimrc
     autocmd CmdwinEnter * startinsert!
-    \|   Arpeggionnoremap <buffer> fj :<C-u>q<CR>
+    \|   nnoremap  <buffer> q :<C-u>q<CR>
     \|   Arpeggioinoremap <buffer> fj <Esc>:<C-u>q<CR>
 augroup END
 
@@ -385,7 +390,9 @@ endif
 
 " Tab move
 nnoremap L gt
+nnoremap <C-n> gt
 nnoremap H gT
+nnoremap <C-p> gT
 
 " Merge tabpage into a tab
 " Reference: http://gist.github.com/434502
@@ -728,67 +735,36 @@ augroup vimrc
     autocmd FileType vimshell nunmap <buffer> <C-d>
 augroup END
 
-" ku
-let g:ku_mrufile_size = 1000
-
-autocmd vimrc FileType ku
-\    call ku#default_key_mappings(1)
-\|   call s:kuMappings()
-function! s:kuMappings()
-    " Cancel by Escape key
-    imap <buffer> <silent> <Esc><Esc> <Plug>(ku-cancel)
-    nmap <buffer> <silent> <Esc> <Plug>(ku-cancel)
-endfunction
-
-call ku#custom_action('common', 'cd', s:SID_PREFIX() . 'kuCommonActionCd')
-function! s:kuCommonActionCd(item)
-    if isdirectory(a:item.word)
-        execute 'TabpageCD' a:item.word
-    else
-        execute 'TabpageCD' fnamemodify(a:item.word, ':h')
-    endif
-endfunction
-
-call ku#custom_action('common', 'tab-Right', s:SID_PREFIX() . 'kuCommonActionTabRight')
-function! s:kuCommonActionTabRight(item)
-    execute 'tabe' fnameescape(a:item.word)
-    CD
-endfunction
-
-call ku#custom_action('common', 'NERD_tree', s:SID_PREFIX() . 'kuCommonActionNERDTree')
-call ku#custom_key('common', 'n', 'NERD_tree')
-function! s:kuCommonActionNERDTree(item)
-    if isdirectory(a:item.word)
-        execute 'NERDTree' fnameescape(a:item.word)
-    else
-        execute 'NERDTree' fnameescape(fnamemodify(a:item.word, ':h'))
-    endif
-endfunction
-
-call ku#custom_prefix('common', '.vim', $HOME . '/.vim')
-call ku#custom_prefix('common', '~', $HOME)
-
-CommandMap [Prefix]b  Ku buffer
-CommandMap [Prefix]kf Ku file
-CommandMap [Prefix]kh Ku history
-CommandMap [Prefix]kc Ku mrucommand
-CommandMap [Prefix]km Ku mrufile
-CommandMap [Prefix]ks Ku source
-CommandMap [Prefix]kt Ku tags
-CommandMap [Prefix]h  Ku tags/help
-
 " Unite
 let g:unite_update_time = 100
 let g:unite_enable_start_insert = 1
-let g:unite_enable_split_vertically = 1
+let g:unite_enable_split_vertically = 0
 let g:unite_cd_command = 'TabpageCD'
-ArpeggioCommandMap km Unite buffer file_mru file register
 
-call unite#set_substitute_pattern('files', '[[:alnum:]]', '*\0')
+call unite#set_substitute_pattern('files', '^\$VIM', substitute(substitute($VIM, '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
+call unite#set_substitute_pattern('files', '^.vim', $HOME . '/.vim', -100)
+
+let s:unite_tabopen = {
+\   'is_selectable': 1,
+\}
+function! s:unite_tabopen.func(candidate)
+    call unite#take_action('tabopen', a:candidate)
+    TabpageCD `=s:dirname(a:candidate.word)`
+endfunction
+call unite#custom_action('file,directory,buffer', 'tabopen', s:unite_tabopen)
+
+let s:unite_nerdtree = {
+\   'is_selectable': 1,
+\}
+function! s:unite_nerdtree.func(candidate)
+   NERDTree `=s:dirname(a:candidate.word)`
+endfunction
+call unite#custom_action('file,directory', 'nerdtree', s:unite_nerdtree)
+
+ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru file register
 
 autocmd vimrc FileType unite call s:unite_settings()
 function! s:unite_settings()
-    Arpeggionmap <buffer> <silent> fj <Plug>(unite_exit)
     Arpeggioimap <buffer> <silent> fj <Plug>(unite_exit)
 
     imap <buffer> <silent> <C-n> <Plug>(unite_insert_leave)
@@ -910,6 +886,12 @@ AlterCommand so[urce] Source
 
 " Quickrun
 let g:quickrun_no_default_key_mappings = 1
+if !exists('g:quickrun_config')
+    let g:quickrun_config = {}
+endif
+let g:quickrun_config._ = {
+\   'runmode': 'async:vimproc'
+\}
 nmap [Prefix]q <Plug>(quickrun)
 
 " ==================== Vim 7.3 features ==================== "
