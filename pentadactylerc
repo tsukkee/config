@@ -11,7 +11,7 @@ set showstatuslinks=2
 set nextpattern+='次','\bolder\b'
 set previouspattern+='前','\bnerwer\b'
 
-set jsdebugger
+" set jsdebugger
 
 let mapleader=","
 
@@ -38,8 +38,11 @@ set! browser.tabs.loadFolderAndReplace=false
 " use mousewheel acceleration
 set! mousewheel.acceleration.factor=5
 set! mousewheel.acceleration.start=3
-" error console
+" for js develop
 set! devtools.errorconsole.enabled=true
+set! javascript.options.strict=false
+set! javascript.options.showInConsole=false
+set! browser.dom.window.dump.enabled=false
 
 
 " ==================== key mappings ==================== "
@@ -58,8 +61,83 @@ cnoremap <C-n> <Down>
 nnoremap p <Nop>
 nnoremap P <Nop>
 
+" instapaper bookmarklet
+nnoremap <silent> <C-r> :readlater<CR>
+
 " disable highlight
-nnoremap <silent> gh :nohl<CR>
+nnoremap <silent> gh :nohl<CR>:offwordhighlight<CR>
+
+" dispatch mouse event
+js <<EOM
+(function() {
+function dispatchMouseClickByXPath(xpath) {
+    let elements = util.evaluateXPath(xpath);
+    if(elements.snapshotLength) {
+        buffer.followLink(elements.snapshotItem(0));
+    }
+    else {
+        liberator.echomsg("not found: " + xpath);
+    }
+}
+/*
+commands.addUserCommand(["toggleautopagerize"],
+    "toggle on/off autopagerize",
+    function(args)
+    {
+        dispatchMouseClickByXPath('id("autopagerize_help")//a[@class="autopagerize_link"]');
+    });
+*/
+commands.addUserCommand(["offwordhighlight"],
+    "off wordhighlight",
+    function(args)
+    {
+        dispatchMouseClickByXPath('id("wordhighlight_words")//*[@value="off"]');
+    });
+})();
+EOM
+
+" nicontroller2
+" nnoremap -urls '^http://www\.nicovideo\.jp/watch' P :nicoplay<CR>
+" nnoremap -urls '^http://www\.nicovideo\.jp/watch' . :nicomove +10<CR>
+" nnoremap -urls '^http://www\.nicovideo\.jp/watch' , :nicomove -10<CR>
+" nnoremap -urls '^http://www\.nicovideo\.jp/watch' > :nicomove +60<CR>
+" nnoremap -urls '^http://www\.nicovideo\.jp/watch' < :nicomove -60<CR>
+" nnoremap -urls '^http://www\.nicovideo\.jp/watch' 0 :nicogoto<CR>
+" nnoremap -urls '^http://www\.nicovideo\.jp/watch' ] :nicovolume +20<CR>
+" nnoremap -urls '^http://www\.nicovideo\.jp/watch' [ :nicovolume -20<CR>
+" nnoremap -urls '^http://www\.nicovideo\.jp/watch' M :nicomute<CR>
+" nnoremap -urls '^http://www\.nicovideo\.jp/watch' C :nicomment 
+
+
+" ==================== plugin options ==================== "
+" Lazy
+command! -nargs=+ lazy autocmd Enter .* <args>
+
+" migemo hint
+set hintmatching=custom
+js <<EOM
+liberator.plugins.customHintMatcher = function(inputString){
+    let r = migemo.getRegExp(inputString);
+    return function(hintString) r.test(hintString);
+};
+EOM
+
+" commandBookmarklet
+let command_bookmarklet_prefix=""
+
+" sbmincsearch
+let sbmincsearch_service_name = "delicious"
+let sbmincsearch_max = 15
+lazy set complete=stIl
+
+" feedSomeKeys
+" lazy fmaps -u='(fastladder|reader\.livedoor)\.com/reader' s a r c j k f,j F,k <Space> <S-Space> z b p o v > J < K
+" lazy fmaps -u='mail\.google\.com/mail' u k j o <CR> p n c ? x s y e m ! # h
+" lazy fmaps -u='www\.tumblr\.com/dashboard' -events=vkeydown j k
+" lazy fmaps -u='www\.google\.(com|co\.jp)/reader/' -events=vkeypress j k <Space> <S-Space> X O N P s,NO a,PO S,s v r F,f f,j F,k ? /
+" lazy fmaps -u='twitter\.com' ? j k
+" lazy fmaps -u='twitter\.com' -events=vkeydown f r t m n <CR> <Space> / . gh gr gp gf gm gu
+
 
 " ==================== others ==================== "
 " load local file

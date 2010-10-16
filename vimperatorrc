@@ -40,9 +40,9 @@ set! browser.tabs.loadFolderAndReplace=false
 set! mousewheel.acceleration.factor=5
 set! mousewheel.acceleration.start=3
 " for js develop
-set! javascript.options.strict=true
-set! javascript.options.showInConsole=true
-set! browser.dom.window.dump.enabled=true
+set! javascript.options.strict=false
+set! javascript.options.showInConsole=false
+set! browser.dom.window.dump.enabled=false
 
 
 " ==================== key mappings ==================== "
@@ -147,7 +147,7 @@ lazy fmaps -u='mail\.google\.com/mail' u k j o <CR> p n c ? x s y e m ! # h
 lazy fmaps -u='www\.tumblr\.com/dashboard' -events=vkeydown j k
 lazy fmaps -u='www\.google\.(com|co\.jp)/reader/' -events=vkeypress j k <Space> <S-Space> X O N P s,NO a,PO S,s v r F,f f,j F,k ? /
 lazy fmaps -u='twitter\.com' ? j k
-lazy fmaps -u='twitter\.com' -events=vkeydown f r t m n <CR> <Space> / . gh gr gp gf gm gu
+lazy fmaps -u='twitter\.com' -events=vkeydown F,f R,r T,t m n <CR> <Space> / . gh gr gp gf gm gu
 
 " spatial navigation
 let spatial_navigation_mappings='<C-h> <C-j> <C-k> <C-l>'
