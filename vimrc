@@ -38,6 +38,8 @@ set history=100 " number of command history
 set backspace=indent,eol,start " delete everything with backspace
 set formatoptions+=m           " add multibyte support
 set nolinebreak                " don't break line automatically
+set iminsert=0
+set imsearch=0
 
 " Command completion
 set wildmenu                   " enhance command completion
