@@ -690,8 +690,8 @@ let g:unite_update_time = 100
 let g:unite_enable_start_insert = 1
 let g:unite_enable_split_vertically = 0
 
-call unite#set_substitute_pattern('files', '^\$VIM', substitute(substitute($VIM, '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
-call unite#set_substitute_pattern('files', '^.vim', $HOME . '/.vim', -100)
+call unite#set_substitute_pattern('files', '^$VIM', substitute(substitute($VIM,  '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
+call unite#set_substitute_pattern('files', '^\.vim', s:runtimepath, -100)
 
 let s:unite_tabopen = {
 \   'is_selectable': 1,
@@ -808,9 +808,9 @@ CommandMap [Prefix]rs call ReloadSafari()
 
 " Utility command for Mac
 if s:is_mac
-    command! Here silent execute '!open' expand('%:p:h')
-    command! This silent execute '!open %'
-    command! -nargs=1 -complete=file Open silent execute '!open' shellescape(expand(<f-args>), 1)
+    command! Here silent call system('open ' . expand('%:p:h'))
+    command! This silent call system('open ' . expand('%:p'))
+    command! -nargs=1 -complete=file Open silent call system('open ' . shellescape(expand(<f-args>), 1))
 endif
 
 " Utility command for Windows
