@@ -713,6 +713,21 @@ endfunction
 call unite#custom_action('file,directory', 'nerdtree', s:unite_nerdtree)
 
 ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru file register
+execute 'ArpeggioCommandMap ke call ' s:SID_PREFIX() . 'unite_help_with_ref()'
+
+function! s:unite_help_with_ref()
+    let sources = keys(filter(copy(ref#available_sources()), 'v:val.available()'))
+    let type = has_key(g:ref_detect_filetype, &filetype) ? g:ref_detect_filetype[&filetype] : '-'
+
+    " try to use ref
+    if index(sources, type) != -1
+        execute 'Unite -buffer-name=help' 'ref/' . type
+    " otherwise show :help
+    else
+        Unite -buffer-name=help help
+    endif
+endfunction
+
 
 autocmd vimrc FileType unite call s:unite_settings()
 function! s:unite_settings()
@@ -740,6 +755,7 @@ elseif s:is_win
     let g:ref_phpmanual_path = expand('~/Documents/phpmanual')
 endif
 let g:ref_alc_use_cache = 1
+nnoremap <C-k> :<C-u>execute 'Ref alc' expand('<cword>')<CR>
 
 " lingr.vim
 if s:is_mac
