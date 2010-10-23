@@ -299,7 +299,7 @@ CExchangeMap <C-n> <Down>
 set cmdwinheight=3
 augroup vimrc
     autocmd CmdwinEnter * startinsert!
-    \|   nnoremap  <buffer> q :<C-u>q<CR>
+    \|   nnoremap <buffer> <Esc> :<C-u>q<CR>
     \|   Arpeggioinoremap <buffer> fj <Esc>:<C-u>q<CR>
 augroup END
 
@@ -712,31 +712,30 @@ function! s:unite_nerdtree.func(candidate)
 endfunction
 call unite#custom_action('file,directory', 'nerdtree', s:unite_nerdtree)
 
-ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru file register
+ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru tags file register
 execute 'ArpeggioCommandMap ke call ' s:SID_PREFIX() . 'unite_help_with_ref()'
 
 function! s:unite_help_with_ref()
-    let sources = keys(filter(copy(ref#available_sources()), 'v:val.available()'))
-    let type = has_key(g:ref_detect_filetype, &filetype) ? g:ref_detect_filetype[&filetype] : '-'
+    let ref_source = ref#detect()
 
     " try to use ref
-    if index(sources, type) != -1
-        execute 'Unite -buffer-name=help' 'ref/' . type
+    if !empty(ref_source)
+        execute 'Unite -buffer-name=help' 'ref/' . ref_source
     " otherwise show :help
     else
         Unite -buffer-name=help help
     endif
 endfunction
 
-
 autocmd vimrc FileType unite call s:unite_settings()
 function! s:unite_settings()
+    imap <buffer> <silent> <C-n> <Plug>(unite_insert_leave)
     Arpeggioimap <buffer> <silent> fj <Plug>(unite_exit)
 
-    imap <buffer> <silent> <C-n> <Plug>(unite_insert_leave)
     nmap <buffer> <silent> <C-n> <Plug>(unite_loop_cursor_down)
     nmap <buffer> <silent> <C-p> <Plug>(unite_loop_cursor_up)
     nmap <buffer> <silent> <C-u> <Plug>(unite_append_end)<Plug>(unite_delete_backward_line)
+    nmap <buffer> <silent> <Esc> <Plug>(unite_exit)
 endfunction
 
 " NERDTree
