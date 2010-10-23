@@ -137,6 +137,7 @@ augroup END
 if s:is_win && has('gui')
     let $LANG='ja_JP.UTF-8'
     set encoding=utf-8
+    set termencoding=cp932 " mainly for ref-phpmanual
 endif
 
 " detect charset automatically
@@ -740,6 +741,7 @@ elseif s:is_win
     let g:ref_phpmanual_path = expand('~/Documents/phpmanual')
 endif
 let g:ref_alc_use_cache = 1
+let g:ref_alc_start_linenumber = 43
 
 " lingr.vim
 if s:is_mac
