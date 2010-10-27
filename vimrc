@@ -344,8 +344,8 @@ if exists('$WINDOW') || exists('$TMUX')
 endif
 
 " Tab move
-nnoremap <C-n> gt
-nnoremap <C-p> gT
+nnoremap L gt
+nnoremap H gT
 
 " Merge tabpage into a tab
 " Reference: http://gist.github.com/434502
@@ -688,6 +688,38 @@ augroup vimrc
     autocmd FileType vimshell nunmap <buffer> <C-d>
 augroup END
 
+" execute repl
+" phpsh: http://github.com/facebook/phpsh
+" node:  http://nodejs.org/
+let s:simple_repl_programs = {
+\   'php':        'phpsh',
+\   'ruby':       'irb',
+\   'python':     'python',
+\   'perl':       'perl -de 1',
+\   'scala':      'scala-2.8',
+\   'javascript': 'node',
+\   'haskell':    'ghci',
+\   'erlang':     'erl'
+\}
+function! s:simple_repl()
+    if !exists(':VimShell')
+        echo "This command requires VimShell"
+        return
+    endif
+
+    if !has_key(s:simple_repl_programs, &filetype)
+    \   || !executable(split(s:simple_repl_programs[&filetype])[0])
+        echo "This filetype is not supported"
+        return
+    endif
+
+    execute "VimShellInteractive" s:simple_repl_programs[&filetype]
+    let b:interactive.is_close_immediately = 1
+
+endfunction
+CommandMap [Prefix]R call <SID>simple_repl()
+vnoremap [Prefix]v :VimShellSendString<CR>
+
 " Unite
 let g:unite_update_time = 100
 let g:unite_enable_start_insert = 1
@@ -713,7 +745,8 @@ function! s:unite_nerdtree.func(candidate)
 endfunction
 call unite#custom_action('file,directory', 'nerdtree', s:unite_nerdtree)
 
-ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru tags file register
+ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru tags file
+ArpeggioCommandMap kb Unite -buffer-name=tabs buffer_tab tab
 execute 'ArpeggioCommandMap ke call ' s:SID_PREFIX() . 'unite_help_with_ref()'
 
 function! s:unite_help_with_ref()
@@ -736,7 +769,9 @@ function! s:unite_settings()
     nmap <buffer> <silent> <C-n> <Plug>(unite_loop_cursor_down)
     nmap <buffer> <silent> <C-p> <Plug>(unite_loop_cursor_up)
     nmap <buffer> <silent> <C-u> <Plug>(unite_append_end)<Plug>(unite_delete_backward_line)
+
     nmap <buffer> <silent> <Esc> <Plug>(unite_exit)
+    nmap <buffer> <silent> / <Plug>(unite_do_narrow_action)
 endfunction
 
 " NERDTree
