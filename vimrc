@@ -587,43 +587,56 @@ let g:gist_open_browser_after_post = 1
 " operator-replace
 map [Operator]r <Plug>(operator-replace)
 
-" NERDCommenter
-let g:NERDSpaceDelims = 1
-let g:NERDMenuMode = 0
-let g:NERDCreateDefaultMappings = 0
+" caw
+let g:caw_no_default_keymappings = 1
+let g:caw_find_another_action = 1
 
-nmap gA <Plug>NERDCommenterAppend
-nmap [Prefix]a <Plug>NERDCommenterAltDelims
+nmap gA <Plug>(caw:a:comment)
 
-" NERDCommenter + operator-user
-function! s:setCommentOperator(key, name)
+" caw + operator-user
+function! s:set_caw_operator(key, name)
     call operator#user#define(
-    \   'comment-' . a:name,
-    \   s:SID_PREFIX() . 'doCommentCommand',
-    \   'call ' . s:SID_PREFIX() . 'setCommentCommand("' . a:name . '")')
-    execute 'map' a:key '<Plug>(operator-comment-' . a:name . ')'
+    \   'caw-' . a:name,
+    \   s:SID_PREFIX() . 'do_caw_command',
+    \   'call ' . s:SID_PREFIX() . 'set_caw_command("' . a:name . '")')
+    execute 'map' a:key '<Plug>(operator-caw-' . a:name . ')'
 endfunction
 
-function! s:setCommentCommand(command)
-    let s:comment_command = a:command
+function! s:set_caw_command(name)
+    let s:caw_command = a:name
 endfunction
 
-function! s:doCommentCommand(motion_wiseness)
+function! s:do_caw_command(motion_wiseness)
+    let func = 'caw#'
+    if s:caw_command == 'comment'
+        if a:motion_wiseness == 'line'
+            let func .= 'do_I_comment'
+        else
+            let func .= 'do_i_comment'
+        endif
+    elseif s:caw_command == 'toggle'
+        if a:motion_wiseness == 'line'
+            let func .= 'do_I_toggle'
+        else
+            let func .= 'do_i_toggle'
+        endif
+    elseif s:caw_command == 'uncomment'
+        let func .= 'do_uncomment_i'
+    else
+        echoerr 'operator caw: unknown command:' s:caw_command
+        return
+    endif
+
     let v = operator#user#visual_command_from_wise_name(a:motion_wiseness)
     execute 'normal! `[' . v . "`]\<Esc>"
-    call NERDComment(1, s:comment_command)
+    call call(func, ['v'])
 endfunction
 
-call s:setCommentOperator('[Operator]c',       'norm')
-call s:setCommentOperator('[Operator]<Space>', 'toggle')
-call s:setCommentOperator('[Operator]m',       'minimal')
-call s:setCommentOperator('[Operator]s',       'sexy')
-call s:setCommentOperator('[Operator]i',       'invert')
-call s:setCommentOperator('[Operator]y',       'yank')
-call s:setCommentOperator('[Operator]l',       'alignLeft')
-call s:setCommentOperator('[Operator]b',       'alignBoth')
-call s:setCommentOperator('[Operator]n',       'nested')
-call s:setCommentOperator('[Operator]u',       'uncomment')
+let s:caw_prefix = "m"
+onoremap <Space> g@
+call s:set_caw_operator(s:caw_prefix . 'c', 'comment')
+call s:set_caw_operator(s:caw_prefix . 'd', 'uncomment')
+call s:set_caw_operator(s:caw_prefix . '<Space>', 'toggle')
 
 " Align
 let g:loaded_AlignMapsPlugin = '1'
@@ -728,6 +741,7 @@ let g:unite_enable_split_vertically = 0
 call unite#set_substitute_pattern('files', '^$VIM', substitute(substitute($VIM,  '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
 call unite#set_substitute_pattern('files', '^\.vim', s:runtimepath, -100)
 call unite#set_substitute_pattern('files', '\$\w\+', '\=eval(submatch(0))', 200)
+call unite#set_substitute_pattern('files', ' ', '**', 100)
 
 let s:unite_tabopen = {
 \   'is_selectable': 1,
