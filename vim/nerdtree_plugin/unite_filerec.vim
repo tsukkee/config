@@ -1,10 +1,10 @@
-if exists("g:loaded_nerdtree_tabpage_cd")
+if exists("g:loaded_nerdtree_unite_filerec")
     finish
 endif
-let g:loaded_nerdtree_tabpage_cd = 1
+let g:loaded_nerdtree_unite_filerec = 1
 
-if !exists(':TabpageCD')
-    echoerr 'This plugin requires TabpageCD command'
+if !exists(':Unite')
+    echoerr 'This plugin requires unite.vim'
     finish
 endif
 
@@ -14,16 +14,15 @@ endfunction
 
 function! s:callback()
     let currentDir = g:NERDTreeFileNode.GetSelected().path.getDir().str({'format': 'Cd'})
-    execute 'TabpageCD' currentDir
+    execute 'Unite' '-input=' . currentDir . '/' 'file_rec'
 endfunction
 
 call NERDTreeAddMenuItem({
-            \ 'text': '(t)abpage cd',
-            \ 'shortcut': 't',
+            \ 'text': '(u)nite file_rec',
+            \ 'shortcut': 'u',
             \ 'callback': s:callback_name()})
 
 call NERDTreeAddKeyMap({
-            \ 'key': 'ct',
+            \ 'key': 'cu',
             \ 'callback': s:callback_name(),
-            \ 'quickhelpText': 'tabpage cd to selected file or directory'})
-
+            \ 'quickhelpText': 'start unite file_rec with selected file or directory'})
