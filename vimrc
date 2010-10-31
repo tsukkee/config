@@ -727,13 +727,16 @@ let g:unite_enable_split_vertically = 0
 
 call unite#set_substitute_pattern('files', '^$VIM', substitute(substitute($VIM,  '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
 call unite#set_substitute_pattern('files', '^\.vim', s:runtimepath, -100)
+call unite#set_substitute_pattern('files', '\$\w\+', '\=eval(submatch(0))', 200)
 
 let s:unite_tabopen = {
 \   'is_selectable': 1,
 \}
-function! s:unite_tabopen.func(candidate)
-    call unite#take_action('tabopen', a:candidate)
-    TabpageCD `=s:dirname(a:candidate.word)`
+function! s:unite_tabopen.func(candidates)
+    for c in a:candidates
+        call unite#take_action('tabopen', c)
+        TabpageCD `=s:dirname(c.word)`
+    endfor
 endfunction
 call unite#custom_action('file,directory,buffer', 'tabopen', s:unite_tabopen)
 
