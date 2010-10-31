@@ -612,13 +612,13 @@ function! s:do_caw_command(motion_wiseness)
         if a:motion_wiseness == 'line'
             let func .= 'do_I_comment'
         else
-            let func .= 'do_i_comment'
+            let func .= 'do_wrap_comment'
         endif
     elseif s:caw_command == 'toggle'
         if a:motion_wiseness == 'line'
             let func .= 'do_I_toggle'
         else
-            let func .= 'do_i_toggle'
+            let func .= 'do_wrap_toggle'
         endif
     elseif s:caw_command == 'uncomment'
         let func .= 'do_uncomment_i'
@@ -754,9 +754,7 @@ function! s:unite_tabopen.func(candidates)
 endfunction
 call unite#custom_action('file,directory,buffer', 'tabopen', s:unite_tabopen)
 
-let s:unite_nerdtree = {
-\   'is_selectable': 1,
-\}
+let s:unite_nerdtree = {}
 function! s:unite_nerdtree.func(candidate)
    NERDTree `=s:dirname(a:candidate.word)`
 endfunction
@@ -789,6 +787,9 @@ function! s:unite_settings()
 
     nmap <buffer> <silent> <Esc> <Plug>(unite_exit)
     nmap <buffer> <silent> / <Plug>(unite_do_narrow_action)
+
+    nnoremap <silent> <buffer> <Plug>(unite_do_tab_action)  :<C-u>call unite#mappings#do_action('tabopen')<CR>
+    nmap <buffer> <expr> t unite#mappings#smart_map('t', "\<Plug>(unite_do_tab_action)")
 endfunction
 
 " NERDTree
@@ -833,12 +834,8 @@ endif
 let g:lingr_vim_time_format = "%Y/%m/%d %H:%M:%S"
 
 " zencoding
-let s:zencoding_indent = ''
-for i in range(&tabstop)
-    let s:zencoding_indent .= ' '
-endfor
 let g:user_zen_settings = {
-\    'indentation': s:zencoding_indent,
+\    'indentation': join(repeat([' '], &tabstop), ''),
 \    'lang': 'ja'
 \}
 
