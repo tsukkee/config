@@ -236,6 +236,7 @@ endif
 call altercmd#load()
 call arpeggio#load()
 
+Arpeggionmap fj <Esc>
 Arpeggioimap fj <Esc>
 Arpeggiocmap fj <Esc>
 Arpeggiovmap fj <Esc>
@@ -279,7 +280,9 @@ function! s:popupMap(lhs, ...)
 endfunction
 
 " Use physical cursor movement
-NExchangeMap j gj
+" NExchangeMap j gj
+nnoremap <Plug>(arpeggio-default:j) gj
+nnoremap gj j
 " VExchangeMap j gj
 vnoremap <Plug>(arpeggio-default:j) gj
 vnoremap gj j
@@ -778,18 +781,17 @@ endfunction
 
 autocmd vimrc FileType unite call s:unite_settings()
 function! s:unite_settings()
-    imap <buffer> <silent> <C-n> <Plug>(unite_insert_leave)
-    Arpeggioimap <buffer> <silent> fj <Plug>(unite_exit)
-
+    imap <buffer> <silent> <C-n> <Plug>(unite_insert_leave)<Plug>(unite_loop_cursor_down)
     nmap <buffer> <silent> <C-n> <Plug>(unite_loop_cursor_down)
     nmap <buffer> <silent> <C-p> <Plug>(unite_loop_cursor_up)
     nmap <buffer> <silent> <C-u> <Plug>(unite_append_end)<Plug>(unite_delete_backward_line)
 
+    Arpeggioimap <buffer> <silent> fj <Plug>(unite_exit)
     nmap <buffer> <silent> <Esc> <Plug>(unite_exit)
     nmap <buffer> <silent> / <Plug>(unite_do_narrow_action)
 
-    nnoremap <silent> <buffer> <Plug>(unite_do_tab_action)  :<C-u>call unite#mappings#do_action('tabopen')<CR>
-    nmap <buffer> <expr> t unite#mappings#smart_map('t', "\<Plug>(unite_do_tab_action)")
+    imap <buffer> <silent> <expr> <C-t> unite#do_action("tabopen")
+    nmap <buffer> <silent> <expr> <C-t> unite#do_action("tabopen")
 endfunction
 
 " NERDTree
