@@ -64,6 +64,9 @@ nnoremap P <Nop>
 " instapaper bookmarklet
 nnoremap <silent> <C-r> :readlater<CR>
 
+" toggle Flashblock
+nnoremap <silent> <C-f> :js Flashblock.toggleSiteWhitelisted()<CR>:reload<CR>
+
 " disable highlight
 nnoremap <silent> gh :nohl<CR>:offwordhighlight<CR>
 

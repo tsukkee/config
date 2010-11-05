@@ -748,6 +748,7 @@ call unite#set_substitute_pattern('files', ' ', '**', 100)
 
 let s:unite_tabopen = {
 \   'is_selectable': 1,
+\   'description': 'open files or buffers in new tab'
 \}
 function! s:unite_tabopen.func(candidates)
     for c in a:candidates
@@ -757,7 +758,9 @@ function! s:unite_tabopen.func(candidates)
 endfunction
 call unite#custom_action('file,directory,buffer', 'tabopen', s:unite_tabopen)
 
-let s:unite_nerdtree = {}
+let s:unite_nerdtree = {
+\   'description': 'open NERD_tree with selected item'
+\}
 function! s:unite_nerdtree.func(candidate)
    NERDTree `=s:dirname(a:candidate.word)`
 endfunction
@@ -837,7 +840,7 @@ let g:lingr_vim_time_format = "%Y/%m/%d %H:%M:%S"
 
 " zencoding
 let g:user_zen_settings = {
-\    'indentation': join(repeat([' '], &tabstop), ''),
+\    'indentation': repeat(' ', &tabstop),
 \    'lang': 'ja'
 \}
 

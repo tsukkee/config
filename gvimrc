@@ -37,6 +37,9 @@ if has('gui_macvim')
         " silent !open -a XQuartz
     endfunction
     nnoremap <silent> <C-f>m :<C-u>call <SID>activate_terminal()<CR>
+
+    " for latest MacVim-Kaoriya
+    let $RUBY_DLL="/usr/lib/libruby.dylib"
 endif
 
 " GVim(Windows)
