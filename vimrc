@@ -752,7 +752,7 @@ let s:unite_tabopen = {
 \}
 function! s:unite_tabopen.func(candidates)
     for c in a:candidates
-        call unite#take_action('tabopen', c)
+        call unite#take_action('tabopen', c, self.func)
         TabpageCD `=s:dirname(c.word)`
     endfor
 endfunction
@@ -798,17 +798,35 @@ function! s:unite_settings()
 endfunction
 
 " ttree
-ArpeggioCommandMap nt call ttree#toggle()
+CommandMap [Prefix]t call ttree#show(getcwd())
+ArpeggioCommandMap nt TtreeToggle
 
 autocmd FileType ttree call s:setup_ttree()
 function! s:setup_ttree()
-    nnoremap <silent> <buffer> ct :<C-u>execute "TabpageCD " . <SID>dirname(ttree#get_node(line('.')).path)<CR>
-    nnoremap <silent> <buffer> cu :<C-u>call unite#start([["file_rec", <SID>dirname(ttree#get_node(line('.')).path)]])<CR>
+    CommandMap! ct call <SID>ttree_tabpagecd()
+    CommandMap! cu call <SID>ttree_unite_filerec()
 endfunction
+
+function! s:ttree_tabpagecd()
+    let dir = s:dirname(ttree#get_node().path)
+    execute 'TabpageCD' dir
+endfunction
+
+function! s:ttree_unite_filerec()
+    let path = s:dirname(ttree#get_node().path)
+    if winnr('#') != winnr()
+        wincmd p
+    else
+        let w = winwidth(winnr()) - g:ttree_width
+        execute 'botright' w 'vnew'
+    endif
+    call unite#start([["file_rec", path]])
+endfunction
+
 
 " NERDTree
 let g:NERDTreeWinSize = 21
-CommandMap [Prefix]t NERDTree
+" CommandMap [Prefix]t NERDTree
 " ArpeggioCommandMap nt NERDTreeToggle
 
 " ref
