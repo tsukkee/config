@@ -797,10 +797,19 @@ function! s:unite_settings()
     nmap <buffer> <silent> <expr> <C-t> unite#do_action("tabopen")
 endfunction
 
+" ttree
+ArpeggioCommandMap nt call ttree#toggle()
+
+autocmd FileType ttree call s:setup_ttree()
+function! s:setup_ttree()
+    nnoremap <silent> <buffer> ct :<C-u>execute "TabpageCD " . <SID>dirname(ttree#get_node(line('.')).path)<CR>
+    nnoremap <silent> <buffer> cu :<C-u>call unite#start([["file_rec", <SID>dirname(ttree#get_node(line('.')).path)]])<CR>
+endfunction
+
 " NERDTree
 let g:NERDTreeWinSize = 21
 CommandMap [Prefix]t NERDTree
-ArpeggioCommandMap nt NERDTreeToggle
+" ArpeggioCommandMap nt NERDTreeToggle
 
 " ref
 if s:is_mac
