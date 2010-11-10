@@ -432,29 +432,6 @@ command! -nargs=1 -bang -complete=file Rename saveas<bang> <args> | call delete(
 " ctags
 command! CtagsR !ctags -R
 
-" ColorScheme selecter
-" Reference: http://vim.g.hatena.ne.jp/tyru/20100226
-fun! s:SelectColorS()
-    30vnew
-
-    let files = split(globpath(&rtp, 'colors/*.vim'), "\n")
-    for idx in range(0, len(files) - 1)
-        let file = files[idx]
-        let name = matchstr(file , '\w\+\(\.vim\)\@=')
-        call setline(idx + 1, name)
-    endfor
-
-    file ColorSchemeSelector
-    setlocal bufhidden=wipe
-    setlocal buftype=nofile
-    setlocal nonu
-    setlocal nomodifiable
-    setlocal cursorline
-    nnoremap <buffer> <Enter> :<C-u>exec 'colors' getline('.')<CR>
-    nnoremap <buffer> q       :<C-u>close<CR>
-endf
-command! SelectColorS call s:SelectColorS()
-
 " Alternate grep
 " Reference: http://vim-users.jp/2010/03/hack130/
 command! -complete=file -nargs=+ Grep call s:grep([<f-args>])
@@ -573,6 +550,13 @@ augroup vimrc
     autocmd BufRead,BufNewFile .tmux.conf*,tmux.conf* setfiletype tmux
 augroup END
 
+" surround
+nmap s  <Plug>Ysurround
+nmap S  <Plug>YSurround
+nmap ss <Plug>Yssurround
+nmap Ss <Plug>YSsurround
+nmap SS <Plug>YSsurround
+
 " vimproc
 if s:is_mac
     let g:vimproc_dll_path = s:runtimepath . '/bundle/vimproc/autoload/proc_mac.so'
@@ -589,6 +573,10 @@ let g:gist_open_browser_after_post = 1
 
 " operator-replace
 map [Operator]r <Plug>(operator-replace)
+
+" operator-html-escape
+map [Operator]h <Plug>(operator-html-escape)
+map [Operator]u <plug>(operator-html-unescape)
 
 " caw
 let g:caw_no_default_keymappings = 1
@@ -666,6 +654,7 @@ endfunction
 " Reference: :h neocomplcache
 let g:neocomplcache_enable_at_startup = 1
 let g:neocomplcache_auto_completion_start_length = 2
+let g:neocomplcache_manual_completion_start_length = 1
 let g:neocomplcache_min_keyword_length = 3
 let g:neocomplcache_min_syntax_length = 3
 let g:neocomplcache_ignore_case = 0
@@ -689,6 +678,7 @@ let g:neocomplcache_filetype_include_lists['php'] =
 
 inoremap <expr> <C-y> neocomplcache#smart_close_popup()
 inoremap <expr> <C-e> neocomplcache#cancel_popup()
+inoremap <expr> <C-x><C-f> neocomplcache#manual_filename_complete()
 imap <expr> <C-l> neocomplcache#sources#snippets_complete#expandable()
 \   ? "\<Plug>(neocomplcache_snippets_expand)"
 \   : neocomplcache#complete_common_string()
@@ -752,34 +742,35 @@ let s:unite_tabopen = {
 \}
 function! s:unite_tabopen.func(candidates)
     for c in a:candidates
-        call unite#take_action('tabopen', c, self.func)
-        TabpageCD `=s:dirname(c.word)`
+        call unite#take_action('tabopen', c)
+        TabpageCD `=s:dirname(c.action__path)`
     endfor
 endfunction
 call unite#custom_action('file,directory,buffer', 'tabopen', s:unite_tabopen)
 
-let s:unite_nerdtree = {
-\   'description': 'open NERD_tree with selected item'
-\}
-function! s:unite_nerdtree.func(candidate)
-   NERDTree `=s:dirname(a:candidate.word)`
-endfunction
-call unite#custom_action('file,directory', 'nerdtree', s:unite_nerdtree)
+" let s:unite_nerdtree = {
+" \   'description': 'open NERD_tree with selected item'
+" \}
+" function! s:unite_nerdtree.func(candidate)
+"    NERDTree `=s:dirname(a:candidate.word)`
+" endfunction
+" call unite#custom_action('file,directory', 'nerdtree', s:unite_nerdtree)
 
 ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru tags file
 ArpeggioCommandMap kb Unite -buffer-name=tabs buffer_tab tab
 execute 'ArpeggioCommandMap ke call ' s:SID_PREFIX() . 'unite_help_with_ref()'
 
 function! s:unite_help_with_ref()
-    let ref_source = ref#detect()
+    let unite_args = []
 
-    " try to use ref
+    let ref_source = ref#detect()
     if !empty(ref_source)
-        execute 'Unite -buffer-name=help' 'ref/' . ref_source
-    " otherwise show :help
-    else
-        Unite -buffer-name=help help
+        call add(unite_args, ["ref/" . ref_source])
     endif
+
+    call add(unite_args, ["help"])
+
+    call unite#start(unite_args)
 endfunction
 
 autocmd vimrc FileType unite call s:unite_settings()
@@ -791,13 +782,15 @@ function! s:unite_settings()
 
     Arpeggioimap <buffer> <silent> fj <Plug>(unite_exit)
     nmap <buffer> <silent> <Esc> <Plug>(unite_exit)
-    nmap <buffer> <silent> / <Plug>(unite_do_narrow_action)
+    nmap <buffer> <silent> <expr> / unite#do_action("narrow")
 
     imap <buffer> <silent> <expr> <C-t> unite#do_action("tabopen")
     nmap <buffer> <silent> <expr> <C-t> unite#do_action("tabopen")
 endfunction
 
 " ttree
+let g:ttree_replace_netrw = 1
+
 CommandMap [Prefix]t call ttree#show(getcwd())
 ArpeggioCommandMap nt TtreeToggle
 
@@ -814,7 +807,7 @@ endfunction
 
 function! s:ttree_unite_filerec()
     let path = s:dirname(ttree#get_node().path)
-    if winnr('#') != winnr()
+    if winnr('$') > 1
         wincmd p
     else
         let w = winwidth(winnr()) - g:ttree_width
@@ -826,6 +819,7 @@ endfunction
 
 " NERDTree
 let g:NERDTreeWinSize = 21
+let g:NERDTreeHijackNetrw = 0
 " CommandMap [Prefix]t NERDTree
 " ArpeggioCommandMap nt NERDTreeToggle
 
@@ -976,54 +970,56 @@ set secure
 
 
 " ==================== Plugins ==================== "
-" align              : http://www.vim.org/scripts/script.php?script_id=294
-" altercmd           : http://www.vim.org/scripts/script.php?script_id=2332
-" arpeggio           : http://www.vim.org/scripts/script.php?script_id=2425
-" cocoa              : http://www.vim.org/scripts/script.php?script_id=2674
-" echodoc            : http://github.com/Shougo/echodoc
-" errormarker        : http://www.vim.org/scripts/script.php?script_id=1861
-" fakeclip           : http://www.vim.org/scripts/script.php?script_id=2098
-" fontzoom           : http://www.vim.org/scripts/script.php?script_id=2931
-" gist               : http://www.vim.org/scripts/script.php?script_id=2423
-" haml               : http://github.com/tpope/vim-haml
-" javascript(syntax) : http://www.vim.org/scripts/script.php?script_id=1491
-" javascript(syntax) : http://www.vim.org/scripts/script.php?script_id=2802
-" ku                 : http://www.vim.org/scripts/script.php?script_id=2337
-" lingr-vim          : http://github.com/tsukkee/lingr-vim
-" lucius             : http://www.vim.org/scripts/script.php?script_id=2536
-" macports           : http://svn.macports.org/repository/macports/contrib/mpvim/
-" markdown(syntax)   : http://www.vim.org/scripts/script.php?script_id=2882
-" matchit            : http://www.vim.org/scripts/script.php?script_id=39
-" metarw             : http://www.vim.org/scripts/script.php?script_id=2335
-" metarw-git         : http://www.vim.org/scripts/script.php?script_id=2336
-" muttator           : https://vimperator-labs.googlecode.com/hg/muttator/contrib/vim/
-" neocomplcache      : http://github.com/Shougo/neocomplcache
-" NERD_commenter     : http://www.vim.org/scripts/script.php?script_id=1218
-" NERD_tree          : http://www.vim.org/scripts/script.php?script_id=1658
-" omnicppcomplete    : http://www.vim.org/scripts/script.php?script_id=1520
-" operator-replace   : http://www.vim.org/scripts/script.php?script_id=2782
-" operator-user      : http://www.vim.org/scripts/script.php?script_id=2692
-" pathogen           : http://www.vim.org/scripts/script.php?script_id=2332
-" php53(syntax)      : http://www.vim.org/scripts/script.php?script_id=2874
-" qfreplace          : http://github.com/thinca/vim-qfreplace
-" quickrun           : http://github.com/thinca/vim-quickrun
-" ref                : http://www.vim.org/scripts/script.php?script_id=3067
-" scala              : https://lampsvn.epfl.ch/trac/scala/browser/scala-tool-support/trunk/src/vim
-" submode            : http://www.vim.org/scripts/script.php?script_id=2467
-" SudoEdit           : http://www.vim.org/scripts/script.php?script_id=2709
-" surround           : http://github.com/kana/vim-surround
-" swap               : http://www.vim.org/scripts/script.php?script_id=3250
-" taskpaper          : http://www.vim.org/scripts/script.php?script_id=2027
-" textile            : http://www.vim.org/scripts/script.php?script_id=2305
-" textobj-comment    : http://gist.github.com/99234
-" textobj-indent     : http://www.vim.org/scripts/script.php?script_id=2484
-" textobj-user       : http://www.vim.org/scripts/script.php?script_id=2100
-" tmux(syntax)       : http://tmux.cvs.sourceforge.net/viewvc/tmux/tmux/examples/tmux.vim
-" unite              : http://github.com/Shougo/unite.vim
-" vimperator         : https://vimperator-labs.googlecode.com/hg/vimperator/contrib/vim/
-" vimproc            : http://github.com/Shougo/vimproc
-" vimrcbox           : http://github.com/sorah/sandbox/blob/master/vim/vimrcbox.vim
-" vimshell           : http://github.com/Shougo/vimshell
-" web-indent         : http://www.vim.org/scripts/script.php?script_id=3081
-" xoria256           : http://www.vim.org/scripts/script.php?script_id=2140
-" zencoding          : http://www.vim.org/scripts/script.php?script_id=2981
+" align                : http://www.vim.org/scripts/script.php?script_id=294
+" altercmd             : http://www.vim.org/scripts/script.php?script_id=2332
+" arpeggio             : http://www.vim.org/scripts/script.php?script_id=2425
+" caw                  : https://github.com/tyru/caw.vim
+" cocoa                : http://www.vim.org/scripts/script.php?script_id=2674
+" echodoc              : http://github.com/Shougo/echodoc
+" errormarker          : http://www.vim.org/scripts/script.php?script_id=1861
+" fakeclip             : http://www.vim.org/scripts/script.php?script_id=2098
+" fontzoom             : http://www.vim.org/scripts/script.php?script_id=2931
+" haml                 : http://github.com/tpope/vim-haml
+" javascript(syntax)   : http://www.vim.org/scripts/script.php?script_id=1491
+" javascript(syntax)   : http://www.vim.org/scripts/script.php?script_id=2802
+" ku                   : http://www.vim.org/scripts/script.php?script_id=2337
+" lingr.vim            : http://github.com/tsukkee/lingr-vim
+" lucius               : http://www.vim.org/scripts/script.php?script_id=2536
+" macports             : http://svn.macports.org/repository/macports/contrib/mpvim/
+" markdown(syntax)     : http://www.vim.org/scripts/script.php?script_id=2882
+" matchit              : http://www.vim.org/scripts/script.php?script_id=39
+" metarw               : http://www.vim.org/scripts/script.php?script_id=2335
+" metarw-git           : http://www.vim.org/scripts/script.php?script_id=2336
+" muttator             : https://vimperator-labs.googlecode.com/hg/muttator/contrib/vim/
+" neocomplcache        : http://github.com/Shougo/neocomplcache
+" operator-html-escape : https://github.com/tyru/operator-html-escape.vim/
+" operator-replace     : http://www.vim.org/scripts/script.php?script_id=2782
+" operator-user        : http://www.vim.org/scripts/script.php?script_id=2692
+" pathogen             : http://www.vim.org/scripts/script.php?script_id=2332
+" php53(syntax)        : http://www.vim.org/scripts/script.php?script_id=2874
+" qfreplace            : http://github.com/thinca/vim-qfreplace
+" quickrun             : http://github.com/thinca/vim-quickrun
+" ref                  : http://www.vim.org/scripts/script.php?script_id=3067
+" scala                : https://lampsvn.epfl.ch/trac/scala/browser/scala-tool-support/trunk/src/vim
+" submode              : http://www.vim.org/scripts/script.php?script_id=2467
+" SudoEdit             : http://www.vim.org/scripts/script.php?script_id=2709
+" surround             : http://github.com/kana/vim-surround
+" swap                 : http://www.vim.org/scripts/script.php?script_id=3250
+" textile              : http://www.vim.org/scripts/script.php?script_id=2305
+" textobj-between      : https://github.com/thinca/vim-textobj-plugins/
+" textobj-comment      : http://gist.github.com/99234
+" textobj-indent       : http://www.vim.org/scripts/script.php?script_id=2484
+" textobj-user         : http://www.vim.org/scripts/script.php?script_id=2100
+" ttree                : https://github.com/tsukkee/ttree.vim
+" tmux(syntax)         : http://tmux.cvs.sourceforge.net/viewvc/tmux/tmux/examples/tmux.vim
+" unite                : http://github.com/Shougo/unite.vim
+" unite-colorscheme    : https://github.com/ujihisa/unite-colorscheme
+" unite-help           : https://github.com/tsukkee/unite-help
+" unite-tags           : https://github.com/tsukkee/unite-tags
+" vimperator           : https://vimperator-labs.googlecode.com/hg/vimperator/contrib/vim/
+" vimproc              : http://github.com/Shougo/vimproc
+" vimrcbox             : http://github.com/sorah/sandbox/blob/master/vim/vimrcbox.vim
+" vimshell             : http://github.com/Shougo/vimshell
+" web-indent           : http://www.vim.org/scripts/script.php?script_id=3081
+" xoria256             : http://www.vim.org/scripts/script.php?script_id=2140
+" zencoding            : http://www.vim.org/scripts/script.php?script_id=2981

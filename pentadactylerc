@@ -13,7 +13,7 @@ set previouspattern+='前','\bnerwer\b'
 
 " set jsdebugger
 
-let mapleader=","
+" let mapleader=","
 
 " ==================== Firefox options ==================== "
 " disable accesskey
@@ -114,13 +114,13 @@ EOM
 command! -nargs=+ lazy autocmd Enter .* <args>
 
 " migemo hint
-set hintmatching=custom
-js <<EOM
-liberator.plugins.customHintMatcher = function(inputString){
-    let r = migemo.getRegExp(inputString);
-    return function(hintString) r.test(hintString);
-};
-EOM
+" set hintmatching=custom
+" js <<EOM
+" liberator.plugins.customHintMatcher = function(inputString){
+"     let r = migemo.getRegExp(inputString);
+"     return function(hintString) r.test(hintString);
+" };
+" EOM
 
 " commandBookmarklet
 let command_bookmarklet_prefix=""
