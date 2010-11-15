@@ -135,7 +135,8 @@ augroup END
 " needs ja.po with utf-8 encoding as $VIMRUNTIME/lang/ja_JP.UTF-8/LC_MESSAGES/vim.mo
 " Reference: http://d.hatena.ne.jp/thinca/20090111/1231684962
 if s:is_win && has('gui')
-    let $LANG='ja_JP.UTF-8'
+"     let $LANG='ja_JP.UTF-8'
+    language messages ja_JP.UTF-8
     set encoding=utf-8
     set termencoding=cp932 " mainly for ref-phpmanual
 endif
@@ -548,6 +549,25 @@ augroup vimrc
 
     " tmux
     autocmd BufRead,BufNewFile .tmux.conf*,tmux.conf* setfiletype tmux
+
+    " tex
+    autocmd FileType plaintex,tex
+    \   setlocal foldmethod=expr
+    \|  setlocal foldexpr=Tex_fold_expr(v:lnum)
+    function! Tex_fold_expr(lnum)
+        let matches = matchlist(getline(a:lnum), '^\s*\\\(\(sub\)*\)section')
+        " set fold level as section level
+        if !empty(matches)
+            " For example, matches[1] is 'subsub' when line is '\subsubsection'
+            return len(matches[1]) / 3 + 1
+        " when next line is /\\(sub)*section/, decrease fold level
+        elseif getline(a:lnum + 1) =~# '^\s*\\\(sub\)*section'
+            return 's1'
+        " otherwise keep fold level
+        else
+            return '='
+        endif
+    endfunction
 augroup END
 
 " surround
@@ -582,6 +602,10 @@ map [Operator]u <plug>(operator-html-unescape)
 let g:caw_no_default_keymappings = 1
 let g:caw_find_another_action = 1
 
+augroup vimrc
+    autocmd FileType plaintex,tex let b:caw_oneline_comment = '%'
+augroup END
+
 nmap gA <Plug>(caw:a:comment)
 
 " caw + operator-user
@@ -601,13 +625,13 @@ function! s:do_caw_command(motion_wiseness)
     let func = 'caw#'
     if s:caw_command == 'comment'
         if a:motion_wiseness == 'line'
-            let func .= 'do_I_comment'
+            let func .= 'do_i_comment'
         else
             let func .= 'do_wrap_comment'
         endif
     elseif s:caw_command == 'toggle'
         if a:motion_wiseness == 'line'
-            let func .= 'do_I_toggle'
+            let func .= 'do_i_toggle'
         else
             let func .= 'do_wrap_toggle'
         endif

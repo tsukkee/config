@@ -9,8 +9,10 @@ set title
 " ==================== Platform setting ==================== "
 " MacVim
 if has('gui_macvim')
-    set columns=154
-    set lines=52
+    if has('vim_starting')
+        set columns=154
+        set lines=52
+    endif
     set linespace=2
 
     set guifont=Menlo:h14
@@ -44,8 +46,10 @@ endif
 
 " GVim(Windows)
 if has('win32')
-    set columns=138
-    set lines=42
+    if has('vim_starting')
+        set columns=138
+        set lines=42
+    endif
     set linespace=1
 
     " This must be after 'columns' and 'lines',
