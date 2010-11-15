@@ -555,17 +555,20 @@ augroup vimrc
     \   setlocal foldmethod=expr
     \|  setlocal foldexpr=Tex_fold_expr(v:lnum)
     function! Tex_fold_expr(lnum)
-        let matches = matchlist(getline(a:lnum), '^\s*\\\(\(sub\)*\)section')
         " set fold level as section level
+        let matches = matchlist(getline(a:lnum), '^\s*\\\(\(sub\)*\)section')
         if !empty(matches)
             " For example, matches[1] is 'subsub' when line is '\subsubsection'
             return len(matches[1]) / 3 + 1
-        " when next line is /\\(sub)*section/, decrease fold level
-        elseif getline(a:lnum + 1) =~# '^\s*\\\(sub\)*section'
-            return 's1'
-        " otherwise keep fold level
         else
-            return '='
+            " when next line is /\\(sub)*section/, this line is the end of specified section
+            let matches = matchlist(getline(a:lnum + 1), '^\s*\\\(\(sub\)*\)section')
+            if !empty(matches)
+                return '<' . string(len(matches[1]) / 3 + 1)
+            " otherwise keep fold level
+            else
+                return '='
+            endif
         endif
     endfunction
 augroup END
