@@ -15,8 +15,8 @@ let s:runtimepath = expand(s:is_win ? '~/vimfiles' : '~/.vim')
 if has('vim_starting')
     let &runtimepath = &runtimepath . ',' . s:runtimepath . '/bundle/pathogen'
     call pathogen#runtime_append_all_bundles()
-    call pathogen#helptags()
 endif
+command! Helptags call pathogen#helptags()
 
 " Get SID prefix of vimrc (see :h <SID>)
 function! s:SID_PREFIX()
@@ -135,18 +135,13 @@ augroup END
 " needs ja.po with utf-8 encoding as $VIMRUNTIME/lang/ja_JP.UTF-8/LC_MESSAGES/vim.mo
 " Reference: http://d.hatena.ne.jp/thinca/20090111/1231684962
 if s:is_win && has('gui')
-"     let $LANG='ja_JP.UTF-8'
     language messages ja_JP.UTF-8
     set encoding=utf-8
     set termencoding=cp932 " mainly for ref-phpmanual
 endif
 
-" detect charset automatically
-if &encoding ==# 'utf-8'
-    set fileencodings=iso-2022-jp,euc-jp,cp932,utf-8,latin1
-else
-    set fileencodings=iso-2022-jp,utf-8,euc-jp,cp932,latin1
-endif
+" detect encoding
+set fileencodings=iso-2022-jp,euc-jp,cp932,utf-8,latin1
 
 " use 'fileencoding' for 'encoding' if the file doesn't contain multibyte characters
 " give up searching multibyte characters when searching time is over 500 ms
@@ -176,6 +171,7 @@ autocmd vimrc QuickfixCmdPost * if !empty(getqflist()) | cwindow | endif
 " Reference: http://vim-users.jp/2009/10/hack84/
 " Don't save options.
 set viewoptions-=options
+let &viewdir = s:runtimepath . '/view'
 augroup vimrc
     autocmd BufWritePost *
     \   if expand('%') != '' && &buftype !~ 'nofile'
@@ -186,9 +182,6 @@ augroup vimrc
     \|      silent loadview
     \|  endif
 augroup END
-if s:is_win
-    let &viewdir = s:runtimepath . '\view'
-endif
 
 " Persistent undo
 if has('persistent_undo')
@@ -404,12 +397,12 @@ augroup END
 
 " TabpageCD
 " Reference: kana's vimrc
-command! -complete=file -nargs=? TabpageCD
+command! -complete=dir -nargs=? TabpageCD
 \   execute 'cd' fnameescape(<q-args>)
 \|  let t:cwd = getcwd()
 
 AlterCommand cd TabpageCD
-command! CD silent execute 'TabpageCD' fnameescape(expand('%:p:h'))
+command! -nargs=0 CD silent execute 'TabpageCD' fnameescape(expand('%:p:h'))
 
 autocmd vimrc VimEnter,TabEnter *
 \   if !exists('t:cwd')
@@ -422,7 +415,7 @@ if !exists('g:AlternateTabNumber')
     let g:AlternateTabNumber = 1
 endif
 
-command! GoToAlternateTab silent execute 'tabnext' g:AlternateTabNumber
+command! -nargs=0 GoToAlternateTab silent execute 'tabnext' g:AlternateTabNumber
 CommandMap g<C-^> GoToAlternateTab
 
 autocmd vimrc TabLeave * let g:AlternateTabNumber = tabpagenr()
@@ -431,7 +424,7 @@ autocmd vimrc TabLeave * let g:AlternateTabNumber = tabpagenr()
 command! -nargs=1 -bang -complete=file Rename saveas<bang> <args> | call delete(expand('#'))
 
 " ctags
-command! CtagsR !ctags -R
+command! -nargs=0 CtagsR !ctags -R
 
 " Alternate grep
 " Reference: http://vim-users.jp/2010/03/hack130/
@@ -757,6 +750,7 @@ vnoremap [Prefix]v :VimShellSendString<CR>
 let g:unite_update_time = 100
 let g:unite_enable_start_insert = 1
 let g:unite_enable_split_vertically = 0
+let g:unite_source_file_mru_limit = 500
 
 call unite#set_substitute_pattern('files', '^$VIM', substitute(substitute($VIM,  '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
 call unite#set_substitute_pattern('files', '^\.vim', s:runtimepath, -100)
@@ -775,16 +769,9 @@ function! s:unite_tabopen.func(candidates)
 endfunction
 call unite#custom_action('file,directory,buffer', 'tabopen', s:unite_tabopen)
 
-" let s:unite_nerdtree = {
-" \   'description': 'open NERD_tree with selected item'
-" \}
-" function! s:unite_nerdtree.func(candidate)
-"    NERDTree `=s:dirname(a:candidate.word)`
-" endfunction
-" call unite#custom_action('file,directory', 'nerdtree', s:unite_nerdtree)
-
 ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru tags file
 ArpeggioCommandMap kb Unite -buffer-name=tabs buffer_tab tab
+ArpeggioCommandMap kt Unite -buffer-name=outline outline tags
 execute 'ArpeggioCommandMap ke call ' s:SID_PREFIX() . 'unite_help_with_ref()'
 
 function! s:unite_help_with_ref()
@@ -842,13 +829,6 @@ function! s:ttree_unite_filerec()
     endif
     call unite#start([["file_rec", path]])
 endfunction
-
-
-" NERDTree
-let g:NERDTreeWinSize = 21
-let g:NERDTreeHijackNetrw = 0
-" CommandMap [Prefix]t NERDTree
-" ArpeggioCommandMap nt NERDTreeToggle
 
 " ref
 if s:is_mac
