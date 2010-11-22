@@ -17,6 +17,7 @@ if has('vim_starting')
     call pathogen#runtime_append_all_bundles()
 endif
 command! Helptags call pathogen#helptags()
+set notagbsearch
 
 " Get SID prefix of vimrc (see :h <SID>)
 function! s:SID_PREFIX()
@@ -210,6 +211,8 @@ function! s:onColorScheme()
         " based on ModeMsg
         highlight User2 ctermbg=237 ctermfg=117 cterm=bold
         \               guibg=#363946 guifg=#76d5f8 gui=bold
+        " ligher Comment
+        highlight Comment ctermfg=244 guifg=#808080
     else
         highlight ZenkakuSpace ctermbg=77
     endif
@@ -751,6 +754,7 @@ let g:unite_update_time = 100
 let g:unite_enable_start_insert = 1
 let g:unite_enable_split_vertically = 0
 let g:unite_source_file_mru_limit = 500
+let g:unite_source_file_rec_max_depth = 5
 
 call unite#set_substitute_pattern('files', '^$VIM', substitute(substitute($VIM,  '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
 call unite#set_substitute_pattern('files', '^\.vim', s:runtimepath, -100)
