@@ -653,25 +653,25 @@ call s:set_caw_operator(s:caw_prefix . 'd', 'uncomment')
 call s:set_caw_operator(s:caw_prefix . '<Space>', 'toggle')
 
 " Align
-let g:loaded_AlignMapsPlugin = '1'
+" let g:loaded_AlignMapsPlugin = '1'
 
 " Align + operator-user
-call operator#user#define('align', s:SID_PREFIX() . 'doAlignCommand')
-map [Operator]a <Plug>(operator-align)
+" call operator#user#define('align', s:SID_PREFIX() . 'doAlignCommand')
+" map [Operator]a <Plug>(operator-align)
 
-function! s:doAlignCommand(motion_wiseness)
-    let separators = input(":'[,']Align ")
+" function! s:doAlignCommand(motion_wiseness)
+"     let separators = input(":'[,']Align ")
 
-    " apply only lines that contain separators
-    call Align#AlignPush()
-    call Align#AlignCtrl('g ' . join(split(separators, '\s\+'), '\|'))
+"     " apply only lines that contain separators
+"     call Align#AlignPush()
+"     call Align#AlignCtrl('g ' . join(split(separators, '\s\+'), '\|'))
 
-    let v = operator#user#visual_command_from_wise_name(a:motion_wiseness)
-    execute 'normal! `[' . v . "`]\<Esc>"
-    '<,'>call Align#Align(0, separators)
+"     let v = operator#user#visual_command_from_wise_name(a:motion_wiseness)
+"     execute 'normal! `[' . v . "`]\<Esc>"
+"     '<,'>call Align#Align(0, separators)
 
-    call Align#AlignPop()
-endfunction
+"     call Align#AlignPop()
+" endfunction
 
 " neocomplcache
 " Reference: :h neocomplcache
@@ -754,6 +754,7 @@ let g:unite_update_time = 100
 let g:unite_enable_start_insert = 1
 let g:unite_enable_split_vertically = 0
 let g:unite_source_file_mru_limit = 500
+let g:unite_source_file_mru_time_format = '(%Y/%m/%d %T) '
 let g:unite_source_file_rec_max_depth = 5
 
 call unite#set_substitute_pattern('files', '^$VIM', substitute(substitute($VIM,  '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
