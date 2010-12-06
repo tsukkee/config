@@ -1,3 +1,25 @@
+" Last Change: 06 Dec 2010
+" Author:      tsukkee
+" Licence:     The MIT License {{{
+"     Permission is hereby granted, free of charge, to any person obtaining a copy
+"     of this software and associated documentation files (the "Software"), to deal
+"     in the Software without restriction, including without limitation the rights
+"     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+"     copies of the Software, and to permit persons to whom the Software is
+"     furnished to do so, subject to the following conditions:
+"
+"     The above copyright notice and this permission notice shall be included in
+"     all copies or substantial portions of the Software.
+"
+"     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+"     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+"     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+"     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+"     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+"     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+"     THE SOFTWARE.
+" }}}
+
 " ==================== Settings ==================== "
 " Define and reset augroup used in vimrc
 augroup vimrc
@@ -497,6 +519,37 @@ if executable("qlmanage")
     endif
 endif
 
+" Last change
+let g:lastchange_pattern  = 'Last Change: '
+let g:lastchange_locale   = 'English'
+let g:lastchange_format   = '%d %b %Y'
+" let g:lastchange_format   = '%a %b %d, %Y at %I:%M %p %z'
+let g:lastchange_line_num = 10
+
+autocmd vimrc BufWritePre * call s:write_last_change()
+command! NOMOD let b:do_not_modify_last_change = 1
+command! MOD   unlet b:do_not_modify_last_change
+
+function! s:write_last_change()
+    if exists('b:do_not_modify_last_change') || !&modified
+        return
+    endif
+
+    let save_lc_time = v:lc_time
+    execute 'language time' g:lastchange_locale
+    for i in range(0, g:lastchange_line_num)
+        let line = getline(i)
+        if line =~ g:lastchange_pattern
+            call setline(i, substitute(line,
+            \   g:lastchange_pattern . '.*',
+            \   g:lastchange_pattern . strftime(g:lastchange_format),
+            \   ''))
+            break
+        endif
+    endfor
+    execute 'language time' save_lc_time
+endfunction
+
 
 " ==================== Plugins settings ==================== "
 " FileType
@@ -549,8 +602,9 @@ augroup vimrc
     " tex
     autocmd FileType plaintex,tex
     \   setlocal foldmethod=expr
-    \|  setlocal foldexpr=Tex_fold_expr(v:lnum)
-    function! Tex_fold_expr(lnum)
+    \|  let &l:foldexpr = s:SID_PREFIX() . 'tex_foldexpr(v:lnum)'
+    " folding using \section, \subsection, \subsubsection
+    function! s:tex_foldexpr(lnum)
         " set fold level as section level
         let matches = matchlist(getline(a:lnum), '^\s*\\\(\(sub\)*\)section')
         if !empty(matches)
