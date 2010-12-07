@@ -521,7 +521,7 @@ endif
 
 " Last change
 let g:lastchange_pattern  = 'Last Change: '
-let g:lastchange_locale   = 'English'
+let g:lastchange_locale   = s:is_win ? 'English' : 'en_US.UTF-8'
 let g:lastchange_format   = '%d %b %Y'
 " let g:lastchange_format   = '%a %b %d, %Y at %I:%M %p %z'
 let g:lastchange_line_num = 10

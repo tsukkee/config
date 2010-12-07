@@ -140,9 +140,9 @@ let sbmincsearch_max = 15
 lazy set complete=stIl
 
 " colorize_url
-lazy hi ColorizeUrlSubdomain color: #333;
-lazy hi ColorizeUrlPort      color: #333;
-lazy hi ColorizeUrlFragment  color: #333;
+" lazy hi ColorizeUrlSubdomain color: #333;
+" lazy hi ColorizeUrlPort      color: #333;
+" lazy hi ColorizeUrlFragment  color: #333;
 
 " feedSomeKeys
 lazy fmaps -u='(fastladder|reader\.livedoor)\.com/reader' s a r c j k f,j F,k <Space> <S-Space> z b p o v > J < K
@@ -166,7 +166,7 @@ liberator.plugins.arpeggioMap(modes.NORMAL, true, "asd", function() {
 EOF
 
 " ==================== colorscheme ==================== "
-colorscheme mac
+" colorscheme mac
 
 " force disable ime in commandline
 style -name commandline-ime chrome://* #liberator-commandline-command input { ime-mode: inactive; }
