@@ -1,4 +1,4 @@
-" Last Change: 21 Dec 2010
+" Last Change: 09 Jan 2011
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -83,7 +83,7 @@ set hidden          " allow opening other buffer without saving current buffer
 set tags=./tags;    " search tag file recursively (see :h file-searching)
 
 " Display
-set notitle                   " don't rewrite title string
+set title                   " don't rewrite title string
 set showmatch                 " highlight corresponds character
 set showcmd                   " show input command
 set noshowmode                " for echodoc
@@ -95,6 +95,12 @@ set foldcolumn=3              " display folds
 set list                      " show unprintable characters
 set listchars=tab:>\ ,trail:~ " strings to use in 'list'
 set ambiwidth=double          " use double width for Eastern Asian Ambiguous characters
+
+set titlestring=Vim:\ %f
+if exists($TMUX)
+    let &t_fs = "\<C-g>"
+    let &t_ts = "\<Esc>]2;"
+endif
 
 " Statusline
 set laststatus=2 " always show statusine
@@ -621,6 +627,24 @@ augroup vimrc
             endif
         endif
     endfunction
+
+    " dot
+    autocmd FileType txt
+    \   setlocal foldmethod=expr
+    \|  let &l:foldexpr = 'Dot_foldexpr(v:lnum)'
+    function! Dot_foldexpr(lnum)
+        let match = matchstr(getline(a:lnum), '^\.\+')
+        if !empty(match)
+            return len(match)
+        else
+            let match = matchstr(getline(a:lnum + 1), '^\.\+')
+            if !empty(match)
+                return '<' . string(len(match))
+            else
+                return '='
+            endif
+        endif
+    endfunction
 augroup END
 
 " surround
@@ -807,7 +831,7 @@ vnoremap [Prefix]v :VimShellSendString<CR>
 let g:unite_update_time = 100
 let g:unite_enable_start_insert = 1
 let g:unite_enable_split_vertically = 0
-let g:unite_source_file_mru_limit = 500
+let g:unite_source_file_mru_limit = 200
 let g:unite_source_file_mru_time_format = '(%Y/%m/%d %T) '
 let g:unite_source_file_rec_max_depth = 5
 
@@ -849,6 +873,7 @@ endfunction
 autocmd vimrc FileType unite call s:unite_settings()
 function! s:unite_settings()
     imap <buffer> <silent> <C-n> <Plug>(unite_insert_leave)<Plug>(unite_loop_cursor_down)
+    imap <buffer> <silent> <C-p> <Plug>(unite_insert_leave)<Plug>(unite_loop_cursor_up)
     nmap <buffer> <silent> <C-n> <Plug>(unite_loop_cursor_down)
     nmap <buffer> <silent> <C-p> <Plug>(unite_loop_cursor_up)
     nmap <buffer> <silent> <C-u> <Plug>(unite_append_end)<Plug>(unite_delete_backward_line)
