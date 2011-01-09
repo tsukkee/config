@@ -1,4 +1,4 @@
-" Last Change: 06 Dec 2010
+" Last Change: 21 Dec 2010
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -945,8 +945,17 @@ function! ReloadFirefox()
         telnet.puts('content.location.reload(true)')
         telnet.close
 EOF
+    elseif has('python')
+        python <<EOF
+# coding=utf-8
+import telnetlib
+telnet = telnetlib.Telnet('localhost', 4242)
+telnet.read_until('repl> ', 10)
+telnet.write('content.location.reload(true)')
+telnet.close()
+EOF
     else
-        echoerr 'need has("ruby")'
+        echoerr 'need has("ruby") or has("python")'
     endif
 endfunction
 CommandMap [Prefix]rf call ReloadFirefox()
