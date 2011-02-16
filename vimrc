@@ -1,4 +1,4 @@
-" Last Change: 09 Jan 2011
+" Last Change: 16 Feb 2011
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -35,6 +35,7 @@ let s:runtimepath = expand(s:is_win ? '~/vimfiles' : '~/.vim')
 
 " generate 'runtimepath' and helptags using pathogen
 if has('vim_starting')
+    set runtimepath&
     let &runtimepath = &runtimepath . ',' . s:runtimepath . '/bundle/pathogen'
     call pathogen#runtime_append_all_bundles()
 endif
@@ -83,7 +84,7 @@ set hidden          " allow opening other buffer without saving current buffer
 set tags=./tags;    " search tag file recursively (see :h file-searching)
 
 " Display
-set title                   " don't rewrite title string
+set title                     " don't rewrite title string
 set showmatch                 " highlight corresponds character
 set showcmd                   " show input command
 set noshowmode                " for echodoc
@@ -96,11 +97,23 @@ set list                      " show unprintable characters
 set listchars=tab:>\ ,trail:~ " strings to use in 'list'
 set ambiwidth=double          " use double width for Eastern Asian Ambiguous characters
 
-set titlestring=Vim:\ %f
-if exists($TMUX)
-    let &t_fs = "\<C-g>"
-    let &t_ts = "\<Esc>]2;"
+" Reference: http://vim.wikia.com/wiki/Automatically_set_screen_title
+set titlelen=15
+autocmd vimrc BufEnter * let &titlestring = '%{' . s:SID_PREFIX() . 'titlestring()}'
+autocmd vimrc User plugin-lingr-message let &titlestring = '%{' . s:SID_PREFIX() . 'titlestring()}'
+if exists('$TMUX') || exists('$WINDOW')
+    set t_ts=k
+    set t_fs=\
 endif
+function! s:titlestring()
+    if bufname('') =~ '^lingr'
+        let &titlestring = 'vim: [lingr: ' . lingr#unread_count() . ']'
+    elseif exists('t:cwd')
+        let &titlestring = 'vim: %<' . t:cwd
+    else
+        let &titlestring = 'vim: %<' . bufname('')
+    endif
+endfunction
 
 " Statusline
 set laststatus=2 " always show statusine
@@ -170,7 +183,11 @@ if s:is_win && has('gui')
 endif
 
 " detect encoding
-set fileencodings=iso-2022-jp,euc-jp,cp932,utf-8,latin1
+if has('kaoriya')
+    set fileencodings=guess
+else
+    set fileencodings=iso-2022-jp,euc-jp,cp932,utf-8,latin1
+endif
 
 " use 'fileencoding' for 'encoding' if the file doesn't contain multibyte characters
 " give up searching multibyte characters when searching time is over 500 ms
@@ -211,6 +228,20 @@ augroup vimrc
     \|      silent loadview
     \|  endif
 augroup END
+
+" Session
+set sessionoptions=blank,buffers,curdir,folds,help,tabpages
+let s:session_file = expand('~/.session.vim')
+function! s:save_session()
+    mksession! `=s:session_file`
+endfunction
+function! s:load_session()
+    if filereadable(s:session_file)
+        source `=s:session_file`
+    endif
+endfunction
+nnoremap <silent> [Prefix]S :<C-u>call <SID>load_session()<CR>
+nnoremap <silent> [Prefix]s :<C-u>call <SID>save_session()<CR>
 
 " Persistent undo
 if has('persistent_undo')
@@ -790,11 +821,6 @@ CommandMap [Prefix]nd NeoComplCacheDisable
 " echodoc
 let g:echodoc_enable_at_startup = 1
 
-" vimshell
-augroup vimrc
-    autocmd FileType vimshell nunmap <buffer> <C-d>
-augroup END
-
 " execute repl
 " phpsh: http://github.com/facebook/phpsh
 " node:  http://nodejs.org/
@@ -852,7 +878,7 @@ function! s:unite_tabopen.func(candidates)
 endfunction
 call unite#custom_action('file,directory,buffer', 'tabopen', s:unite_tabopen)
 
-ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru tags file
+ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru file tag
 ArpeggioCommandMap kb Unite -buffer-name=tabs buffer_tab tab
 ArpeggioCommandMap kt Unite -buffer-name=outline outline tags
 execute 'ArpeggioCommandMap ke call ' s:SID_PREFIX() . 'unite_help_with_ref()'
