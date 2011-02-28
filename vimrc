@@ -1,4 +1,4 @@
-" Last Change: 16 Feb 2011
+" Last Change: 27 Feb 2011
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -106,7 +106,7 @@ if exists('$TMUX') || exists('$WINDOW')
     set t_fs=\
 endif
 function! s:titlestring()
-    if bufname('') =~ '^lingr'
+    if &filetype =~ '^lingr'
         let &titlestring = 'vim: [lingr: ' . lingr#unread_count() . ']'
     elseif exists('t:cwd')
         let &titlestring = 'vim: %<' . t:cwd
@@ -148,7 +148,7 @@ function! s:tabline()
     endfor
 
     " show cwd for current tab
-    let tabpaged_cwd = exists('t:cwd') ? '[' . t:cwd . ']' : ''
+    let tabpage_cwd = exists('t:cwd') ? '[' . t:cwd . ']' : ''
 
     " show lingr unread count
     let lingr_unread = ""
@@ -162,7 +162,7 @@ function! s:tabline()
     endif
 
     " build tabline
-    let s .= '%#TabLineFill#%T%=%<' . tabpaged_cwd . lingr_unread
+    let s .= '%#TabLineFill#%T%=%<' . tabpage_cwd . lingr_unread
     return s
 endfunction
 
@@ -230,15 +230,33 @@ augroup vimrc
 augroup END
 
 " Session
-set sessionoptions=blank,buffers,curdir,folds,help,tabpages
+set viminfo+=!
+set sessionoptions=buffers,curdir,folds,tabpages
 let s:session_file = expand('~/.session.vim')
 function! s:save_session()
     mksession! `=s:session_file`
+    if exists('*gettabvar')
+        let g:SAVED_TABPAGE_CD = []
+        for i in range(1, tabpagenr('$'))
+            call add(g:SAVED_TABPAGE_CD, gettabvar(i, 'cwd'))
+        endfor
+        wviminfo!
+    endif
+    echo "Session saved."
 endfunction
 function! s:load_session()
+    NeoComplCacheDisable
     if filereadable(s:session_file)
         source `=s:session_file`
     endif
+    if exists('*settabvar') && exists('g:SAVED_TABPAGE_CD')
+        for i in range(1, tabpagenr('$'))
+            if !empty(g:SAVED_TABPAGE_CD[i - 1])
+                call settabvar(i, 'cwd', g:SAVED_TABPAGE_CD[i - 1])
+            endif
+        endfor
+    endif
+    NeoComplCacheEnable
 endfunction
 nnoremap <silent> [Prefix]S :<C-u>call <SID>load_session()<CR>
 nnoremap <silent> [Prefix]s :<C-u>call <SID>save_session()<CR>
