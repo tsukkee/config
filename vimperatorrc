@@ -1,8 +1,176 @@
+" ==================== basic options ==================== "
+set activate=quickmark,paste
+set complete=sl
+set focuscontent
+set followhints=1
+set toolbars=all,nomenu
+set hintchars=hjklgfdsa
+set hintinputs+=name
+set hlsearch
+set showstatuslinks=0
+set status-=location
+set smartcase
+
+set nextpattern+='次','\bolder\b'
+set previouspattern+='前','\bnerwer\b'
+
+let mapleader=","
+
+" バグ回避
+js setToolbarVisibility(document.getElementById('PersonalToolbar'), true);
+
+" ==================== Firefox options ==================== "
+" disable accesskey
+set! ui.key.generalAccessKey=0
+" hide close button
+set! browser.tabs.closeButtons=2
+" open bookmarks in background
+set! browser.tabs.loadBookmarksInBackground=true
+" open tabs by javascript in background
+set! browser.tabs.loadDivertedInBackground=true
+" allow lots of popups for ldr
+set! dom.popup_maximum=1000
+" show tab preview
+set! browser.allTabs.previews=true
+set! browser.ctrlTab.previews=true
+" change new tab position
+set! browser.tabs.insertRelatedAfterCurrent=false
+" change behaviour on open folder
+set! browser.tabs.loadFolderAndReplace=false
+" use mousewheel acceleration
+set! mousewheel.acceleration.factor=5
+set! mousewheel.acceleration.start=3
+" for js develop
+set! javascript.options.strict=false
+set! javascript.options.showInConsole=false
+set! browser.dom.window.dump.enabled=false
+set! javascript.options.jitprofiling.chrome=true
+set! javascript.options.methodjit.chrome=true
+
+
+" ==================== key mappings ==================== "
+" increase j, k, h, l
+nnoremap j 5j
+nnoremap k 5k
+nnoremap h 3h
+nnoremap l 3l
+
+" Use beginning matches on command-line history
+cnoremap <C-p> <Up>
+cnoremap <C-n> <Down>
+
+" avoid unintended paste
+" only use "gP"
+nnoremap p <Nop>
+nnoremap P <Nop>
+
+" readlater bookmarklet
+nnoremap <silent> <C-r> :readlater<CR>
+
+" toggle Flashblock
+nnoremap <silent> <C-f> :js Flashblock.toggleSiteWhitelisted()<CR>:reload<CR>
+
+" disable highlight
+nnoremap <silent> gh :nohl<CR>:offwordhighlight<CR>
+
+" toggle autopagerize
+nnoremap <silent> a :toggleautopagerize<CR>
+
+" dispatch mouse event
 js <<EOM
-if(/^2\.4pre/.test(liberator.version)) {
-    io.source('~/.vimperatorrc-2.4pre');
+(function() {
+function dispatchMouseClickByXPath(xpath) {
+    let elements = util.evaluateXPath(xpath);
+    if(elements.snapshotLength) {
+        buffer.followLink(elements.snapshotItem(0));
+    }
+    else {
+        liberator.echomsg("not found: " + xpath);
+    }
 }
-if(/^3\.0pre/.test(liberator.version)) {
-    io.source('~/.vimperatorrc-3.0pre');
-}
+
+commands.addUserCommand(["toggleautopagerize"],
+    "toggle on/off autopagerize",
+    function(args)
+    {
+        var d = window.content.document;
+        var ev = d.createEvent('Event');
+        ev.initEvent('AutoPagerizeToggleRequest', true, false);
+        d.dispatchEvent(ev);
+        liberator.echomsg('toggle');
+    });
+
+commands.addUserCommand(["offwordhighlight"],
+    "off wordhighlight",
+    function(args)
+    {
+        dispatchMouseClickByXPath('id("wordhighlight_words")//*[@value="off"]');
+    });
+})();
 EOM
+
+" nicontroller2
+nnoremap -urls '^http://www\.nicovideo\.jp/watch' P :nicoplay<CR>
+nnoremap -urls '^http://www\.nicovideo\.jp/watch' . :nicomove +10<CR>
+nnoremap -urls '^http://www\.nicovideo\.jp/watch' , :nicomove -10<CR>
+nnoremap -urls '^http://www\.nicovideo\.jp/watch' > :nicomove +60<CR>
+nnoremap -urls '^http://www\.nicovideo\.jp/watch' < :nicomove -60<CR>
+nnoremap -urls '^http://www\.nicovideo\.jp/watch' 0 :nicogoto<CR>
+nnoremap -urls '^http://www\.nicovideo\.jp/watch' ] :nicovolume +20<CR>
+nnoremap -urls '^http://www\.nicovideo\.jp/watch' [ :nicovolume -20<CR>
+nnoremap -urls '^http://www\.nicovideo\.jp/watch' M :nicomute<CR>
+nnoremap -urls '^http://www\.nicovideo\.jp/watch' C :nicomment 
+
+
+" ==================== plugin options ==================== "
+" Lazy
+command! -nargs=+ lazy autocmd VimperatorEnter .* <args>
+
+" migemo hint
+set hintmatching=custom
+js <<EOM
+liberator.plugins.customHintMatcher = function(inputString){
+    let r = migemo.getRegExp(inputString);
+    return function(hintString) r.test(hintString);
+};
+EOM
+
+" commandBookmarklet
+let command_bookmarklet_prefix=""
+
+" sbmincsearch
+let sbmincsearch_service_name = "pinboard"
+let sbmincsearch_max = 15
+lazy set complete=stIl
+
+" feedSomeKeys
+lazy fmaps -u='(fastladder|reader\.livedoor)\.com/reader' s a r c j k f,j F,k <Space> <S-Space> z b p o v > J < K
+lazy fmaps -u='mail\.google\.com/mail' u k j o <CR> p n c ? x s y e m ! # h
+lazy fmaps -u='www\.tumblr\.com/dashboard' -events=vkeydown j k
+lazy fmaps -u='www\.google\.(com|co\.jp)/reader/' -events=vkeypress j k <Space> <S-Space> X O N P s,NO a,PO S,s v r F,f f,j F,k ? /
+lazy fmaps -u='twitter\.com' ? j k
+lazy fmaps -u='twitter\.com' -events=vkeydown F,f R,r T,t m n <CR> <Space> / . gh gr gp gf gm gu
+
+" spatial navigation
+let spatial_navigation_mappings='<C-h> <C-j> <C-k> <C-l>'
+
+
+" ==================== refcontrol ==================== "
+let g:refcontrol_enabled = "true"
+javascript <<EOM
+liberator.globalVariables.refcontrol = {
+    '@DEFAULT'   : ''
+};
+EOM
+
+
+" ==================== colorscheme ==================== "
+" colorscheme mac
+
+" force disable ime in commandline
+style -name commandline-ime chrome://* #liberator-commandline-command input { ime-mode: inactive; }
+
+
+" ==================== others ==================== "
+" load local file
+source! ~/.vimperatorrc.local
