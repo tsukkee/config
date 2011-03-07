@@ -1,4 +1,4 @@
-" Last Change: 27 Feb 2011
+" Last Change: 05 Mar 2011
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -100,7 +100,7 @@ set ambiwidth=double          " use double width for Eastern Asian Ambiguous cha
 " Reference: http://vim.wikia.com/wiki/Automatically_set_screen_title
 set titlelen=15
 autocmd vimrc BufEnter * let &titlestring = '%{' . s:SID_PREFIX() . 'titlestring()}'
-autocmd vimrc User plugin-lingr-message let &titlestring = '%{' . s:SID_PREFIX() . 'titlestring()}'
+autocmd vimrc User plugin-lingr-unread let &titlestring = '%{' . s:SID_PREFIX() . 'titlestring()}'
 if exists('$TMUX') || exists('$WINDOW')
     set t_ts=k
     set t_fs=\
@@ -230,33 +230,24 @@ augroup vimrc
 augroup END
 
 " Session
-set viminfo+=!
 set sessionoptions=buffers,curdir,folds,tabpages
 let s:session_file = expand('~/.session.vim')
 function! s:save_session()
     mksession! `=s:session_file`
-    if exists('*gettabvar')
-        let g:SAVED_TABPAGE_CD = []
-        for i in range(1, tabpagenr('$'))
-            call add(g:SAVED_TABPAGE_CD, gettabvar(i, 'cwd'))
-        endfor
-        wviminfo!
-    endif
     echo "Session saved."
 endfunction
 function! s:load_session()
-    NeoComplCacheDisable
+    let neco_enabled = exists(':NeoComplCacheDisable')
+    if neco_enabled
+        NeoComplCacheDisable
+    endif
     if filereadable(s:session_file)
         source `=s:session_file`
     endif
-    if exists('*settabvar') && exists('g:SAVED_TABPAGE_CD')
-        for i in range(1, tabpagenr('$'))
-            if !empty(g:SAVED_TABPAGE_CD[i - 1])
-                call settabvar(i, 'cwd', g:SAVED_TABPAGE_CD[i - 1])
-            endif
-        endfor
+    tabdo CD
+    if neco_enabled
+        NeoComplCacheEnable
     endif
-    NeoComplCacheEnable
 endfunction
 nnoremap <silent> [Prefix]S :<C-u>call <SID>load_session()<CR>
 nnoremap <silent> [Prefix]s :<C-u>call <SID>save_session()<CR>
@@ -309,6 +300,7 @@ endif
 " Use AlterCommand and Arpeggio
 call altercmd#load()
 call arpeggio#load()
+let g:arpeggio_timeoutlen = 100
 
 Arpeggionmap fj <Esc>
 Arpeggioimap fj <Esc>
@@ -605,6 +597,9 @@ function! s:write_last_change()
     execute 'language time' save_lc_time
 endfunction
 
+" Suicide
+command! Suicide call system('kill -KILL ' . getpid())
+
 
 " ==================== Plugins settings ==================== "
 " FileType
@@ -896,10 +891,15 @@ function! s:unite_tabopen.func(candidates)
 endfunction
 call unite#custom_action('file,directory,buffer', 'tabopen', s:unite_tabopen)
 
-ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru file tag
+ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru file
 ArpeggioCommandMap kb Unite -buffer-name=tabs buffer_tab tab
 ArpeggioCommandMap kt Unite -buffer-name=outline outline tags
 execute 'ArpeggioCommandMap ke call ' s:SID_PREFIX() . 'unite_help_with_ref()'
+
+autocmd vimrc BufEnter *
+\   if empty(&buftype)
+\|      nnoremap <buffer> <C-]> :<C-u>UniteWithCursorWord -immediately tag<CR>
+\|  endif
 
 function! s:unite_help_with_ref()
     let unite_args = []

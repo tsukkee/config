@@ -5,7 +5,6 @@
 --langmap=ruby:+.rhtml
 --c++-kinds=+p
 
---langdef=tex
 --langmap=tex:.tex
 --regex-tex=/\\subsubsection[ \t]*\*?\{[ \t]*([^}]*)\}/- \1/s,subsubsection/
 --regex-tex=/\\subsection[ \t]*\*?\{[ \t]*([^}]*)\}/+\1/s,subsection/
