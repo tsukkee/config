@@ -1,4 +1,4 @@
-" Last Change: 05 Mar 2011
+" Last Change: 16 Mar 2011
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -281,12 +281,21 @@ function! s:onColorScheme()
         \               guibg=#363946 guifg=#76d5f8 gui=bold
         " ligher Comment
         highlight Comment ctermfg=244 guifg=#808080
+
+        " indent guids
+        highlight IndentGuidesOdd ctermbg=235
+        highlight IndentGuidesEven ctermbg=236
     else
         highlight ZenkakuSpace ctermbg=77
     endif
 endfunction
 
 syntax enable " enable syntax coloring
+
+" Indent guide
+let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_auto_colors = 0
+let g:indent_guides_guide_size = 1
 
 " colorscheme
 if &t_Co == 256 || has('gui')
@@ -474,7 +483,7 @@ command! -complete=dir -nargs=? TabpageCD
 \|  let t:cwd = getcwd()
 
 AlterCommand cd TabpageCD
-command! -nargs=0 CD silent execute 'TabpageCD' fnameescape(expand('%:p:h'))
+command! -nargs=0 CD silent execute 'TabpageCD' unite#util#path2project_directory(expand('%:p'))
 
 autocmd vimrc VimEnter,TabEnter *
 \   if !exists('t:cwd')
@@ -720,7 +729,6 @@ map [Operator]h <Plug>(operator-html-escape)
 map [Operator]u <plug>(operator-html-unescape)
 
 " caw
-let g:caw_no_default_keymappings = 1
 let g:caw_find_another_action = 1
 
 augroup vimrc
@@ -728,72 +736,9 @@ augroup vimrc
 augroup END
 
 nmap gA <Plug>(caw:a:comment)
-
-" caw + operator-user
-function! s:set_caw_operator(key, name)
-    call operator#user#define(
-    \   'caw-' . a:name,
-    \   s:SID_PREFIX() . 'do_caw_command',
-    \   'call ' . s:SID_PREFIX() . 'set_caw_command("' . a:name . '")')
-    execute 'map' a:key '<Plug>(operator-caw-' . a:name . ')'
-endfunction
-
-function! s:set_caw_command(name)
-    let s:caw_command = a:name
-endfunction
-
-function! s:do_caw_command(motion_wiseness)
-    let func = 'caw#'
-    if s:caw_command == 'comment'
-        if a:motion_wiseness == 'line'
-            let func .= 'do_i_comment'
-        else
-            let func .= 'do_wrap_comment'
-        endif
-    elseif s:caw_command == 'toggle'
-        if a:motion_wiseness == 'line'
-            let func .= 'do_i_toggle'
-        else
-            let func .= 'do_wrap_toggle'
-        endif
-    elseif s:caw_command == 'uncomment'
-        let func .= 'do_uncomment_i'
-    else
-        echoerr 'operator caw: unknown command:' s:caw_command
-        return
-    endif
-
-    let v = operator#user#visual_command_from_wise_name(a:motion_wiseness)
-    execute 'normal! `[' . v . "`]\<Esc>"
-    call call(func, ['v'])
-endfunction
-
-let s:caw_prefix = "m"
-onoremap <Space> g@
-call s:set_caw_operator(s:caw_prefix . 'c', 'comment')
-call s:set_caw_operator(s:caw_prefix . 'd', 'uncomment')
-call s:set_caw_operator(s:caw_prefix . '<Space>', 'toggle')
-
-" Align
-" let g:loaded_AlignMapsPlugin = '1'
-
-" Align + operator-user
-" call operator#user#define('align', s:SID_PREFIX() . 'doAlignCommand')
-" map [Operator]a <Plug>(operator-align)
-
-" function! s:doAlignCommand(motion_wiseness)
-"     let separators = input(":'[,']Align ")
-
-"     " apply only lines that contain separators
-"     call Align#AlignPush()
-"     call Align#AlignCtrl('g ' . join(split(separators, '\s\+'), '\|'))
-
-"     let v = operator#user#visual_command_from_wise_name(a:motion_wiseness)
-"     execute 'normal! `[' . v . "`]\<Esc>"
-"     '<,'>call Align#Align(0, separators)
-
-"     call Align#AlignPop()
-" endfunction
+nmap <Plug>(arpeggio-default:m) <Plug>(caw:prefix)
+vmap m <Plug>(caw:prefix)
+nmap <Plug>(caw:prefix)<Space> <Plug>(caw:i:toggle)
 
 " neocomplcache
 " Reference: :h neocomplcache
@@ -944,7 +889,7 @@ endfunction
 
 function! s:ttree_tabpagecd()
     let dir = s:dirname(ttree#get_node().path)
-    execute 'TabpageCD' dir
+    CD
 endfunction
 
 function! s:ttree_unite_filerec()
