@@ -127,8 +127,8 @@ nnoremap -urls '^http://www\.nicovideo\.jp/watch' C :nicomment
 command! -nargs=+ lazy autocmd VimperatorEnter .* <args>
 
 " liberator-overlay-ext
-lazy set overlayanimation
-style -name liberator-overlay-ext-opacity chrome://* #liberator-completions,#liberator-multiline-output { opacity: .8; }
+" lazy set overlayanimation
+style -name liberator-overlay-ext-opacity chrome://* #liberator-completions,#liberator-multiline-output { opacity: .8; position: relative; z-index: 9999; }
 
 " migemo hint
 set hintmatching=custom

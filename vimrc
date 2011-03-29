@@ -1,4 +1,4 @@
-" Last Change: 16 Mar 2011
+" Last Change: 21 Mar 2011
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -233,7 +233,10 @@ augroup END
 set sessionoptions=buffers,curdir,folds,tabpages
 let s:session_file = expand('~/.session.vim')
 function! s:save_session()
+    let cwd = getcwd()
+    cd ~
     mksession! `=s:session_file`
+    cd `=cwd`
     echo "Session saved."
 endfunction
 function! s:load_session()
@@ -242,7 +245,10 @@ function! s:load_session()
         NeoComplCacheDisable
     endif
     if filereadable(s:session_file)
+        let cwd = getcwd()
+        cd ~
         source `=s:session_file`
+        cd `=cwd`
     endif
     tabdo CD
     if neco_enabled
@@ -609,6 +615,16 @@ endfunction
 " Suicide
 command! Suicide call system('kill -KILL ' . getpid())
 
+" Undo close tab
+" How can I detect tab closing
+let s:tabcount = 0
+let g:tabclose_histries = []
+augroup vimrc
+    autocmd VimEnter,TabEnter * let s:tabcount = tabpagenr('$')
+    " autocmd WinEnter * echomsg 'enter:count' tabpagenr('$')
+    autocmd TabLeave * if s:tabcount > tabpagenr('$') | echomsg 'tabclose' | endif
+    " autocmd TabLeave * echomsg 'leave:count' tabpagenr('$')
+augroup END
 
 " ==================== Plugins settings ==================== "
 " FileType
