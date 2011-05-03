@@ -3,11 +3,11 @@ set activate=quickmark,paste
 set complete=sl
 set focuscontent
 set followhints=1
-set toolbars=all,nomenu
+set toolbars=all,nomenu,noaddons
 set hintchars=hjklgfdsa
 set hintinputs+=name
 set hlsearch
-set showstatuslinks=0
+set showstatuslinks=2
 set status-=location
 set smartcase
 
@@ -18,6 +18,11 @@ let mapleader=","
 
 " バグ回避
 js setToolbarVisibility(document.getElementById('PersonalToolbar'), true);
+
+" floatbox
+set animations
+style -name liberator-floatbox-opacity chrome://* #liberator-completions,#liberator-multiline-output { opacity: .8; position: relative; z-index: 9999; }
+
 
 " ==================== Firefox options ==================== "
 " disable accesskey
@@ -46,7 +51,8 @@ set! javascript.options.showInConsole=false
 set! browser.dom.window.dump.enabled=false
 set! javascript.options.jitprofiling.chrome=true
 set! javascript.options.methodjit.chrome=true
-
+" http://space.geocities.yahoo.co.jp/gl/alice0775/view/20110416/1302920985
+set! image.mem.min_discard_timeout_ms=10000
 
 " ==================== key mappings ==================== "
 " increase j, k, h, l
@@ -109,26 +115,42 @@ commands.addUserCommand(["offwordhighlight"],
 })();
 EOM
 
-" nicontroller2
-nnoremap -urls '^http://www\.nicovideo\.jp/watch' P :nicoplay<CR>
-nnoremap -urls '^http://www\.nicovideo\.jp/watch' . :nicomove +10<CR>
-nnoremap -urls '^http://www\.nicovideo\.jp/watch' , :nicomove -10<CR>
-nnoremap -urls '^http://www\.nicovideo\.jp/watch' > :nicomove +60<CR>
-nnoremap -urls '^http://www\.nicovideo\.jp/watch' < :nicomove -60<CR>
-nnoremap -urls '^http://www\.nicovideo\.jp/watch' 0 :nicogoto<CR>
-nnoremap -urls '^http://www\.nicovideo\.jp/watch' ] :nicovolume +20<CR>
-nnoremap -urls '^http://www\.nicovideo\.jp/watch' [ :nicovolume -20<CR>
-nnoremap -urls '^http://www\.nicovideo\.jp/watch' M :nicomute<CR>
-nnoremap -urls '^http://www\.nicovideo\.jp/watch' C :nicomment 
-
 
 " ==================== plugin options ==================== "
+" local mappings
+js <<EOM
+function addLocalMappings(buffer, maps) {
+  maps.forEach(
+    function (map) {
+      let [cmd, action, extra] = map;
+      let actionFunc = action;
+      extra || (extra = {});
+
+      if (typeof action == "string") {
+        if (action.charAt(0) == ':')
+          actionFunc = extra.open ? function () commandline.open("", action, modes.EX)
+                                  : function () liberator.execute(action);
+        else
+          actionFunc = function () events.feedkeys(action, extra.noremap, true);
+      }
+      extra.matchingUrls = buffer;
+      mappings.addUserMap(
+        [modes.NORMAL],
+        [cmd],
+        "Local mapping for " + buffer,
+        actionFunc,
+        extra
+      );
+    }
+  );
+}
+EOM
+
 " Lazy
 command! -nargs=+ lazy autocmd VimperatorEnter .* <args>
 
-" liberator-overlay-ext
-" lazy set overlayanimation
-style -name liberator-overlay-ext-opacity chrome://* #liberator-completions,#liberator-multiline-output { opacity: .8; position: relative; z-index: 9999; }
+" move status-bar
+lazy js document.getElementById("liberator-status-toolbar").appendChild(document.getElementById("status-bar"))
 
 " migemo hint
 set hintmatching=custom
@@ -148,15 +170,61 @@ let sbmincsearch_max = 15
 lazy set complete=stIl
 
 " feedSomeKeys
-lazy fmaps -u='(fastladder|reader\.livedoor)\.com/reader' s a r c j k f,j F,k <Space> <S-Space> z b p o v > J < K
+lazy fmaps -u='(fastladder|reader\.livedoor)\.com/reader' s a r c j k f,j F,k <Space> <S-Space> b p o v > J < K
 lazy fmaps -u='mail\.google\.com/mail' u k j o <CR> p n c ? x s y e m ! # h
 lazy fmaps -u='www\.tumblr\.com/dashboard' -events=vkeydown j k
 lazy fmaps -u='www\.google\.(com|co\.jp)/reader/' -events=vkeypress j k <Space> <S-Space> X O N P s,NO a,PO S,s v r F,f f,j F,k ? /
 lazy fmaps -u='twitter\.com' ? j k
 lazy fmaps -u='twitter\.com' -events=vkeydown F,f R,r T,t m n <CR> <Space> / . gh gr gp gf gm gu
 
+" stella
+js <<EOM
+addLocalMappings(
+  /^(http:\/\/(es|www).nicovideo.jp\/(watch|playlist\/mylist)|http:\/\/(jp|www)\.youtube\.com\/watch|http:\/\/(www\.)?vimeo\.com\/(channels\/(hd)?#)?\d+)/,
+  [
+    ['<C-g>', ':pageinfo S',      ],
+    ['P',     ':stplay',          ],
+    ['M',     ':stmute',          ],
+    ['C',     ':stcomment',       ],
+    ['zz',    ':stlarge',         ],
+    ['R',     ':strepeat',        ],
+    ['[',     ':stvolume! -10',   ],
+    [']',     ':stvolume! 10',    ],
+    [',',     ':stseek! -10',     ],
+    ['.',     ':stseek! 10',      ],
+    ['<',     ':stseek! -60',     ],
+    ['>',     ':stseek! 60',      ],
+    ['s',     ':stseek ',         {open: true}],
+    ['S',     ':stseek! ',        {open: true}],
+    ['v',     ':stvolume ',       {open: true}],
+    ['V',     ':stvolume! ',      {open: true}],
+    ['o',     ':strelations ',    {open: true}],
+    ['O',     ':strelations! ',   {open: true}],
+  ]
+);
+EOM
+
 " spatial navigation
 let spatial_navigation_mappings='<C-h> <C-j> <C-k> <C-l>'
+
+" emblur
+js <<EOM
+function emblur(e){
+  switch(e.type){
+    case 'keydown': case 'keyup':
+    return emblur.off = e.shiftKey || e.ctrlKey;
+  }
+  if(emblur.off || emblur.ignore.test(e.target.tagName)) return;
+  clearTimeout(emblur.tim);
+  emblur.tim = setTimeout(
+    function _emblur(lm) lm && lm.blur(), 500, e.target);
+}
+emblur.ignore = /^(?!embed$|object$)/i;
+let(c = document.getElementById('content')){
+  for each(let type in ['focus', 'keydown', 'keyup'])
+    c.addEventListener(type, emblur, type === 'focus');
+}
+EOM
 
 
 " ==================== refcontrol ==================== "
@@ -170,6 +238,7 @@ EOM
 
 " ==================== colorscheme ==================== "
 " colorscheme mac
+colorscheme vimpwhite
 
 " force disable ime in commandline
 style -name commandline-ime chrome://* #liberator-commandline-command input { ime-mode: inactive; }
