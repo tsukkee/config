@@ -1,4 +1,4 @@
-" Last Change: 21 Mar 2011
+" Last Change: 03 May 2011
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,27 +20,74 @@
 "     THE SOFTWARE.
 " }}}
 
+
+" ==================== Vundle ==================== "
+let s:is_mac = has('macunix') || (executable('uname') && system('uname') =~? '^darwin')
+let s:is_win = has('win32') || has('win64')
+let s:runtimepath = expand(s:is_win ? '~/vimfiles' : '~/.vim')
+
+filetype off
+
+set runtimepath&
+let &runtimepath = &runtimepath . ',' . s:runtimepath . '/bundle/vundle'
+call vundle#rc()
+
+Bundle 'cocoa.vim'
+Bundle 'errormarker.vim'
+Bundle 'fontzoom.vim'
+Bundle 'Indent-Guides'
+Bundle 'Javascript-Indentation'
+Bundle 'JavaScript-syntax'
+Bundle 'Lucius'
+Bundle 'Markdown'
+Bundle 'matchit.zip'
+Bundle 'newspaper.vim'
+Bundle 'SudoEdit.vim'
+Bundle 'Textile-for-VIM'
+Bundle 'xoria256.vim'
+Bundle 'ZenCoding.vim'
+
+Bundle 'git://github.com/gmarik/vundle.git'
+Bundle 'git://github.com/h1mesuke/vim-alignta.git'
+Bundle 'git://github.com/h1mesuke/unite-outline.git'
+Bundle 'git://github.com/kana/vim-altercmd.git'
+Bundle 'git://github.com/kana/vim-arpeggio.git'
+Bundle 'git://github.com/kana/vim-fakeclip.git'
+Bundle 'git://github.com/kana/vim-metarw.git'
+Bundle 'git://github.com/kana/vim-metarw-git.git'
+Bundle 'git://github.com/kana/vim-operator-user.git'
+Bundle 'git://github.com/kana/vim-operator-replace.git'
+Bundle 'git://github.com/kana/vim-submode.git'
+Bundle 'git://github.com/kana/vim-surround.git'
+Bundle 'git://github.com/kana/vim-textobj-indent.git'
+Bundle 'git://github.com/kana/vim-textobj-user.git'
+Bundle 'git://github.com/Shougo/echodoc.git'
+Bundle 'git://github.com/Shougo/neocomplcache.git'
+Bundle 'git://github.com/Shougo/unite.vim.git'
+Bundle 'git://github.com/Shougo/vimproc.git'
+Bundle 'git://github.com/Shougo/vimshell.git'
+Bundle 'git://github.com/thinca/vim-qfreplace.git'
+Bundle 'git://github.com/thinca/vim-quickrun.git'
+Bundle 'git://github.com/thinca/vim-ref.git'
+Bundle 'git://github.com/thinca/vim-textobj-plugins.git'
+Bundle 'git://github.com/tpope/vim-haml.git'
+Bundle 'git://github.com/tsukkee/lingr-vim.git'
+Bundle 'git://github.com/tsukkee/ttree.vim.git'
+Bundle 'git://github.com/tyru/caw.vim.git'
+Bundle 'git://github.com/tyru/operator-html-escape.vim.git'
+Bundle 'git://github.com/ujihisa/unite-colorscheme.git'
+Bundle 'git://gist.github.com/99234.git'
+
+" Bundle 'http://svn.macports.org/repository/macports/contrib/mpvim/', {'name': 'macports', 'type': 'svn'}
+
+filetype plugin indent on
+
+
 " ==================== Settings ==================== "
 " Define and reset augroup used in vimrc
 augroup vimrc
     autocmd!
 augroup END
-
-" Platform detection
-let s:is_mac = has('macunix') || (executable('uname') && system('uname') =~? '^darwin')
-let s:is_win = has('win32') || has('win64')
-
-" Default runtime directory
-let s:runtimepath = expand(s:is_win ? '~/vimfiles' : '~/.vim')
-
-" generate 'runtimepath' and helptags using pathogen
-if has('vim_starting')
-    set runtimepath&
-    let &runtimepath = &runtimepath . ',' . s:runtimepath . '/bundle/pathogen'
-    call pathogen#runtime_append_all_bundles()
-endif
-command! Helptags call pathogen#helptags()
-set notagbsearch
 
 " Get SID prefix of vimrc (see :h <SID>)
 function! s:SID_PREFIX()
@@ -70,12 +117,13 @@ set wildmenu                   " enhance command completion
 set wildmode=list:longest,full " use 'list:longest' at first and then use 'full'
 
 " Search
-set wrapscan   " search wrap around the end of the file
-set ignorecase " use ignore case search
-set smartcase  " override 'ignorecase' if the search pattern contains upper case
-set incsearch  " use incremental search
-set hlsearch   " highlight searched words
-nohlsearch     " avoid highlighting when reloading vimrc
+set notagbsearch " don't use binary search
+set wrapscan     " search wrap around the end of the file
+set ignorecase   " use ignore case search
+set smartcase    " override 'ignorecase' if the search pattern contains upper case
+set incsearch    " use incremental search
+set hlsearch     " highlight searched words
+nohlsearch       " avoid highlighting when reloading vimrc
 
 " Reading and writing file
 set directory-=.    " don't save tmp swap file in current directory
@@ -327,6 +375,14 @@ let g:submode_timeoutlen=600
 
 " Use more logical mapping (see :h Y)
 nnoremap Y y$
+
+" Reference: http://vim-users.jp/2011/04/hack214/
+onoremap ) t)
+onoremap ( t(
+onoremap > t>
+onoremap < t<
+onoremap ] t]
+onoremap [ t[
 
 " Prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
@@ -767,7 +823,7 @@ let g:neocomplcache_ignore_case = 0
 let g:neocomplcache_enable_smart_case = 1
 let g:neocomplcache_enable_camel_case_completion = 1
 let g:neocomplcache_enable_underbar_completion = 1
-let g:neocomplcache_disable_caching_buffer_name_pattern = "\.log$\|\.zsh_history"
+let g:neocomplcache_disable_caching_file_path_pattern = "\.log$\|\.zsh_history"
 if !exists('g:neocomplcache_dictionary_filetype_lists')
     let g:neocomplcache_dictionary_filetype_lists = {}
 endif
@@ -1072,59 +1128,3 @@ if filereadable(expand('~/.vimrc.local'))
 endif
 
 set secure
-
-
-" ==================== Plugins ==================== "
-" align                : http://www.vim.org/scripts/script.php?script_id=294
-" altercmd             : http://www.vim.org/scripts/script.php?script_id=2332
-" arpeggio             : http://www.vim.org/scripts/script.php?script_id=2425
-" caw                  : https://github.com/tyru/caw.vim
-" cocoa                : http://www.vim.org/scripts/script.php?script_id=2674
-" echodoc              : http://github.com/Shougo/echodoc
-" errormarker          : http://www.vim.org/scripts/script.php?script_id=1861
-" fakeclip             : http://www.vim.org/scripts/script.php?script_id=2098
-" fontzoom             : http://www.vim.org/scripts/script.php?script_id=2931
-" haml                 : http://github.com/tpope/vim-haml
-" javascript(syntax)   : http://www.vim.org/scripts/script.php?script_id=1491
-" javascript(syntax)   : http://www.vim.org/scripts/script.php?script_id=2802
-" ku                   : http://www.vim.org/scripts/script.php?script_id=2337
-" lingr.vim            : http://github.com/tsukkee/lingr-vim
-" lucius               : http://www.vim.org/scripts/script.php?script_id=2536
-" macports             : http://svn.macports.org/repository/macports/contrib/mpvim/
-" markdown(syntax)     : http://www.vim.org/scripts/script.php?script_id=2882
-" matchit              : http://www.vim.org/scripts/script.php?script_id=39
-" metarw               : http://www.vim.org/scripts/script.php?script_id=2335
-" metarw-git           : http://www.vim.org/scripts/script.php?script_id=2336
-" muttator             : https://vimperator-labs.googlecode.com/hg/muttator/contrib/vim/
-" neocomplcache        : http://github.com/Shougo/neocomplcache
-" operator-html-escape : https://github.com/tyru/operator-html-escape.vim/
-" operator-replace     : http://www.vim.org/scripts/script.php?script_id=2782
-" operator-user        : http://www.vim.org/scripts/script.php?script_id=2692
-" pathogen             : http://www.vim.org/scripts/script.php?script_id=2332
-" php53(syntax)        : http://www.vim.org/scripts/script.php?script_id=2874
-" qfreplace            : http://github.com/thinca/vim-qfreplace
-" quickrun             : http://github.com/thinca/vim-quickrun
-" ref                  : http://www.vim.org/scripts/script.php?script_id=3067
-" scala                : https://lampsvn.epfl.ch/trac/scala/browser/scala-tool-support/trunk/src/vim
-" submode              : http://www.vim.org/scripts/script.php?script_id=2467
-" SudoEdit             : http://www.vim.org/scripts/script.php?script_id=2709
-" surround             : http://github.com/kana/vim-surround
-" swap                 : http://www.vim.org/scripts/script.php?script_id=3250
-" textile              : http://www.vim.org/scripts/script.php?script_id=2305
-" textobj-between      : https://github.com/thinca/vim-textobj-plugins/
-" textobj-comment      : http://gist.github.com/99234
-" textobj-indent       : http://www.vim.org/scripts/script.php?script_id=2484
-" textobj-user         : http://www.vim.org/scripts/script.php?script_id=2100
-" ttree                : https://github.com/tsukkee/ttree.vim
-" tmux(syntax)         : http://tmux.cvs.sourceforge.net/viewvc/tmux/tmux/examples/tmux.vim
-" unite                : http://github.com/Shougo/unite.vim
-" unite-colorscheme    : https://github.com/ujihisa/unite-colorscheme
-" unite-help           : https://github.com/tsukkee/unite-help
-" unite-tags           : https://github.com/tsukkee/unite-tags
-" vimperator           : https://vimperator-labs.googlecode.com/hg/vimperator/contrib/vim/
-" vimproc              : http://github.com/Shougo/vimproc
-" vimrcbox             : http://github.com/sorah/sandbox/blob/master/vim/vimrcbox.vim
-" vimshell             : http://github.com/Shougo/vimshell
-" web-indent           : http://www.vim.org/scripts/script.php?script_id=3081
-" xoria256             : http://www.vim.org/scripts/script.php?script_id=2140
-" zencoding            : http://www.vim.org/scripts/script.php?script_id=2981
