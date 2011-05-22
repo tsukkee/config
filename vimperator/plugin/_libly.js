@@ -12,9 +12,9 @@ var PLUGIN_INFO =
     <description lang="ja">適当なライブラリっぽいものたち。</description>
     <author mail="suvene@zeromemory.info" homepage="http://zeromemory.sblo.jp/">suVene</author>
     <license>MIT</license>
-    <version>0.1.33</version>
+    <version>0.1.34</version>
     <minVersion>2.3pre</minVersion>
-    <maxVersion>2.3</maxVersion>
+    <maxVersion>3.0</maxVersion>
     <updateURL>https://github.com/vimpr/vimperator-plugins/raw/master/_libly.js</updateURL>
     <detail><![CDATA[
 == Objects ==
@@ -137,7 +137,7 @@ Request(url, headers, options):
     options:
         オプションとして以下のようなオブジェクトを指定できる（省略可）
         asynchronous:
-            true: 同期モード／false: 非同期モード（デフォルト:true）
+            true: 非同期モード／false: 同期モード（デフォルト:true）
         encoding:
             エンコーディング（デフォルト: 'UTF-8'）
         username:
@@ -544,13 +544,22 @@ libly.Request.prototype = {
             this.transport = new XMLHttpRequest();
             this.transport.open(method, this.url, this.options.asynchronous, this.options.username, this.options.password);
 
-            this.transport.onreadystatechange = libly.$U.bind(this, this._onStateChange);
+            var stateChangeException;
+            this.transport.onreadystatechange = libly.$U.bind(this, function () {
+                try {
+                    this._onStateChange();
+                } catch (e) {
+                    stateChangeException = e;
+                }
+            });
             this.setRequestHeaders();
             this.transport.overrideMimeType('text/html; charset=' + this.options.encoding);
 
             this.body = this.method == 'POST' ? this.options.postBody : null;
 
             this.transport.send(this.body);
+
+            if (!this.options.asynchronous && stateChangeException) throw stateChangeException;
 
             // Force Firefox to handle ready state 4 for synchronous requests
             if (!this.options.asynchronous && this.transport.overrideMimeType)

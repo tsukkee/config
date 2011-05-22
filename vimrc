@@ -1,4 +1,4 @@
-" Last Change: 03 May 2011
+" Last Change: 07 May 2011
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -264,10 +264,6 @@ endif
 
 " Omni completion
 set completeopt+=menuone " Display menu
-
-" File type settings
-filetype indent on " to use filetype indent
-filetype plugin on " to use filetype plugin
 
 " Show quickfix automatically
 autocmd vimrc QuickfixCmdPost * if !empty(getqflist()) | cwindow | endif
@@ -791,11 +787,11 @@ nmap Ss <Plug>YSsurround
 nmap SS <Plug>YSsurround
 
 " vimproc
-if s:is_mac
-    let g:vimproc_dll_path = s:runtimepath . '/bundle/vimproc/autoload/proc_mac.so'
-elseif has('unix')
-    let g:vimproc_dll_path = s:runtimepath . '/bundle/vimproc/autoload/proc_gcc.so'
-endif
+" if s:is_mac
+"     let g:vimproc_dll_path = s:runtimepath . '/bundle/vimproc/autoload/proc_mac.so'
+" elseif has('unix')
+"     let g:vimproc_dll_path = s:runtimepath . '/bundle/vimproc/autoload/proc_gcc.so'
+" endif
 
 " gist
 if s:is_mac

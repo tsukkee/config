@@ -964,35 +964,11 @@ Thanks:
     set volume (value) (this.player.setVolume(value), this.volume),
 
     fetch: function (filepath) {
-      function _fetch (id, t) {
-        let url =
-          "http://youtube.com/get_video?video_id=" + id +
-          "&t=" + decodeURIComponent(t) +
-          (quality ? "&fmt=" + quality : '');
-        U.download(url, filepath, '.flv', self.title);
-      }
-
-      let self = this;
-
       // all(1080p,720p,480p,360p) -> 37, 22, 35, 34, 5
       // FIXME 一番初めが最高画質だと期待
-      let cargs = content.wrappedJSObject.yt.config_.SWF_CONFIG.args;
-      let quality = cargs.fmt_map.match(/^\d+/);
-      let t = cargs.t;
-      let id = this.id;
-
-      // 時間が経っていると無効化されてしまっている
-      //_fetch(t, id);
-
-      U.httpRequest(
-        U.currentURL,
-        null,
-        function (xhr) {
-          // XXX t が変わるために、キャッシュを利用できない問題アリアリアリアリ
-          let [, t] = xhr.responseText.match(/swfHTML.*&t=([^&]+)/);
-          _fetch(id, t);
-        }
-      );
+      let cargs = content.wrappedJSObject.yt.config_.PLAYER_CONFIG.args;
+      let url = decodeURIComponent(cargs.fmt_url_map.split(',')[0].split('|')[1]);
+      U.download(url, filepath, '.flv', this.title);
     },
 
     makeURL: function (value, type) {
@@ -1478,6 +1454,7 @@ Thanks:
 
     functions: {
       currentTime: 'w',
+      fetch: 'x',
       makeURL: 'x',
       muted: 'w',
       pause: 'x',
@@ -1526,6 +1503,25 @@ Thanks:
     // XXX setVolume は実際には存在しない？
     get volume () parseInt(this.player.__stella_volume),
     set volume (value) (this.api_setVolume(value), this.player.__stella_volume = value),
+
+    fetch: function(filepath) {
+      let self = this;
+      let id = U.currentURL.match(/vimeo\.com\/(\d+)/)[1];
+      U.httpRequest(
+        'http://www.vimeo.com/moogaloop/load/clip:' + id,
+        null,
+        function(xhr) {
+          let doc = xhr.responseXML;
+          let signature = U.xpathGet('/xml/request_signature', doc).textContent;
+          let timestamp = U.xpathGet('/xml/timestamp', doc).textContent;
+          let isHD = parseInt(U.xpathGet('/xml/video/isHD', doc).textContent);
+          let url = 'http://www.vimeo.com/moogaloop/play/clip:' + id
+            + '/' + signature + '/' + timestamp
+            + '/?q=' + (isHD ? 'hd' : 'sd');
+          U.download(url, filepath, isHD ? '.mp4' : '.flv', self.title);
+        }
+      );
+    },
 
     makeURL: function (value, type) {
       switch (type) {
