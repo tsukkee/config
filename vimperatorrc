@@ -65,6 +65,9 @@ nnoremap l 3l
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
 
+nnoremap d <C-d>
+nnoremap D d
+
 " avoid unintended paste
 " only use "gP"
 nnoremap p <Nop>
