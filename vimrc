@@ -1,4 +1,4 @@
-" Last Change: 07 May 2011
+" Last Change: 14 Aug 2011
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,36 +20,50 @@
 "     THE SOFTWARE.
 " }}}
 
-
-" ==================== Vundle ==================== "
+" ==================== Utilities ==================== "
 let s:is_mac = has('macunix') || (executable('uname') && system('uname') =~? '^darwin')
 let s:is_win = has('win32') || has('win64')
 let s:runtimepath = expand(s:is_win ? '~/vimfiles' : '~/.vim')
 
+" define and reset augroup used in vimrc
+augroup vimrc
+    autocmd!
+augroup END
+
+" get SID prefix of vimrc
+" See: :h <SID>
+function! s:SID_PREFIX()
+    return matchstr(expand('<sfile>'), '<SNR>\d\+_')
+endfunction
+
+" get dirname
+function! s:dirname(path)
+    return isdirectory(a:path) ? a:path : fnamemodify(a:path, ':p:h')
+endfunction
+
+
+" ==================== Vundle ==================== "
 filetype off
 
 set runtimepath&
 let &runtimepath = &runtimepath . ',' . s:runtimepath . '/bundle/vundle'
 call vundle#rc()
 
-Bundle 'cocoa.vim'
 Bundle 'errormarker.vim'
-Bundle 'fontzoom.vim'
 Bundle 'Indent-Guides'
 Bundle 'Javascript-Indentation'
 Bundle 'JavaScript-syntax'
 Bundle 'Lucius'
 Bundle 'Markdown'
 Bundle 'matchit.zip'
-Bundle 'newspaper.vim'
 Bundle 'SudoEdit.vim'
 Bundle 'Textile-for-VIM'
 Bundle 'xoria256.vim'
 Bundle 'ZenCoding.vim'
 
 " Bundle 'gmarik/vundle'
+Bundle 'altercation/vim-colors-solarized'
 Bundle 'h1mesuke/vim-alignta'
-Bundle 'h1mesuke/unite-outline'
 Bundle 'kana/vim-altercmd'
 Bundle 'kana/vim-arpeggio'
 Bundle 'kana/vim-fakeclip'
@@ -61,7 +75,6 @@ Bundle 'kana/vim-submode'
 Bundle 'kana/vim-surround'
 Bundle 'kana/vim-textobj-indent'
 Bundle 'kana/vim-textobj-user'
-Bundle 'Shougo/echodoc'
 Bundle 'Shougo/neocomplcache'
 Bundle 'Shougo/unite.vim'
 Bundle 'Shougo/vimproc'
@@ -69,7 +82,6 @@ Bundle 'Shougo/vimshell'
 Bundle 'thinca/vim-qfreplace'
 Bundle 'thinca/vim-quickrun'
 Bundle 'thinca/vim-ref'
-Bundle 'thinca/vim-textobj-plugins'
 Bundle 'tpope/vim-haml'
 Bundle 'git@github.com:tsukkee/lingr-vim.git'
 Bundle 'git@github.com:tsukkee/ttree.vim.git'
@@ -77,14 +89,11 @@ Bundle 'git@github.com:tsukkee/vundle.git'
 Bundle 'git@github.com:tsukkee/unite-help.git'
 Bundle 'git@github.com:tsukkee/unite-tag.git'
 Bundle 'tyru/caw.vim'
-Bundle 'tyru/operator-html-escape.vim'
 Bundle 'ujihisa/unite-colorscheme'
 Bundle 'git://gist.github.com/99234.git', {'name': 'textobj-comment'}
 
 Bundle 'http://svn.macports.org/repository/macports/contrib/mpvim/'
 Bundle 'http://lampsvn.epfl.ch/svn-repos/scala/scala-tool-support/trunk/src/vim', {'name': 'scala'}
-" Bundle 'https://bitbucket.org/ns9tks/vim-l9'
-" Bundle 'https://bitbucket.org/ns9tks/vim-fuzzyfinder'
 
 Bundle 'muttator', {'type': 'nosync'}
 Bundle 'vimperator', {'type': 'nosync'}
@@ -95,68 +104,54 @@ filetype plugin indent on
 
 
 " ==================== Settings ==================== "
-" Define and reset augroup used in vimrc
-augroup vimrc
-    autocmd!
-augroup END
+" tab
+set tabstop=4 shiftwidth=4 softtabstop=4
+set expandtab
+set smartindent
+set history=100
 
-" Get SID prefix of vimrc (see :h <SID>)
-function! s:SID_PREFIX()
-    return matchstr(expand('<sfile>'), '<SNR>\d\+_')
-endfunction
-
-" Get dirname
-function! s:dirname(path)
-    return isdirectory(a:path) ? a:path : fnamemodify(a:path, ':p:h')
-endfunction
-
-" Tab
-set tabstop=4 shiftwidth=4 softtabstop=4 " set tab width
-set expandtab   " use space rather than tab
-set smartindent " use smart indent
-set history=100 " number of command history
-
-" Input support
-set backspace=indent,eol,start " delete everything with backspace
-set formatoptions+=m           " add multibyte support
-set nolinebreak                " don't break line automatically
+" input support
+set backspace=indent,eol,start
+set formatoptions+=m " add multibyte support
+set nolinebreak
 set iminsert=0
 set imsearch=0
 
-" Command completion
-set wildmenu                   " enhance command completion
-set wildmode=list:longest,full " use 'list:longest' at first and then use 'full'
+" command completion
+set wildmenu
+set wildmode=list:longest,full
 
-" Search
-set notagbsearch " don't use binary search
-set wrapscan     " search wrap around the end of the file
-set ignorecase   " use ignore case search
-set smartcase    " override 'ignorecase' if the search pattern contains upper case
-set incsearch    " use incremental search
-set hlsearch     " highlight searched words
-nohlsearch       " avoid highlighting when reloading vimrc
+" search
+set notagbsearch " avoid bug about searching multibyte characters
+set wrapscan
+set ignorecase
+set smartcase
+set incsearch
+set hlsearch
+nohlsearch " reset highlighting when reloading vimrc
 
-" Reading and writing file
-set directory-=.    " don't save tmp swap file in current directory
-set autoread        " auto re-read when the file is modified by other applications
-set hidden          " allow opening other buffer without saving current buffer
-set tags=./tags;    " search tag file recursively (see :h file-searching)
+" reading and writing file
+set directory-=. " don't save tmp swap file in current directory
+set autoread
+set hidden
+set tags=./tags; " search tag file recursively (See: :h file-searching)
 
-" Display
-set title                     " don't rewrite title string
-set showmatch                 " highlight corresponds character
-set showcmd                   " show input command
-set noshowmode                " for echodoc
-set number                    " show line number
-set wrap                      " wrap long lines
-set scrolloff=5               " minimal number of screen lines to keep above and below the cursor
-set foldmethod=marker         " use marker for folding
-set foldcolumn=3              " display folds
-set list                      " show unprintable characters
-set listchars=tab:>\ ,trail:~ " strings to use in 'list'
-set ambiwidth=double          " use double width for Eastern Asian Ambiguous characters
+" display
+set showmatch
+set showcmd
+set showmode
+set number
+set wrap
+set scrolloff=5
+set foldmethod=marker
+set foldcolumn=3
+set list
+set listchars=tab:>\ ,trail:~
+set ambiwidth=double
 
+" title
 " Reference: http://vim.wikia.com/wiki/Automatically_set_screen_title
+set title
 set titlelen=15
 autocmd vimrc BufEnter * let &titlestring = '%{' . s:SID_PREFIX() . 'titlestring()}'
 autocmd vimrc User plugin-lingr-unread let &titlestring = '%{' . s:SID_PREFIX() . 'titlestring()}'
@@ -174,7 +169,7 @@ function! s:titlestring()
     endif
 endfunction
 
-" Statusline
+" statusline
 set laststatus=2 " always show statusine
 let &statusline = '%!' . s:SID_PREFIX() . 'statusline()'
 function! s:statusline()
@@ -185,7 +180,7 @@ function! s:statusline()
     return s
 endfunction
 
-" Tabline
+" tabline
 set showtabline=2 " always show tabline
 let &tabline = '%!' . s:SID_PREFIX() . 'tabline()'
 function! s:tabline()
@@ -225,14 +220,14 @@ function! s:tabline()
     return s
 endfunction
 
-" Display cursorline only in active window
+" display cursorline only in active window
 " Reference: http://nanabit.net/blog/2007/11/03/vim-cursorline/
 augroup vimrc
     autocmd WinLeave * setlocal nocursorline
     autocmd WinEnter,BufRead * setlocal cursorline
 augroup END
 
-" Use set encoding=utf-8 in Windows
+" use set encoding=utf-8 in Windows
 " needs ja.po with utf-8 encoding as $VIMRUNTIME/lang/ja_JP.UTF-8/LC_MESSAGES/vim.mo
 " Reference: http://d.hatena.ne.jp/thinca/20090111/1231684962
 if s:is_win && has('gui')
@@ -262,13 +257,13 @@ else
     set ffs=unix,dos
 endif
 
-" Omni completion
-set completeopt+=menuone " Display menu
+" omni completion
+set completeopt+=menuone
 
-" Show quickfix automatically
+" show quickfix automatically
 autocmd vimrc QuickfixCmdPost * if !empty(getqflist()) | cwindow | endif
 
-" Save and load fold settings automatically
+" save and load fold settings automatically
 " Reference: http://vim-users.jp/2009/10/hack84/
 " Don't save options.
 set viewoptions-=options
@@ -284,7 +279,7 @@ augroup vimrc
     \|  endif
 augroup END
 
-" Session
+" session
 set sessionoptions=buffers,curdir,folds,tabpages
 let s:session_file = expand('~/.session.vim')
 function! s:save_session()
@@ -313,7 +308,7 @@ endfunction
 nnoremap <silent> [Prefix]S :<C-u>call <SID>load_session()<CR>
 nnoremap <silent> [Prefix]s :<C-u>call <SID>save_session()<CR>
 
-" Persistent undo
+" persistent undo
 if has('persistent_undo')
     set undofile
     let &undodir = s:runtimepath . '/undo'
@@ -340,18 +335,30 @@ function! s:onColorScheme()
         " based on ModeMsg
         highlight User2 ctermbg=237 ctermfg=117 cterm=bold
         \               guibg=#363946 guifg=#76d5f8 gui=bold
-        " ligher Comment
+        " lighter Comment
         highlight Comment ctermfg=244 guifg=#808080
 
         " indent guids
         highlight IndentGuidesOdd ctermbg=235
         highlight IndentGuidesEven ctermbg=236
+    elseif g:colors_name == 'solarized'
+        " based on SpecialKey
+        highlight ZenkakuSpace ctermbg=12 guibg=#839496
+        " based on ErrorMsg
+        highlight User1 ctermbg=10 ctermfg=1 cterm=bold
+        \               guibg=#586e75 guifg=#dc322f gui=bold
+        " based on ModeMsg
+        highlight User2 ctermbg=10 ctermfg=4 cterm=bold
+        \               guibg=#586e75 guifg=#268bd2 gui=bold
+        " indent guids
+        highlight IndentGuidesOdd ctermbg=187
+        highlight IndentGuidesEven ctermbg=186
     else
         highlight ZenkakuSpace ctermbg=77
     endif
 endfunction
 
-syntax enable " enable syntax coloring
+syntax enable
 
 " Indent guide
 let g:indent_guides_enable_on_vim_startup = 1
@@ -360,7 +367,9 @@ let g:indent_guides_guide_size = 1
 
 " colorscheme
 if &t_Co == 256 || has('gui')
-    colorscheme lucius
+    let g:solarized_contrast = 'high'
+    colorscheme solarized
+    " colorscheme lucius
 else
     colorscheme desert
 endif
@@ -372,6 +381,7 @@ call altercmd#load()
 call arpeggio#load()
 let g:arpeggio_timeoutlen = 100
 
+" make easy to execute <Esc>
 Arpeggionmap fj <Esc>
 Arpeggioimap fj <Esc>
 Arpeggiocmap fj <Esc>
@@ -380,18 +390,16 @@ Arpeggiovmap fj <Esc>
 " submode
 let g:submode_timeoutlen=600
 
-" Use more logical mapping (see :h Y)
+" use more logical mapping (See: :h Y)
 nnoremap Y y$
 
 " Reference: http://vim-users.jp/2011/04/hack214/
 onoremap ) t)
 onoremap ( t(
-onoremap > t>
-onoremap < t<
 onoremap ] t]
 onoremap [ t[
 
-" Prefix
+" prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
 nnoremap [Prefix] <Nop>
 vnoremap [Prefix] <Nop>
@@ -400,7 +408,7 @@ vmap <Space> [Prefix]
 noremap [Operator] <Nop>
 map , [Operator]
 
-" Mapping command
+" mapping command
 command! -nargs=+ NExchangeMap call s:exchangeMap('n', <f-args>)
 command! -nargs=+ CExchangeMap call s:exchangeMap('c', <f-args>)
 command! -nargs=+ VExchangeMap call s:exchangeMap('v', <f-args>)
@@ -423,7 +431,7 @@ function! s:popupMap(lhs, ...)
     execute 'inoremap <silent> <expr>' a:lhs 'pumvisible() ?' rhs ': "' . a:lhs . '"'
 endfunction
 
-" Use physical cursor movement
+" use physical cursor movement
 " NExchangeMap j gj
 nnoremap <Plug>(arpeggio-default:j) gj
 nnoremap gj j
@@ -439,7 +447,7 @@ VExchangeMap $ g$
 NExchangeMap 0 g0
 VExchangeMap 0 g0
 
-" Use beginning matches on command-line history
+" use beginning matches on command-line history
 CExchangeMap <C-p> <Up>
 CExchangeMap <C-n> <Down>
 
@@ -451,38 +459,33 @@ augroup vimrc
     \|   Arpeggioinoremap <buffer> fj <Esc>:<C-u>q<CR>
 augroup END
 
-" Write file easely
+" write file easely
 CommandMap [Prefix]w update
 
-" Allow undo for i_CTRL-u and i_CTRL-w
+" allow undo for i_CTRL-u and i_CTRL-w
 " Reference: http://vim-users.jp/2009/10/hack81/
 inoremap <C-u> <C-g>u<C-u>
 inoremap <C-w> <C-g>u<C-w>
 
-" Folding
+" folding
 " Reference: http://d.hatena.ne.jp/ns9tks/20080318/1205851539
-" hold with 'h' if the cursor is on the head of line
 nnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zc' : 'h'
-" expand with 'l' if the cursor on the holded text
 nnoremap <expr> l foldclosed(line('.')) != -1 ? 'zo' : 'l'
-" hold with 'h' if the cursor is on the head of line in visual mode
 vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
-" expand with 'l' if the cursor on the holded text in visual mode
 vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 
-" Delete highlight
+" reset highlight
 CommandMap gh nohlsearch
 
-" Select last changed or yanked text
+" select last changed or yanked text
 nnoremap gc `[v`]
 
-" Input path in command mode
+" input path in command mode
 cnoremap <expr> <C-x> expand('%:p:h') . "/"
 cnoremap <expr> <C-z> expand('%:p:r')
 
-" Copy and paste with fakeclip
-" Command-C and Command-V are also available in MacVim
-" see :help fakeclip-multibyte-on-mac
+" copy and paste with fakeclip
+" See: :h fakeclip-multibyte-on-mac
 map gy "*y
 map gp "*p
 if exists('$WINDOW') || exists('$TMUX')
@@ -490,37 +493,11 @@ if exists('$WINDOW') || exists('$TMUX')
     map gP <Plug>(fakeclip-screen-p)
 endif
 
-" Tab move
+" tab move
 nnoremap L gt
 nnoremap H gT
 
-" Merge tabpage into a tab
-" Reference: http://gist.github.com/434502
-function! s:exists_tab(tabpagenr)
-    return 1 <= a:tabpagenr && a:tabpagenr <= tabpagenr('$')
-endfunction
-
-function! s:merge_tab_into_tab(from_tabpagenr, to_tabpagenr)
-    if !s:exists_tab(a:from_tabpagenr)
-    \   || !s:exists_tab(a:to_tabpagenr)
-    \   || a:from_tabpagenr == a:to_tabpagenr
-        return
-    endif
-
-    execute 'tabnext' a:to_tabpagenr
-    for bufnr in tabpagebuflist(a:from_tabpagenr)
-        split
-        execute bufnr 'buffer'
-    endfor
-
-    execute 'tabclose' a:from_tabpagenr
-endfunction
-
-nnoremap [Prefix]mh :<C-u>call <SID>merge_tab_into_tab(tabpagenr(), tabpagenr() - 1)<CR>
-nnoremap [Prefix]ml :<C-u>call <SID>merge_tab_into_tab(tabpagenr(), tabpagenr() + 1)<CR>
-nnoremap [Prefix]m  :<C-u>call <SID>merge_tab_into_tab(tabpagenr(), input('tab number:'))<CR>
-
-" Window resize
+" window resizing with submode
 call submode#enter_with('winsize', 'n', '', '<C-w>>', '<C-w>>')
 call submode#enter_with('winsize', 'n', '', '<C-w><', '<C-w><')
 call submode#enter_with('winsize', 'n', '', '<C-w>+', '<C-w>+')
@@ -530,15 +507,13 @@ call submode#map('winsize', 'n', '', '<', '<C-w><')
 call submode#map('winsize', 'n', '', '+', '<C-w>+')
 call submode#map('winsize', 'n', '', '-', '<C-w>-')
 
-" Enable mouse wheel
-" In Mac, Only on iTerm.app, disable on Terminal.app
+" enable mouse wheel with iTerm2
 if s:is_mac
     set mouse=a
     set ttymouse=xterm2
 endif
 
-" Binary (see :h xxd)
-" vim -b :edit binary using xxd-format!
+" binary editing (See: :h xxd)
 " Reference: http://vim-users.jp/2010/03/hack133/
 augroup vimrc
     autocmd BufReadPost,BufNewFile *.bin,*.exe,*.dll,*.swf setlocal filetype=xxd
@@ -560,23 +535,13 @@ autocmd vimrc VimEnter,TabEnter *
 \|  endif
 \|  execute 'cd' fnameescape(t:cwd)
 
-" Go to alternate tab
-if !exists('g:AlternateTabNumber')
-    let g:AlternateTabNumber = 1
-endif
-
-command! -nargs=0 GoToAlternateTab silent execute 'tabnext' g:AlternateTabNumber
-CommandMap g<C-^> GoToAlternateTab
-
-autocmd vimrc TabLeave * let g:AlternateTabNumber = tabpagenr()
-
-" Rename
+" rename
 command! -nargs=1 -bang -complete=file Rename saveas<bang> <args> | call delete(expand('#'))
 
 " ctags
 command! -nargs=0 CtagsR !ctags -R
 
-" Alternate grep
+" alternate grep
 " Reference: http://vim-users.jp/2010/03/hack130/
 command! -complete=file -nargs=+ Grep call s:grep([<f-args>])
 function! s:grep(args)
@@ -584,7 +549,7 @@ function! s:grep(args)
 endfunction
 AlterCommand gr[ep] Grep
 
-" Expand VimBall
+" expand VimBall
 command! -bang -nargs=? -complete=dir VimBallHere call s:vimBallHere(<bang>0, <f-args>)
 function! s:vimBallHere(force_mkdir, ...)
     let ffs_save = &ffs
@@ -598,7 +563,7 @@ function! s:vimBallHere(force_mkdir, ...)
     let &ffs = ffs_save
 endfunction
 
-" Growl for Mac
+" growl for mac
 if executable("growlnotify")
     command! -nargs=+ Growl call s:growl(<f-args>)
     function! s:growl(title, ...)
@@ -611,7 +576,7 @@ if executable("growlnotify")
     endfunction
 endif
 
-" Quicklook for Mac
+" quicklook for mac
 if executable("qlmanage")
     command! -nargs=? -complete=file Quicklook call s:quicklook(<f-args>)
     function! s:quicklook(...)
@@ -630,7 +595,7 @@ if executable("qlmanage")
             call s:quicklook(name)
         endfunction
 
-        " for Lingr-Vim (should use :python?)
+        " for Lingr-Vim (should use :python ?)
         autocmd vimrc FileType lingr-messages nnoremap <silent> <buffer> O :<C-u>call <SID>lingr_vim_quicklook()<CR>
         function! s:lingr_vim_quicklook()
             let pattern = '^https\?://[^ ]*\.\(png\|jpe\?g\|gif\)$'
@@ -644,11 +609,10 @@ if executable("qlmanage")
     endif
 endif
 
-" Last change
+" last change
 let g:lastchange_pattern  = 'Last Change: '
 let g:lastchange_locale   = s:is_win ? 'English' : 'en_US.UTF-8'
 let g:lastchange_format   = '%d %b %Y'
-" let g:lastchange_format   = '%a %b %d, %Y at %I:%M %p %z'
 let g:lastchange_line_num = 10
 
 autocmd vimrc BufWritePre * call s:write_last_change()
@@ -675,11 +639,11 @@ function! s:write_last_change()
     execute 'language time' save_lc_time
 endfunction
 
-" Suicide
+" suicide
 command! Suicide call system('kill -KILL ' . getpid())
 
-" Undo close tab
-" How can I detect tab closing
+" undo close tab ?
+" how can I detect tab closing ??
 let s:tabcount = 0
 let g:tabclose_histries = []
 augroup vimrc
@@ -689,6 +653,12 @@ augroup vimrc
     " autocmd TabLeave * echomsg 'leave:count' tabpagenr('$')
 augroup END
 
+" count
+function! Count()
+    echo 'Current line: ' len(substitute(getline('.'), '.', '.', 'g')) 'chars'
+endfunction
+nnoremap <CR> :<C-u>call Count()<CR><CR>
+
 " ==================== Plugins settings ==================== "
 " FileType
 let g:python_highlight_all = 1
@@ -696,10 +666,10 @@ augroup vimrc
     " some ftplugins set 'textwidth'
     autocmd FileType * setlocal textwidth=0
 
-    " Vim (use :help)
+    " vim (use :help)
     autocmd FileType vim setlocal keywordprg=:help
 
-    " Ruby
+    " ruby
     autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
     autocmd BufNewFile,BufRead *.ru setfiletype ruby
 
@@ -719,7 +689,7 @@ augroup vimrc
     autocmd BufNewFile,BufRead *.thtml setfiletype php
     autocmd BufNewFile,BufRead *.ctp setfiletype php
 
-    " Scala
+    " scala
     " Reference: http://d.hatena.ne.jp/tyru/20090406/1239015151
     autocmd FileType scala
     \   setlocal softtabstop=2 shiftwidth=2 tabstop=2
@@ -731,7 +701,7 @@ augroup vimrc
     \|  setlocal commentstring=//%s
     \|  setlocal formatoptions-=t formatoptions+=croql
 
-    " Textile
+    " textile
     autocmd BufRead,BufNewFile *.textile setfiletype textile
 
     " tmux
@@ -746,7 +716,7 @@ augroup vimrc
         " set fold level as section level
         let matches = matchlist(getline(a:lnum), '^\s*\\\(\(sub\)*\)section')
         if !empty(matches)
-            " For example, matches[1] is 'subsub' when line is '\subsubsection'
+            " for example, matches[1] is 'subsub' when line is '\subsubsection'
             return len(matches[1]) / 3 + 1
         else
             " when next line is /\\(sub)*section/, this line is the end of specified section
@@ -754,24 +724,6 @@ augroup vimrc
             if !empty(matches)
                 return '<' . string(len(matches[1]) / 3 + 1)
             " otherwise keep fold level
-            else
-                return '='
-            endif
-        endif
-    endfunction
-
-    " dot
-    autocmd FileType txt
-    \   setlocal foldmethod=expr
-    \|  let &l:foldexpr = 'Dot_foldexpr(v:lnum)'
-    function! Dot_foldexpr(lnum)
-        let match = matchstr(getline(a:lnum), '^\.\+')
-        if !empty(match)
-            return len(match)
-        else
-            let match = matchstr(getline(a:lnum + 1), '^\.\+')
-            if !empty(match)
-                return '<' . string(len(match))
             else
                 return '='
             endif
@@ -793,30 +745,20 @@ nmap SS <Plug>YSsurround
 "     let g:vimproc_dll_path = s:runtimepath . '/bundle/vimproc/autoload/proc_gcc.so'
 " endif
 
-" gist
-if s:is_mac
-    let g:gist_clip_command = 'pbcopy'
-endif
-let g:gist_detect_filetype = 1
-let g:gist_open_browser_after_post = 1
-
 " operator-replace
 map [Operator]r <Plug>(operator-replace)
-
-" operator-html-escape
-map [Operator]h <Plug>(operator-html-escape)
-map [Operator]u <plug>(operator-html-unescape)
 
 " caw
 let g:caw_find_another_action = 1
 
 augroup vimrc
     autocmd FileType plaintex,tex let b:caw_oneline_comment = '%'
+    autocmd FileType tmux let b:caw_oneline_comment = '#'
 augroup END
 
 nmap gA <Plug>(caw:a:comment)
-nmap <Plug>(arpeggio-default:m) <Plug>(caw:prefix)
-vmap m <Plug>(caw:prefix)
+nmap @ <Plug>(caw:prefix)
+vmap @ <Plug>(caw:prefix)
 nmap <Plug>(caw:prefix)<Space> <Plug>(caw:i:toggle)
 
 " neocomplcache
@@ -855,9 +797,6 @@ smap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
 CommandMap [Prefix]ne NeoComplCacheEnable
 CommandMap [Prefix]nd NeoComplCacheDisable
 
-" echodoc
-let g:echodoc_enable_at_startup = 1
-
 " execute repl
 " phpsh: http://github.com/facebook/phpsh
 " node:  http://nodejs.org/
@@ -890,7 +829,7 @@ endfunction
 CommandMap [Prefix]R call <SID>simple_repl()
 vnoremap [Prefix]v :VimShellSendString<CR>
 
-" Unite
+" unite
 let g:unite_update_time = 100
 let g:unite_enable_start_insert = 1
 let g:unite_enable_split_vertically = 0
@@ -916,8 +855,7 @@ endfunction
 call unite#custom_action('file,directory,buffer', 'tabopen', s:unite_tabopen)
 
 ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru file
-ArpeggioCommandMap kb Unite -buffer-name=tabs buffer_tab tab
-ArpeggioCommandMap kt Unite -buffer-name=outline outline tags
+ArpeggioCommandMap kt Unite -buffer-name=tags tags
 execute 'ArpeggioCommandMap ke call ' s:SID_PREFIX() . 'unite_help_with_ref()'
 
 autocmd vimrc BufEnter *
@@ -968,7 +906,7 @@ endfunction
 
 function! s:ttree_tabpagecd()
     let dir = s:dirname(ttree#get_node().path)
-    CD
+    TabpageCD `=dir`
 endfunction
 
 function! s:ttree_unite_filerec()
@@ -1024,12 +962,8 @@ let g:user_zen_settings = {
 \    'lang': 'ja'
 \}
 
-" swap
-vmap [Prefix]s <Plug>SwapSwapOperands
-vmap [Prefix]S <Plug>SwapSwapPivotOperands
-
-" Reload Firefox
-" Need MozRepl and +ruby
+" reload Firefox
+" needs MozRepl and +ruby
 function! ReloadFirefox()
     if has('ruby')
         ruby <<EOF
@@ -1048,13 +982,13 @@ telnet.write('content.location.reload(true)')
 telnet.close()
 EOF
     else
-        echoerr 'need has("ruby") or has("python")'
+        echoerr 'needs has("ruby") or has("python")'
     endif
 endfunction
 CommandMap [Prefix]rf call ReloadFirefox()
 
-" Reload Safari
-" Need RubyOSA and +ruby
+" reload Safari
+" needs RubyOSA and +ruby
 function! ReloadSafari()
     if has('ruby') && s:is_mac
         ruby <<EOF
@@ -1064,19 +998,19 @@ function! ReloadSafari()
         safari.do_javascript('location.reload(true)', safari.documents[0])
 EOF
     else
-        echoerr 'need has("mac") and has("ruby")'
+        echoerr 'needs has("mac") and has("ruby")'
     endif
 endfunction
 CommandMap [Prefix]rs call ReloadSafari()
 
-" Utility command for Mac
+" utility command for Mac
 if s:is_mac
     command! Here silent call system('open ' . expand('%:p:h'))
     command! This silent call system('open ' . expand('%:p'))
     command! -nargs=1 -complete=file Open silent call system('open ' . shellescape(expand(<f-args>), 1))
 endif
 
-" Utility command for Windows
+" utility command for Windows
 if s:is_win
     command! Here silent execute '!explorer' expand('%:p:h')
     command! This silent execute '!start cmd /c "%"'
@@ -1096,7 +1030,7 @@ AlterCommand r[ead] Read
 AlterCommand w[rite] Write
 AlterCommand so[urce] Source
 
-" Quickrun
+" quickrun
 let g:quickrun_no_default_key_mappings = 1
 if !exists('g:quickrun_config')
     let g:quickrun_config = {}
@@ -1108,17 +1042,7 @@ nmap [Prefix]q <Plug>(quickrun)
 
 
 " ==================== Loading vimrc ==================== "
-" Reference: http://vim-users.jp/2009/12/hack112/
-" Load settings for each location.
-autocmd vimrc BufNewFile,BufReadPost * call s:vimrc_local(expand('<afile>:p:h'))
-function! s:vimrc_local(loc)
-    let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
-    for i in reverse(filter(files, 'filereadable(v:val)'))
-        source `=i`
-    endfor
-endfunction
-
-" Auto reloading vimrc
+" auto reloading vimrc
 " Reference: http://vim-users.jp/2009/09/hack74/
 if has('gui_running')
     autocmd vimrc BufWritePost .vimrc,_vimrc,vimrc nested
@@ -1126,7 +1050,7 @@ if has('gui_running')
     autocmd vimrc BufWritePost .gvimrc,_gvimrc,gvimrc nested
     \   source $MYGVIMRC
 else
-    autocmd vimrc BufWritePost .vimrc nested
+    autocmd vimrc BufWritePost .vimrc,_vimrc,vimrc nested
     \   source $MYVIMRC
 endif
 

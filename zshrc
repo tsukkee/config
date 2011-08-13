@@ -19,7 +19,7 @@ colors
 
 
 # ==================== Events ==================== "
-# typeset -ga chpwd_functions
+typeset -ga chpwd_functions
 typeset -ga precmd_functions
 typeset -ga preexec_functions
 
@@ -185,12 +185,12 @@ bindkey -M afu "^[s" _quote-previous-word-in-single
 bindkey -M afu "^[d" _quote-previous-word-in-double
 
 # cdd
-source $HOME/.zsh.d/cdd.sh
-export CDD_PWD_FILE=$HOME/.zsh.d/cdd_pwd_list
+# source $HOME/.zsh.d/cdd.sh
+# export CDD_PWD_FILE=$HOME/.zsh.d/cdd_pwd_list
 # chpwd_functions+=_reg_pwd_screennum
-function chpwd() {
-    _reg_pwd_screennum
-}
+# function chpwd() {
+    # _reg_pwd_screennum
+# }
 
 # visual mode
 # source ~/.zsh.d/visualmode.sh
