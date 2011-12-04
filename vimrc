@@ -1,4 +1,4 @@
-" Last Change: 14 Aug 2011
+" Last Change: 19 Nov 2011
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -71,14 +71,18 @@ Bundle 'kana/vim-metarw'
 Bundle 'kana/vim-metarw-git'
 Bundle 'kana/vim-operator-user'
 Bundle 'kana/vim-operator-replace'
+Bundle 'kana/vim-smartchr'
 Bundle 'kana/vim-submode'
 Bundle 'kana/vim-surround'
 Bundle 'kana/vim-textobj-indent'
 Bundle 'kana/vim-textobj-user'
+Bundle 'Rykka/ColorV'
 Bundle 'Shougo/neocomplcache'
 Bundle 'Shougo/unite.vim'
 Bundle 'Shougo/vimproc'
 Bundle 'Shougo/vimshell'
+Bundle 't9md/vim-quickhl'
+Bundle 't9md/vim-textmanip'
 Bundle 'thinca/vim-qfreplace'
 Bundle 'thinca/vim-quickrun'
 Bundle 'thinca/vim-ref'
@@ -99,6 +103,8 @@ Bundle 'muttator', {'type': 'nosync'}
 Bundle 'vimperator', {'type': 'nosync'}
 Bundle 'vimrcbox', {'type': 'nosync'}
 Bundle 'tmux', {'type': 'nosync'}
+
+Bundle 'qfixhowm', {'type': 'nosync'}
 
 filetype plugin indent on
 
@@ -369,7 +375,6 @@ let g:indent_guides_guide_size = 1
 if &t_Co == 256 || has('gui')
     let g:solarized_contrast = 'high'
     colorscheme solarized
-    " colorscheme lucius
 else
     colorscheme desert
 endif
@@ -464,7 +469,7 @@ CommandMap [Prefix]w update
 
 " allow undo for i_CTRL-u and i_CTRL-w
 " Reference: http://vim-users.jp/2009/10/hack81/
-inoremap <C-u> <C-g>u<C-u>
+inoremap <expr> <C-u> (pumvisible() ? "\<C-e>" : "") . "\<C-g>u\<C-u>"
 inoremap <C-w> <C-g>u<C-w>
 
 " folding
@@ -543,11 +548,13 @@ command! -nargs=0 CtagsR !ctags -R
 
 " alternate grep
 " Reference: http://vim-users.jp/2010/03/hack130/
-command! -complete=file -nargs=+ Grep call s:grep([<f-args>])
+command! -complete=file -nargs=+ Jvgrep call s:grep([<f-args>])
+set grepprg=jvgrep
 function! s:grep(args)
-    execute 'vimgrep' '/'.a:args[-1].'/' join(a:args[:-2])
+    " execute 'vimgrep' '/'.a:args[-1].'/' join(a:args[:-2])
+    execute 'grep' a:args[-1] join(a:args[:-2])
 endfunction
-AlterCommand gr[ep] Grep
+AlterCommand gr[ep] Jvgrep
 
 " expand VimBall
 command! -bang -nargs=? -complete=dir VimBallHere call s:vimBallHere(<bang>0, <f-args>)
@@ -700,6 +707,7 @@ augroup vimrc
     \|  setlocal comments& comments^=s0:*\ -,m0:*\ \ ,ex0:*/
     \|  setlocal commentstring=//%s
     \|  setlocal formatoptions-=t formatoptions+=croql
+    \|  let b:template_used = 1 " avoid using template
 
     " textile
     autocmd BufRead,BufNewFile *.textile setfiletype textile
@@ -757,9 +765,10 @@ augroup vimrc
 augroup END
 
 nmap gA <Plug>(caw:a:comment)
-nmap @ <Plug>(caw:prefix)
-vmap @ <Plug>(caw:prefix)
+nmap _ <Plug>(caw:prefix)
+vmap _ <Plug>(caw:prefix)
 nmap <Plug>(caw:prefix)<Space> <Plug>(caw:i:toggle)
+vmap <Plug>(caw:prefix)<Space> <Plug>(caw:i:toggle)
 
 " neocomplcache
 " Reference: :h neocomplcache
@@ -917,7 +926,7 @@ function! s:ttree_unite_filerec()
         let w = winwidth(winnr()) - g:ttree_width
         execute 'botright' w 'vnew'
     endif
-    call unite#start([["file_rec", path]])
+    call unite#start([["file_rec/async", path]])
 endfunction
 
 " ref
@@ -1039,7 +1048,23 @@ let g:quickrun_config._ = {
 \   'runmode': 'async:vimproc'
 \}
 nmap [Prefix]q <Plug>(quickrun)
+vmap [Prefix]q :QuickRun<CR>
 
+" textmanip
+call submode#enter_with('textmanip', 'v', 'r', '<C-t>h', '<Plug>(textmanip-move-left)')
+call submode#enter_with('textmanip', 'v', 'r', '<C-t>j', '<Plug>(textmanip-move-down)')
+call submode#enter_with('textmanip', 'v', 'r', '<C-t>k', '<Plug>(textmanip-move-up)')
+call submode#enter_with('textmanip', 'v', 'r', '<C-t>l', '<Plug>(textmanip-move-right)')
+call submode#leave_with('textmanip', 'v', '', '<Esc>')
+call submode#map('textmanip', 'v', 'r', 'h', '<Plug>(textmanip-move-left)')
+call submode#map('textmanip', 'v', 'r', 'j', '<Plug>(textmanip-move-down)')
+call submode#map('textmanip', 'v', 'r', 'k', '<Plug>(textmanip-move-up)')
+call submode#map('textmanip', 'v', 'r', 'l', '<Plug>(textmanip-move-right)')
+
+" quickhl
+nmap <Space>m <Plug>(quickhl-toggle)
+vmap <Space>m <Plug>(quickhl-toggle)
+nmap <Space>M <Plug>(quickhl-reset)
 
 " ==================== Loading vimrc ==================== "
 " auto reloading vimrc

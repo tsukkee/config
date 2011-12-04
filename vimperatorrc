@@ -3,7 +3,7 @@ set activate=quickmark,paste
 set complete=sl
 set focuscontent
 set followhints=1
-set toolbars=all,nomenu,noaddons
+set toolbars=all,nomenu
 set hintchars=hjklgfdsa
 set hintinputs+=name
 set hlsearch
@@ -17,7 +17,7 @@ set previouspattern+='前','\bnerwer\b'
 let mapleader=","
 
 " バグ回避
-js setToolbarVisibility(document.getElementById('PersonalToolbar'), true);
+" js setToolbarVisibility(document.getElementById('PersonalToolbar'), true);
 
 " floatbox
 set animations
@@ -35,11 +35,8 @@ set! browser.tabs.loadBookmarksInBackground=true
 set! browser.tabs.loadDivertedInBackground=true
 " allow lots of popups for ldr
 set! dom.popup_maximum=1000
-" show tab preview
-set! browser.allTabs.previews=true
-set! browser.ctrlTab.previews=true
 " change new tab position
-set! browser.tabs.insertRelatedAfterCurrent=false
+" set! browser.tabs.insertRelatedAfterCurrent=false
 " change behaviour on open folder
 set! browser.tabs.loadFolderAndReplace=false
 " use mousewheel acceleration
@@ -65,16 +62,10 @@ nnoremap l 3l
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
 
-nnoremap d <C-d>
-nnoremap D d
-
 " avoid unintended paste
 " only use "gP"
 nnoremap p <Nop>
 nnoremap P <Nop>
-
-" readlater bookmarklet
-nnoremap <silent> <C-r> :readlater<CR>
 
 " toggle Flashblock
 nnoremap <silent> <C-f> :js Flashblock.toggleSiteWhitelisted()<CR>:reload<CR>
@@ -88,16 +79,6 @@ nnoremap <silent> a :toggleautopagerize<CR>
 " dispatch mouse event
 js <<EOM
 (function() {
-function dispatchMouseClickByXPath(xpath) {
-    let elements = util.evaluateXPath(xpath);
-    if(elements.snapshotLength) {
-        buffer.followLink(elements.snapshotItem(0));
-    }
-    else {
-        liberator.echomsg("not found: " + xpath);
-    }
-}
-
 commands.addUserCommand(["toggleautopagerize"],
     "toggle on/off autopagerize",
     function(args)
@@ -108,14 +89,6 @@ commands.addUserCommand(["toggleautopagerize"],
         d.dispatchEvent(ev);
         liberator.echomsg('toggle');
     });
-
-commands.addUserCommand(["offwordhighlight"],
-    "off wordhighlight",
-    function(args)
-    {
-        dispatchMouseClickByXPath('id("wordhighlight_words")//*[@value="off"]');
-    });
-})();
 EOM
 
 
@@ -152,9 +125,6 @@ EOM
 " Lazy
 command! -nargs=+ lazy autocmd VimperatorEnter .* <args>
 
-" move status-bar
-lazy js document.getElementById("liberator-status-toolbar").appendChild(document.getElementById("status-bar"))
-
 " migemo hint
 set hintmatching=custom
 js <<EOM
@@ -177,8 +147,6 @@ lazy fmaps -u='(fastladder|reader\.livedoor)\.com/reader' s a r c j k f,j F,k <S
 lazy fmaps -u='mail\.google\.com/mail' u k j o <CR> p n c ? x s y e m ! # h
 lazy fmaps -u='www\.tumblr\.com/dashboard' -events=vkeydown j k
 lazy fmaps -u='www\.google\.(com|co\.jp)/reader/' -events=vkeypress j k <Space> <S-Space> X O N P s,NO a,PO S,s v r F,f f,j F,k ? /
-lazy fmaps -u='twitter\.com' ? j k
-lazy fmaps -u='twitter\.com' -events=vkeydown F,f R,r T,t m n <CR> <Space> / . gh gr gp gf gm gu
 
 " stella
 js <<EOM
@@ -190,7 +158,7 @@ addLocalMappings(
     ['M',     ':stmute',          ],
     ['C',     ':stcomment',       ],
     ['zz',    ':stlarge',         ],
-    ['R',     ':strepeat',        ],
+//    ['R',     ':strepeat',        ],
     ['[',     ':stvolume! -10',   ],
     [']',     ':stvolume! 10',    ],
     [',',     ':stseek! -10',     ],
@@ -206,9 +174,6 @@ addLocalMappings(
   ]
 );
 EOM
-
-" spatial navigation
-let spatial_navigation_mappings='<C-h> <C-j> <C-k> <C-l>'
 
 " emblur
 js <<EOM
@@ -227,15 +192,6 @@ let(c = document.getElementById('content')){
   for each(let type in ['focus', 'keydown', 'keyup'])
     c.addEventListener(type, emblur, type === 'focus');
 }
-EOM
-
-
-" ==================== refcontrol ==================== "
-let g:refcontrol_enabled = "true"
-javascript <<EOM
-liberator.globalVariables.refcontrol = {
-    '@DEFAULT'   : ''
-};
 EOM
 
 

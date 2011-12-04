@@ -5,7 +5,7 @@ __CF_USER_TEXT_ENCODING='0x1F5:0x08000100:14'; export __CF_USER_TEXT_ENCODING;
 # Path
 PATH="/usr/bin:/usr/sbin:/bin:/sbin"
 MANPATH="/usr/local/man:/usr/share/man"
-test -d /usr/local && PATH=/usr/local/bin:/usr/local/sbin:$PATH &&
+test -d /usr/local && PATH=/usr/local/bin:/usr/local/sbin:/usr/local/go/bin:$PATH &&
                       MANPATH=/usr/local/share/man:$MANPATH
 test -d /usr/X11   && PATH=$PATH:/usr/X11/bin &&
                       MANPATH=$MANPATH:/usr/X11/man:/usr/X11/share/man

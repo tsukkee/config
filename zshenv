@@ -13,6 +13,7 @@ test -d /opt       && PATH=/opt/local/bin:/opt/local/sbin:$PATH &&
                       MANPATH=/opt/local/share/man:/opt/local/man:$MANPATH
 test -d /usr/local && PATH=/usr/local/bin:/usr/local/sbin:$PATH &&
                       MANPATH=/usr/local/share/man:/usr/local/man:$MANPATH
+test -d $HOME/go && PATH=$HOME/go/bin:$PATH
 test -d /Developer/SDKs/Flex2 && PATH=/Developer/SDKs/Flex2/bin:$PATH
 export PATH MANPATH
 
@@ -24,8 +25,11 @@ if [ -d /opt ]; then
     export LIBRARY_PATH=/opt/local/lib:$LIBRARY_PATH
     export DYLD_FALLBACK_LIBRARY_PATH=.:/opt/local/lib:$DYLD_FALLBACK_LIBRARY_PATH
 fi
-# test -d $HOME/.cabal && LIBRARY_PATH=$HOME/.cabal/lib:$LIBRARY_PATH &&
-#                         LD_LIBRARY_PATH=$HOME/.cabal/lib:$LD_LIBRARY_PATH
+
+test -d /Library/Haskell && LIBRARY_PATH=/Library/Haskell/current/lib:$LIBRARY_PATH &&
+                            LD_LIBRARY_PATH=/Library/Haskell/current/lib:$LD_LIBRARY_PATH
+test -d $HOME/.cabal     && LIBRARY_PATH=$HOME/.cabal/lib:$LIBRARY_PATH &&
+                            LD_LIBRARY_PATH=$HOME/.cabal/lib:$LD_LIBRARY_PATH
 
 # Editor
 if test -x /opt/local/bin/vim; then
