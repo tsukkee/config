@@ -1,4 +1,4 @@
-" Last Change: 08 Apr 2012
+" Last Change: 11 Apr 2012
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -60,7 +60,9 @@ NeoBundle 'SudoEdit.vim'
 NeoBundle 'Textile-for-VIM'
 
 NeoBundle 'altercation/vim-colors-solarized'
+NeoBundle 'davidoc/taskpaper.vim'
 NeoBundle 'h1mesuke/vim-alignta'
+NeoBundle 'h1mesuke/textobj-wiw'
 NeoBundle 'kana/vim-altercmd'
 NeoBundle 'kana/vim-arpeggio'
 NeoBundle 'kana/vim-fakeclip'
