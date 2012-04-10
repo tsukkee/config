@@ -1,4 +1,4 @@
-" Last Change: 19 Nov 2011
+" Last Change: 08 Apr 2012
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -42,69 +42,65 @@ function! s:dirname(path)
 endfunction
 
 
-" ==================== Vundle ==================== "
-filetype off
+" ==================== Neobundle ==================== "
+filetype plugin indent off
 
-set runtimepath&
-let &runtimepath = &runtimepath . ',' . s:runtimepath . '/bundle/vundle'
-call vundle#rc()
+if has('vim_starting')
+    let &runtimepath = &runtimepath . ',' . s:runtimepath . '/bundle/neobundle.vim'
+    call neobundle#rc(expand(s:runtimepath . '/bundle'))
+endif
 
-Bundle 'errormarker.vim'
-Bundle 'Indent-Guides'
-Bundle 'Javascript-Indentation'
-Bundle 'JavaScript-syntax'
-Bundle 'Lucius'
-Bundle 'Markdown'
-Bundle 'matchit.zip'
-Bundle 'SudoEdit.vim'
-Bundle 'Textile-for-VIM'
-Bundle 'xoria256.vim'
-Bundle 'ZenCoding.vim'
+NeoBundle 'errormarker.vim'
+NeoBundle 'Indent-Guides'
+NeoBundle 'Javascript-Indentation'
+NeoBundle 'JavaScript-syntax'
+NeoBundle 'Markdown'
+NeoBundle 'matchit.zip'
+NeoBundle 'SudoEdit.vim'
+NeoBundle 'Textile-for-VIM'
 
-" Bundle 'gmarik/vundle'
-Bundle 'altercation/vim-colors-solarized'
-Bundle 'h1mesuke/vim-alignta'
-Bundle 'kana/vim-altercmd'
-Bundle 'kana/vim-arpeggio'
-Bundle 'kana/vim-fakeclip'
-Bundle 'kana/vim-metarw'
-Bundle 'kana/vim-metarw-git'
-Bundle 'kana/vim-operator-user'
-Bundle 'kana/vim-operator-replace'
-Bundle 'kana/vim-smartchr'
-Bundle 'kana/vim-submode'
-Bundle 'kana/vim-surround'
-Bundle 'kana/vim-textobj-indent'
-Bundle 'kana/vim-textobj-user'
-Bundle 'Rykka/ColorV'
-Bundle 'Shougo/neocomplcache'
-Bundle 'Shougo/unite.vim'
-Bundle 'Shougo/vimproc'
-Bundle 'Shougo/vimshell'
-Bundle 't9md/vim-quickhl'
-Bundle 't9md/vim-textmanip'
-Bundle 'thinca/vim-qfreplace'
-Bundle 'thinca/vim-quickrun'
-Bundle 'thinca/vim-ref'
-Bundle 'tpope/vim-haml'
-Bundle 'git@github.com:tsukkee/lingr-vim.git'
-Bundle 'git@github.com:tsukkee/ttree.vim.git'
-Bundle 'git@github.com:tsukkee/vundle.git'
-Bundle 'git@github.com:tsukkee/unite-help.git'
-Bundle 'git@github.com:tsukkee/unite-tag.git'
-Bundle 'tyru/caw.vim'
-Bundle 'ujihisa/unite-colorscheme'
-Bundle 'git://gist.github.com/99234.git', {'name': 'textobj-comment'}
+NeoBundle 'altercation/vim-colors-solarized'
+NeoBundle 'h1mesuke/vim-alignta'
+NeoBundle 'kana/vim-altercmd'
+NeoBundle 'kana/vim-arpeggio'
+NeoBundle 'kana/vim-fakeclip'
+NeoBundle 'kana/vim-operator-user'
+NeoBundle 'kana/vim-operator-replace'
+NeoBundle 'kana/vim-smartchr'
+NeoBundle 'kana/vim-submode'
+NeoBundle 'kana/vim-surround'
+NeoBundle 'kana/vim-textobj-indent'
+NeoBundle 'kana/vim-textobj-user'
+NeoBundle 'Lokaltog/vim-powerline'
+NeoBundle 'Rykka/ColorV'
+NeoBundle 'Shougo/neobundle.vim'
+NeoBundle 'Shougo/neocomplcache'
+NeoBundle 'Shougo/unite.vim'
+NeoBundle 'Shougo/vimproc'
+NeoBundle 'Shougo/vimshell'
+NeoBundle 't9md/vim-quickhl'
+NeoBundle 't9md/vim-textmanip'
+NeoBundle 'thinca/vim-qfreplace'
+NeoBundle 'thinca/vim-quickrun'
+NeoBundle 'thinca/vim-ref'
+NeoBundle 'tpope/vim-haml'
+NeoBundle 'git@github.com:tsukkee/lingr-vim.git'
+NeoBundle 'git@github.com:tsukkee/ttree.vim.git'
+NeoBundle 'git@github.com:tsukkee/unite-help.git'
+NeoBundle 'git@github.com:tsukkee/unite-tag.git'
+NeoBundle 'tyru/caw.vim'
+NeoBundle 'ujihisa/unite-colorscheme'
+NeoBundle 'git://gist.github.com/99234.git', {'name': 'textobj-comment'}
 
-Bundle 'http://svn.macports.org/repository/macports/contrib/mpvim/'
-Bundle 'http://lampsvn.epfl.ch/svn-repos/scala/scala-tool-support/trunk/src/vim', {'name': 'scala'}
+NeoBundle 'http://svn.macports.org/repository/macports/contrib/mpvim/'
+NeoBundle 'http://lampsvn.epfl.ch/svn-repos/scala/scala-tool-support/trunk/src/vim', {'name': 'scala'}
 
-Bundle 'muttator', {'type': 'nosync'}
-Bundle 'vimperator', {'type': 'nosync'}
-Bundle 'vimrcbox', {'type': 'nosync'}
-Bundle 'tmux', {'type': 'nosync'}
+NeoBundle 'muttator', {'type': 'nosync'}
+NeoBundle 'vimperator', {'type': 'nosync'}
+NeoBundle 'vimrcbox', {'type': 'nosync'}
+NeoBundle 'tmux', {'type': 'nosync'}
 
-Bundle 'qfixhowm', {'type': 'nosync'}
+NeoBundle 'qfixhowm', {'type': 'nosync'}
 
 filetype plugin indent on
 
@@ -332,22 +328,7 @@ function! s:onColorScheme()
         return
     endif
 
-    if g:colors_name == 'lucius'
-        " based on SpecialKey
-        highlight ZenkakuSpace ctermbg=239 guibg=#405060
-        " based on ErrorMsg
-        highlight User1 ctermbg=237 ctermfg=196 cterm=bold
-        \               guibg=#363946 guifg=#e5786d gui=bold
-        " based on ModeMsg
-        highlight User2 ctermbg=237 ctermfg=117 cterm=bold
-        \               guibg=#363946 guifg=#76d5f8 gui=bold
-        " lighter Comment
-        highlight Comment ctermfg=244 guifg=#808080
-
-        " indent guids
-        highlight IndentGuidesOdd ctermbg=235
-        highlight IndentGuidesEven ctermbg=236
-    elseif g:colors_name == 'solarized'
+    if g:colors_name == 'solarized'
         " based on SpecialKey
         highlight ZenkakuSpace ctermbg=12 guibg=#839496
         " based on ErrorMsg
@@ -414,14 +395,6 @@ noremap [Operator] <Nop>
 map , [Operator]
 
 " mapping command
-command! -nargs=+ NExchangeMap call s:exchangeMap('n', <f-args>)
-command! -nargs=+ CExchangeMap call s:exchangeMap('c', <f-args>)
-command! -nargs=+ VExchangeMap call s:exchangeMap('v', <f-args>)
-function! s:exchangeMap(mode, a, b)
-    execute a:mode . 'noremap' a:a a:b
-    execute a:mode . 'noremap' a:b a:a
-endfunction
-
 command! -bang -nargs=+ CommandMap call s:commandMap('nnoremap', <bang>0, <f-args>)
 command! -bang -nargs=+ ArpeggioCommandMap call s:commandMap('Arpeggionnoremap', <bang>0, <f-args>)
 function! s:commandMap(command, buffer, lhs, ...)
@@ -430,31 +403,29 @@ function! s:commandMap(command, buffer, lhs, ...)
     execute a:command '<silent>' buffer a:lhs ':<C-u>' . rhs . '<CR>'
 endfunction
 
-command! -nargs=+ PopupMap call s:popupMap(<f-args>)
-function! s:popupMap(lhs, ...)
-    let rhs = join(a:000, ' ')
-    execute 'inoremap <silent> <expr>' a:lhs 'pumvisible() ?' rhs ': "' . a:lhs . '"'
-endfunction
-
 " use physical cursor movement
-" NExchangeMap j gj
 nnoremap <Plug>(arpeggio-default:j) gj
 nnoremap gj j
-" VExchangeMap j gj
 vnoremap <Plug>(arpeggio-default:j) gj
 vnoremap gj j
-" NExchangeMap k gk
 nnoremap <Plug>(arpeggio-default:k) gk
 nnoremap gk k
-VExchangeMap gk k
-NExchangeMap $ g$
-VExchangeMap $ g$
-NExchangeMap 0 g0
-VExchangeMap 0 g0
+vnoremap gk k
+vnoremap k gk
+nnoremap $ g$
+nnoremap g$ $
+vnoremap $ g$
+vnoremap g$ $
+nnoremap 0 g0
+nnoremap g0 0
+vnoremap 0 g0
+vnoremap g0 0
 
 " use beginning matches on command-line history
-CExchangeMap <C-p> <Up>
-CExchangeMap <C-n> <Down>
+cnoremap <C-p> <Up>
+cnoremap <Up> <C-p>
+cnoremap <C-n> <Down>
+cnoremap <Down> <C-n>
 
 " cmdwin
 set cmdwinheight=3
@@ -502,6 +473,12 @@ endif
 nnoremap L gt
 nnoremap H gT
 
+" move among window
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+nnoremap <C-h> <C-w>h
+
 " window resizing with submode
 call submode#enter_with('winsize', 'n', '', '<C-w>>', '<C-w>>')
 call submode#enter_with('winsize', 'n', '', '<C-w><', '<C-w><')
@@ -519,6 +496,7 @@ if s:is_mac
 endif
 
 " binary editing (See: :h xxd)
+" TODO: use vinarize
 " Reference: http://vim-users.jp/2010/03/hack133/
 augroup vimrc
     autocmd BufReadPost,BufNewFile *.bin,*.exe,*.dll,*.swf setlocal filetype=xxd
@@ -548,13 +526,14 @@ command! -nargs=0 CtagsR !ctags -R
 
 " alternate grep
 " Reference: http://vim-users.jp/2010/03/hack130/
-command! -complete=file -nargs=+ Jvgrep call s:grep([<f-args>])
 set grepprg=jvgrep
-function! s:grep(args)
-    " execute 'vimgrep' '/'.a:args[-1].'/' join(a:args[:-2])
-    execute 'grep' a:args[-1] join(a:args[:-2])
+command! -complete=file -nargs=+ Jvgrep call s:grep('grep', [<f-args>])
+command! -complete=file -nargs=+ Vimgrep call s:grep('vimgrep', [<f-args>])
+function! s:grep(cmd, args)
+    execute a:cmd a:args[-1] join(a:args[:-2])
 endfunction
-AlterCommand gr[ep] Jvgrep
+" AlterCommand gr[ep] Jvgrep
+AlterCommand gr[ep] Vimgrep
 
 " expand VimBall
 command! -bang -nargs=? -complete=dir VimBallHere call s:vimBallHere(<bang>0, <f-args>)
@@ -649,23 +628,6 @@ endfunction
 " suicide
 command! Suicide call system('kill -KILL ' . getpid())
 
-" undo close tab ?
-" how can I detect tab closing ??
-let s:tabcount = 0
-let g:tabclose_histries = []
-augroup vimrc
-    autocmd VimEnter,TabEnter * let s:tabcount = tabpagenr('$')
-    " autocmd WinEnter * echomsg 'enter:count' tabpagenr('$')
-    autocmd TabLeave * if s:tabcount > tabpagenr('$') | echomsg 'tabclose' | endif
-    " autocmd TabLeave * echomsg 'leave:count' tabpagenr('$')
-augroup END
-
-" count
-function! Count()
-    echo 'Current line: ' len(substitute(getline('.'), '.', '.', 'g')) 'chars'
-endfunction
-nnoremap <CR> :<C-u>call Count()<CR><CR>
-
 " ==================== Plugins settings ==================== "
 " FileType
 let g:python_highlight_all = 1
@@ -745,13 +707,6 @@ nmap S  <Plug>YSurround
 nmap ss <Plug>Yssurround
 nmap Ss <Plug>YSsurround
 nmap SS <Plug>YSsurround
-
-" vimproc
-" if s:is_mac
-"     let g:vimproc_dll_path = s:runtimepath . '/bundle/vimproc/autoload/proc_mac.so'
-" elseif has('unix')
-"     let g:vimproc_dll_path = s:runtimepath . '/bundle/vimproc/autoload/proc_gcc.so'
-" endif
 
 " operator-replace
 map [Operator]r <Plug>(operator-replace)
@@ -942,7 +897,7 @@ endif
 let g:ref_alc_use_cache = 1
 let g:ref_alc_start_linenumber = 43
 
-nnoremap <C-k> :<C-u>execute 'Ref alc' expand('<cword>')<CR>
+" nnoremap <C-k> :<C-u>execute 'Ref alc' expand('<cword>')<CR>
 
 " lingr.vim
 if s:is_mac
@@ -964,12 +919,6 @@ if s:is_mac
     augroup END
 endif
 let g:lingr_vim_time_format = "%Y/%m/%d %H:%M:%S"
-
-" zencoding
-let g:user_zen_settings = {
-\    'indentation': repeat(' ', &tabstop),
-\    'lang': 'ja'
-\}
 
 " reload Firefox
 " needs MozRepl and +ruby
@@ -1032,13 +981,6 @@ let g:html_use_css = 1
 let g:use_xhtml = 1
 let g:html_use_encoding = 'utf-8'
 
-" metarw
-call metarw#define_wrapper_commands(1)
-AlterCommand e[dit] Edit
-AlterCommand r[ead] Read
-AlterCommand w[rite] Write
-AlterCommand so[urce] Source
-
 " quickrun
 let g:quickrun_no_default_key_mappings = 1
 if !exists('g:quickrun_config')
@@ -1065,6 +1007,9 @@ call submode#map('textmanip', 'v', 'r', 'l', '<Plug>(textmanip-move-right)')
 nmap <Space>m <Plug>(quickhl-toggle)
 vmap <Space>m <Plug>(quickhl-toggle)
 nmap <Space>M <Plug>(quickhl-reset)
+
+" powerline
+let g:Powerline_symbols = 'fancy'
 
 " ==================== Loading vimrc ==================== "
 " auto reloading vimrc
