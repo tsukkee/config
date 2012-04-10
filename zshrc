@@ -11,7 +11,7 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 zstyle ':completion:*:sudo:*' command-path /opt/local/bin /opt/local/sbin \
     /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin
 # completer for auto-fu
-zstyle ':completion:*' completer _oldlist _complete
+# zstyle ':completion:*' completer _oldlist _complete
 
 # color
 autoload -U colors
@@ -131,7 +131,7 @@ function _vi_rprompt {
     zle reset-prompt
 }
 function zle-line-init {
-    auto-fu-init
+    # auto-fu-init
     _vi_rprompt
 }
 function zle-keymap-select {
@@ -173,16 +173,16 @@ alias -g SU="| iconv -f sjis -t utf-8"
 # ==================== Ohters ==================== "
 # auto-fu
 # source $HOME/.zsh.d/auto-fu.zsh/auto-fu.zsh
-{ . ~/.zsh.d/auto-fu; auto-fu-install; }
-zstyle ':auto-fu:highlight' input bold
-zstyle ':auto-fu:highlight' completion fg=black,bold
-zstyle ':auto-fu:highlight' completion/one fg=white,bold,underline
-zstyle ':auto-fu:var' postdisplay $'\n-azfu-'
-bindkey -M afu "^P" history-beginning-search-backward-end
-bindkey -M afu "^N" history-beginning-search-forward-end
-bindkey -M afu "^]" insert-last-word
-bindkey -M afu "^[s" _quote-previous-word-in-single
-bindkey -M afu "^[d" _quote-previous-word-in-double
+# { . ~/.zsh.d/auto-fu; auto-fu-install; }
+# zstyle ':auto-fu:highlight' input bold
+# zstyle ':auto-fu:highlight' completion fg=black,bold
+# zstyle ':auto-fu:highlight' completion/one fg=white,bold,underline
+# zstyle ':auto-fu:var' postdisplay $'\n-azfu-'
+# bindkey -M afu "^P" history-beginning-search-backward-end
+# bindkey -M afu "^N" history-beginning-search-forward-end
+# bindkey -M afu "^]" insert-last-word
+# bindkey -M afu "^[s" _quote-previous-word-in-single
+# bindkey -M afu "^[d" _quote-previous-word-in-double
 
 # cdd
 # source $HOME/.zsh.d/cdd.sh
