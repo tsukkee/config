@@ -10,6 +10,7 @@ set hlsearch
 set showstatuslinks=2
 set status-=location
 set smartcase
+set toolbars=noaddons,nobookmarks,nomenu,navigation,tabs
 
 set nextpattern+='次','\bolder\b'
 set previouspattern+='前','\bnerwer\b'
@@ -57,6 +58,10 @@ nnoremap j 5j
 nnoremap k 5k
 nnoremap h 3h
 nnoremap l 3l
+
+" don't use <C-j>
+nnoremap <C-j> <Nop>
+cnoremap <C-j> <Nop>
 
 " Use beginning matches on command-line history
 cnoremap <C-p> <Up>
