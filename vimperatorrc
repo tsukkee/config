@@ -10,7 +10,7 @@ set hlsearch
 set showstatuslinks=2
 set status-=location
 set smartcase
-set toolbars=noaddons,nobookmarks,nomenu,navigation,tabs
+set toolbars=noaddons,bookmarks,nomenu,navigation,tabs
 
 set nextpattern+='次','\bolder\b'
 set previouspattern+='前','\bnerwer\b'
@@ -131,13 +131,13 @@ EOM
 command! -nargs=+ lazy autocmd VimperatorEnter .* <args>
 
 " migemo hint
-set hintmatching=custom
-js <<EOM
-liberator.plugins.customHintMatcher = function(inputString){
-    let r = migemo.getRegExp(inputString);
-    return function(hintString) r.test(hintString);
-};
-EOM
+" set hintmatching=custom
+" js <<EOM
+" liberator.plugins.customHintMatcher = function(inputString){
+"     let r = migemo.getRegExp(inputString);
+"     return function(hintString) r.test(hintString);
+" };
+" EOM
 
 " commandBookmarklet
 let command_bookmarklet_prefix=""
@@ -181,23 +181,23 @@ addLocalMappings(
 EOM
 
 " emblur
-js <<EOM
-function emblur(e){
-  switch(e.type){
-    case 'keydown': case 'keyup':
-    return emblur.off = e.shiftKey || e.ctrlKey;
-  }
-  if(emblur.off || emblur.ignore.test(e.target.tagName)) return;
-  clearTimeout(emblur.tim);
-  emblur.tim = setTimeout(
-    function _emblur(lm) lm && lm.blur(), 500, e.target);
-}
-emblur.ignore = /^(?!embed$|object$)/i;
-let(c = document.getElementById('content')){
-  for each(let type in ['focus', 'keydown', 'keyup'])
-    c.addEventListener(type, emblur, type === 'focus');
-}
-EOM
+" js <<EOM
+" function emblur(e){
+"   switch(e.type){
+"     case 'keydown': case 'keyup':
+"     return emblur.off = e.shiftKey || e.ctrlKey;
+"   }
+"   if(emblur.off || emblur.ignore.test(e.target.tagName)) return;
+"   clearTimeout(emblur.tim);
+"   emblur.tim = setTimeout(
+"     function _emblur(lm) lm && lm.blur(), 500, e.target);
+" }
+" emblur.ignore = /^(?!embed$|object$)/i;
+" let(c = document.getElementById('content')){
+"   for each(let type in ['focus', 'keydown', 'keyup'])
+"     c.addEventListener(type, emblur, type === 'focus');
+" }
+" EOM
 
 
 " ==================== colorscheme ==================== "

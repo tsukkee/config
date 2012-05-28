@@ -1,4 +1,4 @@
-" Last Change: 11 Apr 2012
+" Last Change: 27 May 2012
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -50,7 +50,7 @@ if has('vim_starting')
     call neobundle#rc(expand(s:runtimepath . '/bundle'))
 endif
 
-NeoBundle 'errormarker.vim'
+NeoBundleLazy 'errormarker.vim'
 NeoBundle 'Indent-Guides'
 NeoBundle 'Javascript-Indentation'
 NeoBundle 'JavaScript-syntax'
@@ -73,18 +73,20 @@ NeoBundle 'kana/vim-submode'
 NeoBundle 'kana/vim-surround'
 NeoBundle 'kana/vim-textobj-indent'
 NeoBundle 'kana/vim-textobj-user'
+NeoBundleLazy 'kien/ctrlp.vim'
 NeoBundle 'Lokaltog/vim-powerline'
-NeoBundle 'Rykka/ColorV'
+NeoBundleLazy 'Rykka/ColorV'
 NeoBundle 'Shougo/neobundle.vim'
 NeoBundle 'Shougo/neocomplcache'
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'Shougo/vimproc'
-NeoBundle 'Shougo/vimshell'
+NeoBundleLazy 'Shougo/vimshell'
 NeoBundle 't9md/vim-quickhl'
 NeoBundle 't9md/vim-textmanip'
 NeoBundle 'thinca/vim-qfreplace'
 NeoBundle 'thinca/vim-quickrun'
 NeoBundle 'thinca/vim-ref'
+NeoBundleLazy 'thinca/vim-showtime'
 NeoBundle 'tpope/vim-haml'
 NeoBundle 'git@github.com:tsukkee/lingr-vim.git'
 NeoBundle 'git@github.com:tsukkee/ttree.vim.git'
@@ -94,15 +96,13 @@ NeoBundle 'tyru/caw.vim'
 NeoBundle 'ujihisa/unite-colorscheme'
 NeoBundle 'git://gist.github.com/99234.git', {'name': 'textobj-comment'}
 
-NeoBundle 'http://svn.macports.org/repository/macports/contrib/mpvim/'
-NeoBundle 'http://lampsvn.epfl.ch/svn-repos/scala/scala-tool-support/trunk/src/vim', {'name': 'scala'}
+NeoBundle 'http://svn.macports.org/repository/macports/contrib/mpvim/', {'type': 'svn'}
+NeoBundle 'http://lampsvn.epfl.ch/svn-repos/scala/scala-tool-support/trunk/src/vim', {'directory': 'scala', 'type': 'svn'}
 
 NeoBundle 'muttator', {'type': 'nosync'}
 NeoBundle 'vimperator', {'type': 'nosync'}
 NeoBundle 'vimrcbox', {'type': 'nosync'}
 NeoBundle 'tmux', {'type': 'nosync'}
-
-NeoBundle 'qfixhowm', {'type': 'nosync'}
 
 filetype plugin indent on
 
@@ -480,6 +480,7 @@ nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 nnoremap <C-h> <C-w>h
+nnoremap <BS>  <C-w>h
 
 " window resizing with submode
 call submode#enter_with('winsize', 'n', '', '<C-w>>', '<C-w>>')
@@ -985,11 +986,10 @@ let g:html_use_encoding = 'utf-8'
 
 " quickrun
 let g:quickrun_no_default_key_mappings = 1
-if !exists('g:quickrun_config')
-    let g:quickrun_config = {}
-endif
-let g:quickrun_config._ = {
-\   'runmode': 'async:vimproc'
+let g:quickrun_config = {
+\   '_': {
+\       'runner': 'python'
+\   }
 \}
 nmap [Prefix]q <Plug>(quickrun)
 vmap [Prefix]q :QuickRun<CR>
@@ -1012,6 +1012,12 @@ nmap <Space>M <Plug>(quickhl-reset)
 
 " powerline
 let g:Powerline_symbols = 'fancy'
+
+" taskpaper
+
+
+" textobj-wiw
+
 
 " ==================== Loading vimrc ==================== "
 " auto reloading vimrc
