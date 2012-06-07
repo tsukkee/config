@@ -1,4 +1,4 @@
-" Last Change: 13 Jan 2011
+" Last Change: 01 Jun 2012
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -67,8 +67,8 @@ endif
 " GVim(Windows)
 if has('win32')
     if has('vim_starting')
-        set columns=138
-        set lines=42
+        set columns=100
+        set lines=32
     endif
     set linespace=1
 
@@ -76,7 +76,8 @@ if has('win32')
     " and before 'transparency'
     gui
 
-    set guifont=Consolas:h13
+    set guifont=Inconsolata-dz_for_Powerline:h11:cANSI
+    " set guifont=Consolas:h13
     set guifontwide=TakaoGothic
 
     if has('kaoriya')

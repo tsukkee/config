@@ -12,3 +12,14 @@
 --regex-tex=/\\chapter[ \t]*\*?\{[ \t]*([^}]*)\}/\1/c,chapter/
 --regex-tex=/\\label[ \t]*\*?\{[ \t]*([^}]*)\}/\1/l,label/
 --regex-tex=/\\ref[ \t]*\*?\{[ \t]*([^}]*)\}/\1/r,ref/
+
+--langdef=actionscript
+--langmap=actionscript:.as
+--regex-actionscript=/^[ \t]*[(protected|private|public|static)( \t)]*package[ \t]*([A-Za-z0-9_.]+)[ \t]*/\1/p,package/
+--regex-actionscript=/^[ \t]*[(protected|private| public|static) ( \t)]*function[ \t]+([A-Za-z0-9_]+)[ \t]*\(/\1/f, function, functions/
+--regex-actionscript=/^[ \t]*[(public) ( \t)]*function[ \t]+(set|get) [ \t]+([A-Za-z0-9_]+)[ \t]*\(/\1 \2/p,property, properties/
+--regex-actionscript=/^[ \t]*[(protected|private| public|static) ( \t)]*var[ \t]+([A-Za-z0-9_]+)[ \t]*/\1/v,variable, variables/
+--regex-actionscript=/^[ \t][(protected|private| public|static) ( \t)]*class[ \t]+([A-Za-z0-9_]+)[ \t]*/\1/c,class, classes/
+--regex-actionscript=/^[ \t]*[(protected|private|public|static|dynamic|final|internal)( \t)]*interface[ \t]+([A-Za-z0-9_]+)[ \t]*([^\{]*)/\1/i,interface,interfaces/
+--regex-actionscript=/\/\/[ \t]*(NOTE|note|Note)[ \t]*\:*(.*)/\2/i,{Notes}/
+--regex-actionscript=/\/\/[ \t]*(TODO|todo|ToDo|Todo)[ \t]*\:*(.*)/\2/i,{To do}/

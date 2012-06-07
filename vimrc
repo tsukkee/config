@@ -1,4 +1,4 @@
-" Last Change: 27 May 2012
+" Last Change: 07 Jun 2012
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -49,6 +49,9 @@ if has('vim_starting')
     let &runtimepath = &runtimepath . ',' . s:runtimepath . '/bundle/neobundle.vim'
     call neobundle#rc(expand(s:runtimepath . '/bundle'))
 endif
+if has('win32')
+    let g:neobundle_default_git_protocol = 'https'
+endif
 
 NeoBundleLazy 'errormarker.vim'
 NeoBundle 'Indent-Guides'
@@ -59,8 +62,10 @@ NeoBundle 'matchit.zip'
 NeoBundle 'SudoEdit.vim'
 NeoBundle 'Textile-for-VIM'
 
+NeoBundle 'airblade/vim-rooter'
 NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'davidoc/taskpaper.vim'
+NeoBundle 'endel/flashdevelop.vim'
 NeoBundle 'h1mesuke/vim-alignta'
 NeoBundle 'h1mesuke/textobj-wiw'
 NeoBundle 'kana/vim-altercmd'
@@ -81,12 +86,15 @@ NeoBundle 'Shougo/neocomplcache'
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'Shougo/vimproc'
 NeoBundleLazy 'Shougo/vimshell'
+NeoBundle 'Shougo/vinarise'
 NeoBundle 't9md/vim-quickhl'
 NeoBundle 't9md/vim-textmanip'
+NeoBundle 'thinca/vim-prettyprint'
 NeoBundle 'thinca/vim-qfreplace'
 NeoBundle 'thinca/vim-quickrun'
 NeoBundle 'thinca/vim-ref'
 NeoBundleLazy 'thinca/vim-showtime'
+NeoBundle 'tomtom/tlib_vim'
 NeoBundle 'tpope/vim-haml'
 NeoBundle 'git@github.com:tsukkee/lingr-vim.git'
 NeoBundle 'git@github.com:tsukkee/ttree.vim.git'
@@ -103,9 +111,9 @@ NeoBundle 'muttator', {'type': 'nosync'}
 NeoBundle 'vimperator', {'type': 'nosync'}
 NeoBundle 'vimrcbox', {'type': 'nosync'}
 NeoBundle 'tmux', {'type': 'nosync'}
+NeoBundle 'jpformat', {'type': 'nosync'}
 
 filetype plugin indent on
-
 
 " ==================== Settings ==================== "
 " tab
@@ -116,7 +124,8 @@ set history=100
 
 " input support
 set backspace=indent,eol,start
-set formatoptions+=m " add multibyte support
+set formatoptions+=mM " add multibyte support
+set formatexpr=jpvim#formatexpr()
 set nolinebreak
 set iminsert=0
 set imsearch=0
@@ -156,7 +165,7 @@ set ambiwidth=double
 " title
 " Reference: http://vim.wikia.com/wiki/Automatically_set_screen_title
 set title
-set titlelen=15
+set titlelen=100
 autocmd vimrc BufEnter * let &titlestring = '%{' . s:SID_PREFIX() . 'titlestring()}'
 autocmd vimrc User plugin-lingr-unread let &titlestring = '%{' . s:SID_PREFIX() . 'titlestring()}'
 if exists('$TMUX') || exists('$WINDOW')
@@ -234,7 +243,7 @@ augroup END
 " use set encoding=utf-8 in Windows
 " needs ja.po with utf-8 encoding as $VIMRUNTIME/lang/ja_JP.UTF-8/LC_MESSAGES/vim.mo
 " Reference: http://d.hatena.ne.jp/thinca/20090111/1231684962
-if s:is_win && has('gui')
+if s:is_win && has('gui_running')
     language messages ja_JP.UTF-8
     set encoding=utf-8
     set termencoding=cp932 " mainly for ref-phpmanual
@@ -356,12 +365,12 @@ let g:indent_guides_guide_size = 1
 
 " colorscheme
 if &t_Co == 256 || has('gui')
-    let g:solarized_contrast = 'high'
+    let g:solarized_contrast = 'low'
+    set background=light
     colorscheme solarized
 else
     colorscheme desert
 endif
-
 
 " ==================== Keybind and commands ==================== "
 " Use AlterCommand and Arpeggio
@@ -502,7 +511,7 @@ endif
 " TODO: use vinarize
 " Reference: http://vim-users.jp/2010/03/hack133/
 augroup vimrc
-    autocmd BufReadPost,BufNewFile *.bin,*.exe,*.dll,*.swf setlocal filetype=xxd
+    autocmd BufReadPost,BufNewFile *.bin,*.exe,*.dll,*.swf,*.bmp setlocal filetype=xxd
     autocmd BufReadPost * if &l:binary | setlocal filetype=xxd | endif
 augroup END
 
@@ -1014,10 +1023,39 @@ nmap <Space>M <Plug>(quickhl-reset)
 let g:Powerline_symbols = 'fancy'
 
 " taskpaper
+autocmd vimrc FileType taskpaper call s:taskpaper_mapping()
 
+function! s:raise_to_project()
+    call setline('.', substitute(getline('.'), '\(^\s*\)- \(.\+\)$', '\1\2:', ''))
+endfunction
+
+function! s:taskpaper_mapping()
+    nnoremap <buffer> [TaskPaper] <Nop>
+    nmap <buffer> @ [TaskPaper]
+
+    map <buffer> [TaskPaper]d <Plug>TaskPaperToggleDone
+    map <buffer> [TaskPaper]c <Plug>TaskPaperToggleCancelled
+    map <buffer> [TaskPaper]a <Plug>TaskPaperShowAll
+    map <buffer> [TaskPaper]f <Plug>TaskPaperFoldProjects
+    map <buffer> [TaskPaper]A <Plug>TaskPaperArchiveDone
+    map <buffer> [TaskPaper]t <Plug>TaskPaperToggleToday
+
+    map <buffer> <silent> [TaskPaper]w :<C-u>call taskpaper#toggle_tag('waiting', '')<CR>
+    map <buffer> <silent> [TaskPaper]h :<C-u>call taskpaper#toggle_tag('others', '')<CR>
+
+    nnoremap <buffer> <silent> [TaskPaper]: :<C-u>call <SID>raise_to_project()<CR>
+endfunction
 
 " textobj-wiw
 
+" JpFormat
+hi ColorColumn guibg=#aaaaaa
+autocmd vimrc BufNew,BufRead *.txt
+\   setl cc+=72
+\|  setl textwidth=72
+\|  let b:jpformat = 1
+\|  let b:JpCountChars = &l:textwidth / 2
+nnoremap [Prefix]F :<C-u>JpFormatAll!<CR>
 
 " ==================== Loading vimrc ==================== "
 " auto reloading vimrc
