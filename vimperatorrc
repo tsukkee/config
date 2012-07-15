@@ -17,9 +17,6 @@ set previouspattern+='前','\bnerwer\b'
 
 let mapleader=","
 
-" バグ回避
-" js setToolbarVisibility(document.getElementById('PersonalToolbar'), true);
-
 " floatbox
 set animations
 style -name liberator-floatbox-opacity chrome://* #liberator-completions,#liberator-multiline-output { opacity: .8; position: relative; z-index: 9999; }
@@ -59,10 +56,6 @@ nnoremap k 5k
 nnoremap h 3h
 nnoremap l 3l
 
-" don't use <C-j>
-nnoremap <C-j> <Nop>
-cnoremap <C-j> <Nop>
-
 " Use beginning matches on command-line history
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
@@ -72,11 +65,8 @@ cnoremap <C-n> <Down>
 nnoremap p <Nop>
 nnoremap P <Nop>
 
-" toggle Flashblock
-nnoremap <silent> <C-f> :js Flashblock.toggleSiteWhitelisted()<CR>:reload<CR>
-
 " disable highlight
-nnoremap <silent> gh :nohl<CR>:offwordhighlight<CR>
+nnoremap <silent> gh :nohlsearch<CR>
 
 " toggle autopagerize
 nnoremap <silent> a :toggleautopagerize<CR>
@@ -94,6 +84,7 @@ commands.addUserCommand(["toggleautopagerize"],
         d.dispatchEvent(ev);
         liberator.echomsg('toggle');
     });
+})
 EOM
 
 
@@ -129,15 +120,6 @@ EOM
 
 " Lazy
 command! -nargs=+ lazy autocmd VimperatorEnter .* <args>
-
-" migemo hint
-" set hintmatching=custom
-" js <<EOM
-" liberator.plugins.customHintMatcher = function(inputString){
-"     let r = migemo.getRegExp(inputString);
-"     return function(hintString) r.test(hintString);
-" };
-" EOM
 
 " commandBookmarklet
 let command_bookmarklet_prefix=""
@@ -179,25 +161,6 @@ addLocalMappings(
   ]
 );
 EOM
-
-" emblur
-" js <<EOM
-" function emblur(e){
-"   switch(e.type){
-"     case 'keydown': case 'keyup':
-"     return emblur.off = e.shiftKey || e.ctrlKey;
-"   }
-"   if(emblur.off || emblur.ignore.test(e.target.tagName)) return;
-"   clearTimeout(emblur.tim);
-"   emblur.tim = setTimeout(
-"     function _emblur(lm) lm && lm.blur(), 500, e.target);
-" }
-" emblur.ignore = /^(?!embed$|object$)/i;
-" let(c = document.getElementById('content')){
-"   for each(let type in ['focus', 'keydown', 'keyup'])
-"     c.addEventListener(type, emblur, type === 'focus');
-" }
-" EOM
 
 
 " ==================== colorscheme ==================== "

@@ -1,4 +1,4 @@
-" Last Change: 07 Jun 2012
+" Last Change: 15 Jul 2012
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -42,7 +42,7 @@ function! s:dirname(path)
 endfunction
 
 
-" ==================== Neobundle ==================== "
+" ==================== NeoBundle ==================== "
 filetype plugin indent off
 
 if has('vim_starting')
@@ -76,11 +76,12 @@ NeoBundle 'kana/vim-operator-replace'
 NeoBundle 'kana/vim-smartchr'
 NeoBundle 'kana/vim-submode'
 NeoBundle 'kana/vim-surround'
+NeoBundle 'kana/vim-tabpagecd'
 NeoBundle 'kana/vim-textobj-indent'
 NeoBundle 'kana/vim-textobj-user'
 NeoBundleLazy 'kien/ctrlp.vim'
 NeoBundle 'Lokaltog/vim-powerline'
-NeoBundleLazy 'Rykka/ColorV'
+NeoBundleLazy 'Rykka/colorv.vim'
 NeoBundle 'Shougo/neobundle.vim'
 NeoBundle 'Shougo/neocomplcache'
 NeoBundle 'Shougo/unite.vim'
@@ -117,10 +118,11 @@ filetype plugin indent on
 
 " ==================== Settings ==================== "
 " tab
-set tabstop=4 shiftwidth=4 softtabstop=4
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
 set expandtab
 set smartindent
-set history=100
 
 " input support
 set backspace=indent,eol,start
@@ -341,7 +343,7 @@ function! s:onColorScheme()
 
     if g:colors_name == 'solarized'
         " based on SpecialKey
-        highlight ZenkakuSpace ctermbg=12 guibg=#839496
+        highlight ZenkakuSpace ctermbg=185
         " based on ErrorMsg
         highlight User1 ctermbg=10 ctermfg=1 cterm=bold
         \               guibg=#586e75 guifg=#dc322f gui=bold
@@ -365,7 +367,7 @@ let g:indent_guides_guide_size = 1
 
 " colorscheme
 if &t_Co == 256 || has('gui')
-    let g:solarized_contrast = 'low'
+    let g:solarized_contrast = 'high'
     set background=light
     colorscheme solarized
 else
@@ -516,19 +518,7 @@ augroup vimrc
 augroup END
 
 " TabpageCD
-" Reference: kana's vimrc
-command! -complete=dir -nargs=? TabpageCD
-\   execute 'cd' fnameescape(<q-args>)
-\|  let t:cwd = getcwd()
-
-AlterCommand cd TabpageCD
-command! -nargs=0 CD silent execute 'TabpageCD' unite#util#path2project_directory(expand('%:p'))
-
-autocmd vimrc VimEnter,TabEnter *
-\   if !exists('t:cwd')
-\|    let t:cwd = getcwd()
-\|  endif
-\|  execute 'cd' fnameescape(t:cwd)
+command! -nargs=0 CD silent let t:cwd = unite#util#path2project_directory(expand('%:p')) | cd `=t:cwd`
 
 " rename
 command! -nargs=1 -bang -complete=file Rename saveas<bang> <args> | call delete(expand('#'))
@@ -825,7 +815,8 @@ let s:unite_tabopen = {
 function! s:unite_tabopen.func(candidates)
     for c in a:candidates
         call unite#take_action('tabopen', c)
-        TabpageCD `=s:dirname(c.action__path)`
+        cd `=s:dirname(c.action__path)`
+        " TabpageCD `=s:dirname(c.action__path)`
     endfor
 endfunction
 call unite#custom_action('file,directory,buffer', 'tabopen', s:unite_tabopen)
@@ -882,7 +873,8 @@ endfunction
 
 function! s:ttree_tabpagecd()
     let dir = s:dirname(ttree#get_node().path)
-    TabpageCD `=dir`
+    cd `=dir`
+    let t:cwd = dir
 endfunction
 
 function! s:ttree_unite_filerec()
@@ -1045,8 +1037,6 @@ function! s:taskpaper_mapping()
 
     nnoremap <buffer> <silent> [TaskPaper]: :<C-u>call <SID>raise_to_project()<CR>
 endfunction
-
-" textobj-wiw
 
 " JpFormat
 hi ColorColumn guibg=#aaaaaa
