@@ -1,6 +1,6 @@
 " ==================== basic options ==================== "
 set activate=quickmark,paste
-set complete=sl
+set complete=stl
 set focuscontent
 set followhints=1
 set toolbars=all,nomenu
@@ -84,7 +84,7 @@ commands.addUserCommand(["toggleautopagerize"],
         d.dispatchEvent(ev);
         liberator.echomsg('toggle');
     });
-})
+})();
 EOM
 
 
@@ -127,7 +127,7 @@ let command_bookmarklet_prefix=""
 " sbmincsearch
 let sbmincsearch_service_name = "pinboard"
 let sbmincsearch_max = 15
-lazy set complete=stIl
+" lazy set complete=stIl
 
 " feedSomeKeys
 lazy fmaps -u='(fastladder|reader\.livedoor)\.com/reader' s a r c j k f,j F,k <Space> <S-Space> b p o v > J < K

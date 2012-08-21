@@ -15,7 +15,8 @@ try {
 }
 catch(e)
 {
-    liberator.echoerr(e);
+    liberator.echomsg('sbm_incsearch needs XYZincsearch extension');
+    // liberator.echoerr(e);
     return;
 }
 

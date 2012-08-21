@@ -1,4 +1,4 @@
-" Last Change: 15 Jul 2012
+" Last Change: 21 Aug 2012
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -83,11 +83,11 @@ NeoBundleLazy 'kien/ctrlp.vim'
 NeoBundle 'Lokaltog/vim-powerline'
 NeoBundleLazy 'Rykka/colorv.vim'
 NeoBundle 'Shougo/neobundle.vim'
-NeoBundle 'Shougo/neocomplcache'
+NeoBundleLazy 'Shougo/neocomplcache'
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'Shougo/vimproc'
 NeoBundleLazy 'Shougo/vimshell'
-NeoBundle 'Shougo/vinarise'
+NeoBundleLazy 'Shougo/vinarise'
 NeoBundle 't9md/vim-quickhl'
 NeoBundle 't9md/vim-textmanip'
 NeoBundle 'thinca/vim-prettyprint'
@@ -106,7 +106,7 @@ NeoBundle 'ujihisa/unite-colorscheme'
 NeoBundle 'git://gist.github.com/99234.git', {'name': 'textobj-comment'}
 
 NeoBundle 'http://svn.macports.org/repository/macports/contrib/mpvim/', {'type': 'svn'}
-NeoBundle 'http://lampsvn.epfl.ch/svn-repos/scala/scala-tool-support/trunk/src/vim', {'directory': 'scala', 'type': 'svn'}
+" NeoBundle 'http://lampsvn.epfl.ch/svn-repos/scala/scala-tool-support/trunk/src/vim', {'directory': 'scala', 'type': 'svn'}
 
 NeoBundle 'muttator', {'type': 'nosync'}
 NeoBundle 'vimperator', {'type': 'nosync'}
@@ -177,8 +177,6 @@ endif
 function! s:titlestring()
     if &filetype =~ '^lingr'
         let &titlestring = 'vim: [lingr: ' . lingr#unread_count() . ']'
-    elseif exists('t:cwd')
-        let &titlestring = 'vim: %<' . t:cwd
     else
         let &titlestring = 'vim: %<' . bufname('')
     endif
@@ -186,14 +184,14 @@ endfunction
 
 " statusline
 set laststatus=2 " always show statusine
-let &statusline = '%!' . s:SID_PREFIX() . 'statusline()'
-function! s:statusline()
-    let s = '%2*%w%r%*%y'
-    let s .= '[' . (&fenc != '' ? &fenc : &enc) . ']'
-    let s .= '[' . &ff . ']'
-    let s .= ' %<%F%1*%m%*%= %v,%l/%L(%P)'
-    return s
-endfunction
+" let &statusline = '%!' . s:SID_PREFIX() . 'statusline()'
+" function! s:statusline()
+"     let s = '%2*%w%r%*%y'
+"     let s .= '[' . (&fenc != '' ? &fenc : &enc) . ']'
+"     let s .= '[' . &ff . ']'
+"     let s .= ' %<%F%1*%m%*%= %v,%l/%L(%P)'
+"     return s
+" endfunction
 
 " tabline
 set showtabline=2 " always show tabline
@@ -204,20 +202,19 @@ function! s:tabline()
     for i in range(1, tabpagenr('$'))
         let list = tabpagebuflist(i)
         let nr = tabpagewinnr(i)
-        if exists('*gettabvar')
-            let title = fnamemodify(gettabvar(i, 'cwd'), ':t') . '/'
+        let current_tabnr = tabpagenr()
+
+        if i == current_tabnr
+            let title = fnamemodify(getcwd(), ':t') . '/'
         else
-            let title = fnamemodify(bufname(list[nr - 1]), ':t')
+            let title = fnamemodify(gettabvar(i, 'cwd'), ':t') . '/'
         endif
         let title = empty(title) ? '[No Name]' : title
 
-        let s .= i == tabpagenr() ? '%#TabLineSel#' : '%#TabLine#'
+        let s .= i == current_tabnr ? '%#TabLineSel#' : '%#TabLine#'
         let s .= '%' . i . 'T[' . i . '] ' . title
         let s .= '  '
     endfor
-
-    " show cwd for current tab
-    let tabpage_cwd = exists('t:cwd') ? '[' . t:cwd . ']' : ''
 
     " show lingr unread count
     let lingr_unread = ""
@@ -231,7 +228,7 @@ function! s:tabline()
     endif
 
     " build tabline
-    let s .= '%#TabLineFill#%T%=%<' . tabpage_cwd . lingr_unread
+    let s .= '%#TabLineFill#%T%=%<[' . getcwd() . ']' . lingr_unread
     return s
 endfunction
 
@@ -517,8 +514,8 @@ augroup vimrc
     autocmd BufReadPost * if &l:binary | setlocal filetype=xxd | endif
 augroup END
 
-" TabpageCD
-command! -nargs=0 CD silent let t:cwd = unite#util#path2project_directory(expand('%:p')) | cd `=t:cwd`
+" cd to project directory
+command! -nargs=0 CD execute 'cd' unite#util#path2project_directory(expand('%:p'))
 
 " rename
 command! -nargs=1 -bang -complete=file Rename saveas<bang> <args> | call delete(expand('#'))
@@ -816,7 +813,6 @@ function! s:unite_tabopen.func(candidates)
     for c in a:candidates
         call unite#take_action('tabopen', c)
         cd `=s:dirname(c.action__path)`
-        " TabpageCD `=s:dirname(c.action__path)`
     endfor
 endfunction
 call unite#custom_action('file,directory,buffer', 'tabopen', s:unite_tabopen)
@@ -867,14 +863,13 @@ ArpeggioCommandMap nt TtreeToggle
 
 autocmd FileType ttree call s:setup_ttree()
 function! s:setup_ttree()
-    CommandMap! ct call <SID>ttree_tabpagecd()
+    CommandMap! ct call <SID>ttree_cd()
     CommandMap! cu call <SID>ttree_unite_filerec()
 endfunction
 
-function! s:ttree_tabpagecd()
+function! s:ttree_cd()
     let dir = s:dirname(ttree#get_node().path)
     cd `=dir`
-    let t:cwd = dir
 endfunction
 
 function! s:ttree_unite_filerec()
@@ -1046,6 +1041,24 @@ autocmd vimrc BufNew,BufRead *.txt
 \|  let b:jpformat = 1
 \|  let b:JpCountChars = &l:textwidth / 2
 nnoremap [Prefix]F :<C-u>JpFormatAll!<CR>
+
+" CtrlP
+" let g:ctrlp_map = '<c-p>'
+let g:ctrlp_custom_ignore = {
+\   'dir':  '\.git$\|\.hg$\|\.svn$\|\.neocon$\|\.unite$',
+\   'file': '\.exe$\|\.so$\|\.dll$\|\.DS_Store$'
+\ }
+let g:ctrlp_max_files = 5000
+let g:ctrlp_max_depth = 5
+let g:ctrlp_user_command = {
+\   'types': {
+\       1: ['.git', 'cd %s && git ls-files'],
+\       2: ['.hg', 'hg --cwd %s locate -I .'],
+\   },
+\   'fallback': s:is_win ? 'dir %s /-n /b /s /a-d' : 'find %s -type f'
+\}
+let g:ctrlp_arg_map = 1
+
 
 " ==================== Loading vimrc ==================== "
 " auto reloading vimrc
