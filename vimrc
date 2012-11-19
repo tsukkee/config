@@ -1,4 +1,4 @@
-" Last Change: 21 Aug 2012
+" Last Change: 19 Nov 2012
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -55,12 +55,12 @@ endif
 
 NeoBundleLazy 'errormarker.vim'
 NeoBundle 'Indent-Guides'
-NeoBundle 'Javascript-Indentation'
-NeoBundle 'JavaScript-syntax'
-NeoBundle 'Markdown'
+NeoBundleLazy 'Javascript-Indentation'
+NeoBundleLazy 'JavaScript-syntax'
+NeoBundleLazy 'Markdown'
 NeoBundle 'matchit.zip'
 NeoBundle 'SudoEdit.vim'
-NeoBundle 'Textile-for-VIM'
+NeoBundleLazy 'Textile-for-VIM'
 
 NeoBundle 'airblade/vim-rooter'
 NeoBundle 'altercation/vim-colors-solarized'
@@ -83,7 +83,7 @@ NeoBundleLazy 'kien/ctrlp.vim'
 NeoBundle 'Lokaltog/vim-powerline'
 NeoBundleLazy 'Rykka/colorv.vim'
 NeoBundle 'Shougo/neobundle.vim'
-NeoBundleLazy 'Shougo/neocomplcache'
+NeoBundle 'Shougo/neocomplcache'
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'Shougo/vimproc'
 NeoBundleLazy 'Shougo/vimshell'
@@ -95,22 +95,22 @@ NeoBundle 'thinca/vim-qfreplace'
 NeoBundle 'thinca/vim-quickrun'
 NeoBundle 'thinca/vim-ref'
 NeoBundleLazy 'thinca/vim-showtime'
+NeoBundle 'thinca/vim-textobj-comment'
 NeoBundle 'tomtom/tlib_vim'
-NeoBundle 'tpope/vim-haml'
+NeoBundleLazy 'tpope/vim-haml'
 NeoBundle 'git@github.com:tsukkee/lingr-vim.git'
 NeoBundle 'git@github.com:tsukkee/ttree.vim.git'
 NeoBundle 'git@github.com:tsukkee/unite-help.git'
 NeoBundle 'git@github.com:tsukkee/unite-tag.git'
 NeoBundle 'tyru/caw.vim'
 NeoBundle 'ujihisa/unite-colorscheme'
-NeoBundle 'git://gist.github.com/99234.git', {'name': 'textobj-comment'}
 
 NeoBundle 'http://svn.macports.org/repository/macports/contrib/mpvim/', {'type': 'svn'}
-" NeoBundle 'http://lampsvn.epfl.ch/svn-repos/scala/scala-tool-support/trunk/src/vim', {'directory': 'scala', 'type': 'svn'}
+NeoBundle 'http://lampsvn.epfl.ch/svn-repos/scala/scala-tool-support/trunk/src/vim', {'directory': 'scala', 'type': 'svn'}
 
-NeoBundle 'muttator', {'type': 'nosync'}
+NeoBundleLazy 'muttator', {'type': 'nosync'}
 NeoBundle 'vimperator', {'type': 'nosync'}
-NeoBundle 'vimrcbox', {'type': 'nosync'}
+NeoBundleLazy 'vimrcbox', {'type': 'nosync'}
 NeoBundle 'tmux', {'type': 'nosync'}
 NeoBundle 'jpformat', {'type': 'nosync'}
 
@@ -184,6 +184,7 @@ endfunction
 
 " statusline
 set laststatus=2 " always show statusine
+" now using Powerline
 " let &statusline = '%!' . s:SID_PREFIX() . 'statusline()'
 " function! s:statusline()
 "     let s = '%2*%w%r%*%y'
@@ -196,24 +197,24 @@ set laststatus=2 " always show statusine
 " tabline
 set showtabline=2 " always show tabline
 let &tabline = '%!' . s:SID_PREFIX() . 'tabline()'
+let s:v = vital#of('unite.vim') " for truncate()
+let s:max_tabwidth = 16
 function! s:tabline()
     " show each tab
     let s = ''
+    let title_width = min([s:max_tabwidth, &columns / (tabpagenr('$') + 1) - 1])
     for i in range(1, tabpagenr('$'))
         let list = tabpagebuflist(i)
         let nr = tabpagewinnr(i)
         let current_tabnr = tabpagenr()
 
-        if i == current_tabnr
-            let title = fnamemodify(getcwd(), ':t') . '/'
-        else
-            let title = fnamemodify(gettabvar(i, 'cwd'), ':t') . '/'
-        endif
-        let title = empty(title) ? '[No Name]' : title
+        let title = fnamemodify(bufname(list[nr - 1]), ':t')
+        if empty(title) | let title = '[No Name]' | endif
+        let title = s:v.truncate(title, title_width)
 
-        let s .= i == current_tabnr ? '%#TabLineSel#' : '%#TabLine#'
-        let s .= '%' . i . 'T[' . i . '] ' . title
-        let s .= '  '
+        let s .= i == tabpagenr() ? '%#TabLineSel#' : '%#TabLine#'
+        let s .= '%' . i . 'T' . title
+        let s .= '%#SpecialKey#|'
     endfor
 
     " show lingr unread count
@@ -256,9 +257,9 @@ else
 endif
 
 " use 'fileencoding' for 'encoding' if the file doesn't contain multibyte characters
-" give up searching multibyte characters when searching time is over 500 ms
+" give up searching multibyte characters when searching time is over 100 ms
 autocmd vimrc BufReadPost *
-\   if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n', 0, 500) == 0
+\   if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n', 0, 100) == 0
 \|      let &fileencoding=&encoding
 \|  endif
 
@@ -292,13 +293,10 @@ augroup vimrc
 augroup END
 
 " session
-set sessionoptions=buffers,curdir,folds,tabpages
+set sessionoptions=buffers,folds,tabpages
 let s:session_file = expand('~/.session.vim')
 function! s:save_session()
-    let cwd = getcwd()
-    cd ~
     mksession! `=s:session_file`
-    cd `=cwd`
     echo "Session saved."
 endfunction
 function! s:load_session()
@@ -307,10 +305,7 @@ function! s:load_session()
         NeoComplCacheDisable
     endif
     if filereadable(s:session_file)
-        let cwd = getcwd()
-        cd ~
         source `=s:session_file`
-        cd `=cwd`
     endif
     tabdo CD
     if neco_enabled
@@ -342,11 +337,11 @@ function! s:onColorScheme()
         " based on SpecialKey
         highlight ZenkakuSpace ctermbg=185
         " based on ErrorMsg
-        highlight User1 ctermbg=10 ctermfg=1 cterm=bold
-        \               guibg=#586e75 guifg=#dc322f gui=bold
+        " highlight User1 ctermbg=10 ctermfg=1 cterm=bold
+        " \               guibg=#586e75 guifg=#dc322f gui=bold
         " based on ModeMsg
-        highlight User2 ctermbg=10 ctermfg=4 cterm=bold
-        \               guibg=#586e75 guifg=#268bd2 gui=bold
+        " highlight User2 ctermbg=10 ctermfg=4 cterm=bold
+        " \               guibg=#586e75 guifg=#268bd2 gui=bold
         " indent guids
         highlight IndentGuidesOdd ctermbg=187
         highlight IndentGuidesEven ctermbg=186
@@ -394,6 +389,9 @@ onoremap ) t)
 onoremap ( t(
 onoremap ] t]
 onoremap [ t[
+
+" open new tab at last
+nnoremap <silent> <C-n> :<C-u>9999tabnew<CR>
 
 " prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
@@ -581,7 +579,7 @@ if executable("qlmanage")
         endfunction
 
         " for Lingr-Vim (should use :python ?)
-        autocmd vimrc FileType lingr-messages nnoremap <silent> <buffer> O :<C-u>call <SID>lingr_vim_quicklook()<CR>
+        " autocmd vimrc FileType lingr-messages nnoremap <silent> <buffer> O :<C-u>call <SID>lingr_vim_quicklook()<CR>
         function! s:lingr_vim_quicklook()
             let pattern = '^https\?://[^ ]*\.\(png\|jpe\?g\|gif\)$'
             let candidate = expand('<cWORD>')
@@ -796,9 +794,10 @@ vnoremap [Prefix]v :VimShellSendString<CR>
 let g:unite_update_time = 100
 let g:unite_enable_start_insert = 1
 let g:unite_enable_split_vertically = 0
-let g:unite_source_file_mru_limit = 200
+let g:unite_source_file_mru_limit = 50
 let g:unite_source_file_mru_time_format = '(%Y/%m/%d %T) '
 let g:unite_source_file_rec_max_depth = 5
+let g:unite_winwidth = 30
 
 call unite#set_substitute_pattern('files', '^$VIM', substitute(substitute($VIM,  '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
 call unite#set_substitute_pattern('files', '^\.vim', s:runtimepath, -100)
@@ -818,7 +817,8 @@ endfunction
 call unite#custom_action('file,directory,buffer', 'tabopen', s:unite_tabopen)
 
 ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru file
-ArpeggioCommandMap kt Unite -buffer-name=tags tags
+" ArpeggioCommandMap kt Unite -buffer-name=tags tags
+ArpeggioCommandMap kt Unite -vertical tab
 execute 'ArpeggioCommandMap ke call ' s:SID_PREFIX() . 'unite_help_with_ref()'
 
 autocmd vimrc BufEnter *
@@ -1007,7 +1007,11 @@ vmap <Space>m <Plug>(quickhl-toggle)
 nmap <Space>M <Plug>(quickhl-reset)
 
 " powerline
-let g:Powerline_symbols = 'fancy'
+if s:is_mac
+    let g:Powerline_symbols = 'fancy'
+else
+    let g:Powerline_symbols = 'compatible'
+endif
 
 " taskpaper
 autocmd vimrc FileType taskpaper call s:taskpaper_mapping()

@@ -1,4 +1,4 @@
-" Last Change: 01 Jun 2012
+" Last Change: 19 Nov 2012
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -67,7 +67,7 @@ endif
 " GVim(Windows)
 if has('win32')
     if has('vim_starting')
-        set columns=100
+        set columns=140
         set lines=32
     endif
     set linespace=1
@@ -76,13 +76,11 @@ if has('win32')
     " and before 'transparency'
     gui
 
-    set guifont=Inconsolata-dz_for_Powerline:h11:cANSI
-    " set guifont=Consolas:h13
-    set guifontwide=TakaoGothic
+    set guifont=MigMix_1M:h12:cSHIFTJIS
 
-    if has('kaoriya')
-        set transparency=240 " (opaque) 255 - 0 (transparent)
-    endif
+    " if has('kaoriya')
+    "     set transparency=240 " (opaque) 255 - 0 (transparent)
+    " endif
 
     set guioptions-=e " don't use gui tab apperance
     set guioptions-=T " hide toolbar

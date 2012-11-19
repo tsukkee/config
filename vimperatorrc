@@ -67,9 +67,12 @@ nnoremap P <Nop>
 
 " disable highlight
 nnoremap <silent> gh :nohlsearch<CR>
+nnoremap ? /<Up><CR>
 
 " toggle autopagerize
 nnoremap <silent> a :toggleautopagerize<CR>
+
+nnoremap <C-t> :tabopen about:treestyletab-group?
 
 " dispatch mouse event
 js <<EOM
@@ -127,7 +130,7 @@ let command_bookmarklet_prefix=""
 " sbmincsearch
 let sbmincsearch_service_name = "pinboard"
 let sbmincsearch_max = 15
-" lazy set complete=stIl
+lazy set complete=stIl
 
 " feedSomeKeys
 lazy fmaps -u='(fastladder|reader\.livedoor)\.com/reader' s a r c j k f,j F,k <Space> <S-Space> b p o v > J < K
