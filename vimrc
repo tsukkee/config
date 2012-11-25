@@ -1,4 +1,4 @@
-" Last Change: 19 Nov 2012
+" Last Change: 25 Nov 2012
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,6 +19,8 @@
 "     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 "     THE SOFTWARE.
 " }}}
+
+scriptencoding utf-8
 
 " ==================== Utilities ==================== "
 let s:is_mac = has('macunix') || (executable('uname') && system('uname') =~? '^darwin')
@@ -137,7 +139,6 @@ set wildmenu
 set wildmode=list:longest,full
 
 " search
-set notagbsearch " avoid bug about searching multibyte characters
 set wrapscan
 set ignorecase
 set smartcase
@@ -176,9 +177,9 @@ if exists('$TMUX') || exists('$WINDOW')
 endif
 function! s:titlestring()
     if &filetype =~ '^lingr'
-        let &titlestring = 'vim: [lingr: ' . lingr#unread_count() . ']'
+        return 'vim: [lingr: ' . lingr#unread_count() . ']'
     else
-        let &titlestring = 'vim: %<' . bufname('')
+        return 'vim: ' . bufname('')
     endif
 endfunction
 
@@ -391,7 +392,7 @@ onoremap ] t]
 onoremap [ t[
 
 " open new tab at last
-nnoremap <silent> <C-n> :<C-u>9999tabnew<CR>
+nnoremap <silent> <C-n> :<C-u>-1tabnew<CR>
 
 " prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
@@ -637,7 +638,6 @@ augroup vimrc
 
     " ruby
     autocmd FileType ruby,eruby,yaml setlocal softtabstop=2 shiftwidth=2 tabstop=2
-    autocmd BufNewFile,BufRead *.ru setfiletype ruby
 
     " less
     autocmd BufNewFile,BufRead *.less setfiletype css
@@ -646,8 +646,8 @@ augroup vimrc
     autocmd BufNewFile,BufRead *.rb
     \   unlet b:current_syntax
     \|  syn include @rubyData syntax/haml.vim
-    \|  syn region rubyDataHaml matchgroup=rubyData start="^__END__$" keepend end="\%$" contains=@rubyData 
-    \|  syn match inFileTemplateName '^@@\w\+' containedin=rubyDataHaml 
+    \|  syn region rubyDataHaml matchgroup=rubyData start="^__END__$" keepend end="\%$" contains=@rubyData
+    \|  syn match inFileTemplateName '^@@\w\+' containedin=rubyDataHaml
     \|  hi def link inFileTemplateName Type
     \|  let b:current_syntax = "ruby"
 
@@ -659,14 +659,14 @@ augroup vimrc
     " Reference: http://d.hatena.ne.jp/tyru/20090406/1239015151
     autocmd FileType scala
     \   setlocal softtabstop=2 shiftwidth=2 tabstop=2
-    \|  setlocal iskeyword+=@-@ " for javadoc
+    \|  setlocal iskeyword+=@-@
     \|  setlocal includeexpr=substitute(v:fname,'\\.','/','g')
     \|  setlocal suffixesadd=.scala
     \|  setlocal suffixes+=.class
     \|  setlocal comments& comments^=s0:*\ -,m0:*\ \ ,ex0:*/
     \|  setlocal commentstring=//%s
     \|  setlocal formatoptions-=t formatoptions+=croql
-    \|  let b:template_used = 1 " avoid using template
+    \|  let b:template_used = 1
 
     " textile
     autocmd BufRead,BufNewFile *.textile setfiletype textile
