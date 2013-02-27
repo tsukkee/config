@@ -56,6 +56,9 @@ nnoremap k 5k
 nnoremap h 3h
 nnoremap l 3l
 
+" bookmark
+nnoremap a a -tags=
+
 " Use beginning matches on command-line history
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
@@ -70,7 +73,7 @@ nnoremap <silent> gh :nohlsearch<CR>
 nnoremap ? /<Up><CR>
 
 " toggle autopagerize
-nnoremap <silent> a :toggleautopagerize<CR>
+nnoremap <silent> p :toggleautopagerize<CR>
 
 nnoremap <C-t> :tabopen about:treestyletab-group?
 
