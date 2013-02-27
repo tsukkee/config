@@ -1,4 +1,4 @@
-" Last Change: 19 Nov 2012
+" Last Change: 27 Feb 2013
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -61,13 +61,15 @@ if has('gui_macvim')
     nnoremap <silent> <C-f>m :<C-u>call <SID>activate_terminal()<CR>
 
     " for latest MacVim-Kaoriya
-    let $RUBY_DLL="/usr/lib/libruby.dylib"
+    if has('kaoriya')
+        let $RUBY_DLL="/usr/lib/libruby.dylib"
+    endif
 endif
 
 " GVim(Windows)
 if has('win32')
     if has('vim_starting')
-        set columns=140
+        set columns=120
         set lines=32
     endif
     set linespace=1
@@ -76,7 +78,8 @@ if has('win32')
     " and before 'transparency'
     gui
 
-    set guifont=MigMix_1M:h12:cSHIFTJIS
+    " set guifont=MigMix_1M:h12:cSHIFTJIS
+    set guifont=Ricty_Diminished:h13:cSHIFTJIS
 
     " if has('kaoriya')
     "     set transparency=240 " (opaque) 255 - 0 (transparent)

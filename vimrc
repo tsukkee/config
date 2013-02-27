@@ -1,4 +1,4 @@
-" Last Change: 25 Nov 2012
+" Last Change: 27 Feb 2013
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -59,12 +59,11 @@ NeoBundleLazy 'errormarker.vim'
 NeoBundle 'Indent-Guides'
 NeoBundleLazy 'Javascript-Indentation'
 NeoBundleLazy 'JavaScript-syntax'
-NeoBundleLazy 'Markdown'
 NeoBundle 'matchit.zip'
 NeoBundle 'SudoEdit.vim'
 NeoBundleLazy 'Textile-for-VIM'
 
-NeoBundle 'airblade/vim-rooter'
+NeoBundleLazy 'airblade/vim-rooter'
 NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'davidoc/taskpaper.vim'
 NeoBundle 'endel/flashdevelop.vim'
@@ -75,14 +74,16 @@ NeoBundle 'kana/vim-arpeggio'
 NeoBundle 'kana/vim-fakeclip'
 NeoBundle 'kana/vim-operator-user'
 NeoBundle 'kana/vim-operator-replace'
-NeoBundle 'kana/vim-smartchr'
+NeoBundleLazy 'kana/vim-smartchr'
 NeoBundle 'kana/vim-submode'
 NeoBundle 'kana/vim-surround'
 NeoBundle 'kana/vim-tabpagecd'
 NeoBundle 'kana/vim-textobj-indent'
 NeoBundle 'kana/vim-textobj-user'
 NeoBundleLazy 'kien/ctrlp.vim'
+NeoBundleLazy 'koron/minimap-vim'
 NeoBundle 'Lokaltog/vim-powerline'
+NeoBundle 'osyo-manga/vim-reanimate'
 NeoBundleLazy 'Rykka/colorv.vim'
 NeoBundle 'Shougo/neobundle.vim'
 NeoBundle 'Shougo/neocomplcache'
@@ -92,7 +93,7 @@ NeoBundleLazy 'Shougo/vimshell'
 NeoBundleLazy 'Shougo/vinarise'
 NeoBundle 't9md/vim-quickhl'
 NeoBundle 't9md/vim-textmanip'
-NeoBundle 'thinca/vim-prettyprint'
+NeoBundleLazy 'thinca/vim-prettyprint'
 NeoBundle 'thinca/vim-qfreplace'
 NeoBundle 'thinca/vim-quickrun'
 NeoBundle 'thinca/vim-ref'
@@ -119,6 +120,10 @@ NeoBundle 'jpformat', {'type': 'nosync'}
 filetype plugin indent on
 
 " ==================== Settings ==================== "
+if s:is_win
+    set shellslash
+endif
+
 " tab
 set tabstop=4
 set shiftwidth=4
@@ -162,7 +167,7 @@ set scrolloff=5
 set foldmethod=marker
 set foldcolumn=3
 set list
-set listchars=tab:>\ ,trail:~
+set listchars=tab:^\ ,trail:~
 set ambiwidth=double
 
 " title
@@ -185,15 +190,6 @@ endfunction
 
 " statusline
 set laststatus=2 " always show statusine
-" now using Powerline
-" let &statusline = '%!' . s:SID_PREFIX() . 'statusline()'
-" function! s:statusline()
-"     let s = '%2*%w%r%*%y'
-"     let s .= '[' . (&fenc != '' ? &fenc : &enc) . ']'
-"     let s .= '[' . &ff . ']'
-"     let s .= ' %<%F%1*%m%*%= %v,%l/%L(%P)'
-"     return s
-" endfunction
 
 " tabline
 set showtabline=2 " always show tabline
@@ -294,27 +290,7 @@ augroup vimrc
 augroup END
 
 " session
-set sessionoptions=buffers,folds,tabpages
-let s:session_file = expand('~/.session.vim')
-function! s:save_session()
-    mksession! `=s:session_file`
-    echo "Session saved."
-endfunction
-function! s:load_session()
-    let neco_enabled = exists(':NeoComplCacheDisable')
-    if neco_enabled
-        NeoComplCacheDisable
-    endif
-    if filereadable(s:session_file)
-        source `=s:session_file`
-    endif
-    tabdo CD
-    if neco_enabled
-        NeoComplCacheEnable
-    endif
-endfunction
-nnoremap <silent> [Prefix]S :<C-u>call <SID>load_session()<CR>
-nnoremap <silent> [Prefix]s :<C-u>call <SID>save_session()<CR>
+set sessionoptions=buffers,folds,resize,tabpages
 
 " persistent undo
 if has('persistent_undo')
@@ -337,12 +313,6 @@ function! s:onColorScheme()
     if g:colors_name == 'solarized'
         " based on SpecialKey
         highlight ZenkakuSpace ctermbg=185
-        " based on ErrorMsg
-        " highlight User1 ctermbg=10 ctermfg=1 cterm=bold
-        " \               guibg=#586e75 guifg=#dc322f gui=bold
-        " based on ModeMsg
-        " highlight User2 ctermbg=10 ctermfg=4 cterm=bold
-        " \               guibg=#586e75 guifg=#268bd2 gui=bold
         " indent guids
         highlight IndentGuidesOdd ctermbg=187
         highlight IndentGuidesEven ctermbg=186
@@ -917,6 +887,7 @@ if s:is_mac
         \|  unlet s:temp
     augroup END
 endif
+let g:lingr_vim_terminate_thread_immediately = 1
 let g:lingr_vim_time_format = "%Y/%m/%d %H:%M:%S"
 
 " reload Firefox
@@ -1039,7 +1010,7 @@ endfunction
 
 " JpFormat
 hi ColorColumn guibg=#aaaaaa
-autocmd vimrc BufNew,BufRead *.txt
+autocmd vimrc FileType text
 \   setl cc+=72
 \|  setl textwidth=72
 \|  let b:jpformat = 1
@@ -1063,6 +1034,127 @@ let g:ctrlp_user_command = {
 \}
 let g:ctrlp_arg_map = 1
 
+" reanimate
+let g:reanimate_save_dir = s:runtimepath . '/reanimate'
+command! -nargs=0 ReanimateSaveWithTimeStamp execute 'ReanimateSave' strftime('time%Y%m%d%H%M%S')
+CommandMap [Prefix]ss ReanimateSaveWithTimeStamp
+CommandMap [Prefix]sl ReanimateLoadLatest
+CommandMap [Prefix]sL Unite reanimate -default-action=reanimate_load
+
+let s:reanimate_event = {
+\   "name": "show_message"
+\}
+function! s:reanimate_event.save(context)
+    echomsg "save session to" a:context.point
+endfunction
+function! s:reanimate_event.load(context)
+    echomsg "load session from" a:context.point
+endfunction
+call reanimate#hook(s:reanimate_event)
+
+autocmd vimrc VimLeave * call s:delete_old_sessions(10)
+function! s:delete_old_sessions(num)
+    let dirs = sort(split(globpath(g:reanimate_save_dir . '/' . g:reanimate_default_category, 'time*'), "\n"))
+    let len = len(dirs)
+
+    if len - a:num <= 0
+        return
+    endif
+
+    for i in range(0, len - a:num - 1)
+        if s:is_win
+            call system('rmdir /s /q "' . dirs[i] . '"')
+        elseif s:is_mac
+            call system('rm -Rf ' . dirs[i])
+        endif
+    endfor
+endfunction
+
+" markdown-pandoc
+let s:pandoc_command = "pandoc \"%s\" -s -c \"%s\" -o \"%s\" &"
+let s:pandoc_default_css = 'pandoc.css'
+let s:pandoc_default_formats = ['html']
+let s:pandoc_output_encoding = s:is_win ? 'cp932' : 'utf-8'
+
+function! s:pandoc_auto_run()
+    if exists('b:pandoc_enable') && b:pandoc_enable
+        let b:pandoc_auto_run = 1
+    endif
+endfunction
+
+function! s:pandoc_stop_auto_run()
+    let b:pandoc_auto_run = 0
+endfunction
+
+function! s:pandoc_run()
+    if !exists('b:pandoc_auto_run') || !b:pandoc_auto_run | return | endif
+
+    let input = expand('%')
+    let base = expand('%:r')
+    let css = exists('b:pandoc_css') ? b:pandoc_css : s:pandoc_default_css
+    let formats = exists('b:pandoc_formats') && (type([]) == type(b:pandoc_formats))
+                \ ? b:pandoc_formats : s:pandoc_default_formats
+
+    for format in formats
+        let c = iconv(printf(s:pandoc_command, input, css, base . '.' . format),
+                    \ &encoding, s:pandoc_output_encoding)
+        call vimproc#system(c)
+        if vimproc#get_last_status() != 0
+            echomsg vimproc#get_last_errmsg()
+        endif
+    endfor
+endfunction
+
+function! s:pandoc_parse_local_setting()
+    let raw = matchstr(getline('$'), '<!--\zs.\+\ze-->')
+    try
+        sandbox let data = eval('{' . raw . '}')
+        for [k, v] in items(data)
+            let b:pandoc_{k} = v
+            unlet k v
+        endfor
+    catch /E121/
+        echomsg 'markdown: local setting parse error'
+    endtry
+endfunction
+
+function! s:markdown_make_title()
+    let l = strwidth(getline('.'))
+    let n = line('.')
+    let s = ''
+    for i in range(l)
+        let s .= '='
+    endfor
+    call append(n, s)
+endfunction
+
+function! s:pandoc_markdown_to_pdf()
+    let oldcwd = getcwd()
+    lcd `=expand("%:p:h")`
+
+    let command = "pandoc %s -V documentclass=ltjarticle --latex-engine=lualatex -o %s"
+    let input = expand('%')
+    let output = expand('%:r') . '.pdf'
+    let c = iconv(printf(command, input, output), &encoding, s:pandoc_output_encoding)
+    call vimproc#system(c)
+    if vimproc#get_last_status() != 0
+        echomsg vimproc#get_last_errmsg()
+    endif
+
+    lcd `=oldcwd`
+endfunction
+
+function! s:pandoc_setup_markdown()
+    call s:pandoc_parse_local_setting()
+    call s:pandoc_auto_run()
+
+    nnoremap <buffer> [Prefix]T :<C-u>call <SID>markdown_make_title()<CR>
+
+    command! -buffer PandocAutoRun call s:pandoc_auto_run()
+    command! -buffer PandocMarkdown2PDF call s:pandoc_markdown_to_pdf()
+endfunction
+autocmd vimrc BufWritePost *.mkd call s:pandoc_run()
+autocmd vimrc FileType markdown call s:pandoc_setup_markdown()
 
 " ==================== Loading vimrc ==================== "
 " auto reloading vimrc
