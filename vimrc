@@ -1,4 +1,4 @@
-" Last Change: 27 Feb 2013
+" Last Change: 24 Mar 2013
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -49,73 +49,81 @@ filetype plugin indent off
 
 if has('vim_starting')
     let &runtimepath = &runtimepath . ',' . s:runtimepath . '/bundle/neobundle.vim'
-    call neobundle#rc(expand(s:runtimepath . '/bundle'))
 endif
-if has('win32')
-    let g:neobundle_default_git_protocol = 'https'
-endif
+let g:neobundle_default_git_protocol = 'https'
+call neobundle#rc(expand(s:runtimepath . '/bundle'))
 
-NeoBundleLazy 'errormarker.vim'
+NeoBundle 'ag.vim'
+NeoBundle 'errormarker.vim', {'lazy': 1}
 NeoBundle 'Indent-Guides'
-NeoBundleLazy 'Javascript-Indentation'
-NeoBundleLazy 'JavaScript-syntax'
 NeoBundle 'matchit.zip'
 NeoBundle 'SudoEdit.vim'
-NeoBundleLazy 'Textile-for-VIM'
+NeoBundle 'Vdebug', {'lazy': 1}
 
-NeoBundleLazy 'airblade/vim-rooter'
 NeoBundle 'altercation/vim-colors-solarized'
-NeoBundle 'davidoc/taskpaper.vim'
-NeoBundle 'endel/flashdevelop.vim'
-NeoBundle 'h1mesuke/vim-alignta'
+NeoBundle 'davidhalter/jedi-vim', {'lazy': 1,
+            \ 'autoload': { 'filetypes': ['python']}}
+NeoBundle 'davidoc/taskpaper.vim', {'lazy': 1}
+NeoBundle 'deris/columnjump'
+NeoBundle 'deton/jasegment.vim', {'lazy': 1,
+            \ 'autoload': { 'filetypes': ['text', 'txt']}}
 NeoBundle 'h1mesuke/textobj-wiw'
+NeoBundle 'h1mesuke/vim-alignta'
+NeoBundle 'itchyny/thumbnail.vim', {'lazy': 1}
 NeoBundle 'kana/vim-altercmd'
 NeoBundle 'kana/vim-arpeggio'
 NeoBundle 'kana/vim-fakeclip'
-NeoBundle 'kana/vim-operator-user'
 NeoBundle 'kana/vim-operator-replace'
-NeoBundleLazy 'kana/vim-smartchr'
+NeoBundle 'kana/vim-operator-user'
+NeoBundle 'kana/vim-smartinput'
 NeoBundle 'kana/vim-submode'
-NeoBundle 'kana/vim-surround'
 NeoBundle 'kana/vim-tabpagecd'
 NeoBundle 'kana/vim-textobj-indent'
 NeoBundle 'kana/vim-textobj-user'
-NeoBundleLazy 'kien/ctrlp.vim'
-NeoBundleLazy 'koron/minimap-vim'
+NeoBundle 'kien/ctrlp.vim', {'lazy': 1}
 NeoBundle 'Lokaltog/vim-powerline'
+NeoBundle 'mattn/wiseman-f-vim'
+NeoBundle 'osyo-manga/shabadou.vim', {'lazy': 1}
 NeoBundle 'osyo-manga/vim-reanimate'
-NeoBundleLazy 'Rykka/colorv.vim'
+NeoBundle 'osyo-manga/vim-watchdogs', {'lazy': 1}
+NeoBundle 'Rykka/colorv.vim', {'lazy': 1}
+NeoBundle 'scrooloose/nerdtree'
+NeoBundle 'scrooloose/syntastic', {'lazy': 1}
 NeoBundle 'Shougo/neobundle.vim'
 NeoBundle 'Shougo/neocomplcache'
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'Shougo/vimproc'
-NeoBundleLazy 'Shougo/vimshell'
-NeoBundleLazy 'Shougo/vinarise'
+NeoBundle 'Shougo/vimshell', {'lazy': 1}
+NeoBundle 'Shougo/vinarise', {'lazy': 1}
 NeoBundle 't9md/vim-quickhl'
 NeoBundle 't9md/vim-textmanip'
-NeoBundleLazy 'thinca/vim-prettyprint'
-NeoBundle 'thinca/vim-qfreplace'
+NeoBundle 'teramako/jscomplete-vim', {'lazy': 1,
+            \ 'autoload': { 'filetypes': ['javascript']}}
+NeoBundle 'thinca/vim-prettyprint', {'lazy': 1}
+NeoBundle 'thinca/vim-qfreplace', {'lazy': 1}
 NeoBundle 'thinca/vim-quickrun'
 NeoBundle 'thinca/vim-ref'
-NeoBundleLazy 'thinca/vim-showtime'
+NeoBundle 'thinca/vim-scall'
+NeoBundle 'thinca/vim-showtime', {'lazy': 1}
 NeoBundle 'thinca/vim-textobj-comment'
-NeoBundle 'tomtom/tlib_vim'
-NeoBundleLazy 'tpope/vim-haml'
+NeoBundle 'tomtom/tcomment_vim'
+NeoBundle 'tpope/vim-repeat'
+NeoBundle 'tpope/vim-surround'
+NeoBundle 'ujihisa/unite-colorscheme'
+NeoBundle 'vim-jp/autofmt'
+
 NeoBundle 'git@github.com:tsukkee/lingr-vim.git'
-NeoBundle 'git@github.com:tsukkee/ttree.vim.git'
+NeoBundle 'git@github.com:tsukkee/ttree.vim.git', {'lazy': 1}
 NeoBundle 'git@github.com:tsukkee/unite-help.git'
 NeoBundle 'git@github.com:tsukkee/unite-tag.git'
-NeoBundle 'tyru/caw.vim'
-NeoBundle 'ujihisa/unite-colorscheme'
 
+NeoBundle 'http://lampsvn.epfl.ch/svn-repos/scala/scala-tool-support/trunk/src/vim',
+            \ {'name': 'scala', 'directory': 'scala', 'type': 'svn'}
 NeoBundle 'http://svn.macports.org/repository/macports/contrib/mpvim/', {'type': 'svn'}
-NeoBundle 'http://lampsvn.epfl.ch/svn-repos/scala/scala-tool-support/trunk/src/vim', {'directory': 'scala', 'type': 'svn'}
 
-NeoBundleLazy 'muttator', {'type': 'nosync'}
-NeoBundle 'vimperator', {'type': 'nosync'}
-NeoBundleLazy 'vimrcbox', {'type': 'nosync'}
+NeoBundle 'muttator', {'type': 'nosync', 'lazy': 1}
 NeoBundle 'tmux', {'type': 'nosync'}
-NeoBundle 'jpformat', {'type': 'nosync'}
+NeoBundle 'vimperator', {'type': 'nosync'}
 
 filetype plugin indent on
 
@@ -124,14 +132,14 @@ if s:is_win
     set shellslash
 endif
 
-" tab
+" indent
 set tabstop=4
 set shiftwidth=4
 set softtabstop=4
 set expandtab
 set smartindent
 
-" input support
+" input
 set backspace=indent,eol,start
 set formatoptions+=mM " add multibyte support
 set formatexpr=jpvim#formatexpr()
@@ -157,7 +165,7 @@ set autoread
 set hidden
 set tags=./tags; " search tag file recursively (See: :h file-searching)
 
-" display
+" interface
 set showmatch
 set showcmd
 set showmode
@@ -238,12 +246,9 @@ augroup vimrc
 augroup END
 
 " use set encoding=utf-8 in Windows
-" needs ja.po with utf-8 encoding as $VIMRUNTIME/lang/ja_JP.UTF-8/LC_MESSAGES/vim.mo
-" Reference: http://d.hatena.ne.jp/thinca/20090111/1231684962
 if s:is_win && has('gui_running')
     language messages ja_JP.UTF-8
     set encoding=utf-8
-    set termencoding=cp932 " mainly for ref-phpmanual
 endif
 
 " detect encoding
@@ -355,14 +360,8 @@ let g:submode_timeoutlen=600
 " use more logical mapping (See: :h Y)
 nnoremap Y y$
 
-" Reference: http://vim-users.jp/2011/04/hack214/
-onoremap ) t)
-onoremap ( t(
-onoremap ] t]
-onoremap [ t[
-
 " open new tab at last
-nnoremap <silent> <C-n> :<C-u>-1tabnew<CR>
+nnoremap <silent> <C-n> :<C-u>99tabnew<CR>
 
 " prefix
 " Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
@@ -407,7 +406,7 @@ cnoremap <C-n> <Down>
 cnoremap <Down> <C-n>
 
 " cmdwin
-set cmdwinheight=3
+set cmdwinheight=1
 augroup vimrc
     autocmd CmdwinEnter * startinsert!
     \|   nnoremap <buffer> <Esc> :<C-u>q<CR>
@@ -417,10 +416,11 @@ augroup END
 " write file easely
 CommandMap [Prefix]w update
 
-" allow undo for i_CTRL-u and i_CTRL-w
+" allow undo for i_CTRL-u, i_CTRL-w and <CR>
 " Reference: http://vim-users.jp/2009/10/hack81/
 inoremap <expr> <C-u> (pumvisible() ? "\<C-e>" : "") . "\<C-g>u\<C-u>"
 inoremap <C-w> <C-g>u<C-w>
+inoremap <CR> <C-g>u<CR>
 
 " folding
 " Reference: http://d.hatena.ne.jp/ns9tks/20080318/1205851539
@@ -433,7 +433,7 @@ vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
 CommandMap gh nohlsearch
 
 " select last changed or yanked text
-nnoremap gc `[v`]
+nnoremap gl `[v`]
 
 " input path in command mode
 cnoremap <expr> <C-x> expand('%:p:h') . "/"
@@ -449,15 +449,10 @@ if exists('$WINDOW') || exists('$TMUX')
 endif
 
 " tab move
-nnoremap L gt
-nnoremap H gT
-
-" move among window
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-nnoremap <C-h> <C-w>h
-nnoremap <BS>  <C-w>h
+call submode#enter_with('tabmove', 'n', '', 'gt', 'gt')
+call submode#enter_with('tabmove', 'n', '', 'gT', 'gT')
+call submode#map('tabmove', 'n', '', 't', 'gt')
+call submode#map('tabmove', 'n', '', 'T', 'gT')
 
 " window resizing with submode
 call submode#enter_with('winsize', 'n', '', '<C-w>>', '<C-w>>')
@@ -612,34 +607,9 @@ augroup vimrc
     " less
     autocmd BufNewFile,BufRead *.less setfiletype css
 
-    " haml (inline)
-    autocmd BufNewFile,BufRead *.rb
-    \   unlet b:current_syntax
-    \|  syn include @rubyData syntax/haml.vim
-    \|  syn region rubyDataHaml matchgroup=rubyData start="^__END__$" keepend end="\%$" contains=@rubyData
-    \|  syn match inFileTemplateName '^@@\w\+' containedin=rubyDataHaml
-    \|  hi def link inFileTemplateName Type
-    \|  let b:current_syntax = "ruby"
-
     " CakePHP
     autocmd BufNewFile,BufRead *.thtml setfiletype php
     autocmd BufNewFile,BufRead *.ctp setfiletype php
-
-    " scala
-    " Reference: http://d.hatena.ne.jp/tyru/20090406/1239015151
-    autocmd FileType scala
-    \   setlocal softtabstop=2 shiftwidth=2 tabstop=2
-    \|  setlocal iskeyword+=@-@
-    \|  setlocal includeexpr=substitute(v:fname,'\\.','/','g')
-    \|  setlocal suffixesadd=.scala
-    \|  setlocal suffixes+=.class
-    \|  setlocal comments& comments^=s0:*\ -,m0:*\ \ ,ex0:*/
-    \|  setlocal commentstring=//%s
-    \|  setlocal formatoptions-=t formatoptions+=croql
-    \|  let b:template_used = 1
-
-    " textile
-    autocmd BufRead,BufNewFile *.textile setfiletype textile
 
     " tmux
     autocmd BufRead,BufNewFile .tmux.conf*,tmux.conf* setfiletype tmux
@@ -678,70 +648,30 @@ nmap SS <Plug>YSsurround
 " operator-replace
 map [Operator]r <Plug>(operator-replace)
 
-" caw
-let g:caw_find_another_action = 1
-
-augroup vimrc
-    autocmd FileType plaintex,tex let b:caw_oneline_comment = '%'
-    autocmd FileType tmux let b:caw_oneline_comment = '#'
-augroup END
-
-nmap gA <Plug>(caw:a:comment)
-nmap _ <Plug>(caw:prefix)
-vmap _ <Plug>(caw:prefix)
-nmap <Plug>(caw:prefix)<Space> <Plug>(caw:i:toggle)
-vmap <Plug>(caw:prefix)<Space> <Plug>(caw:i:toggle)
-
 " neocomplcache
-" Reference: :h neocomplcache
-let g:neocomplcache_enable_at_startup = 1
-let g:neocomplcache_auto_completion_start_length = 2
-let g:neocomplcache_manual_completion_start_length = 1
-let g:neocomplcache_min_keyword_length = 3
-let g:neocomplcache_min_syntax_length = 3
-let g:neocomplcache_ignore_case = 0
-let g:neocomplcache_enable_smart_case = 1
-let g:neocomplcache_enable_camel_case_completion = 1
-let g:neocomplcache_enable_underbar_completion = 1
-let g:neocomplcache_disable_caching_file_path_pattern = "\.log$\|\.zsh_history"
-if !exists('g:neocomplcache_dictionary_filetype_lists')
-    let g:neocomplcache_dictionary_filetype_lists = {}
-endif
-let g:neocomplcache_dictionary_filetype_lists['vimshell'] = expand('~/.vimshell_hist')
-if !exists('g:neocomplcache_vim_completefuncs')
-   let g:neocomplcache_vim_completefuncs = {}
-endif
-let g:neocomplcache_vim_completefuncs.Ref = 'ref#complete'
-if !exists('g:neocomplcache_filetype_include_lists')
-    let g:neocomplcache_filetype_include_lists = {}
-endif
-let g:neocomplcache_filetype_include_lists['php'] =
-\   [{'filetype': 'html', 'start': '?>', 'end': '<?'}]
+let g:neocomplcache_enable_at_startup = 0
 
 inoremap <expr> <C-y> neocomplcache#smart_close_popup()
 inoremap <expr> <C-e> neocomplcache#cancel_popup()
-inoremap <expr> <C-x><C-f> neocomplcache#manual_filename_complete()
 imap <expr> <C-l> neocomplcache#sources#snippets_complete#expandable()
 \   ? "\<Plug>(neocomplcache_snippets_expand)"
 \   : neocomplcache#complete_common_string()
 smap <silent> <C-l> <Plug>(neocomplcache_snippets_expand)
-CommandMap [Prefix]ne NeoComplCacheEnable
-CommandMap [Prefix]nd NeoComplCacheDisable
 
 " execute repl
 " phpsh: http://github.com/facebook/phpsh
-" node:  http://nodejs.org/
 let s:simple_repl_programs = {
 \   'php':        'phpsh',
 \   'ruby':       'irb',
 \   'python':     'python',
 \   'perl':       'perl -de 1',
-\   'scala':      'scala-2.8',
+\   'scala':      'scala',
 \   'javascript': 'node',
 \   'haskell':    'ghci',
 \   'erlang':     'erl'
 \}
 function! s:simple_repl()
+    NeoBundleSource vimshell
     if !exists(':VimShell')
         echo "This command requires VimShell"
         return
@@ -761,18 +691,11 @@ CommandMap [Prefix]R call <SID>simple_repl()
 vnoremap [Prefix]v :VimShellSendString<CR>
 
 " unite
-let g:unite_update_time = 100
 let g:unite_enable_start_insert = 1
-let g:unite_enable_split_vertically = 0
-let g:unite_source_file_mru_limit = 50
 let g:unite_source_file_mru_time_format = '(%Y/%m/%d %T) '
-let g:unite_source_file_rec_max_depth = 5
-let g:unite_winwidth = 30
 
 call unite#set_substitute_pattern('files', '^$VIM', substitute(substitute($VIM,  '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
 call unite#set_substitute_pattern('files', '^\.vim', s:runtimepath, -100)
-call unite#set_substitute_pattern('files', '\$\w\+', '\=eval(submatch(0))', 200)
-call unite#set_substitute_pattern('files', ' ', '**', 100)
 
 let s:unite_tabopen = {
 \   'is_selectable': 1,
@@ -788,7 +711,6 @@ call unite#custom_action('file,directory,buffer', 'tabopen', s:unite_tabopen)
 
 ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru file
 " ArpeggioCommandMap kt Unite -buffer-name=tags tags
-ArpeggioCommandMap kt Unite -vertical tab
 execute 'ArpeggioCommandMap ke call ' s:SID_PREFIX() . 'unite_help_with_ref()'
 
 autocmd vimrc BufEnter *
@@ -865,8 +787,6 @@ elseif s:is_win
 endif
 let g:ref_alc_use_cache = 1
 let g:ref_alc_start_linenumber = 43
-
-" nnoremap <C-k> :<C-u>execute 'Ref alc' expand('<cword>')<CR>
 
 " lingr.vim
 if s:is_mac
@@ -973,9 +893,9 @@ call submode#map('textmanip', 'v', 'r', 'k', '<Plug>(textmanip-move-up)')
 call submode#map('textmanip', 'v', 'r', 'l', '<Plug>(textmanip-move-right)')
 
 " quickhl
-nmap <Space>m <Plug>(quickhl-toggle)
-vmap <Space>m <Plug>(quickhl-toggle)
-nmap <Space>M <Plug>(quickhl-reset)
+nmap [Prefix]m <Plug>(quickhl-toggle)
+vmap [Prefix]m <Plug>(quickhl-toggle)
+nmap [Prefix]M <Plug>(quickhl-reset)
 
 " powerline
 if s:is_mac
@@ -1008,14 +928,12 @@ function! s:taskpaper_mapping()
     nnoremap <buffer> <silent> [TaskPaper]: :<C-u>call <SID>raise_to_project()<CR>
 endfunction
 
-" JpFormat
+" plain text
 hi ColorColumn guibg=#aaaaaa
-autocmd vimrc FileType text
+autocmd vimrc FileType text,txt
 \   setl cc+=72
 \|  setl textwidth=72
-\|  let b:jpformat = 1
-\|  let b:JpCountChars = &l:textwidth / 2
-nnoremap [Prefix]F :<C-u>JpFormatAll!<CR>
+\|  setl formatexpr=autofmt#japanese#formatexpr()
 
 " CtrlP
 " let g:ctrlp_map = '<c-p>'
