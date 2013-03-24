@@ -23,8 +23,9 @@
 scriptencoding utf-8
 
 " ==================== Utilities ==================== "
-let s:is_mac = has('macunix') || (executable('uname') && system('uname') =~? '^darwin')
 let s:is_win = has('win32') || has('win64')
+" let s:is_mac = has('macunix') || (executable('uname') && system('uname') =~? '^darwin')
+let s:is_mac = !s:is_win
 let s:runtimepath = expand(s:is_win ? '~/vimfiles' : '~/.vim')
 
 " define and reset augroup used in vimrc
@@ -83,6 +84,7 @@ NeoBundle 'kana/vim-textobj-user'
 NeoBundle 'kien/ctrlp.vim', {'lazy': 1}
 NeoBundle 'Lokaltog/vim-powerline'
 NeoBundle 'mattn/wiseman-f-vim'
+NeoBundle 'mattn/benchvimrc-vim'
 NeoBundle 'osyo-manga/shabadou.vim', {'lazy': 1}
 NeoBundle 'osyo-manga/vim-reanimate'
 NeoBundle 'osyo-manga/vim-watchdogs', {'lazy': 1}
@@ -202,9 +204,13 @@ set laststatus=2 " always show statusine
 " tabline
 set showtabline=2 " always show tabline
 let &tabline = '%!' . s:SID_PREFIX() . 'tabline()'
-let s:v = vital#of('unite.vim') " for truncate()
 let s:max_tabwidth = 16
+let s:v = {}
 function! s:tabline()
+    if empty(s:v)
+        let s:v = vital#of('unite.vim') " for truncate()
+    endif
+
     " show each tab
     let s = ''
     let title_width = min([s:max_tabwidth, &columns / (tabpagenr('$') + 1) - 1])
@@ -694,29 +700,9 @@ vnoremap [Prefix]v :VimShellSendString<CR>
 let g:unite_enable_start_insert = 1
 let g:unite_source_file_mru_time_format = '(%Y/%m/%d %T) '
 
-call unite#set_substitute_pattern('files', '^$VIM', substitute(substitute($VIM,  '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
-call unite#set_substitute_pattern('files', '^\.vim', s:runtimepath, -100)
-
-let s:unite_tabopen = {
-\   'is_selectable': 1,
-\   'description': 'open files or buffers in new tab'
-\}
-function! s:unite_tabopen.func(candidates)
-    for c in a:candidates
-        call unite#take_action('tabopen', c)
-        cd `=s:dirname(c.action__path)`
-    endfor
-endfunction
-call unite#custom_action('file,directory,buffer', 'tabopen', s:unite_tabopen)
-
 ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru file
 " ArpeggioCommandMap kt Unite -buffer-name=tags tags
 execute 'ArpeggioCommandMap ke call ' s:SID_PREFIX() . 'unite_help_with_ref()'
-
-autocmd vimrc BufEnter *
-\   if empty(&buftype)
-\|      nnoremap <buffer> <C-]> :<C-u>UniteWithCursorWord -immediately tag<CR>
-\|  endif
 
 function! s:unite_help_with_ref()
     let unite_args = []
@@ -732,7 +718,14 @@ function! s:unite_help_with_ref()
 endfunction
 
 autocmd vimrc FileType unite call s:unite_settings()
+let s:did_unite_setting = 0
 function! s:unite_settings()
+    if !s:did_unite_setting
+        call unite#set_substitute_pattern('files', '^$VIM', substitute(substitute($VIM,  '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
+        call unite#set_substitute_pattern('files', '^\.vim', s:runtimepath, -100)
+        let s:did_unite_setting = 1
+    endif
+
     imap <buffer> <silent> <C-n> <Plug>(unite_insert_leave)<Plug>(unite_loop_cursor_down)
     imap <buffer> <silent> <C-p> <Plug>(unite_insert_leave)<Plug>(unite_loop_cursor_up)
     nmap <buffer> <silent> <C-n> <Plug>(unite_loop_cursor_down)
@@ -747,33 +740,37 @@ function! s:unite_settings()
     nmap <buffer> <silent> <expr> <C-t> unite#do_action("tabopen")
 endfunction
 
+" nerdtree
+CommandMap [Prefix]t NERDTree
+ArpeggioCommandMap nt NERDTreeToggle
+
 " ttree
-let g:ttree_replace_netrw = 1
-
-CommandMap [Prefix]t call ttree#show(getcwd())
-ArpeggioCommandMap nt TtreeToggle
-
-autocmd FileType ttree call s:setup_ttree()
-function! s:setup_ttree()
-    CommandMap! ct call <SID>ttree_cd()
-    CommandMap! cu call <SID>ttree_unite_filerec()
-endfunction
-
-function! s:ttree_cd()
-    let dir = s:dirname(ttree#get_node().path)
-    cd `=dir`
-endfunction
-
-function! s:ttree_unite_filerec()
-    let path = s:dirname(ttree#get_node().path)
-    if winnr('$') > 1
-        wincmd p
-    else
-        let w = winwidth(winnr()) - g:ttree_width
-        execute 'botright' w 'vnew'
-    endif
-    call unite#start([["file_rec/async", path]])
-endfunction
+" let g:ttree_replace_netrw = 1
+" 
+" CommandMap [Prefix]t call ttree#show(getcwd())
+" ArpeggioCommandMap nt TtreeToggle
+" 
+" autocmd FileType ttree call s:setup_ttree()
+" function! s:setup_ttree()
+"     CommandMap! ct call <SID>ttree_cd()
+"     CommandMap! cu call <SID>ttree_unite_filerec()
+" endfunction
+" 
+" function! s:ttree_cd()
+"     let dir = s:dirname(ttree#get_node().path)
+"     cd `=dir`
+" endfunction
+" 
+" function! s:ttree_unite_filerec()
+"     let path = s:dirname(ttree#get_node().path)
+"     if winnr('$') > 1
+"         wincmd p
+"     else
+"         let w = winwidth(winnr()) - g:ttree_width
+"         execute 'botright' w 'vnew'
+"     endif
+"     call unite#start([["file_rec/async", path]])
+" endfunction
 
 " ref
 if s:is_mac
@@ -959,16 +956,16 @@ CommandMap [Prefix]ss ReanimateSaveWithTimeStamp
 CommandMap [Prefix]sl ReanimateLoadLatest
 CommandMap [Prefix]sL Unite reanimate -default-action=reanimate_load
 
-let s:reanimate_event = {
-\   "name": "show_message"
-\}
-function! s:reanimate_event.save(context)
-    echomsg "save session to" a:context.point
-endfunction
-function! s:reanimate_event.load(context)
-    echomsg "load session from" a:context.point
-endfunction
-call reanimate#hook(s:reanimate_event)
+" let s:reanimate_event = {
+" \   "name": "show_message"
+" \}
+" function! s:reanimate_event.save(context)
+"     echomsg "save session to" a:context.point
+" endfunction
+" function! s:reanimate_event.load(context)
+"     echomsg "load session from" a:context.point
+" endfunction
+" call reanimate#hook(s:reanimate_event)
 
 autocmd vimrc VimLeave * call s:delete_old_sessions(10)
 function! s:delete_old_sessions(num)
