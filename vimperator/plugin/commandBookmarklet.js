@@ -6,7 +6,7 @@
  */
 
 let PLUGIN_INFO =
-<VimperatorPlugin>
+xml`<VimperatorPlugin>
 <name>{NAME}</name>
 <description>convert bookmarklets to commands</description>
 <description lang="ja">ブックマークレットをコマンドにする</description>
@@ -60,7 +60,7 @@ let PLUGIN_INFO =
   この問題を避けるためにブックマークレットのタイトルを ASCII 文字のみに書き換えることをおすすめします。
 
 ]]></detail>
-</VimperatorPlugin>;
+</VimperatorPlugin>`;
 
 ( function () {
 

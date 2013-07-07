@@ -29,7 +29,11 @@ test -d /Library/Haskell && LIBRARY_PATH=/Library/Haskell/current/lib:$LIBRARY_P
                             LD_LIBRARY_PATH=/Library/Haskell/current/lib:$LD_LIBRARY_PATH
 test -d $HOME/.cabal     && LIBRARY_PATH=$HOME/.cabal/lib:$LIBRARY_PATH &&
                             LD_LIBRARY_PATH=$HOME/.cabal/lib:$LD_LIBRARY_PATH
-test -d /opt/local/Library/Frameworks/Python.framework && LD_LIBRARY_PATH=/opt/local/Library/Frameworks/Python.framework/Versions/2.7:$LD_LIBRARY_PATH
+test -d /opt/local/lib   && LD_LIBRARY_PATH=/opt/local/lib:$LD_LIBRARY_PATH
+test -d /opt/local/Library/Frameworks/Python.framework/Versions/2.7 &&\
+    LD_LIBRARY_PATH=/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib:$LD_LIBRARY_PATH
+test -d /opt/local/Library/Frameworks/Python.framework/Versions/3.3 &&\
+    LD_LIBRARY_PATH=/opt/local/Library/Frameworks/Python.framework/Versions/3.3/lib:$LD_LIBRARY_PATH
 export LIBRARY_PATH LD_LIBRARY_PATH
 
 # Editor

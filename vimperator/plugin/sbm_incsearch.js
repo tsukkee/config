@@ -36,11 +36,11 @@ let format = {
         // Title
         function(item, text) {
             let url = item.text.replace(/^https?:\/\//, '');
-            return <>{item.description} <span class="extra-info">{url}</span></>;
+            return xml`${item.description} <span class="extra-info">${url}</span>`;
         },
         // Info
         function(item, text) {
-            return <><span class="extra-info">{item.extra}</span></>;
+            return xml`<span class="extra-info">${item.extra}</span>`;
         }
     ]
 };

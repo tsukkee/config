@@ -1,5 +1,5 @@
 let INFO =
-<plugin name="Tree Style Tab" version="0.0.1"
+xml`<plugin name="Tree Style Tab" version="0.0.1"
         href=""
         summary="manipulate Tree Style Tab extension"
         xmlns="http://vimperator.org/namespaces/liberator">
@@ -33,7 +33,7 @@ let INFO =
     <note>
         既存のマッピングを適当に上書きするので注意
     </note>
-</plugin>;
+</plugin>`;
 
 (function() {
 if(!("TreeStyleTabService" in window)) {

@@ -1,4 +1,4 @@
-" Last Change: 24 Mar 2013
+" Last Change: 07 Jul 2013
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,8 +24,8 @@ scriptencoding utf-8
 
 " ==================== Utilities ==================== "
 let s:is_win = has('win32') || has('win64')
+let s:is_mac = has('unix')
 " let s:is_mac = has('macunix') || (executable('uname') && system('uname') =~? '^darwin')
-let s:is_mac = !s:is_win
 let s:runtimepath = expand(s:is_win ? '~/vimfiles' : '~/.vim')
 
 " define and reset augroup used in vimrc
@@ -54,7 +54,7 @@ endif
 let g:neobundle_default_git_protocol = 'https'
 call neobundle#rc(expand(s:runtimepath . '/bundle'))
 
-NeoBundle 'ag.vim'
+NeoBundle 'ag.vim', {'lazy': 1}
 NeoBundle 'errormarker.vim', {'lazy': 1}
 NeoBundle 'Indent-Guides'
 NeoBundle 'matchit.zip'
@@ -62,15 +62,13 @@ NeoBundle 'SudoEdit.vim'
 NeoBundle 'Vdebug', {'lazy': 1}
 
 NeoBundle 'altercation/vim-colors-solarized'
+NeoBundle 'bling/vim-airline'
 NeoBundle 'davidhalter/jedi-vim', {'lazy': 1,
             \ 'autoload': { 'filetypes': ['python']}}
-NeoBundle 'davidoc/taskpaper.vim', {'lazy': 1}
-NeoBundle 'deris/columnjump'
 NeoBundle 'deton/jasegment.vim', {'lazy': 1,
             \ 'autoload': { 'filetypes': ['text', 'txt']}}
 NeoBundle 'h1mesuke/textobj-wiw'
 NeoBundle 'h1mesuke/vim-alignta'
-NeoBundle 'itchyny/thumbnail.vim', {'lazy': 1}
 NeoBundle 'kana/vim-altercmd'
 NeoBundle 'kana/vim-arpeggio'
 NeoBundle 'kana/vim-fakeclip'
@@ -81,11 +79,10 @@ NeoBundle 'kana/vim-submode'
 NeoBundle 'kana/vim-tabpagecd'
 NeoBundle 'kana/vim-textobj-indent'
 NeoBundle 'kana/vim-textobj-user'
-NeoBundle 'kien/ctrlp.vim', {'lazy': 1}
-NeoBundle 'Lokaltog/vim-powerline'
+NeoBundle 'kien/ctrlp.vim'
 NeoBundle 'mattn/wiseman-f-vim'
-NeoBundle 'mattn/benchvimrc-vim'
-NeoBundle 'osyo-manga/shabadou.vim', {'lazy': 1}
+NeoBundle 'mattn/benchvimrc-vim', {'lazy': 1}
+ NeoBundle 'osyo-manga/shabadou.vim', {'lazy': 1}
 NeoBundle 'osyo-manga/vim-reanimate'
 NeoBundle 'osyo-manga/vim-watchdogs', {'lazy': 1}
 NeoBundle 'Rykka/colorv.vim', {'lazy': 1}
@@ -99,13 +96,11 @@ NeoBundle 'Shougo/vimshell', {'lazy': 1}
 NeoBundle 'Shougo/vinarise', {'lazy': 1}
 NeoBundle 't9md/vim-quickhl'
 NeoBundle 't9md/vim-textmanip'
-NeoBundle 'teramako/jscomplete-vim', {'lazy': 1,
-            \ 'autoload': { 'filetypes': ['javascript']}}
 NeoBundle 'thinca/vim-prettyprint', {'lazy': 1}
 NeoBundle 'thinca/vim-qfreplace', {'lazy': 1}
 NeoBundle 'thinca/vim-quickrun'
 NeoBundle 'thinca/vim-ref'
-NeoBundle 'thinca/vim-scall'
+NeoBundle 'thinca/vim-scall', {'lazy': 1}
 NeoBundle 'thinca/vim-showtime', {'lazy': 1}
 NeoBundle 'thinca/vim-textobj-comment'
 NeoBundle 'tomtom/tcomment_vim'
@@ -160,6 +155,7 @@ set smartcase
 set incsearch
 set hlsearch
 nohlsearch " reset highlighting when reloading vimrc
+set wildignore+=*/.git*,*/.hg/*,*/.svn/*
 
 " reading and writing file
 set directory-=. " don't save tmp swap file in current directory
@@ -691,7 +687,6 @@ function! s:simple_repl()
 
     execute "VimShellInteractive" s:simple_repl_programs[&filetype]
     let b:interactive.is_close_immediately = 1
-
 endfunction
 CommandMap [Prefix]R call <SID>simple_repl()
 vnoremap [Prefix]v :VimShellSendString<CR>
@@ -701,7 +696,7 @@ let g:unite_enable_start_insert = 1
 let g:unite_source_file_mru_time_format = '(%Y/%m/%d %T) '
 
 ArpeggioCommandMap km Unite -buffer-name=files buffer file_mru file
-" ArpeggioCommandMap kt Unite -buffer-name=tags tags
+ArpeggioCommandMap kt Unite -buffer-name=tags tags
 execute 'ArpeggioCommandMap ke call ' s:SID_PREFIX() . 'unite_help_with_ref()'
 
 function! s:unite_help_with_ref()
@@ -721,8 +716,8 @@ autocmd vimrc FileType unite call s:unite_settings()
 let s:did_unite_setting = 0
 function! s:unite_settings()
     if !s:did_unite_setting
-        call unite#set_substitute_pattern('files', '^$VIM', substitute(substitute($VIM,  '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
-        call unite#set_substitute_pattern('files', '^\.vim', s:runtimepath, -100)
+        " call unite#set_substitute_pattern('files', '^$VIM', substitute(substitute($VIM,  '\\', '/', 'g'), ' ', '\\\\ ', 'g'), -100)
+        " call unite#set_substitute_pattern('files', '^\.vim', s:runtimepath, -100)
         let s:did_unite_setting = 1
     endif
 
@@ -782,8 +777,6 @@ elseif s:is_win
     let g:ref_refe_encoding = 'cp932'
     let g:ref_phpmanual_path = expand('~/Documents/phpmanual')
 endif
-let g:ref_alc_use_cache = 1
-let g:ref_alc_start_linenumber = 43
 
 " lingr.vim
 if s:is_mac
@@ -832,22 +825,6 @@ EOF
 endfunction
 CommandMap [Prefix]rf call ReloadFirefox()
 
-" reload Safari
-" needs RubyOSA and +ruby
-function! ReloadSafari()
-    if has('ruby') && s:is_mac
-        ruby <<EOF
-        require 'rubygems'
-        require 'rbosa'
-        safari = OSA.app('Safari')
-        safari.do_javascript('location.reload(true)', safari.documents[0])
-EOF
-    else
-        echoerr 'needs has("mac") and has("ruby")'
-    endif
-endfunction
-CommandMap [Prefix]rs call ReloadSafari()
-
 " utility command for Mac
 if s:is_mac
     command! Here silent call system('open ' . expand('%:p:h'))
@@ -894,36 +871,10 @@ nmap [Prefix]m <Plug>(quickhl-toggle)
 vmap [Prefix]m <Plug>(quickhl-toggle)
 nmap [Prefix]M <Plug>(quickhl-reset)
 
-" powerline
-if s:is_mac
-    let g:Powerline_symbols = 'fancy'
-else
-    let g:Powerline_symbols = 'compatible'
-endif
-
-" taskpaper
-autocmd vimrc FileType taskpaper call s:taskpaper_mapping()
-
-function! s:raise_to_project()
-    call setline('.', substitute(getline('.'), '\(^\s*\)- \(.\+\)$', '\1\2:', ''))
-endfunction
-
-function! s:taskpaper_mapping()
-    nnoremap <buffer> [TaskPaper] <Nop>
-    nmap <buffer> @ [TaskPaper]
-
-    map <buffer> [TaskPaper]d <Plug>TaskPaperToggleDone
-    map <buffer> [TaskPaper]c <Plug>TaskPaperToggleCancelled
-    map <buffer> [TaskPaper]a <Plug>TaskPaperShowAll
-    map <buffer> [TaskPaper]f <Plug>TaskPaperFoldProjects
-    map <buffer> [TaskPaper]A <Plug>TaskPaperArchiveDone
-    map <buffer> [TaskPaper]t <Plug>TaskPaperToggleToday
-
-    map <buffer> <silent> [TaskPaper]w :<C-u>call taskpaper#toggle_tag('waiting', '')<CR>
-    map <buffer> <silent> [TaskPaper]h :<C-u>call taskpaper#toggle_tag('others', '')<CR>
-
-    nnoremap <buffer> <silent> [TaskPaper]: :<C-u>call <SID>raise_to_project()<CR>
-endfunction
+" airline
+let g:airline_theme = 'light'
+let g:airline_left_sep=' '
+let g:airline_right_sep=' '
 
 " plain text
 hi ColorColumn guibg=#aaaaaa
@@ -933,21 +884,13 @@ autocmd vimrc FileType text,txt
 \|  setl formatexpr=autofmt#japanese#formatexpr()
 
 " CtrlP
-" let g:ctrlp_map = '<c-p>'
+let g:ctrlp_tabpage_position = 'l'
+let g:ctrlp_clear_cache_on_exit = 0
+let g:ctrlp_max_depth = 2
 let g:ctrlp_custom_ignore = {
 \   'dir':  '\.git$\|\.hg$\|\.svn$\|\.neocon$\|\.unite$',
 \   'file': '\.exe$\|\.so$\|\.dll$\|\.DS_Store$'
 \ }
-let g:ctrlp_max_files = 5000
-let g:ctrlp_max_depth = 5
-let g:ctrlp_user_command = {
-\   'types': {
-\       1: ['.git', 'cd %s && git ls-files'],
-\       2: ['.hg', 'hg --cwd %s locate -I .'],
-\   },
-\   'fallback': s:is_win ? 'dir %s /-n /b /s /a-d' : 'find %s -type f'
-\}
-let g:ctrlp_arg_map = 1
 
 " reanimate
 let g:reanimate_save_dir = s:runtimepath . '/reanimate'
@@ -955,17 +898,6 @@ command! -nargs=0 ReanimateSaveWithTimeStamp execute 'ReanimateSave' strftime('t
 CommandMap [Prefix]ss ReanimateSaveWithTimeStamp
 CommandMap [Prefix]sl ReanimateLoadLatest
 CommandMap [Prefix]sL Unite reanimate -default-action=reanimate_load
-
-" let s:reanimate_event = {
-" \   "name": "show_message"
-" \}
-" function! s:reanimate_event.save(context)
-"     echomsg "save session to" a:context.point
-" endfunction
-" function! s:reanimate_event.load(context)
-"     echomsg "load session from" a:context.point
-" endfunction
-" call reanimate#hook(s:reanimate_event)
 
 autocmd vimrc VimLeave * call s:delete_old_sessions(10)
 function! s:delete_old_sessions(num)
