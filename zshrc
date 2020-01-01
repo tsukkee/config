@@ -7,11 +7,6 @@ compinit
 zstyle ':completion:*' list-colors ''
 # ignore case
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-# sudo
-zstyle ':completion:*:sudo:*' command-path /opt/local/bin /opt/local/sbin \
-    /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin
-# completer for auto-fu
-# zstyle ':completion:*' completer _oldlist _complete
 
 # color
 autoload -U colors
@@ -86,60 +81,62 @@ bindkey '^[d' _quote-previous-word-in-double
 
 
 # ==================== Prompt ==================== "
-# PROMPT
-function _colorize_prompt {
-    PROMPT="%{%(?.$fg[green].$fg[red])%}%n@%m %D{%m/%d %H:%M:%S} $reset_color$fg[yellow]%~%{$reset_color%}
-%# "
-}
-_colorize_prompt
-precmd_functions+=_colorize_prompt
+eval "$(starship init zsh)"
 
-# RPROMPT
-vi_mode_str="%{$fg[green]%}--INSERT--%{$reset_color%}"
-function _set_rprompt {
-    # RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}[$vi_mode_str]"
-    RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}"
-}
-
-# vcs_info
-autoload -Uz vcs_info
-zstyle ':vcs_info:*' enable git svn hg bzr cvs
-zstyle ':vcs_info:*' formats '(%s)-[%b]'
-zstyle ':vcs_info:*' actionformats '(%s)-[%b|%a]'
-zstyle ':vcs_info:(svn|bzr):*' branchformat '%b:r%r'
-zstyle ':vcs_info:bzr:*' use-simple true
-
-function _vsc_info {
-    psvar=()
-    LANG=en_US.UTF-8 vcs_info
-    _set_rprompt
-}
-_vsc_info
-precmd_functions+=_vsc_info
+# # PROMPT
+# function _colorize_prompt {
+#     PROMPT="%{%(?.$fg[green].$fg[red])%}%n@%m %D{%m/%d %H:%M:%S} $reset_color$fg[yellow]%~%{$reset_color%}
+# %# "
+# }
+# _colorize_prompt
+# precmd_functions+=_colorize_prompt
+#
+# # RPROMPT
+# vi_mode_str="%{$fg[green]%}--INSERT--%{$reset_color%}"
+# function _set_rprompt {
+#     # RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}[$vi_mode_str]"
+#     RPROMPT="%{$fg[cyan]%}$vcs_info_msg_0_%{$reset_color%}"
+# }
+#
+# # vcs_info
+# autoload -Uz vcs_info
+# zstyle ':vcs_info:*' enable git svn hg bzr cvs
+# zstyle ':vcs_info:*' formats '(%s)-[%b]'
+# zstyle ':vcs_info:*' actionformats '(%s)-[%b|%a]'
+# zstyle ':vcs_info:(svn|bzr):*' branchformat '%b:r%r'
+# zstyle ':vcs_info:bzr:*' use-simple true
+#
+# function _vsc_info {
+#     psvar=()
+#     LANG=en_US.UTF-8 vcs_info
+#     _set_rprompt
+# }
+# _vsc_info
+# precmd_functions+=_vsc_info
 
 # show vi mode
-function _vi_rprompt {
-    case $KEYMAP in
-        vicmd)
-        vi_mode_str="%{$fg[red]%}--NORMAL--%{$reset_color%}"
-        ;;
-        main|viins)
-        vi_mode_str="%{$fg[green]%}--INSERT--%{$reset_color%}"
-        ;;
-    esac
-    _set_rprompt
-    zle reset-prompt
-}
-function zle-line-init {
-    # auto-fu-init
-    _vi_rprompt
-}
-function zle-keymap-select {
-    _vi_rprompt
-}
-zle -N zle-line-init
-zle -N zle-keymap-select
-
+# function _vi_rprompt {
+#     case $KEYMAP in
+#         vicmd)
+#         vi_mode_str="%{$fg[red]%}--NORMAL--%{$reset_color%}"
+#         ;;
+#         main|viins)
+#         vi_mode_str="%{$fg[green]%}--INSERT--%{$reset_color%}"
+#         ;;
+#     esac
+#     _set_rprompt
+#     zle reset-prompt
+# }
+# function zle-line-init {
+#     # auto-fu-init
+#     _vi_rprompt
+# }
+# function zle-keymap-select {
+#     _vi_rprompt
+# }
+# zle -N zle-line-init
+# zle -N zle-keymap-select
+#
 
 # ==================== screen/tmux ==================== "
 function _screen_dirname() {
@@ -160,9 +157,7 @@ preexec_functions+=_screen_cmdname
 # ==================== Aliases ==================== "
 set complete_aliases
 alias ls="ls -GF"
-alias scr="screen -xR"
 alias tm="tmux attach-session || tmux"
-alias refe="refe-1_8_7"
 alias -g C="| iconv -f utf-8 -t sjis | pbcopy"
 alias -g Csjis="| pbcopy"
 alias -g Ceuc="| iconv -f euc-jp -t sjis | pbcopy"
@@ -171,29 +166,5 @@ alias -g SU="| iconv -f sjis -t utf-8"
 
 
 # ==================== Ohters ==================== "
-# auto-fu
-# source $HOME/.zsh.d/auto-fu.zsh/auto-fu.zsh
-# { . ~/.zsh.d/auto-fu; auto-fu-install; }
-# zstyle ':auto-fu:highlight' input bold
-# zstyle ':auto-fu:highlight' completion fg=black,bold
-# zstyle ':auto-fu:highlight' completion/one fg=white,bold,underline
-# zstyle ':auto-fu:var' postdisplay $'\n-azfu-'
-# bindkey -M afu "^P" history-beginning-search-backward-end
-# bindkey -M afu "^N" history-beginning-search-forward-end
-# bindkey -M afu "^]" insert-last-word
-# bindkey -M afu "^[s" _quote-previous-word-in-single
-# bindkey -M afu "^[d" _quote-previous-word-in-double
-
-# cdd
-# source $HOME/.zsh.d/cdd.sh
-# export CDD_PWD_FILE=$HOME/.zsh.d/cdd_pwd_list
-# chpwd_functions+=_reg_pwd_screennum
-# function chpwd() {
-    # _reg_pwd_screennum
-# }
-
-# visual mode
-# source ~/.zsh.d/visualmode.sh
-
 # load loadl settings
 test -f $HOME/.zshrc.local && source $HOME/.zshrc.local
