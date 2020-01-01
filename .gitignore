@@ -8,6 +8,7 @@ vim/view
 vim/undo
 vim/.netrwhist
 vim/bundle*
+vim/pack
 vimperator/info
 pentadactyle/info
 .yardoc
