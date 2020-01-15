@@ -421,6 +421,24 @@ else
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
 
+    function! s:setup_angular_server() abort
+        let base = expand(printf('~/.vscode/extensions/%s', 'angular.ng-template-0.900.3'))
+        let node_modules = printf('%s/node_modules/', base)
+        let ng = expand(printf('--ngProbeLocations %s/server', base))
+        let ts = expand(printf('--tsProbeLocations %s', node_modules))
+        let s:server = printf('%s/server %s %s', base, ng, ts)
+        autocmd User lsp_setup call lsp#register_server({
+        \   'name': 'Angular Language Service',
+        \   'cmd': {server_info -> [&shell, &shellcmdflag, printf('node %s --stdio', s:server)]},
+        \   'root_uri':{server_info -> lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'angular.json'))},
+        \   'whitelist': ['html', 'typescript'],
+        \})
+    endfunction
+    call s:setup_angular_server()
+
+    " vital
+    call minpac#add('vim-jp/vital.vim')
+
     " MEMO: will install later if needed
     " 'SudoEdit.vim'
     " 'deton/jasegment.vim'
@@ -483,6 +501,10 @@ augroup vimrc
             endif
         endif
     endfunction
+
+    " golang
+    autocmd FileType go
+    \   setlocal noexpandtab
 augroup END
 
 " TOhtml
