@@ -67,6 +67,7 @@ set shiftwidth=4
 set softtabstop=4
 set expandtab
 set smartindent
+let g:vim_indent_cont = 0
 
 " input
 set backspace=indent,eol,start
@@ -198,13 +199,6 @@ nmap <Space> [Prefix]
 vmap <Space> [Prefix]
 noremap [Operator] <Nop>
 map , [Operator]
-
-" make easy to execute <Esc>
-inoremap jf <Esc>
-cnoremap fj <Esc>
-cnoremap jf <Esc>
-vnoremap fj <Esc>
-vnoremap jf <Esc>
 
 " use more logical mapping (See: :h Y)
 nnoremap Y y$
@@ -379,9 +373,11 @@ else
     call minpac#add('machakann/vim-sandwich')
     call minpac#add('tyru/caw.vim')
     call minpac#add('junegunn/vim-easy-align')
+    call minpac#add('cohama/lexima.vim')
 
     " file manager
-    call minpac#add('cocopon/vaffle.vim')
+    call minpac#add('lambdalisue/fern.vim')
+    nmap [Prefix]f :<C-u>Fern . -drawer<CR>
 
     " fuzzy finder
     call minpac#add('liuchengxu/vim-clap')
