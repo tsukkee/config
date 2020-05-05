@@ -97,6 +97,7 @@ set hidden
 set tags=./tags; " search tag file recursively (See: :h file-searching)
 
 " interface
+set termguicolors
 set showmatch
 set showcmd
 set showmode
@@ -313,8 +314,9 @@ let g:indent_guides_guide_size = 1
 if &t_Co == 256 || has('gui')
     let g:solarized_contrast = 'high'
     set background=light
-    colorscheme solarized
-    " colorscheme iceberg
+    " colorscheme solarized
+    colorscheme iceberg
+    " colorscheme japanesque
 else
     colorscheme desert
 endif
@@ -339,11 +341,13 @@ else
     " colorscheme
     call minpac#add('altercation/vim-colors-solarized')
     call minpac#add('cocopon/iceberg.vim')
+    call minpac#add('aereal/vim-colors-japanesque')
 
     " enhance statusline and tabline
     call minpac#add('itchyny/lightline.vim')
     set noshowmode " hide mode when using lightline
     let g:lightline = {
+    \    'colorscheme': 'iceberg',
     \    'tabline': { 'right': [ [  ] ] }
     \} " just delete close button on tabline
 
