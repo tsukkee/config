@@ -97,7 +97,6 @@ set hidden
 set tags=./tags; " search tag file recursively (See: :h file-searching)
 
 " interface
-set termguicolors
 set showmatch
 set showcmd
 set showmode
@@ -251,14 +250,9 @@ CommandMap [Prefix]w update
 " reset highlight
 CommandMap gh nohlsearch
 
-" copy and paste with fakeclip
-" See: :h fakeclip-multibyte-on-mac
+" copy and paste
 map gy "*y
 map gp "*p
-if exists('$WINDOW') || exists('$TMUX')
-    map gY <Plug>(fakeclip-screen-y)
-    map gP <Plug>(fakeclip-screen-p)
-endif
 
 " rename
 command! -nargs=1 -bang -complete=file Rename saveas<bang> <args> | call delete(expand('#'))
@@ -287,36 +281,24 @@ augroup vimrc
     autocmd VimEnter,WinEnter * call matchadd('ZenkakuSpace', '　')
 augroup END
 function! s:onColorScheme()
-    " Modify colorscheme
-    if !exists('g:colors_name')
-        return
-    endif
-
-    if g:colors_name == 'solarized'
-        " based on SpecialKey
-        highlight ZenkakuSpace ctermbg=185
-        " indent guids
-        highlight IndentGuidesOdd ctermbg=187
-        highlight IndentGuidesEven ctermbg=186
+    " based on SpecialKey
+    if &termguicolors
+        execute 'highlight ZenkakuSpace guibg=' synIDattr(synIDtrans(hlID('SpecialKey')), 'fg')
     else
-        highlight ZenkakuSpace ctermbg=77
+        execute 'highlight ZenkakuSpace ctermbg=' synIDattr(synIDtrans(hlID('SpecialKey')), 'fg')
     endif
 endfunction
 
 syntax enable
 
-" Indent guide
-let g:indent_guides_enable_on_vim_startup = 1
-let g:indent_guides_auto_colors = 0
-let g:indent_guides_guide_size = 1
-
 " colorscheme
-if &t_Co == 256 || has('gui')
+if exists('+termguicolors')
+    set termguicolors
+    colorscheme gruvbox
+elseif &t_Co == 256 || has('gui')
     let g:solarized_contrast = 'high'
-    set background=light
-    " colorscheme solarized
-    colorscheme iceberg
-    " colorscheme japanesque
+    set background=dark
+    colorscheme solarized
 else
     colorscheme desert
 endif
@@ -342,12 +324,15 @@ else
     call minpac#add('altercation/vim-colors-solarized')
     call minpac#add('cocopon/iceberg.vim')
     call minpac#add('aereal/vim-colors-japanesque')
+    call minpac#add('morhetz/gruvbox')
+
+    call minpac#add('hoov/tmuxline.vim')
 
     " enhance statusline and tabline
     call minpac#add('itchyny/lightline.vim')
     set noshowmode " hide mode when using lightline
     let g:lightline = {
-    \    'colorscheme': 'iceberg',
+    \    'colorscheme': 'gruvbox',
     \    'tabline': { 'right': [ [  ] ] }
     \} " just delete close button on tabline
 
@@ -442,11 +427,9 @@ else
     " MEMO: will install later if needed
     " 'SudoEdit.vim'
     " 'deton/jasegment.vim'
-    " 'kana/vim-fakeclip'
     " 'kana/vim-operator-replace'
     "   map [Operator]r <Plug>(operator-replace)
     " 'kana/vim-operator-user'
-    " 'kana/vim-tabpagecd'
     " 'kana/vim-textobj-indent'
     " 'kana/vim-textobj-user'
     " 't9md/vim-quickhl'
