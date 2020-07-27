@@ -52,7 +52,6 @@ function! s:commandMap(command, buffer, lhs, ...)
     execute a:command '<silent>' buffer a:lhs ':<C-u>' . rhs . '<CR>'
 endfunction
 
-
 " ==================== Settings ==================== "
 if s:is_win
     set shellslash
@@ -151,7 +150,7 @@ autocmd vimrc QuickfixCmdPost * if !empty(getqflist()) | cwindow | endif
 " save and load fold settings automatically
 " Reference: http://vim-users.jp/2009/10/hack84/
 " Don't save options.
-set viewoptions-=options
+set viewoptions-=options,curdir
 let &viewdir = s:runtimepath . '/view'
 augroup vimrc
     autocmd BufWritePost *
@@ -274,7 +273,6 @@ if s:is_win
     command! -nargs=1 -complete=file Open silent execute '!explorer' shellescape(expand(<f-args>), 1)
 endif
 
-
 " ==================== Hightlight ==================== "
 augroup vimrc
     autocmd ColorScheme * call s:onColorScheme()
@@ -326,8 +324,6 @@ else
     call minpac#add('aereal/vim-colors-japanesque')
     call minpac#add('morhetz/gruvbox')
 
-    call minpac#add('hoov/tmuxline.vim')
-
     " enhance statusline and tabline
     call minpac#add('itchyny/lightline.vim')
     set noshowmode " hide mode when using lightline
@@ -362,7 +358,7 @@ else
     call minpac#add('machakann/vim-sandwich')
     call minpac#add('tyru/caw.vim')
     call minpac#add('junegunn/vim-easy-align')
-    call minpac#add('cohama/lexima.vim')
+    call minpac#add('editorconfig/editorconfig-vim')
 
     " file manager
     call minpac#add('lambdalisue/fern.vim')
@@ -457,7 +453,6 @@ else
     "   \|  setl textwidth=72
     "   \|  setl formatexpr=autofmt#japanese#formatexpr()
 endif
-
 
 " ==================== Plugins settings ==================== "
 " FileType
