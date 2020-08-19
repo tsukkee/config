@@ -362,7 +362,16 @@ else
 
     " file manager
     call minpac#add('lambdalisue/fern.vim')
-    nmap [Prefix]f :<C-u>Fern . -drawer<CR>
+    nmap [Prefix]f :<C-u>Fern . -drawer -reveal=% -keep -toggle<CR>
+    function! s:init_fern() abort
+        nunmap <buffer> c
+        nmap <buffer> y <Plug>(fern-action-copy)
+        nmap <buffer> cd <Plug>(fern-action-cd)
+        nmap <buffer> ct <Plug>(fern-action-tcd)
+    endfunction
+    augroup vimrc
+        autocmd FileType fern call s:init_fern()
+    augroup END
 
     " fuzzy finder
     call minpac#add('liuchengxu/vim-clap')
