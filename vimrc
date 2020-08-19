@@ -44,14 +44,6 @@ function! s:dirname(path)
     return isdirectory(a:path) ? a:path : fnamemodify(a:path, ':p:h')
 endfunction
 
-" mapping command
-command! -bang -nargs=+ CommandMap call s:commandMap('nnoremap', <bang>0, <f-args>)
-function! s:commandMap(command, buffer, lhs, ...)
-    let rhs = join(a:000, ' ')
-    let buffer = a:buffer ? '<buffer>' : ''
-    execute a:command '<silent>' buffer a:lhs ':<C-u>' . rhs . '<CR>'
-endfunction
-
 " ==================== Settings ==================== "
 if s:is_win
     set shellslash
@@ -247,20 +239,14 @@ cnoremap <expr> <C-x> expand('%:p:h') . "/"
 cnoremap <expr> <C-z> expand('%:p:r')
 
 " write file easely
-CommandMap [Prefix]w update
+nmap <silent> [Prefix]w :<C-u>:update<CR>
 
 " reset highlight
-CommandMap gh nohlsearch
+nnoremap <silent> gh :<C-u>nohlsearch<CR>
 
 " copy and paste
 map gy "*y
 map gp "*p
-
-" rename
-command! -nargs=1 -bang -complete=file Rename saveas<bang> <args> | call delete(expand('#'))
-
-" ctags
-command! -nargs=0 CtagsR !ctags -R
 
 " utility command for Mac
 if s:is_mac
