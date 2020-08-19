@@ -150,7 +150,7 @@ autocmd vimrc QuickfixCmdPost * if !empty(getqflist()) | cwindow | endif
 " save and load fold settings automatically
 " Reference: http://vim-users.jp/2009/10/hack84/
 " Don't save options.
-set viewoptions-=options,curdir
+set viewoptions=cursor,folds
 let &viewdir = s:runtimepath . '/view'
 augroup vimrc
     autocmd BufWritePost *
@@ -164,7 +164,10 @@ augroup vimrc
 augroup END
 
 " session
-set sessionoptions=folds,resize,tabpages
+set sessionoptions=buffers,curdir,folds,resize,tabpages,terminal,winsize
+let sessiondir = s:runtimepath . '/session'
+command! MkSession execute 'mksession! ' . sessiondir . '/Session.vim'
+command! LoadSession execute 'source ' . sessiondir . '/Session.vim'
 
 " persistent undo
 set undofile
@@ -329,7 +332,14 @@ else
     set noshowmode " hide mode when using lightline
     let g:lightline = {
     \    'colorscheme': 'gruvbox',
-    \    'tabline': { 'right': [ [  ] ] }
+    \    'tabline': { 'right': [ [  ] ] },
+    \    'active': {
+    \       'left': [ [ 'mode', 'paste' ],
+    \               [ 'readonly', 'filename', 'modified', 'method' ] ],
+    \    },
+    \    'component_function': {
+    \       'method': 'NearestMethodOrFunction'
+    \    }
     \} " just delete close button on tabline
 
     " enhance key mappings
@@ -362,9 +372,9 @@ else
 
     " file manager
     call minpac#add('lambdalisue/fern.vim')
-    nmap [Prefix]f :<C-u>Fern . -drawer -reveal=% -keep -toggle<CR>
+    nmap <silent> [Prefix]f :<C-u>Fern . -drawer -reveal=% -keep -toggle<CR>
+    nmap <silent> [Prefix]F :<C-u>Fern . -drawer -reveal=%<CR>
     function! s:init_fern() abort
-        nunmap <buffer> c
         nmap <buffer> y <Plug>(fern-action-copy)
         nmap <buffer> cd <Plug>(fern-action-cd)
         nmap <buffer> ct <Plug>(fern-action-tcd)
@@ -373,15 +383,22 @@ else
         autocmd FileType fern call s:init_fern()
     augroup END
 
-    " fuzzy finder
+    " finder
     call minpac#add('liuchengxu/vim-clap')
+    nmap [Prefix]c :<C-u>Clap<CR>
+    call minpac#add('liuchengxu/vista.vim')
+    nmap [Prefix]v :<C-u>Vista!!<CR>
+
+    function! NearestMethodOrFunction() abort
+      return get(b:, 'vista_nearest_method_or_function', '')
+    endfunction
+    autocmd vimrc VimEnter * call vista#RunForNearestMethodOrFunction()
 
     " completion
     " Reference: https://mattn.kaoriya.net/software/vim/20191231213507.htm
-    call minpac#add('prabirshrestha/async.vim')
+    call minpac#add('prabirshrestha/vim-lsp')
     call minpac#add('prabirshrestha/asyncomplete.vim')
     call minpac#add('prabirshrestha/asyncomplete-lsp.vim')
-    call minpac#add('prabirshrestha/vim-lsp')
     call minpac#add('mattn/vim-lsp-settings')
     call minpac#add('mattn/vim-lsp-icons')
     call minpac#add('hrsh7th/vim-vsnip')
@@ -395,8 +412,7 @@ else
         inoremap <expr> <cr> pumvisible() ? "\<c-y>" : "\<cr>"
     endfunction
 
-    augroup lsp_install
-      au!
+    augroup vimrc
       autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
     augroup END
     command! LspDebug let lsp_log_verbose=1 | let lsp_log_file = expand('~/lsp.log')
@@ -410,21 +426,6 @@ else
 
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
-
-    function! s:setup_angular_server() abort
-        let base = expand(printf('~/.vscode/extensions/%s', 'angular.ng-template-0.900.3'))
-        let node_modules = printf('%s/node_modules/', base)
-        let ng = expand(printf('--ngProbeLocations %s/server', base))
-        let ts = expand(printf('--tsProbeLocations %s', node_modules))
-        let s:server = printf('%s/server %s %s', base, ng, ts)
-        autocmd User lsp_setup call lsp#register_server({
-        \   'name': 'Angular Language Service',
-        \   'cmd': {server_info -> [&shell, &shellcmdflag, printf('node %s --stdio', s:server)]},
-        \   'root_uri':{server_info -> lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'angular.json'))},
-        \   'whitelist': ['html', 'typescript'],
-        \})
-    endfunction
-    call s:setup_angular_server()
 
     " vital
     call minpac#add('vim-jp/vital.vim')
