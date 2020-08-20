@@ -303,10 +303,13 @@ else
     \    'tabline': { 'right': [ [  ] ] },
     \    'active': {
     \       'left': [ [ 'mode', 'paste' ],
-    \               [ 'readonly', 'filename', 'modified', 'method' ] ],
+    \               [ 'readonly', 'filename', 'modified' ],
+    \               [ 'gitrepo', 'gitstatus' ] ]
     \    },
     \    'component_function': {
-    \       'method': s:SID_PREFIX() . 'nearestMethodOrFunction'
+    \       'method': s:SID_PREFIX() . 'nearestMethodOrFunction',
+    \       'gitrepo': 'gina#component#repo#preset',
+    \       'gitstatus': 'gina#component#status#preset'
     \    }
     \}
 
