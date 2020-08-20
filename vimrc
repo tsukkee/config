@@ -39,11 +39,6 @@ function! s:SID_PREFIX()
     return matchstr(expand('<sfile>'), '<SNR>\d\+_')
 endfunction
 
-" get dirname
-function! s:dirname(path)
-    return isdirectory(a:path) ? a:path : fnamemodify(a:path, ':p:h')
-endfunction
-
 " ==================== Settings ==================== "
 if s:is_win
     set shellslash
@@ -62,7 +57,7 @@ let g:vim_indent_cont = 0
 
 " input
 set backspace=indent,eol,start
-set formatoptions+=mM " add multibyte support
+set formatoptions+=mM
 " set formatexpr=jpvim#formatexpr()
 set nolinebreak
 set iminsert=0
@@ -82,7 +77,7 @@ nohlsearch " reset highlighting when reloading vimrc
 set wildignore+=*/.git*,*/.hg/*,*/.svn/*
 
 " reading and writing file
-set directory-=. " don't save tmp swap file in current directory
+set directory& directory-=. " don't save tmp swap file in current directory
 set autoread
 set hidden
 set tags=./tags; " search tag file recursively (See: :h file-searching)
@@ -99,11 +94,10 @@ set foldcolumn=3
 set list
 set listchars=tab:^\ ,trail:~
 set ambiwidth=double
-set laststatus=2 " always show statusine
-set showtabline=2 " always show tabline
+set laststatus=2
+set showtabline=2
 
 " display cursorline only in active window
-" Reference: http://nanabit.net/blog/2007/11/03/vim-cursorline/
 augroup vimrc
     autocmd WinLeave * setlocal nocursorline
     autocmd WinEnter,BufRead * setlocal cursorline
@@ -122,8 +116,8 @@ else
     set fileencodings=iso-2022-jp,euc-jp,cp932,utf-8,latin1
 endif
 
-" use 'fileencoding' for 'encoding' if the file doesn't contain multibyte characters
-" give up searching multibyte characters when searching time is over 100 ms
+" use 'fileencoding' for 'encoding' if the file doesn't contain multibyte characters,
+" and give up searching multibyte characters when searching time is over 100 ms
 autocmd vimrc BufReadPost *
 \   if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n', 0, 100) == 0
 \|      let &fileencoding=&encoding
@@ -139,9 +133,7 @@ endif
 " show quickfix automatically
 autocmd vimrc QuickfixCmdPost * if !empty(getqflist()) | cwindow | endif
 
-" save and load fold settings automatically
-" Reference: http://vim-users.jp/2009/10/hack84/
-" Don't save options.
+" save and load views automatically
 set viewoptions=cursor,folds
 let &viewdir = s:runtimepath . '/view'
 augroup vimrc
@@ -156,9 +148,10 @@ augroup vimrc
 augroup END
 
 " session
-set sessionoptions=buffers,curdir,folds,resize,tabpages,terminal,winsize
+set sessionoptions=curdir,folds,resize,tabpages,terminal,winsize
 let sessiondir = s:runtimepath . '/session'
-command! MkSession execute 'mksession! ' . sessiondir . '/Session.vim'
+command! -bar MkSession execute 'mksession! ' . sessiondir . '/Session.vim'
+command! Q MkSession <bar> wqa
 command! LoadSession execute 'source ' . sessiondir . '/Session.vim'
 
 " persistent undo
@@ -166,27 +159,18 @@ set undofile
 let &undodir = s:runtimepath . '/undo'
 
 " enable mouse wheel with iTerm2
-if s:is_mac
-    set mouse=a
-    set ttymouse=xterm2
-endif
+set mouse=a
+set ttymouse=xterm2
 
 " binary editing (See: :h xxd)
-" Reference: http://vim-users.jp/2010/03/hack133/
 augroup vimrc
     autocmd BufReadPost,BufNewFile *.bin,*.exe,*.dll,*.swf,*.bmp setlocal filetype=xxd
     autocmd BufReadPost * if &l:binary | setlocal filetype=xxd | endif
 augroup END
 
-" use jvgrep
-if executable('jvgrep')
-    set grepprg=jvgrep
-endif
-
 
 " ==================== Keybind and commands ==================== "
 " prefix
-" Reference: http://d.hatena.ne.jp/kuhukuhun/20090213/1234522785
 nnoremap [Prefix] <Nop>
 vnoremap [Prefix] <Nop>
 nmap <Space> [Prefix]
@@ -222,13 +206,11 @@ cnoremap <C-n> <Down>
 cnoremap <Down> <C-n>
 
 " allow undo for i_CTRL-u, i_CTRL-w and <CR>
-" Reference: http://vim-users.jp/2009/10/hack81/
 inoremap <expr> <C-u> (pumvisible() ? "\<C-e>" : "") . "\<C-g>u\<C-u>"
 inoremap <C-w> <C-g>u<C-w>
 inoremap <CR> <C-g>u<CR>
 
 " folding
-" Reference: http://d.hatena.ne.jp/ns9tks/20080318/1205851539
 nnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zc' : 'h'
 nnoremap <expr> l foldclosed(line('.')) != -1 ? 'zo' : 'l'
 vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
@@ -245,8 +227,8 @@ nmap <silent> [Prefix]w :<C-u>:update<CR>
 nnoremap <silent> gh :<C-u>nohlsearch<CR>
 
 " copy and paste
-map gy "*y
-map gp "*p
+nnoremap gy "*y
+nnoremap gp "*p
 
 " utility command for Mac
 if s:is_mac
@@ -324,9 +306,9 @@ else
     \               [ 'readonly', 'filename', 'modified', 'method' ] ],
     \    },
     \    'component_function': {
-    \       'method': 'NearestMethodOrFunction'
+    \       'method': s:SID_PREFIX() . 'nearestMethodOrFunction'
     \    }
-    \} " just delete close button on tabline
+    \}
 
     " enhance key mappings
     call minpac#add('kana/vim-submode')
@@ -369,13 +351,24 @@ else
         autocmd FileType fern call s:init_fern()
     augroup END
 
+    call minpac#add('lambdalisue/gina.vim')
+
     " finder
     call minpac#add('liuchengxu/vim-clap')
-    nmap [Prefix]c :<C-u>Clap<CR>
+    let g:clap_layout = {
+    \   'relative': 'editor',
+    \   'width': '70%', 'col': '15%',
+    \   'height': '40%', 'row': 3
+    \}
+    nmap [Prefix]cc :<C-u>Clap!<CR>
+    nmap [Prefix]cb :<C-u>Clap! buffers<CR>
+    nmap [Prefix]cf :<C-u>Clap! files<CR>
+    nmap [Prefix]cg :<C-u>Clap! grep<CR>
+
     call minpac#add('liuchengxu/vista.vim')
     nmap [Prefix]v :<C-u>Vista!!<CR>
 
-    function! NearestMethodOrFunction() abort
+    function! s:nearestMethodOrFunction() abort
       return get(b:, 'vista_nearest_method_or_function', '')
     endfunction
     autocmd vimrc VimEnter * call vista#RunForNearestMethodOrFunction()
