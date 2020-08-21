@@ -27,6 +27,12 @@ let s:is_mac = has('mac')
 let s:is_linux = has('linux')
 
 if s:is_win
+    let s:runtimepath = expand('~/vimfiles')
+else
+    let s:runtimepath = expand('~/.vim')
+endif
+
+if s:is_win
   let s:data_dir = expand('$LOCALAPPDATA/vimrc')
 elseif $XDG_DATA_HOME !=# ''
   let s:data_dir = expand('$XDG_DATA_HOME/vimrc')
@@ -219,12 +225,6 @@ inoremap <expr> <C-u> (pumvisible() ? "\<C-e>" : "") . "\<C-g>u\<C-u>"
 inoremap <C-w> <C-g>u<C-w>
 inoremap <CR> <C-g>u<CR>
 
-" folding
-nnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zc' : 'h'
-nnoremap <expr> l foldclosed(line('.')) != -1 ? 'zo' : 'l'
-vnoremap <expr> h col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'
-vnoremap <expr> l foldclosed(line('.')) != -1 ? 'zogv' : 'l'
-
 " input path in command mode
 cnoremap <expr> <C-x> expand('%:p:h') . "/"
 cnoremap <expr> <C-z> expand('%:p:r')
@@ -237,7 +237,9 @@ nnoremap <silent> gh :<C-u>nohlsearch<CR>
 
 " copy and paste
 nnoremap gy "*y
+vnoremap gy "*y
 nnoremap gp "*p
+vnoremap gp "*p
 
 " utility command for Mac
 if s:is_mac
@@ -427,6 +429,32 @@ else
 
     call minpac#add('hrsh7th/vim-vsnip')
     call minpac#add('hrsh7th/vim-vsnip-integ')
+    let g:vsnip_snippet_dirs = [
+    \   s:runtimepath . '/vsnip',
+    \   s:data_dir . '/vsnip-vscode'
+    \]
+    for dir in g:vsnip_snippet_dirs
+        call mkdir(dir, 'p')
+    endfor
+
+    function! RetrieveVSCodeSnippet() abort
+        let files = {
+        \   'typescript': 'https://raw.githubusercontent.com/microsoft/vscode/master/extensions/typescript-basics/snippets/typescript.code-snippets',
+        \   'ruby': 'https://raw.githubusercontent.com/rubyide/vscode-ruby/master/packages/vscode-ruby/snippets/ruby.json',
+        \   'python': 'https://raw.githubusercontent.com/microsoft/vscode-python/master/snippets/python.json'
+        \}
+
+        for [type, url] in items(files)
+            call job_start(['curl', url, '-o', s:data_dir . '/vsnip-vscode/' . type . '.json'])
+        endfor
+    endfunction
+
+    imap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'
+    smap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'
+    imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+    smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+    imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
+    smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
 
     " vital
     call minpac#add('vim-jp/vital.vim')
