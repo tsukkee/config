@@ -32,8 +32,8 @@ if has('gui_macvim')
     endif
     set linespace=2
 
-    set guifont=Menlo:h14
-    set guifontwide=Osaka-Mono
+    set guifont=Cica:h16
+    set guifontwide=Cica
 
     set transparency=5 " (opaque) 0-100 (transparent)
     set noimdisable    " use IM control
@@ -51,14 +51,6 @@ if has('gui_macvim')
 
     nnoremap <silent> gw :<C-u>macaction selectNextWindow:<CR>
     nnoremap <silent> gW :<C-u>macaction selectPreviousWindow:<CR>
-
-    " Reference: http://github.com/kana/config/blob/c21dfc660dd789e14b0c194315773b71815f3ef0/vim/personal/dot.vimrc#L657
-    function! s:activate_terminal()
-        " silent !open -a Terminal
-        silent !open -a iTerm
-        " silent !open -a XQuartz
-    endfunction
-    nnoremap <silent> <C-f>m :<C-u>call <SID>activate_terminal()<CR>
 
     " for latest MacVim-Kaoriya
     if has('kaoriya')

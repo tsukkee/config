@@ -26,7 +26,13 @@ let s:is_win = has('win32') || has('win64')
 let s:is_mac = has('mac')
 let s:is_linux = has('linux')
 
-let s:runtimepath = expand(s:is_win ? '~/vimfiles' : '~/.vim')
+if s:is_win
+  let s:data_dir = expand('$LOCALAPPDATA/vimrc')
+elseif $XDG_DATA_HOME !=# ''
+  let s:data_dir = expand('$XDG_DATA_HOME/vimrc')
+else
+  let s:data_dir = expand('~/.local/share/vimrc')
+endif
 
 " define and reset augroup used in vimrc
 augroup vimrc
@@ -135,7 +141,8 @@ autocmd vimrc QuickfixCmdPost * if !empty(getqflist()) | cwindow | endif
 
 " save and load views automatically
 set viewoptions=cursor,folds
-let &viewdir = s:runtimepath . '/view'
+let &viewdir = s:data_dir . '/view'
+call mkdir(&viewdir, 'p')
 augroup vimrc
     autocmd BufWritePost *
     \   if expand('%') != '' && &buftype !~ 'nofile'
@@ -149,14 +156,16 @@ augroup END
 
 " session
 set sessionoptions=curdir,folds,resize,tabpages,terminal,winsize
-let sessiondir = s:runtimepath . '/session'
-command! -bar MkSession execute 'mksession! ' . sessiondir . '/Session.vim'
+let s:sessiondir = s:data_dir . '/session'
+call mkdir(s:sessiondir, 'p')
+command! -bar MkSession execute 'mksession! ' . s:sessiondir . '/Session.vim'
 command! Q MkSession <bar> wqa
-command! LoadSession execute 'source ' . sessiondir . '/Session.vim'
+command! LoadSession execute 'source ' . s:sessiondir . '/Session.vim'
 
 " persistent undo
 set undofile
-let &undodir = s:runtimepath . '/undo'
+let &undodir = s:data_dir . '/undo'
+call mkdir(&undodir, 'p')
 
 " enable mouse wheel with iTerm2
 set mouse=a
@@ -273,12 +282,13 @@ else
 endif
 
 " ==================== Plugins ==================== "
-filetype plugin indent on
 
 " do NOT load plugins when git commit
 if $HOME != $USERPROFILE && $GIT_EXEC_PATH != ''
   finish
 end
+
+filetype plugin indent on
 
 " use minpac to manage my plugins
 packadd minpac
@@ -382,9 +392,13 @@ else
     call minpac#add('prabirshrestha/asyncomplete.vim')
     call minpac#add('prabirshrestha/asyncomplete-lsp.vim')
     call minpac#add('mattn/vim-lsp-settings')
-    call minpac#add('mattn/vim-lsp-icons')
-    call minpac#add('hrsh7th/vim-vsnip')
-    call minpac#add('hrsh7th/vim-vsnip-integ')
+
+    function! s:on_lsp_setup()
+        let g:lsp_signs_error = {'text': '󿚆' }
+        let g:lsp_signs_warning = {'text': '󿙿' }
+        let g:lsp_signs_information = {'text': '󿙽' }
+        let g:lsp_signs_hint = {'text': '󿚅' }
+    endfunction
 
     function! s:on_lsp_buffer_enabled() abort
         setlocal omnifunc=lsp#complete
@@ -395,19 +409,24 @@ else
     endfunction
 
     augroup vimrc
+      autocmd User lsp_setup call s:on_lsp_setup()
       autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
     augroup END
     command! LspDebug let lsp_log_verbose=1 | let lsp_log_file = expand('~/lsp.log')
 
-    let g:lsp_diagnostics_enabled = 1
-    let g:lsp_diagnostics_echo_cursor = 1
     let g:asyncomplete_auto_popup = 1
     let g:asyncomplete_auto_completeopt = 0
     let g:asyncomplete_popup_delay = 200
+    let g:lsp_diagnostics_enabled = 1
+    let g:lsp_diagnostics_echo_cursor = 1
     let g:lsp_text_edit_enabled = 1
+    let g:lsp_signs_enabled = 1
 
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
+
+    call minpac#add('hrsh7th/vim-vsnip')
+    call minpac#add('hrsh7th/vim-vsnip-integ')
 
     " vital
     call minpac#add('vim-jp/vital.vim')
@@ -446,35 +465,11 @@ else
     "   \|  setl formatexpr=autofmt#japanese#formatexpr()
 endif
 
-" ==================== Plugins settings ==================== "
+" ==================== Others ==================== "
 " FileType
 augroup vimrc
-    " tex
-    autocmd FileType plaintex,tex
-    \   setlocal foldmethod=expr
-    \|  let &l:foldexpr = s:SID_PREFIX() . 'tex_foldexpr(v:lnum)'
-    " folding using \section, \subsection, \subsubsection
-    function! s:tex_foldexpr(lnum)
-        " set fold level as section level
-        let matches = matchlist(getline(a:lnum), '^\s*\\\(\(sub\)*\)section')
-        if !empty(matches)
-            " for example, matches[1] is 'subsub' when line is '\subsubsection'
-            return len(matches[1]) / 3 + 1
-        else
-            " when next line is /\\(sub)*section/, this line is the end of specified section
-            let matches = matchlist(getline(a:lnum + 1), '^\s*\\\(\(sub\)*\)section')
-            if !empty(matches)
-                return '<' . string(len(matches[1]) / 3 + 1)
-            " otherwise keep fold level
-            else
-                return '='
-            endif
-        endif
-    endfunction
-
     " golang
-    autocmd FileType go
-    \   setlocal noexpandtab
+    autocmd FileType go setlocal noexpandtab
 augroup END
 
 " TOhtml
@@ -483,93 +478,6 @@ let g:html_use_css = 1
 let g:use_xhtml = 1
 let g:html_use_encoding = 'utf-8'
 
-" markdown-pandoc
-let s:pandoc_command = "pandoc \"%s\" -s -c \"%s\" -o \"%s\" &"
-let s:pandoc_default_css = 'pandoc.css'
-let s:pandoc_default_formats = ['html']
-let s:pandoc_output_encoding = s:is_win ? 'cp932' : 'utf-8'
-
-function! s:pandoc_auto_run()
-    if exists('b:pandoc_enable') && b:pandoc_enable
-        let b:pandoc_auto_run = 1
-    endif
-endfunction
-
-function! s:pandoc_stop_auto_run()
-    let b:pandoc_auto_run = 0
-endfunction
-
-function! s:pandoc_run()
-    if !exists('b:pandoc_auto_run') || !b:pandoc_auto_run | return | endif
-
-    let input = expand('%')
-    let base = expand('%:r')
-    let css = exists('b:pandoc_css') ? b:pandoc_css : s:pandoc_default_css
-    let formats = exists('b:pandoc_formats') && (type([]) == type(b:pandoc_formats))
-                \ ? b:pandoc_formats : s:pandoc_default_formats
-
-    for format in formats
-        let c = iconv(printf(s:pandoc_command, input, css, base . '.' . format),
-                    \ &encoding, s:pandoc_output_encoding)
-        call vimproc#system(c)
-        if vimproc#get_last_status() != 0
-            echomsg vimproc#get_last_errmsg()
-        endif
-    endfor
-endfunction
-
-function! s:pandoc_parse_local_setting()
-    let raw = matchstr(getline('$'), '<!--\zs.\+\ze-->')
-    try
-        sandbox let data = eval('{' . raw . '}')
-        for [k, v] in items(data)
-            let b:pandoc_{k} = v
-            unlet k v
-        endfor
-    catch /E121/
-        echomsg 'markdown: local setting parse error'
-    endtry
-endfunction
-
-function! s:markdown_make_title()
-    let l = strwidth(getline('.'))
-    let n = line('.')
-    let s = ''
-    for i in range(l)
-        let s .= '='
-    endfor
-    call append(n, s)
-endfunction
-
-function! s:pandoc_markdown_to_pdf()
-    let oldcwd = getcwd()
-    lcd `=expand("%:p:h")`
-
-    let command = "pandoc %s -V documentclass=ltjarticle --latex-engine=lualatex -o %s"
-    let input = expand('%')
-    let output = expand('%:r') . '.pdf'
-    let c = iconv(printf(command, input, output), &encoding, s:pandoc_output_encoding)
-    call vimproc#system(c)
-    if vimproc#get_last_status() != 0
-        echomsg vimproc#get_last_errmsg()
-    endif
-
-    lcd `=oldcwd`
-endfunction
-
-function! s:pandoc_setup_markdown()
-    call s:pandoc_parse_local_setting()
-    call s:pandoc_auto_run()
-
-    nnoremap <buffer> [Prefix]T :<C-u>call <SID>markdown_make_title()<CR>
-
-    command! -buffer PandocAutoRun call s:pandoc_auto_run()
-    command! -buffer PandocMarkdown2PDF call s:pandoc_markdown_to_pdf()
-endfunction
-autocmd vimrc BufWritePost *.mkd call s:pandoc_run()
-autocmd vimrc FileType markdown call s:pandoc_setup_markdown()
-
-" ==================== Loading vimrc ==================== "
 " auto reloading vimrc
 " Reference: http://vim-users.jp/2009/09/hack74/
 if has('gui_running')

@@ -1,14 +1,3 @@
 .DS_Store
-vim/ja/*
-vim/doc/tags
-vim/doc/tags-ja
-vim/info
-vim/session
-vim/view
-vim/undo
 vim/.netrwhist
-vim/bundle*
 vim/pack
-vimperator/info
-pentadactyle/info
-.yardoc
