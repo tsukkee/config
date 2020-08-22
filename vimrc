@@ -389,7 +389,6 @@ else
     autocmd vimrc VimEnter * call vista#RunForNearestMethodOrFunction()
 
     " completion
-    " Reference: https://mattn.kaoriya.net/software/vim/20191231213507.htm
     call minpac#add('prabirshrestha/vim-lsp')
     call minpac#add('prabirshrestha/asyncomplete.vim')
     call minpac#add('prabirshrestha/asyncomplete-lsp.vim')
@@ -404,10 +403,16 @@ else
 
     function! s:on_lsp_buffer_enabled() abort
         setlocal omnifunc=lsp#complete
+        setlocal tagfunc=lsp#tagfunc
         setlocal signcolumn=yes
         nmap <buffer> gd <plug>(lsp-definition)
+        nmap <buffer> gr <plug>(lsp-references)
+        nmap <buffer> gi <plug>(lsp-implementation)
+        nmap <buffer> ge <plug>(lsp-type-definition)
         nmap <buffer> <f2> <plug>(lsp-rename)
-        inoremap <expr> <cr> pumvisible() ? "\<c-y>" : "\<cr>"
+        if &filetype !=# 'vim'
+            nmap <buffer> K <plug>(lsp-hover)
+        endif
     endfunction
 
     augroup vimrc
@@ -423,6 +428,7 @@ else
     let g:lsp_diagnostics_echo_cursor = 1
     let g:lsp_text_edit_enabled = 1
     let g:lsp_signs_enabled = 1
+    let g:lsp_settings_filetype_html = ['html-languageserver', 'angular-language-server']
 
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
@@ -437,7 +443,7 @@ else
         call mkdir(dir, 'p')
     endfor
 
-    function! RetrieveVSCodeSnippet() abort
+    function! RetrieveVSCodeSnippets() abort
         let files = {
         \   'typescript': 'https://raw.githubusercontent.com/microsoft/vscode/master/extensions/typescript-basics/snippets/typescript.code-snippets',
         \   'ruby': 'https://raw.githubusercontent.com/rubyide/vscode-ruby/master/packages/vscode-ruby/snippets/ruby.json',
@@ -458,6 +464,10 @@ else
 
     " vital
     call minpac#add('vim-jp/vital.vim')
+
+    " edita
+    call minpac#add('lambdalisue/edita.vim')
+    let g:edita_enable = 1
 
     " MEMO: will install later if needed
     " 'SudoEdit.vim'
@@ -507,7 +517,6 @@ let g:use_xhtml = 1
 let g:html_use_encoding = 'utf-8'
 
 " auto reloading vimrc
-" Reference: http://vim-users.jp/2009/09/hack74/
 if has('gui_running')
     autocmd vimrc BufWritePost .vimrc,_vimrc,vimrc nested
     \   source $MYVIMRC | source $MYGVIMRC

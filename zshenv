@@ -10,8 +10,8 @@ typeset -U path
 path=(/usr/local/bin(N-/) /opt/local/bin(N-/) /opt/local/sbin(N-/) /usr/X11/bin(N-/) $path)
 
 # Editor
-if test -x /opt/local/bin/vim; then
-    export EDITOR=/opt/local/bin/vim
+if test -x /usr/local/bin/vim; then
+    export EDITOR=/usr/local/bin/vim
 else
     export EDITOR=/usr/bin/vim
 fi
