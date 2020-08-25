@@ -105,7 +105,7 @@ set foldmethod=marker
 set foldcolumn=3
 set list
 set listchars=tab:^\ ,trail:~
-set ambiwidth=double
+set ambiwidth=single
 set laststatus=2
 set showtabline=2
 
@@ -522,7 +522,7 @@ function! s:ranger_eval_conf(key) abort
     return 'eval print(''\033]51;["call","TapiRanger_handler",["' . a:key . '","'' + fm.thisfile.path + ''"]]\x07'')'
 endfunction
 
-function! s:ranger_start() abort
+function! s:ranger_start(startdir) abort
     " use existing one
     if exists('t:ranger')
         let winnr = bufwinnr(t:ranger)
@@ -544,8 +544,10 @@ function! s:ranger_start() abort
     endfor
     call writefile(configs, temp_conf)
 
+    let startdir = isdirectory(a:startdir) ? a:startdir : fnamemodify(a:startdir, ':h')
+
     let t:ranger = term_start(
-    \   'ranger --cmd="source ' . temp_conf . '"',
+    \   'ranger --cmd="source ' . temp_conf . '" ' . startdir,
     \   {
     \       'env': {'EDITOR': s:runtimepath . '/macros/vim.py'},
     \       'term_api': 'TapiRanger_',
@@ -576,7 +578,8 @@ function! TapiRanger_handler(bufnum, args) abort
     execute command
 endfunction
 
-command! Ranger call s:ranger_start()
+command! -complete=dir -nargs=? Ranger call s:ranger_start(<q-args>)
+" command! -complete=dir -nargs=? RangerPopup ...
 
 let g:ranger_map = {
 \   'S': 'botright split <<file>>',
