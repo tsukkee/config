@@ -462,6 +462,9 @@ else
     imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
     smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
 
+    " linter
+    call minpac#add('dense-analysis/ale')
+
     " vital
     call minpac#add('vim-jp/vital.vim')
 
@@ -518,74 +521,13 @@ let g:use_xhtml = 1
 let g:html_use_encoding = 'utf-8'
 
 " Ranger
-function! s:ranger_eval_conf(key) abort
-    return 'eval print(''\033]51;["call","TapiRanger_handler",["' . a:key . '","'' + fm.thisfile.path + ''"]]\x07'')'
-endfunction
-
-function! s:ranger_start(startdir) abort
-    " use existing one
-    if exists('t:ranger')
-        let winnr = bufwinnr(t:ranger)
-        if winnr > -1
-            " focus to that
-            execute "normal!" winnr "\<C-w>\<C-w>"
-        else
-            " show again
-            execute "topleft" t:ranger "sbuffer"
-        endif
-        return
-    endif
-
-    " create new one
-    let configs = []
-    let temp_conf = tempname()
-    for [key, val] in items(g:ranger_map)
-        call add(configs, 'map ' . key . ' ' . s:ranger_eval_conf(key))
-    endfor
-    call writefile(configs, temp_conf)
-
-    let startdir = isdirectory(a:startdir) ? a:startdir : fnamemodify(a:startdir, ':h')
-
-    let t:ranger = term_start(
-    \   'ranger --cmd="source ' . temp_conf . '" ' . startdir,
-    \   {
-    \       'env': {'EDITOR': s:runtimepath . '/macros/vim.py'},
-    \       'term_api': 'TapiRanger_',
-    \       'term_name': '[ranger]',
-    \       'term_finish': 'close',
-    \       'exit_cb': { -> execute('unlet t:ranger') }
-    \   }
-    \)
-    execute "normal! \<C-w>K"
-endfunction
-
-function! TapiRanger_handler(bufnum, args) abort
-    let [key, path] = a:args
-
-    if empty(key)
-        " called from $EDITOR
-        let w = winnr('#')
-        execute "normal!" w "\<C-w>\<C-w>"
-        execute g:ranger_opener path
-        return
-    endif
-
-    let dir = isdirectory(path) ? path : fnamemodify(path, ':h')
-
-    let command = g:ranger_map[key]
-    let command = substitute(command, '<<file>>', path, 'g')
-    let command = substitute(command, '<<dir>>', dir, 'g')
-    execute command
-endfunction
-
-command! -complete=dir -nargs=? Ranger call s:ranger_start(<q-args>)
-" command! -complete=dir -nargs=? RangerPopup ...
-
 let g:ranger_map = {
 \   'S': 'botright split <<file>>',
-\   'ct': 'tcd <<dir>>'
+\   'ct': 'tcd <<dir>>',
+\   'T': 'tabnew <<DIR>> | tcd <<DIR>>',
 \}
-let g:ranger_opener = get(g:, 'g:ranger_opener', 'edit')
+let g:ranger_opener = 'edit'
+let g:ranger_rows = 12
 
 " auto reloading vimrc
 if has('gui_running')
