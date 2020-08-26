@@ -368,6 +368,19 @@ else
 
     call minpac#add('lambdalisue/gina.vim')
 
+    call minpac#add('tsukkee/vim-rangeriv')
+    let g:rangeriv_map = {
+    \   '<enter>': 'execute "normal! \<C-W>\<C-W>" | edit <<file>>',
+    \   'S': 'botright split <<file>>',
+    \   'V': 'execute "normal! \<C-W>\<C-W>" | belowright vsplit <<file>>',
+    \   'T': 'tabnew <<file>> | tcd <<dir>>',
+    \   'ct': 'tcd <<dir>>',
+    \   'q': "normal! \<C-W>\<C-W>"
+    \}
+    let g:rangeriv_opener = 'edit'
+    let g:rangeriv_rows = 12
+    let g:rangeriv_close_on_vimexit = v:true
+
     " finder
     call minpac#add('liuchengxu/vim-clap')
     let g:clap_layout = {
@@ -519,15 +532,6 @@ let g:html_number_lines = 0
 let g:html_use_css = 1
 let g:use_xhtml = 1
 let g:html_use_encoding = 'utf-8'
-
-" Ranger
-let g:ranger_map = {
-\   'S': 'botright split <<file>>',
-\   'ct': 'tcd <<dir>>',
-\   'T': 'tabnew <<DIR>> | tcd <<DIR>>',
-\}
-let g:ranger_opener = 'edit'
-let g:ranger_rows = 12
 
 " auto reloading vimrc
 if has('gui_running')
