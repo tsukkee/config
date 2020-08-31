@@ -272,12 +272,12 @@ endfunction
 syntax enable
 
 " colorscheme
+set background=dark
 if exists('+termguicolors')
     set termguicolors
     colorscheme gruvbox
 elseif &t_Co == 256 || has('gui')
     let g:solarized_contrast = 'high'
-    set background=dark
     colorscheme solarized
 else
     colorscheme desert
@@ -375,7 +375,7 @@ else
     \   'V': 'execute "normal! \<C-W>\<C-W>" | belowright vsplit <<file>>',
     \   'T': 'tabnew <<file>> | tcd <<dir>>',
     \   'ct': 'tcd <<dir>>',
-    \   'q': "normal! \<C-W>\<C-W>"
+    \   'q': 'call timer_start(0, { -> execute("quit") })'
     \}
     let g:rangeriv_opener = 'edit'
     let g:rangeriv_rows = 12

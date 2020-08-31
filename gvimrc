@@ -32,8 +32,8 @@ if has('gui_macvim')
     endif
     set linespace=2
 
-    set guifont=Cica:h16
-    set guifontwide=Cica
+    set guifont=Cica:h18
+    set guifontwide=Cica:h18
 
     set transparency=5 " (opaque) 0-100 (transparent)
     set noimdisable    " use IM control
