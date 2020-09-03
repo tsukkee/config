@@ -370,9 +370,9 @@ else
 
     call minpac#add('tsukkee/vim-rangeriv')
     let g:rangeriv_map = {
-    \   '<enter>': 'execute "normal! \<C-W>\<C-W>" | edit <<file>>',
+    \   '<enter>': 'execute "normal! \<C-W>\<C-P>" | edit <<file>>',
     \   'S': 'botright split <<file>>',
-    \   'V': 'execute "normal! \<C-W>\<C-W>" | belowright vsplit <<file>>',
+    \   'V': 'execute "normal! \<C-W>\<C-P>" | belowright vsplit <<file>>',
     \   'T': 'tabnew <<file>> | tcd <<dir>>',
     \   'ct': 'tcd <<dir>>',
     \   'q': 'call timer_start(0, { -> execute("quit") })'
@@ -437,8 +437,8 @@ else
     let g:asyncomplete_auto_popup = 1
     let g:asyncomplete_auto_completeopt = 0
     let g:asyncomplete_popup_delay = 200
-    let g:lsp_diagnostics_enabled = 1
     let g:lsp_diagnostics_echo_cursor = 1
+    let g:lsp_diagnostics_float_cursor = 1
     let g:lsp_text_edit_enabled = 1
     let g:lsp_signs_enabled = 1
     let g:lsp_settings_filetype_html = ['html-languageserver', 'angular-language-server']
