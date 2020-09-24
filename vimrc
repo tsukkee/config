@@ -295,7 +295,7 @@ filetype plugin indent on
 " use minpac to manage my plugins
 packadd minpac
 
-if !exists('*minpac#init')
+if !exists('g:loaded_minpac')
     " minpac is not available
 else
     call minpac#init()
@@ -315,8 +315,11 @@ else
     \    'tabline': { 'right': [ [  ] ] },
     \    'active': {
     \       'left': [ [ 'mode', 'paste' ],
-    \               [ 'readonly', 'filename', 'modified' ],
-    \               [ 'gitrepo', 'gitstatus' ] ]
+    \                 [ 'readonly', 'filename', 'modified' ],
+    \                 [ 'gitrepo', 'gitstatus' ] ],
+    \       'right': [ [ 'lineinfo' ],
+    \                  [ 'percent', 'method' ],
+    \                  [ 'fileformat', 'fileencoding', 'filetype' ] ]
     \    },
     \    'component_function': {
     \       'method': s:SID_PREFIX() . 'nearestMethodOrFunction',
@@ -349,6 +352,8 @@ else
     " text editting
     call minpac#add('andymass/vim-matchup')
     call minpac#add('machakann/vim-sandwich')
+    nmap s <Nop>
+    xmap s <Nop>
     call minpac#add('tyru/caw.vim')
     call minpac#add('junegunn/vim-easy-align')
     call minpac#add('editorconfig/editorconfig-vim')
@@ -380,6 +385,8 @@ else
     let g:rangeriv_opener = 'edit'
     let g:rangeriv_rows = 12
     let g:rangeriv_close_on_vimexit = v:true
+    nmap [Prefix]r :<C-u>Rangeriv<CR>
+
 
     " finder
     call minpac#add('liuchengxu/vim-clap')
@@ -388,10 +395,12 @@ else
     \   'width': '70%', 'col': '15%',
     \   'height': '40%', 'row': 3
     \}
-    nmap [Prefix]cc :<C-u>Clap!<CR>
-    nmap [Prefix]cb :<C-u>Clap! buffers<CR>
-    nmap [Prefix]cf :<C-u>Clap! files<CR>
-    nmap [Prefix]cg :<C-u>Clap! grep<CR>
+    let g:clap_provider_grep_opts = '-H -F --no-heading --vimgrep --smart-case'
+
+    nmap [Prefix]pc :<C-u>Clap!<CR>
+    nmap [Prefix]pb :<C-u>Clap! buffers<CR>
+    nmap [Prefix]pf :<C-u>Clap! files<CR>
+    nmap [Prefix]pg :<C-u>Clap! grep<CR>
 
     call minpac#add('liuchengxu/vista.vim')
     nmap [Prefix]v :<C-u>Vista!!<CR>
@@ -422,7 +431,9 @@ else
         nmap <buffer> gr <plug>(lsp-references)
         nmap <buffer> gi <plug>(lsp-implementation)
         nmap <buffer> ge <plug>(lsp-type-definition)
-        nmap <buffer> <f2> <plug>(lsp-rename)
+        nmap <buffer> gR <plug>(lsp-rename)
+        nmap <buffer> g] <Plug>(lsp-next-diagnostic)
+        nmap <buffer> g[ <Plug>(lsp-previous-diagnostic)
         if &filetype !=# 'vim'
             nmap <buffer> K <plug>(lsp-hover)
         endif
@@ -442,6 +453,7 @@ else
     let g:lsp_text_edit_enabled = 1
     let g:lsp_signs_enabled = 1
     let g:lsp_settings_filetype_html = ['html-languageserver', 'angular-language-server']
+    let g:lsp_settings_filetype_typescript = ['typescript-language-server', 'eslint-language-server']
 
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
@@ -476,7 +488,7 @@ else
     smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
 
     " linter
-    call minpac#add('dense-analysis/ale')
+    " call minpac#add('dense-analysis/ale')
 
     " vital
     call minpac#add('vim-jp/vital.vim')
