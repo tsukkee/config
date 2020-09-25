@@ -351,6 +351,7 @@ else
 
     " text editting
     call minpac#add('andymass/vim-matchup')
+    let g:matchup_matchparen_offscreen = {'method': 'popup'}
     call minpac#add('machakann/vim-sandwich')
     nmap s <Nop>
     xmap s <Nop>
