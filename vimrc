@@ -57,7 +57,6 @@ if s:is_win
 endif
 
 set spelllang=en,cjk
-set viminfo& viminfo+=%20
 
 " indent
 set tabstop=4
@@ -498,6 +497,9 @@ else
     " call minpac#add('kyoh86/vim-editerm')
     call minpac#add('lambdalisue/edita.vim')
     let g:edita_enable = 0
+
+    " fish
+    call minpac#add('dag/vim-fish')
 
     " MEMO: will install later if needed
     " 'SudoEdit.vim'
