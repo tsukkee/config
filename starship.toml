@@ -3,3 +3,4 @@ truncation_length = 10
 
 [git_branch]
 disabled = true
+truncation_length = 15

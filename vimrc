@@ -495,11 +495,12 @@ else
 
     " edita
     " call minpac#add('kyoh86/vim-editerm')
-    call minpac#add('lambdalisue/edita.vim')
-    let g:edita_enable = 0
+    " call minpac#add('lambdalisue/edita.vim')
+    " let g:edita_enable = 0
 
-    " fish
+    " syntax
     call minpac#add('dag/vim-fish')
+    call minpac#add('cespare/vim-toml')
 
     " MEMO: will install later if needed
     " 'SudoEdit.vim'
