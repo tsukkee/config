@@ -314,8 +314,7 @@ else
     \    'tabline': { 'right': [ [  ] ] },
     \    'active': {
     \       'left': [ [ 'mode', 'paste' ],
-    \                 [ 'readonly', 'filename', 'modified' ],
-    \                 [ 'gitrepo', 'gitstatus' ] ],
+    \                 [ 'readonly', 'filename', 'modified' ] ],
     \       'right': [ [ 'lineinfo' ],
     \                  [ 'percent', 'method' ],
     \                  [ 'fileformat', 'fileencoding', 'filetype' ] ]
@@ -326,6 +325,8 @@ else
     \       'gitstatus': 'gina#component#status#preset'
     \    }
     \}
+    "\                 [ 'readonly', 'filename', 'modified' ],
+    "\                 [ 'gitrepo', 'gitstatus' ] ],
 
     " enhance key mappings
     call minpac#add('kana/vim-submode')
@@ -357,6 +358,10 @@ else
     call minpac#add('tyru/caw.vim')
     call minpac#add('junegunn/vim-easy-align')
     call minpac#add('editorconfig/editorconfig-vim')
+    call minpac#add('t9md/vim-quickhl')
+    nmap [Prefix]m <Plug>(quickhl-toggle)
+    vmap [Prefix]m <Plug>(quickhl-toggle)
+    nmap [Prefix]M <Plug>(quickhl-reset)
 
     " file manager
     call minpac#add('lambdalisue/fern.vim')
@@ -401,6 +406,7 @@ else
     nmap [Prefix]pb :<C-u>Clap! buffers<CR>
     nmap [Prefix]pf :<C-u>Clap! files<CR>
     nmap [Prefix]pg :<C-u>Clap! grep<CR>
+    nnoremap <C-p> :<C-u>Clap! history<CR>
 
     call minpac#add('liuchengxu/vista.vim')
     nmap [Prefix]v :<C-u>Vista!!<CR>
@@ -510,10 +516,6 @@ else
     " 'kana/vim-operator-user'
     " 'kana/vim-textobj-indent'
     " 'kana/vim-textobj-user'
-    " 't9md/vim-quickhl'
-    "   nmap [Prefix]m <Plug>(quickhl-toggle)
-    "   vmap [Prefix]m <Plug>(quickhl-toggle)
-    "   nmap [Prefix]M <Plug>(quickhl-reset)
     " 't9md/vim-textmanip'
     " 'thinca/vim-quickrun'
     "   let g:quickrun_no_default_key_mappings = 1
