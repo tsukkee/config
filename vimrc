@@ -400,6 +400,10 @@ else
     \   'width': '70%', 'col': '15%',
     \   'height': '40%', 'row': 3
     \}
+    let g:clap_popup_move_manager = {
+    \ "\<C-N>": "\<Down>",
+    \ "\<C-P>": "\<Up>",
+    \ }
     let g:clap_provider_grep_opts = '-H -F --no-heading --vimgrep --smart-case'
 
     nmap [Prefix]pc :<C-u>Clap!<CR>
@@ -440,6 +444,7 @@ else
         nmap <buffer> gR <plug>(lsp-rename)
         nmap <buffer> g] <Plug>(lsp-next-diagnostic)
         nmap <buffer> g[ <Plug>(lsp-previous-diagnostic)
+        nmap <buffer> gA <Plug>(lsp-code-action)
         if &filetype !=# 'vim'
             nmap <buffer> K <plug>(lsp-hover)
         endif
