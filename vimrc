@@ -358,10 +358,8 @@ else
     call minpac#add('tyru/caw.vim')
     call minpac#add('junegunn/vim-easy-align')
     call minpac#add('editorconfig/editorconfig-vim')
-    call minpac#add('t9md/vim-quickhl')
-    nmap [Prefix]m <Plug>(quickhl-toggle)
-    vmap [Prefix]m <Plug>(quickhl-toggle)
-    nmap [Prefix]M <Plug>(quickhl-reset)
+    call minpac#add('Yggdroot/indentLine')
+    let g:indentLine_char = '┊'
 
     " file manager
     call minpac#add('lambdalisue/fern.vim')
