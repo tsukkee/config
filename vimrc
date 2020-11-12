@@ -192,6 +192,9 @@ vmap <Space> [Prefix]
 noremap [Operator] <Nop>
 map , [Operator]
 
+" don't use Ex-mode
+nnoremap Q <Nop>
+
 " use more logical mapping (See: :h Y)
 nnoremap Y y$
 
@@ -463,6 +466,20 @@ else
     let g:lsp_signs_enabled = 1
     let g:lsp_settings_filetype_html = ['html-languageserver', 'angular-language-server']
     let g:lsp_settings_filetype_typescript = ['typescript-language-server', 'eslint-language-server']
+
+    let s:vls_config = {
+    \   'vetur': {
+    \     'experimental': {
+    \       'templateInterpolationService': v:true
+    \     }
+    \   }
+    \ }
+
+    let g:lsp_settings = {
+    \   'vls': {
+    \       'workspace_config': s:vls_config
+    \   }
+    \}
 
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
