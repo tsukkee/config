@@ -514,7 +514,22 @@ else
     smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
 
     " linter
-    " call minpac#add('dense-analysis/ale')
+    call minpac#add('dense-analysis/ale')
+    let g:ale_disable_lsp = 1
+    let g:ale_linters_explicit = 1
+    let g:ale_fix_on_save = 1
+    let g:ale_fixers = {
+    \   'javascript': ['prettier'],
+    \   'typescript': ['prettier'],
+    \   'vue': ['prettier'],
+    \   'css': ['prettier'],
+    \   'scss': ['prettier'],
+    \}
+    let g:ale_linters = {
+    \   'javascript': ['eslint'],
+    \   'typescript': ['eslint'],
+    \   'vue': ['eslint'],
+    \}
 
     " vital
     call minpac#add('vim-jp/vital.vim')
