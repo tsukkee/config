@@ -19,3 +19,4 @@ fi
 # Local
 test -f $HOME/.zshenv.local && source $HOME/.zshenv.local
 
+source "$HOME/.cargo/env"

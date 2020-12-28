@@ -124,7 +124,7 @@ endif
 if has('kaoriya')
     set fileencodings=guess
 else
-    set fileencodings=iso-2022-jp,euc-jp,cp932,utf-8,latin1
+    set fileencodings=iso-2022-jp,utf-8,euc-jp,cp932,latin1
 endif
 
 " use 'fileencoding' for 'encoding' if the file doesn't contain multibyte characters,
@@ -465,7 +465,8 @@ else
     let g:lsp_text_edit_enabled = 1
     let g:lsp_signs_enabled = 1
     let g:lsp_settings_filetype_html = ['html-languageserver', 'angular-language-server']
-    let g:lsp_settings_filetype_typescript = ['typescript-language-server', 'eslint-language-server']
+    let g:lsp_settings_filetype_typescript = ['typescript-language-server'] ", 'eslint-language-server']
+    let g:lsp_settings_filetype_vue = ['vls'] ", 'eslint-language-server']
 
     let s:vls_config = {
     \   'vetur': {
@@ -519,20 +520,25 @@ else
     let g:ale_linters_explicit = 1
     let g:ale_fix_on_save = 1
     let g:ale_fixers = {
-    \   'javascript': ['prettier'],
     \   'typescript': ['prettier'],
     \   'vue': ['prettier'],
-    \   'css': ['prettier'],
     \   'scss': ['prettier'],
     \}
     let g:ale_linters = {
-    \   'javascript': ['eslint'],
     \   'typescript': ['eslint'],
     \   'vue': ['eslint'],
     \}
 
     " vital
     call minpac#add('vim-jp/vital.vim')
+
+    " git
+    call minpac#add('rhysd/committia.vim')
+    let g:committia_hooks = {}
+    function! g:committia_hooks.edit_open(info)
+        setlocal spell
+        setlocal spelllang=en,cjk
+    endfunction
 
     " edita
     " call minpac#add('kyoh86/vim-editerm')
@@ -579,6 +585,9 @@ augroup vimrc
     " golang
     autocmd FileType go setlocal noexpandtab
 augroup END
+
+" JSON
+let g:vim_json_conceal = 0
 
 " TOhtml
 let g:html_number_lines = 0
