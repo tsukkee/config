@@ -311,13 +311,14 @@ else
 
     " enhance statusline and tabline
     call minpac#add('itchyny/lightline.vim')
+    call minpac#add('micchy326/lightline-lsp-progress')
     set noshowmode " hide mode when using lightline
     let g:lightline = {
     \    'colorscheme': 'gruvbox',
     \    'tabline': { 'right': [ [  ] ] },
     \    'active': {
     \       'left': [ [ 'mode', 'paste' ],
-    \                 [ 'readonly', 'filename', 'modified' ] ],
+    \                 [ 'readonly', 'filename', 'modified', 'lspstatus' ] ],
     \       'right': [ [ 'lineinfo' ],
     \                  [ 'percent', 'method' ],
     \                  [ 'fileformat', 'fileencoding', 'filetype' ] ]
@@ -325,7 +326,8 @@ else
     \    'component_function': {
     \       'method': s:SID_PREFIX() . 'nearestMethodOrFunction',
     \       'gitrepo': 'gina#component#repo#preset',
-    \       'gitstatus': 'gina#component#status#preset'
+    \       'gitstatus': 'gina#component#status#preset',
+    \       'lspstatus': 'lightline_lsp_progress#progress'
     \    }
     \}
     "\                 [ 'readonly', 'filename', 'modified' ],
@@ -428,10 +430,10 @@ else
     call minpac#add('mattn/vim-lsp-settings')
 
     function! s:on_lsp_setup()
-        let g:lsp_signs_error = {'text': '󿚆' }
-        let g:lsp_signs_warning = {'text': '󿙿' }
-        let g:lsp_signs_information = {'text': '󿙽' }
-        let g:lsp_signs_hint = {'text': '󿚅' }
+        let g:lsp_diagnostics_signs_error = {'text': '󿚆' }
+        let g:lsp_diagnostics_signs_warning = {'text': '󿙿' }
+        let g:lsp_diagnostics_signs_information = {'text': '󿙽' }
+        let g:lsp_diagnostics_signs_hint = {'text': '󿚅' }
     endfunction
 
     function! s:on_lsp_buffer_enabled() abort
@@ -462,6 +464,7 @@ else
     let g:asyncomplete_popup_delay = 200
     let g:lsp_diagnostics_echo_cursor = 1
     let g:lsp_diagnostics_float_cursor = 1
+    let g:lsp_diagnostics_signs_priority = 31 " ALE's one + 1
     let g:lsp_text_edit_enabled = 1
     let g:lsp_signs_enabled = 1
     let g:lsp_settings_filetype_html = ['html-languageserver', 'angular-language-server']
