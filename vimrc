@@ -272,6 +272,7 @@ function! s:onColorScheme()
 endfunction
 
 syntax enable
+syntax sync fromstart
 
 " colorscheme
 set background=dark
@@ -551,6 +552,11 @@ else
     " syntax
     call minpac#add('dag/vim-fish')
     call minpac#add('cespare/vim-toml')
+    call minpac#add('leafOfTree/vim-vue-plugin')
+    let g:vim_vue_plugin_use_typescript = 1
+    let g:vim_vue_plugin_use_scss = 1
+    let g:vim_vue_plugin_highlight_vue_attr = 1
+    call minpac#add('Shougo/context_filetype.vim')
 
     " MEMO: will install later if needed
     " 'SudoEdit.vim'
