@@ -16,7 +16,7 @@ end
 starship init fish | source
 
 # git
-set __fish_git_prompt_showcolorhints true
+# set __fish_git_prompt_showcolorhints true
 
 # key bindings
 fish_vi_key_bindings

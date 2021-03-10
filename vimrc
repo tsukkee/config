@@ -243,6 +243,9 @@ vnoremap gy "*y
 nnoremap gp "*p
 vnoremap gp "*p
 
+" refresh
+nnoremap <C-L> <Cmd>syntax sync fromstart<CR><C-L>
+
 " utility command for Mac
 if s:is_mac
     command! Here silent call system('open ' . expand('%:p:h'))
@@ -272,7 +275,6 @@ function! s:onColorScheme()
 endfunction
 
 syntax enable
-syntax sync fromstart
 
 " colorscheme
 set background=dark
@@ -593,6 +595,9 @@ endif
 augroup vimrc
     " golang
     autocmd FileType go setlocal noexpandtab
+
+    " JS
+    autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2
 augroup END
 
 " JSON
