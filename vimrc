@@ -433,11 +433,14 @@ else
     call minpac#add('mattn/vim-lsp-settings')
 
     function! s:on_lsp_setup()
-        let g:lsp_diagnostics_signs_error = {'text': '󿚆' }
-        let g:lsp_diagnostics_signs_warning = {'text': '󿙿' }
-        let g:lsp_diagnostics_signs_information = {'text': '󿙽' }
-        let g:lsp_diagnostics_signs_hint = {'text': '󿚅' }
+        " copy & paste from https://miiton.github.io/Cica/
+        let g:lsp_diagnostics_signs_error = {'text': "󿚆 " } " 0xff686 nf-mdi-comment-remove-outline
+        let g:lsp_diagnostics_signs_warning = {'text': "󿙽" } " 0xff67d nf-mdi-comment_alert_outline
+        let g:lsp_diagnostics_signs_information = {'text': "󿙿" } " 0xff67f nf-mdi-comment_check_outline
+        let g:lsp_diagnostics_signs_hint = {'text': "󿚅" } " 0xff685 nf-mdi-comment_question_outline
+        let g:lsp_document_code_action_signs_hint = {'text': "󿠵" } " 0xff835 nf-mdi-lightbulb_outline
     endfunction
+
 
     function! s:on_lsp_buffer_enabled() abort
         setlocal omnifunc=lsp#complete
@@ -468,11 +471,12 @@ else
     let g:lsp_diagnostics_echo_cursor = 1
     let g:lsp_diagnostics_float_cursor = 1
     let g:lsp_diagnostics_signs_priority = 31 " ALE's one + 1
+    " let g:lsp_document_code_action_signs_enabled = 0
     let g:lsp_text_edit_enabled = 1
     let g:lsp_signs_enabled = 1
     let g:lsp_settings_filetype_html = ['html-languageserver', 'angular-language-server']
-    let g:lsp_settings_filetype_typescript = ['typescript-language-server'] ", 'eslint-language-server']
-    let g:lsp_settings_filetype_vue = ['vls'] ", 'eslint-language-server']
+    let g:lsp_settings_filetype_typescript = ['typescript-language-server', 'eslint-language-server']
+    let g:lsp_settings_filetype_vue = ['vls', 'eslint-language-server']
 
     let s:vls_config = {
     \   'vetur': {
@@ -531,9 +535,9 @@ else
     \   'scss': ['prettier'],
     \}
     let g:ale_linters = {
-    \   'typescript': ['eslint'],
     \   'vue': ['eslint'],
     \}
+    "\   'typescript': ['eslint'],
 
     " vital
     call minpac#add('vim-jp/vital.vim')
