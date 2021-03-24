@@ -533,9 +533,11 @@ else
     \   'typescript': ['prettier'],
     \   'vue': ['prettier'],
     \   'scss': ['prettier'],
+    \   'rust': ['rustfmt']
     \}
     let g:ale_linters = {
     \   'vue': ['eslint'],
+    \   'rust': ['clippy']
     \}
     "\   'typescript': ['eslint'],
 
