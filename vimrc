@@ -110,7 +110,7 @@ set showtabline=2
 
 " display cursorline only in active window
 augroup vimrc
-    autocmd WinLeave * setlocal nocursorline
+    autocmd WinLeave * if &filetype !~# "^lsp-quickpick" | setlocal nocursorline | endif
     autocmd WinEnter,BufRead * setlocal cursorline
 augroup END
 
@@ -530,6 +530,7 @@ else
     let g:ale_linters_explicit = 1
     let g:ale_fix_on_save = 1
     let g:ale_fixers = {
+    "\   'javascript': ['prettier'],
     \   'typescript': ['prettier'],
     \   'vue': ['prettier'],
     \   'scss': ['prettier'],
@@ -537,9 +538,9 @@ else
     \}
     let g:ale_linters = {
     \   'vue': ['eslint'],
-    \   'rust': ['clippy']
-    \}
+    \   'rust': ['clippy'],
     "\   'typescript': ['eslint'],
+    \}
 
     " vital
     call minpac#add('vim-jp/vital.vim')
@@ -561,9 +562,19 @@ else
     call minpac#add('dag/vim-fish')
     call minpac#add('cespare/vim-toml')
     call minpac#add('leafOfTree/vim-vue-plugin')
-    let g:vim_vue_plugin_use_typescript = 1
-    let g:vim_vue_plugin_use_scss = 1
-    let g:vim_vue_plugin_highlight_vue_attr = 1
+    let g:vim_vue_plugin_config = {
+        \'syntax': {
+        \   'script': ['typescript'],
+        \   'template': ['html'],
+        \   'style': ['scss'],
+        \},
+        \'full_syntax': ['html', 'scss'],
+        \'attribute': 1,
+        \'keyword': 1,
+        \'foldexpr': 0,
+        \'init_indent': 0,
+        \'debug': 0,
+        \}
     call minpac#add('Shougo/context_filetype.vim')
 
     " MEMO: will install later if needed

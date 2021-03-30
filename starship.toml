@@ -3,3 +3,6 @@ truncation_length = 10
 
 [git_branch]
 truncation_length = 30
+
+[nodejs]
+symbol = "󿢘 "
