@@ -71,6 +71,7 @@ set backspace=indent,eol,start
 set formatoptions+=mM
 " set formatexpr=jpvim#formatexpr()
 set nolinebreak
+set nrformats=bin
 set iminsert=0
 set imsearch=0
 
@@ -315,6 +316,7 @@ else
     " enhance statusline and tabline
     call minpac#add('itchyny/lightline.vim')
     call minpac#add('micchy326/lightline-lsp-progress')
+    call minpac#add('maximbaz/lightline-ale')
     set noshowmode " hide mode when using lightline
     let g:lightline = {
     \    'colorscheme': 'gruvbox',
@@ -322,19 +324,36 @@ else
     \    'active': {
     \       'left': [ [ 'mode', 'paste' ],
     \                 [ 'readonly', 'filename', 'modified', 'lspstatus' ] ],
-    \       'right': [ [ 'lineinfo' ],
-    \                  [ 'percent', 'method' ],
-    \                  [ 'fileformat', 'fileencoding', 'filetype' ] ]
+    \       'right': [ [ 'lineinfo', 'percent' ],
+    \                  [ 'fileformat', 'fileencoding', 'filetype' ],
+    \                  [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_infos', 'linter_ok' ] ]
     \    },
     \    'component_function': {
     \       'method': s:SID_PREFIX() . 'nearestMethodOrFunction',
     \       'gitrepo': 'gina#component#repo#preset',
     \       'gitstatus': 'gina#component#status#preset',
     \       'lspstatus': 'lightline_lsp_progress#progress'
+    \    },
+    \    'component_expand': {
+    \       'linter_checking': 'lightline#ale#checking',
+    \       'linter_infos': 'lightline#ale#infos',
+    \       'linter_warnings': 'lightline#ale#warnings',
+    \       'linter_errors': 'lightline#ale#errors',
+    \       'linter_ok': 'lightline#ale#ok',
+    \    },
+    \    'component_type': {
+    \       'linter_checking': 'right',
+    \       'linter_infos': 'right',
+    \       'linter_warnings': 'warning',
+    \       'linter_errors': 'error',
+    \       'linter_ok': 'right',
     \    }
     \}
-    "\                 [ 'readonly', 'filename', 'modified' ],
-    "\                 [ 'gitrepo', 'gitstatus' ] ],
+    let g:lightline#ale#indicator_checking = "\uf110 "
+    let g:lightline#ale#indicator_infos = "\uf129 "
+    let g:lightline#ale#indicator_warnings = "\uf071 "
+    let g:lightline#ale#indicator_errors = "\uf05e "
+    let g:lightline#ale#indicator_ok = "\uf00c "
 
     " enhance key mappings
     call minpac#add('kana/vim-submode')
@@ -431,6 +450,7 @@ else
     call minpac#add('prabirshrestha/asyncomplete.vim')
     call minpac#add('prabirshrestha/asyncomplete-lsp.vim')
     call minpac#add('mattn/vim-lsp-settings')
+    call minpac#add('rhysd/vim-lsp-ale')
 
     function! s:on_lsp_setup()
         " copy & paste from https://miiton.github.io/Cica/
@@ -451,8 +471,10 @@ else
         nmap <buffer> gi <plug>(lsp-implementation)
         nmap <buffer> ge <plug>(lsp-type-definition)
         nmap <buffer> gR <plug>(lsp-rename)
-        nmap <buffer> g] <Plug>(lsp-next-diagnostic)
-        nmap <buffer> g[ <Plug>(lsp-previous-diagnostic)
+        " nmap <buffer> g] <Plug>(lsp-next-diagnostic)
+        " nmap <buffer> g[ <Plug>(lsp-previous-diagnostic)
+        nmap <buffer> g] <Plug>(ale_next)
+        nmap <buffer> g[ <Plug>(ale_previous)
         nmap <buffer> gA <Plug>(lsp-code-action)
         if &filetype !=# 'vim'
             nmap <buffer> K <plug>(lsp-hover)
@@ -468,15 +490,15 @@ else
     let g:asyncomplete_auto_popup = 1
     let g:asyncomplete_auto_completeopt = 0
     let g:asyncomplete_popup_delay = 200
-    let g:lsp_diagnostics_echo_cursor = 1
-    let g:lsp_diagnostics_float_cursor = 1
-    let g:lsp_diagnostics_signs_priority = 31 " ALE's one + 1
+    " let g:lsp_diagnostics_echo_cursor = 1
+    " let g:lsp_diagnostics_float_cursor = 1
+    " let g:lsp_diagnostics_signs_priority = 31 " ALE's one + 1
     " let g:lsp_document_code_action_signs_enabled = 0
     let g:lsp_text_edit_enabled = 1
     let g:lsp_signs_enabled = 1
     let g:lsp_settings_filetype_html = ['html-languageserver', 'angular-language-server']
-    let g:lsp_settings_filetype_typescript = ['typescript-language-server', 'eslint-language-server']
-    let g:lsp_settings_filetype_vue = ['vls', 'eslint-language-server']
+    let g:lsp_settings_filetype_typescript = ['typescript-language-server'] " , 'eslint-language-server']
+    let g:lsp_settings_filetype_vue = ['vls'] " , 'eslint-language-server']
 
     let s:vls_config = {
     \   'vetur': {
@@ -537,10 +559,12 @@ else
     \   'rust': ['rustfmt']
     \}
     let g:ale_linters = {
-    \   'vue': ['eslint'],
+    \   'vue': ['eslint', 'vim-lsp'],
     \   'rust': ['clippy'],
-    "\   'typescript': ['eslint'],
+    \   'typescript': ['eslint', 'vim-lsp'],
     \}
+    nmap <C-K> <Plug>(ale_detail) 
+    set previewheight=5
 
     " vital
     call minpac#add('vim-jp/vital.vim')
@@ -568,7 +592,7 @@ else
         \   'template': ['html'],
         \   'style': ['scss'],
         \},
-        \'full_syntax': ['html', 'scss'],
+        \'full_syntax': ['html', 'scss', 'typescript'],
         \'attribute': 1,
         \'keyword': 1,
         \'foldexpr': 0,
