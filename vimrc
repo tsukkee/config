@@ -281,6 +281,9 @@ syntax enable
 set background=dark
 if exists('+termguicolors')
     set termguicolors
+    " see :h undercurl
+    let &t_Cs = "\e[4:3m"
+    let &t_Ce = "\e[4:0m"
     colorscheme gruvbox
 elseif &t_Co == 256 || has('gui')
     let g:solarized_contrast = 'high'
