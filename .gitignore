@@ -4,3 +4,5 @@ vim/pack
 ranger/bookmarks
 ranger/history
 ranger/tagged
+tmux/plugins
+tmux/resurrect

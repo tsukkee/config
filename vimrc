@@ -284,7 +284,7 @@ if exists('+termguicolors')
     " see :h undercurl
     let &t_Cs = "\e[4:3m"
     let &t_Ce = "\e[4:0m"
-    colorscheme gruvbox
+    colorscheme elly
 elseif &t_Co == 256 || has('gui')
     let g:solarized_contrast = 'high'
     colorscheme solarized
@@ -315,6 +315,8 @@ else
     call minpac#add('cocopon/iceberg.vim')
     call minpac#add('aereal/vim-colors-japanesque')
     call minpac#add('morhetz/gruvbox')
+    call minpac#add('ulwlu/elly.vim')
+
 
     " enhance statusline and tabline
     call minpac#add('itchyny/lightline.vim')
@@ -322,7 +324,7 @@ else
     call minpac#add('maximbaz/lightline-ale')
     set noshowmode " hide mode when using lightline
     let g:lightline = {
-    \    'colorscheme': 'gruvbox',
+    \    'colorscheme': 'elly',
     \    'tabline': { 'right': [ [  ] ] },
     \    'active': {
     \       'left': [ [ 'mode', 'paste' ],
@@ -587,6 +589,7 @@ else
 
     " syntax
     call minpac#add('dag/vim-fish')
+    call minpac#add('tmux-plugins/vim-tmux')
     call minpac#add('cespare/vim-toml')
     call minpac#add('leafOfTree/vim-vue-plugin')
     let g:vim_vue_plugin_config = {
