@@ -273,6 +273,10 @@ function! s:onColorScheme()
     else
         execute 'highlight ZenkakuSpace ctermbg=' synIDattr(synIDtrans(hlID('SpecialKey')), 'fg')
     endif
+
+    " ALE
+    highlight ALEError ctermfg=NONE guifg=NONE cterm=undercurl gui=undercurl
+    highlight ALEWarning ctermfg=NONE guifg=NONE cterm=undercurl gui=undercurl
 endfunction
 
 syntax enable
@@ -284,7 +288,7 @@ if exists('+termguicolors')
     " see :h undercurl
     let &t_Cs = "\e[4:3m"
     let &t_Ce = "\e[4:0m"
-    colorscheme elly
+    colorscheme nord
 elseif &t_Co == 256 || has('gui')
     let g:solarized_contrast = 'high'
     colorscheme solarized
@@ -316,7 +320,7 @@ else
     call minpac#add('aereal/vim-colors-japanesque')
     call minpac#add('morhetz/gruvbox')
     call minpac#add('ulwlu/elly.vim')
-
+    call minpac#add('arcticicestudio/nord-vim')
 
     " enhance statusline and tabline
     call minpac#add('itchyny/lightline.vim')
@@ -324,7 +328,7 @@ else
     call minpac#add('maximbaz/lightline-ale')
     set noshowmode " hide mode when using lightline
     let g:lightline = {
-    \    'colorscheme': 'elly',
+    \    'colorscheme': 'nord',
     \    'tabline': { 'right': [ [  ] ] },
     \    'active': {
     \       'left': [ [ 'mode', 'paste' ],
