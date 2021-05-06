@@ -74,6 +74,7 @@ set nolinebreak
 set nrformats=bin
 set iminsert=0
 set imsearch=0
+set ttimeoutlen=10
 
 " command completion
 set wildmenu
