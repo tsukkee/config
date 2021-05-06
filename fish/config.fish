@@ -12,6 +12,8 @@ else
     set -x EDITOR /usr/bin/vim
 end
 
+set -x BAT_THEME Nord
+
 # prompt
 starship init fish | source
 
