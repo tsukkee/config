@@ -440,7 +440,6 @@ else
     let g:rangeriv_close_on_vimexit = v:true
     nmap [Prefix]r :<C-u>Rangeriv<CR>
 
-
     " finder
     call minpac#add('liuchengxu/vim-clap')
     let g:clap_layout = {
@@ -452,7 +451,8 @@ else
     \ "\<C-N>": "\<Down>",
     \ "\<C-P>": "\<Up>",
     \ }
-    let g:clap_provider_grep_opts = '-H -F --no-heading --vimgrep --smart-case'
+    let g:clap_preview_direction = 'UD'
+    let g:clap_preview_size = 10
 
     nmap [Prefix]pc :<C-u>Clap!<CR>
     nmap [Prefix]pb :<C-u>Clap! buffers<CR>
