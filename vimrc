@@ -245,8 +245,8 @@ vnoremap gy "*y
 nnoremap gp "*p
 vnoremap gp "*p
 
-" refresh
-nnoremap <C-L> <Cmd>syntax sync fromstart<CR><C-L>
+" fix syntax highlight (especially for long vue/ts files)
+autocmd vimrc BufEnter * syntax sync fromstart
 
 " utility command for Mac
 if s:is_mac
