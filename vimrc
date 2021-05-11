@@ -346,7 +346,7 @@ else
     \    'subseparator': { 'left': "\ue0b1", 'right': "\ue0b3" },
     \    'active': {
     \       'left': [ [ 'mode', 'paste' ],
-    \                 [ 'readonly', 'filename', 'modified', 'lspstatus' ] ],
+    \                 [ 'readonly', 'filename', 'modified', 'method', 'lspstatus' ] ],
     \       'right': [ [ 'lineinfo', 'percent' ],
     \                  [ 'fileformat', 'fileencoding', 'filetype' ],
     \                  [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_infos', 'linter_ok' ] ]
@@ -458,10 +458,60 @@ else
     nmap [Prefix]pb :<C-u>Clap! buffers<CR>
     nmap [Prefix]pf :<C-u>Clap! files<CR>
     nmap [Prefix]pg :<C-u>Clap! grep<CR>
+    nmap [Prefix]pt :<C-u>Clap! tags vim_lsp<CR>
     nnoremap <C-p> :<C-u>Clap! history<CR>
 
     call minpac#add('liuchengxu/vista.vim')
     nmap [Prefix]v :<C-u>Vista!!<CR>
+
+    let g:vista_executive_for = {
+    \   'typescript': 'vim_lsp',
+    \   'vue': 'vim_lsp',
+    \   'scss': 'vim_lsp',
+    \   'css': 'vim_lsp',
+    \   'python': 'vim_lsp',
+    \}
+
+    let g:vista#renderer#icons = {
+    \    'func': nr2char(0xff794),
+    \    'function': nr2char(0xff794),
+    \    'functions': nr2char(0xff794),
+    \    'var': nr2char(0xff71b),
+    \    'variable': nr2char(0xff71b),
+    \    'variables': nr2char(0xff71b),
+    \    'const': nr2char(0xff8ff),
+    \    'constant': nr2char(0xff8ff),
+    \    'constructor': nr2char(0xff976),
+    \    'method': nr2char(0xff6a6),
+    \    'package': nr2char(0xe612),
+    \    'packages': nr2char(0xe612),
+    \    'enum': nr2char(0xff702),
+    \    'enummember': nr2char(0xf282),
+    \    'enumerator': nr2char(0xff702),
+    \    'module': nr2char(0xf136),
+    \    'modules': nr2char(0xf136),
+    \    'type': nr2char(0xff7fd),
+    \    'typedef': nr2char(0xff7fd),
+    \    'types': nr2char(0xff7fd),
+    \    'field': nr2char(0xf30b),
+    \    'fields': nr2char(0xf30b),
+    \    'macro': nr2char(0xff8a3),
+    \    'macros': nr2char(0xff8a3),
+    \    'map': nr2char(0xffb44),
+    \    'class': nr2char(0xf0e8),
+    \    'augroup': nr2char(0xffb44),
+    \    'struct': nr2char(0xf318),
+    \    'union': nr2char(0xffacd),
+    \    'member': nr2char(0xf02b),
+    \    'target': nr2char(0xff893),
+    \    'property': nr2char(0xffab6),
+    \    'interface': nr2char(0xff7fe),
+    \    'namespace': nr2char(0xf475),
+    \    'subroutine': nr2char(0xff9af),
+    \    'implementation': nr2char(0xff776),
+    \    'typeParameter': nr2char(0xf278),
+    \    'default': nr2char(0xf29c)
+    \}
 
     function! s:nearestMethodOrFunction() abort
       return get(b:, 'vista_nearest_method_or_function', '')
@@ -499,6 +549,9 @@ else
         nmap <buffer> g] <Plug>(ale_next)
         nmap <buffer> g[ <Plug>(ale_previous)
         nmap <buffer> gA <Plug>(lsp-code-action)
+
+        nmap <buffer> gs <Plug>(lsp-document-symbol-search)
+
         if &filetype !=# 'vim'
             nmap <buffer> K <plug>(lsp-hover)
         endif

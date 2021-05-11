@@ -6,3 +6,6 @@ truncation_length = 30
 
 [nodejs]
 symbol = "󿢘  "
+
+[battery]
+disabled = true
