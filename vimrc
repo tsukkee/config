@@ -143,6 +143,20 @@ else
     set ffs=unix,dos
 endif
 
+" search with rg
+function! s:grep(word, dir='') abort
+    cgetexpr system(printf("rg --vimgrep --smart-case --fixed-strings %s %s", shellescape(a:word), a:dir))
+endfunction
+command! -nargs=+ Grep call <SID>grep(<f-args>)
+
+nnoremap [q <cmd>cprev<CR>
+nnoremap ]q <cmd>cnext<CR>
+function s:qf_map() abort
+    nnoremap <buffer> <silent> H <cmd>colder<CR>
+    nnoremap <buffer> <silent> L <cmd>cnewer<CR>
+endfunction
+autocmd vimrc FileType qf call s:qf_map()
+
 " show quickfix automatically
 autocmd vimrc QuickfixCmdPost * if !empty(getqflist()) | cwindow | endif
 
@@ -346,7 +360,7 @@ else
     \    'subseparator': { 'left': "\ue0b1", 'right': "\ue0b3" },
     \    'active': {
     \       'left': [ [ 'mode', 'paste' ],
-    \                 [ 'readonly', 'filename', 'modified', 'method', 'lspstatus' ] ],
+    \                 [ 'gitrepo', 'gitstatus', 'readonly', 'filename', 'modified', 'method', 'lspstatus' ] ],
     \       'right': [ [ 'lineinfo', 'percent' ],
     \                  [ 'fileformat', 'fileencoding', 'filetype' ],
     \                  [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_infos', 'linter_ok' ] ]
@@ -452,7 +466,6 @@ else
     \ "\<C-P>": "\<Up>",
     \ }
     let g:clap_preview_direction = 'UD'
-    let g:clap_preview_size = 10
 
     nmap [Prefix]pc :<C-u>Clap!<CR>
     nmap [Prefix]pb :<C-u>Clap! buffers<CR>
@@ -470,6 +483,7 @@ else
     \   'scss': 'vim_lsp',
     \   'css': 'vim_lsp',
     \   'python': 'vim_lsp',
+    \   'go': 'vim_lsp',
     \}
 
     let g:vista#renderer#icons = {
