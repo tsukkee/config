@@ -151,7 +151,7 @@ command! -nargs=+ Grep call <SID>grep(<f-args>)
 
 nnoremap [q <cmd>cprev<CR>
 nnoremap ]q <cmd>cnext<CR>
-function s:qf_map() abort
+function! s:qf_map() abort
     nnoremap <buffer> <silent> H <cmd>colder<CR>
     nnoremap <buffer> <silent> L <cmd>cnewer<CR>
 endfunction
@@ -691,6 +691,8 @@ else
         \'debug': 0,
         \}
     call minpac#add('Shougo/context_filetype.vim')
+
+    call minpac#add('markonm/traces.vim')
 
     " MEMO: will install later if needed
     " 'SudoEdit.vim'
