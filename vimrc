@@ -145,7 +145,7 @@ endif
 
 " search with rg
 function! s:grep(word, dir='') abort
-    cgetexpr system(printf("rg --vimgrep --smart-case --fixed-strings %s %s", shellescape(a:word), a:dir))
+    cgetexpr system(printf("rg --vimgrep --smart-case --fixed-strings --hidden -g '!.git/' %s %s", shellescape(a:word), a:dir))
 endfunction
 command! -nargs=+ Grep call <SID>grep(<f-args>)
 
@@ -248,10 +248,10 @@ cnoremap <expr> <C-x> expand('%:p:h') . "/"
 cnoremap <expr> <C-z> expand('%:p:r')
 
 " write file easely
-nmap <silent> [Prefix]w :<C-u>:update<CR>
+nmap <silent> [Prefix]w <Cmd>update<CR>
 
 " reset highlight
-nnoremap <silent> gh :<C-u>nohlsearch<CR>
+nnoremap <silent> gh <Cmd>nohlsearch<CR>
 
 " copy and paste
 nnoremap gy "*y
@@ -427,8 +427,8 @@ else
 
     " file manager
     call minpac#add('lambdalisue/fern.vim')
-    nmap <silent> [Prefix]f :<C-u>Fern . -drawer -reveal=% -keep -toggle<CR>
-    nmap <silent> [Prefix]F :<C-u>Fern . -drawer -reveal=%<CR>
+    nmap <silent> [Prefix]f <Cmd>Fern . -drawer -reveal=% -keep -toggle<CR>
+    nmap <silent> [Prefix]F <Cmd>Fern . -drawer -reveal=%<CR>
     function! s:init_fern() abort
         nmap <buffer> y <Plug>(fern-action-copy)
         nmap <buffer> cd <Plug>(fern-action-cd)
@@ -452,7 +452,7 @@ else
     let g:rangeriv_opener = 'edit'
     let g:rangeriv_rows = 12
     let g:rangeriv_close_on_vimexit = v:true
-    nmap [Prefix]r :<C-u>Rangeriv<CR>
+    nmap [Prefix]r <Cmd>Rangeriv<CR>
 
     " finder
     call minpac#add('liuchengxu/vim-clap')
@@ -467,15 +467,15 @@ else
     \ }
     let g:clap_preview_direction = 'UD'
 
-    nmap [Prefix]pc :<C-u>Clap!<CR>
-    nmap [Prefix]pb :<C-u>Clap! buffers<CR>
-    nmap [Prefix]pf :<C-u>Clap! files<CR>
-    nmap [Prefix]pg :<C-u>Clap! grep<CR>
-    nmap [Prefix]pt :<C-u>Clap! tags vim_lsp<CR>
-    nnoremap <C-p> :<C-u>Clap! history<CR>
+    nmap [Prefix]pc <Cmd>Clap!<CR>
+    nmap [Prefix]pb <Cmd>Clap! buffers<CR>
+    nmap [Prefix]pf <Cmd>Clap! files ++finder=rg --files --follow --hidden -g '!.git/' <CR>
+    nmap [Prefix]pg <Cmd>Clap! grep<CR>
+    nmap [Prefix]pt <Cmd>Clap! tags vim_lsp<CR>
+    nnoremap <C-p>  <Cmd>Clap! history<CR>
 
     call minpac#add('liuchengxu/vista.vim')
-    nmap [Prefix]v :<C-u>Vista!!<CR>
+    nmap [Prefix]v <Cmd>Vista!!<CR>
 
     let g:vista_executive_for = {
     \   'typescript': 'vim_lsp',
@@ -546,8 +546,64 @@ else
         let g:lsp_diagnostics_signs_information = {'text': "󿙿" } " 0xff67f nf-mdi-comment_check_outline
         let g:lsp_diagnostics_signs_hint = {'text': "󿚅" } " 0xff685 nf-mdi-comment_question_outline
         let g:lsp_document_code_action_signs_hint = {'text': "󿠵" } " 0xff835 nf-mdi-lightbulb_outline
-    endfunction
+          let g:vim_lsp_settings_volar_config = {
+          \   "volar-api": {
+          \     "trace": {
+          \       "server": v:false,
+          \     },
+          \   },
+          \   "volar-document": {
+          \     "trace": {
+          \       "server": v:false,
+          \     },
+          \   },
+          \   "volar-html": {
+          \     "trace": {
+          \       "server": v:false,
+          \     },
+          \   },
+          \   "volar": {
+          \     "codeLens": {
+          \       "references": v:true,
+          \       "pugTools": v:true,
+          \       "scriptSetupTools": v:true
+          \     },
+          \     "icon": {
+          \       "splitEditors": v:true
+          \     },
+          \     "autoCompleteRefs": v:true,
+          \     "tsPlugin": v:null,
+          \     "tsPluginStatus": v:true,
+          \     "preferredTagNameCase": "auto",
+          \     "preferredAttrNameCase": "auto-kebab"
+          \   }
+          \ }
 
+        " call lsp#register_server({
+        "  \  'name': 'volar-document',
+        "  \  'cmd': { server_info->['node', '/Users/tsukkee/dev/volar/volar/node_modules/@volar/vscode-server/out/server.js', '--stdio'] },
+        "  \  'root_uri':{server_info->lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'package.json')},
+        "  \  'workspace_config': g:vim_lsp_settings_volar_config,
+        "  \  'initialization_options': { 'mode': 'doc' , 'appRoot': '/Applications/Visual Studio Code.app/Contents/Resources/app', 'language': 'ja', 'tsPlugin': v:true, 'useWorkspaceTsdk': v:false },
+        "  \  'allowlist': ['vue']
+        "  \ })
+        " call lsp#register_server({
+        "  \  'name': 'volar-api',
+        "  \  'cmd': { server_info->['node', '/Users/tsukkee/dev/volar/volar/node_modules/@volar/vscode-server/out/server.js', '--stdio'] },
+        "  \  'root_uri':{server_info->lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'package.json')},
+        "  \  'workspace_config': g:vim_lsp_settings_volar_config,
+        "  \  'initialization_options': { 'mode': 'api' , 'appRoot': '/Applications/Visual Studio Code.app/Contents/Resources/app', 'language': 'ja' , 'tsPlugin': v:true, 'useWorkspaceTsdk': v:false },
+        "  \  'allowlist': ['vue']
+        "  \ })
+        " call lsp#register_server({
+        "  \  'name': 'volar-html',
+        "  \  'cmd': { server_info->['node', '/Users/tsukkee/dev/volar/volar/node_modules/@volar/vscode-server/out/server.js', '--stdio'] },
+        "  \  'root_uri':{server_info->lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'package.json')},
+        "  \  'workspace_config': g:vim_lsp_settings_volar_config,
+        "  \  'initialization_options': { 'mode': 'html', 'appRoot': '/Applications/Visual Studio Code.app/Contents/Resources/app', 'language': 'ja'  , 'tsPlugin': v:true, 'useWorkspaceTsdk': v:false},
+        "  \  'allowlist': ['vue']
+        "  \ })
+    endfunction
 
     function! s:on_lsp_buffer_enabled() abort
         setlocal omnifunc=lsp#complete
@@ -639,6 +695,7 @@ else
     " linter
     call minpac#add('dense-analysis/ale')
     let g:ale_disable_lsp = 1
+    let g:ale_floating_preview = 1
     let g:ale_linters_explicit = 1
     let g:ale_fix_on_save = 1
     let g:ale_fixers = {
