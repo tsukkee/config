@@ -539,72 +539,6 @@ else
     call minpac#add('mattn/vim-lsp-settings')
     call minpac#add('rhysd/vim-lsp-ale')
 
-    function! s:on_lsp_setup()
-        " copy & paste from https://miiton.github.io/Cica/
-        let g:lsp_diagnostics_signs_error = {'text': "󿚆 " } " 0xff686 nf-mdi-comment-remove-outline
-        let g:lsp_diagnostics_signs_warning = {'text': "󿙽" } " 0xff67d nf-mdi-comment_alert_outline
-        let g:lsp_diagnostics_signs_information = {'text': "󿙿" } " 0xff67f nf-mdi-comment_check_outline
-        let g:lsp_diagnostics_signs_hint = {'text': "󿚅" } " 0xff685 nf-mdi-comment_question_outline
-        let g:lsp_document_code_action_signs_hint = {'text': "󿠵" } " 0xff835 nf-mdi-lightbulb_outline
-          let g:vim_lsp_settings_volar_config = {
-          \   "volar-api": {
-          \     "trace": {
-          \       "server": v:false,
-          \     },
-          \   },
-          \   "volar-document": {
-          \     "trace": {
-          \       "server": v:false,
-          \     },
-          \   },
-          \   "volar-html": {
-          \     "trace": {
-          \       "server": v:false,
-          \     },
-          \   },
-          \   "volar": {
-          \     "codeLens": {
-          \       "references": v:true,
-          \       "pugTools": v:true,
-          \       "scriptSetupTools": v:true
-          \     },
-          \     "icon": {
-          \       "splitEditors": v:true
-          \     },
-          \     "autoCompleteRefs": v:true,
-          \     "tsPlugin": v:null,
-          \     "tsPluginStatus": v:true,
-          \     "preferredTagNameCase": "auto",
-          \     "preferredAttrNameCase": "auto-kebab"
-          \   }
-          \ }
-
-        " call lsp#register_server({
-        "  \  'name': 'volar-document',
-        "  \  'cmd': { server_info->['node', '/Users/tsukkee/dev/volar/volar/node_modules/@volar/vscode-server/out/server.js', '--stdio'] },
-        "  \  'root_uri':{server_info->lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'package.json')},
-        "  \  'workspace_config': g:vim_lsp_settings_volar_config,
-        "  \  'initialization_options': { 'mode': 'doc' , 'appRoot': '/Applications/Visual Studio Code.app/Contents/Resources/app', 'language': 'ja', 'tsPlugin': v:true, 'useWorkspaceTsdk': v:false },
-        "  \  'allowlist': ['vue']
-        "  \ })
-        " call lsp#register_server({
-        "  \  'name': 'volar-api',
-        "  \  'cmd': { server_info->['node', '/Users/tsukkee/dev/volar/volar/node_modules/@volar/vscode-server/out/server.js', '--stdio'] },
-        "  \  'root_uri':{server_info->lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'package.json')},
-        "  \  'workspace_config': g:vim_lsp_settings_volar_config,
-        "  \  'initialization_options': { 'mode': 'api' , 'appRoot': '/Applications/Visual Studio Code.app/Contents/Resources/app', 'language': 'ja' , 'tsPlugin': v:true, 'useWorkspaceTsdk': v:false },
-        "  \  'allowlist': ['vue']
-        "  \ })
-        " call lsp#register_server({
-        "  \  'name': 'volar-html',
-        "  \  'cmd': { server_info->['node', '/Users/tsukkee/dev/volar/volar/node_modules/@volar/vscode-server/out/server.js', '--stdio'] },
-        "  \  'root_uri':{server_info->lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'package.json')},
-        "  \  'workspace_config': g:vim_lsp_settings_volar_config,
-        "  \  'initialization_options': { 'mode': 'html', 'appRoot': '/Applications/Visual Studio Code.app/Contents/Resources/app', 'language': 'ja'  , 'tsPlugin': v:true, 'useWorkspaceTsdk': v:false},
-        "  \  'allowlist': ['vue']
-        "  \ })
-    endfunction
-
     function! s:on_lsp_buffer_enabled() abort
         setlocal omnifunc=lsp#complete
         setlocal tagfunc=lsp#tagfunc
@@ -628,7 +562,6 @@ else
     endfunction
 
     augroup vimrc
-      autocmd User lsp_setup call s:on_lsp_setup()
       autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
     augroup END
     command! LspDebug let lsp_log_verbose=1 | let lsp_log_file = expand('~/lsp.log')
@@ -636,15 +569,9 @@ else
     let g:asyncomplete_auto_popup = 1
     let g:asyncomplete_auto_completeopt = 0
     let g:asyncomplete_popup_delay = 200
-    " let g:lsp_diagnostics_echo_cursor = 1
-    " let g:lsp_diagnostics_float_cursor = 1
-    " let g:lsp_diagnostics_signs_priority = 31 " ALE's one + 1
-    " let g:lsp_document_code_action_signs_enabled = 0
     let g:lsp_text_edit_enabled = 1
     let g:lsp_signs_enabled = 1
     let g:lsp_settings_filetype_html = ['html-languageserver', 'angular-language-server']
-    let g:lsp_settings_filetype_typescript = ['typescript-language-server'] " , 'eslint-language-server']
-    let g:lsp_settings_filetype_vue = ['vls'] " , 'eslint-language-server']
 
     let s:vls_config = {
     \   'vetur': {
@@ -706,9 +633,9 @@ else
     \   'rust': ['rustfmt']
     \}
     let g:ale_linters = {
+    \   'typescript': ['eslint', 'vim-lsp'],
     \   'vue': ['eslint', 'vim-lsp'],
     \   'rust': ['clippy'],
-    \   'typescript': ['eslint', 'vim-lsp'],
     \}
     nmap <C-K> <Plug>(ale_detail) 
     set previewheight=5
@@ -723,11 +650,6 @@ else
         setlocal spell
         setlocal spelllang=en,cjk
     endfunction
-
-    " edita
-    " call minpac#add('kyoh86/vim-editerm')
-    " call minpac#add('lambdalisue/edita.vim')
-    " let g:edita_enable = 0
 
     " syntax
     call minpac#add('dag/vim-fish')
@@ -763,16 +685,6 @@ else
     " 'thinca/vim-quickrun'
     "   let g:quickrun_no_default_key_mappings = 1
     "   vmap [Prefix]q :QuickRun<CR>
-    " 'thinca/vim-ref'
-    "   if s:is_mac
-    "      let g:ref_refe_cmd = '/opt/local/bin/refe-1_8_7'
-    "      let g:ref_refe_encoding = 'utf-8'
-    "      let g:ref_refe_rsense_cmd = '/usr/local/lib/rsense-0.2/bin/rsense'
-    "      let g:ref_phpmanual_path = expand('~/Documents/phpmanual')
-    "   elseif s:is_win
-    "      let g:ref_refe_encoding = 'cp932'
-    "      let g:ref_phpmanual_path = expand('~/Documents/phpmanual')
-    "   endif
     " 'vim-jp/autofmt'
     "    hi ColorColumn guibg=#aaaaaa
     "    autocmd vimrc FileType text,txt
