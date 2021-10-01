@@ -587,6 +587,8 @@ else
     \   }
     \}
 
+    let g:vim_lsp_settings_volar_experimental_multiple_servers = v:false
+
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
 
