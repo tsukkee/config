@@ -632,7 +632,8 @@ else
     \   'typescript': ['prettier'],
     \   'vue': ['prettier'],
     \   'scss': ['prettier'],
-    \   'rust': ['rustfmt']
+    \   'rust': ['rustfmt'],
+    \   'go': ['gofmt']
     \}
     let g:ale_linters = {
     \   'typescript': ['eslint', 'vim-lsp'],
@@ -700,6 +701,9 @@ endif
 augroup vimrc
     " golang
     autocmd FileType go setlocal noexpandtab
+
+    " proto
+    autocmd FileType proto setlocal tabstop=2 shiftwidth=2 softtabstop=2
 
     " JS
     autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2
