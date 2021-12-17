@@ -305,9 +305,9 @@ if exists('+termguicolors')
     let &t_Cs = "\e[4:3m"
     let &t_Ce = "\e[4:0m"
 
-    " see https://www.pandanoir.info/entry/2019/11/02/202146
-    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum" " 文字色
-    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum" " 背景色
+    " see :h xterm-true-color
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 
     let g:nord_bold_vertical_split_line = 1
     let g:nord_italic = 1
@@ -424,6 +424,7 @@ else
     call minpac#add('editorconfig/editorconfig-vim')
     call minpac#add('Yggdroot/indentLine')
     let g:indentLine_char = '┊'
+    call minpac#add('markonm/traces.vim')
 
     " file manager
     call minpac#add('lambdalisue/fern.vim')
@@ -587,7 +588,7 @@ else
     \   }
     \}
 
-    let g:vim_lsp_settings_volar_experimental_multiple_servers = v:false
+    " let g:vim_lsp_settings_volar_experimental_multiple_servers = v:true
 
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
@@ -621,6 +622,8 @@ else
     imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
     smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
 
+    call minpac#add('github/copilot.vim')
+
     " linter
     call minpac#add('dense-analysis/ale')
     let g:ale_disable_lsp = 1
@@ -630,17 +633,21 @@ else
     let g:ale_fixers = {
     "\   'javascript': ['prettier'],
     \   'typescript': ['prettier'],
-    \   'vue': ['prettier'],
-    \   'scss': ['prettier'],
+    \   'vue': ['prettier', 'eslint', 'stylelint'],
+    \   'scss': ['prettier', 'eslint', 'stylelint'],
     \   'rust': ['rustfmt'],
-    \   'go': ['gofmt']
+    \   'go': ['gofmt'],
+    \   'python': ['black', 'isort']
     \}
     let g:ale_linters = {
     \   'typescript': ['eslint', 'vim-lsp'],
-    \   'vue': ['eslint', 'vim-lsp'],
+    \   'vue': ['eslint', 'stylelint', 'vim-lsp'],
+    \   'scss': ['stylelint'],
     \   'rust': ['clippy'],
     \}
-    nmap <C-K> <Plug>(ale_detail) 
+    let g:ale_linter_aliases = {'vue': ['vue', 'typescript', 'scss']}
+    let g:ale_python_auto_poetry = 1
+    nmap <C-K> <Plug>(ale_detail)
     set previewheight=5
 
     " vital
@@ -672,9 +679,9 @@ else
         \'init_indent': 0,
         \'debug': 0,
         \}
-    call minpac#add('Shougo/context_filetype.vim')
+    call minpac#add('hashivim/vim-terraform')
 
-    call minpac#add('markonm/traces.vim')
+    call minpac#add('Shougo/context_filetype.vim')
 
     " MEMO: will install later if needed
     " 'SudoEdit.vim'
@@ -707,6 +714,9 @@ augroup vimrc
 
     " JS
     autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2
+
+    " Markdown
+    autocmd FileType markdown setlocal conceallevel=0
 augroup END
 
 " JSON

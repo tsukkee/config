@@ -1,4 +1,3 @@
-" Last Change: 27 Feb 2013
 " Author:      tsukkee
 " Licence:     The MIT License {{{
 "     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,9 +19,6 @@
 "     THE SOFTWARE.
 " }}}
 
-" Before use this vimrc, it's better to rename vimrc and gvimrc
-" of Kaoriya so that gvim don't read these.
-
 " ==================== Platform setting ==================== "
 " MacVim
 if has('gui_macvim')
@@ -30,10 +26,10 @@ if has('gui_macvim')
         set columns=154
         set lines=52
     endif
-    set linespace=2
+    set linespace=0
 
-    set guifont=Cica:h18
-    set guifontwide=Cica:h18
+    set guifont=PlemolJPConsoleNF-Regular:h20
+    set guifontwide=PlemolJPConsoleNF-Regular:h20
 
     set transparency=5 " (opaque) 0-100 (transparent)
     set noimdisable    " use IM control
