@@ -551,8 +551,6 @@ else
         nmap <buffer> gR <plug>(lsp-rename)
         " nmap <buffer> g] <Plug>(lsp-next-diagnostic)
         " nmap <buffer> g[ <Plug>(lsp-previous-diagnostic)
-        nmap <buffer> g] <Plug>(ale_next)
-        nmap <buffer> g[ <Plug>(ale_previous)
         nmap <buffer> gA <Plug>(lsp-code-action)
 
         nmap <buffer> gs <Plug>(lsp-document-symbol-search)
@@ -571,7 +569,6 @@ else
     let g:asyncomplete_auto_completeopt = 0
     let g:asyncomplete_popup_delay = 200
     let g:lsp_text_edit_enabled = 1
-    let g:lsp_signs_enabled = 1
     let g:lsp_settings_filetype_html = ['html-languageserver', 'angular-language-server']
 
     let s:vls_config = {
@@ -626,7 +623,6 @@ else
 
     " linter
     call minpac#add('dense-analysis/ale')
-    let g:ale_disable_lsp = 1
     let g:ale_floating_preview = 1
     let g:ale_linters_explicit = 1
     let g:ale_fix_on_save = 1
@@ -640,14 +636,16 @@ else
     \   'python': ['black', 'isort']
     \}
     let g:ale_linters = {
-    \   'typescript': ['eslint', 'vim-lsp'],
-    \   'vue': ['eslint', 'stylelint', 'vim-lsp'],
+    \   'typescript': ['eslint'],
+    \   'vue': ['eslint', 'stylelint'],
     \   'scss': ['stylelint'],
     \   'rust': ['clippy'],
     \}
     let g:ale_linter_aliases = {'vue': ['vue', 'typescript', 'scss']}
     let g:ale_python_auto_poetry = 1
     nmap <C-K> <Plug>(ale_detail)
+    nmap <buffer> g] <Plug>(ale_next)
+    nmap <buffer> g[ <Plug>(ale_previous)
     set previewheight=5
 
     " vital
