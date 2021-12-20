@@ -644,8 +644,8 @@ else
     let g:ale_linter_aliases = {'vue': ['vue', 'typescript', 'scss']}
     let g:ale_python_auto_poetry = 1
     nmap <C-K> <Plug>(ale_detail)
-    nmap <buffer> g] <Plug>(ale_next)
-    nmap <buffer> g[ <Plug>(ale_previous)
+    nmap g] <Plug>(ale_next)
+    nmap g[ <Plug>(ale_previous)
     set previewheight=5
 
     " vital
