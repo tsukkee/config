@@ -78,7 +78,8 @@ set ttimeoutlen=10
 
 " command completion
 set wildmenu
-set wildmode=list:longest,full
+" set wildmode=list:longest,full
+set wildoptions=pum,fuzzy
 
 " search
 set wrapscan
@@ -628,9 +629,9 @@ else
     let g:ale_fix_on_save = 1
     let g:ale_fixers = {
     "\   'javascript': ['prettier'],
-    \   'typescript': ['prettier'],
-    \   'vue': ['prettier', 'eslint', 'stylelint'],
-    \   'scss': ['prettier', 'eslint', 'stylelint'],
+    \   'typescript': ['eslint', 'prettier'],
+    \   'vue': ['eslint', 'stylelint', 'prettier'],
+    \   'scss': ['eslint', 'stylelint', 'prettier'],
     \   'rust': ['rustfmt'],
     \   'go': ['gofmt'],
     \   'python': ['black', 'isort']
@@ -663,7 +664,7 @@ else
     call minpac#add('dag/vim-fish')
     call minpac#add('tmux-plugins/vim-tmux')
     call minpac#add('cespare/vim-toml')
-    call minpac#add('leafOfTree/vim-vue-plugin')
+    " call minpac#add('leafOfTree/vim-vue-plugin')
     let g:vim_vue_plugin_config = {
         \'syntax': {
         \   'script': ['typescript'],
