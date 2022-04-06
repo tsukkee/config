@@ -16,6 +16,10 @@ set -x BAT_THEME Nord
 
 # prompt
 starship init fish | source
+export-aws-expiration
+function re-export-aws-expiration --on-event fish_prompt
+    export-aws-expiration
+end
 
 # git
 # set __fish_git_prompt_showcolorhints true
