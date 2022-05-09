@@ -71,7 +71,7 @@ set backspace=indent,eol,start
 set formatoptions+=mM
 " set formatexpr=jpvim#formatexpr()
 set nolinebreak
-set nrformats=bin
+set nrformats=bin,hex,unsigned
 set iminsert=0
 set imsearch=0
 set ttimeoutlen=10
@@ -343,15 +343,14 @@ else
 
     " colorscheme
     call minpac#add('altercation/vim-colors-solarized')
-    call minpac#add('cocopon/iceberg.vim')
-    call minpac#add('aereal/vim-colors-japanesque')
-    call minpac#add('morhetz/gruvbox')
-    call minpac#add('ulwlu/elly.vim')
+    " call minpac#add('cocopon/iceberg.vim')
+    " call minpac#add('aereal/vim-colors-japanesque')
+    " call minpac#add('morhetz/gruvbox')
+    " call minpac#add('ulwlu/elly.vim')
     call minpac#add('arcticicestudio/nord-vim')
 
     " enhance statusline and tabline
     call minpac#add('itchyny/lightline.vim')
-    call minpac#add('micchy326/lightline-lsp-progress')
     call minpac#add('maximbaz/lightline-ale')
     set noshowmode " hide mode when using lightline
     let g:lightline = {
@@ -361,16 +360,13 @@ else
     \    'subseparator': { 'left': "\ue0b1", 'right': "\ue0b3" },
     \    'active': {
     \       'left': [ [ 'mode', 'paste' ],
-    \                 [ 'gitrepo', 'gitstatus', 'readonly', 'filename', 'modified', 'method', 'lspstatus' ] ],
+    \                 [ 'readonly', 'filename', 'modified', 'method' ] ],
     \       'right': [ [ 'lineinfo', 'percent' ],
     \                  [ 'fileformat', 'fileencoding', 'filetype' ],
     \                  [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_infos', 'linter_ok' ] ]
     \    },
     \    'component_function': {
     \       'method': s:SID_PREFIX() . 'nearestMethodOrFunction',
-    \       'gitrepo': 'gina#component#repo#preset',
-    \       'gitstatus': 'gina#component#status#preset',
-    \       'lspstatus': 'lightline_lsp_progress#progress'
     \    },
     \    'component_expand': {
     \       'linter_checking': 'lightline#ale#checking',
@@ -428,19 +424,19 @@ else
     call minpac#add('markonm/traces.vim')
 
     " file manager
-    call minpac#add('lambdalisue/fern.vim')
-    nmap <silent> [Prefix]f <Cmd>Fern . -drawer -reveal=% -keep -toggle<CR>
-    nmap <silent> [Prefix]F <Cmd>Fern . -drawer -reveal=%<CR>
-    function! s:init_fern() abort
-        nmap <buffer> y <Plug>(fern-action-copy)
-        nmap <buffer> cd <Plug>(fern-action-cd)
-        nmap <buffer> ct <Plug>(fern-action-tcd)
-    endfunction
-    augroup vimrc
-        autocmd FileType fern call s:init_fern()
-    augroup END
+    " call minpac#add('lambdalisue/fern.vim')
+    " nmap <silent> [Prefix]f <Cmd>Fern . -drawer -reveal=% -keep -toggle<CR>
+    " nmap <silent> [Prefix]F <Cmd>Fern . -drawer -reveal=%<CR>
+    " function! s:init_fern() abort
+    "     nmap <buffer> y <Plug>(fern-action-copy)
+    "     nmap <buffer> cd <Plug>(fern-action-cd)
+    "     nmap <buffer> ct <Plug>(fern-action-tcd)
+    " endfunction
+    " augroup vimrc
+    "     autocmd FileType fern call s:init_fern()
+    " augroup END
 
-    call minpac#add('lambdalisue/gina.vim')
+    " call minpac#add('lambdalisue/gina.vim')
 
     call minpac#add('tsukkee/vim-rangeriv')
     let g:rangeriv_map = {
@@ -569,7 +565,6 @@ else
     let g:asyncomplete_auto_popup = 1
     let g:asyncomplete_auto_completeopt = 0
     let g:asyncomplete_popup_delay = 200
-    let g:lsp_text_edit_enabled = 1
     let g:lsp_settings_filetype_html = ['html-languageserver', 'angular-language-server']
 
     let s:vls_config = {
@@ -620,30 +615,32 @@ else
     imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
     smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
 
-    call minpac#add('github/copilot.vim')
+    " call minpac#add('github/copilot.vim')
 
     " linter
     call minpac#add('dense-analysis/ale')
     let g:ale_floating_preview = 1
+    let g:ale_floating_window_border = ['│', '─', '┌', '┐', '┘', '└']
     let g:ale_linters_explicit = 1
     let g:ale_fix_on_save = 1
     let g:ale_fixers = {
     "\   'javascript': ['prettier'],
     \   'typescript': ['eslint', 'prettier'],
     \   'vue': ['eslint', 'stylelint', 'prettier'],
-    \   'scss': ['eslint', 'stylelint', 'prettier'],
+    \   'scss': ['stylelint', 'prettier'],
     \   'rust': ['rustfmt'],
     \   'go': ['gofmt'],
     \   'python': ['black', 'isort']
     \}
     let g:ale_linters = {
-    \   'typescript': ['eslint'],
-    \   'vue': ['eslint', 'stylelint'],
-    \   'scss': ['stylelint'],
+    \   'typescript': ['eslint', 'cspell'],
+    \   'vue': ['eslint', 'stylelint', 'cspell'],
+    \   'scss': ['stylelint', 'cspell'],
     \   'rust': ['clippy'],
     \}
     let g:ale_linter_aliases = {'vue': ['vue', 'typescript', 'scss']}
     let g:ale_python_auto_poetry = 1
+    let g:ale_cspell_use_global = 1
     nmap <C-K> <Plug>(ale_detail)
     nmap g] <Plug>(ale_next)
     nmap g[ <Plug>(ale_previous)
