@@ -400,7 +400,7 @@ else
     call submode#map('tabmove', 'n', '', 't', 'gt')
     call submode#map('tabmove', 'n', '', 'T', 'gT')
 
-    " window resizing with submode
+    " window resizing
     call submode#enter_with('winsize', 'n', '', '<C-w>>', '<C-w>>')
     call submode#enter_with('winsize', 'n', '', '<C-w><', '<C-w><')
     call submode#enter_with('winsize', 'n', '', '<C-w>+', '<C-w>+')
@@ -409,6 +409,9 @@ else
     call submode#map('winsize', 'n', '', '<', '<C-w><')
     call submode#map('winsize', 'n', '', '+', '<C-w>+')
     call submode#map('winsize', 'n', '', '-', '<C-w>-')
+
+    call minpac#add('markstory/vim-zoomwin')
+    nmap [Prefix]z <Cmd>ZoomToggle<CR>
 
     " text editting
     call minpac#add('andymass/vim-matchup')
@@ -422,6 +425,8 @@ else
     call minpac#add('Yggdroot/indentLine')
     let g:indentLine_char = '┊'
     call minpac#add('markonm/traces.vim')
+    call minpac#add('rbtnn/vim-ambiwidth')
+    let g:ambiwidth_cica_enabled = v:false
 
     " file manager
     " call minpac#add('lambdalisue/fern.vim')
@@ -464,6 +469,10 @@ else
     \ "\<C-P>": "\<Up>",
     \ }
     let g:clap_preview_direction = 'UD'
+
+    function! g:ClapProviderHistoryCustomFilter(line) abort
+        return !isabsolutepath(a:line)
+    endfunction
 
     nmap [Prefix]pc <Cmd>Clap!<CR>
     nmap [Prefix]pb <Cmd>Clap! buffers<CR>
@@ -565,21 +574,12 @@ else
     let g:asyncomplete_auto_popup = 1
     let g:asyncomplete_auto_completeopt = 0
     let g:asyncomplete_popup_delay = 200
-    let g:lsp_settings_filetype_html = ['html-languageserver', 'angular-language-server']
 
-    let s:vls_config = {
-    \   'vetur': {
-    \     'experimental': {
-    \       'templateInterpolationService': v:true
-    \     }
-    \   }
-    \ }
-
-    let g:lsp_settings = {
-    \   'vls': {
-    \       'workspace_config': s:vls_config
-    \   }
-    \}
+    let g:lsp_document_code_action_signs_enabled = 0
+    let g:lsp_document_highlight_enabled = 0
+    let g:lsp_fold_enabled = 0
+    " let g:lsp_inlay_hints_enabled = 1
+    let g:lsp_experimental_workspace_folders = v:true
 
     " let g:vim_lsp_settings_volar_experimental_multiple_servers = v:true
 
@@ -626,6 +626,7 @@ else
     let g:ale_fixers = {
     "\   'javascript': ['prettier'],
     \   'typescript': ['eslint', 'prettier'],
+    \   'typescriptreact': ['eslint', 'prettier'],
     \   'vue': ['eslint', 'stylelint', 'prettier'],
     \   'scss': ['stylelint', 'prettier'],
     \   'rust': ['rustfmt'],
@@ -637,10 +638,13 @@ else
     \   'vue': ['eslint', 'stylelint', 'cspell'],
     \   'scss': ['stylelint', 'cspell'],
     \   'rust': ['clippy'],
+    \   'proto': ['cspell'],
     \}
     let g:ale_linter_aliases = {'vue': ['vue', 'typescript', 'scss']}
+
     let g:ale_python_auto_poetry = 1
     let g:ale_cspell_use_global = 1
+
     nmap <C-K> <Plug>(ale_detail)
     nmap g] <Plug>(ale_next)
     nmap g[ <Plug>(ale_previous)
@@ -661,7 +665,7 @@ else
     call minpac#add('dag/vim-fish')
     call minpac#add('tmux-plugins/vim-tmux')
     call minpac#add('cespare/vim-toml')
-    " call minpac#add('leafOfTree/vim-vue-plugin')
+    call minpac#add('leafOfTree/vim-vue-plugin')
     let g:vim_vue_plugin_config = {
         \'syntax': {
         \   'script': ['typescript'],
@@ -710,6 +714,7 @@ augroup vimrc
 
     " JS
     autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2
+    autocmd FileType html setlocal tabstop=2 shiftwidth=2 softtabstop=2
 
     " Markdown
     autocmd FileType markdown setlocal conceallevel=0
