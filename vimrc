@@ -575,13 +575,8 @@ else
     let g:asyncomplete_auto_completeopt = 0
     let g:asyncomplete_popup_delay = 200
 
-    let g:lsp_document_code_action_signs_enabled = 0
-    let g:lsp_document_highlight_enabled = 0
-    let g:lsp_fold_enabled = 0
     " let g:lsp_inlay_hints_enabled = 1
     let g:lsp_experimental_workspace_folders = v:true
-
-    " let g:vim_lsp_settings_volar_experimental_multiple_servers = v:true
 
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
