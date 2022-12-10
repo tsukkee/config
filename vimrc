@@ -277,6 +277,9 @@ if s:is_win
     command! -nargs=1 -complete=file Open silent execute '!explorer' shellescape(expand(<f-args>), 1)
 endif
 
+" fix typo
+abbreviate stirng string
+
 " ==================== Hightlight ==================== "
 augroup vimrc
     autocmd ColorScheme * call s:onColorScheme()
@@ -576,7 +579,7 @@ else
     let g:asyncomplete_popup_delay = 200
 
     " let g:lsp_inlay_hints_enabled = 1
-    let g:lsp_experimental_workspace_folders = v:true
+    let g:lsp_experimental_workspace_folders = 1
 
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
@@ -626,7 +629,8 @@ else
     \   'scss': ['stylelint', 'prettier'],
     \   'rust': ['rustfmt'],
     \   'go': ['gofmt'],
-    \   'python': ['black', 'isort']
+    \   'python': ['black', 'isort'],
+    \   'ruby': ['rubocop']
     \}
     let g:ale_linters = {
     \   'typescript': ['eslint', 'cspell'],
@@ -634,6 +638,7 @@ else
     \   'scss': ['stylelint', 'cspell'],
     \   'rust': ['clippy'],
     \   'proto': ['cspell'],
+    \   'ruby': ['rubocop', 'cspell']
     \}
     let g:ale_linter_aliases = {'vue': ['vue', 'typescript', 'scss']}
 
@@ -660,7 +665,7 @@ else
     call minpac#add('dag/vim-fish')
     call minpac#add('tmux-plugins/vim-tmux')
     call minpac#add('cespare/vim-toml')
-    call minpac#add('leafOfTree/vim-vue-plugin')
+    " call minpac#add('leafOfTree/vim-vue-plugin')
     let g:vim_vue_plugin_config = {
         \'syntax': {
         \   'script': ['typescript'],
