@@ -477,12 +477,12 @@ else
         return !isabsolutepath(a:line)
     endfunction
 
-    nmap [Prefix]pc <Cmd>Clap!<CR>
-    nmap [Prefix]pb <Cmd>Clap! buffers<CR>
-    nmap [Prefix]pf <Cmd>Clap! files ++finder=rg --files --follow --hidden -g '!.git/' <CR>
-    nmap [Prefix]pg <Cmd>Clap! grep<CR>
-    nmap [Prefix]pt <Cmd>Clap! tags vim_lsp<CR>
-    nnoremap <C-p>  <Cmd>Clap! history<CR>
+    nmap [Prefix]pc <Cmd>Clap<CR>
+    nmap [Prefix]pb <Cmd>Clap buffers<CR>
+    nmap [Prefix]pf <Cmd>Clap files<CR>
+    nmap [Prefix]pg <Cmd>Clap grep<CR>
+    nmap [Prefix]pt <Cmd>Clap tags vim_lsp<CR>
+    nnoremap <C-p>  <Cmd>Clap history<CR>
 
     call minpac#add('liuchengxu/vista.vim')
     nmap [Prefix]v <Cmd>Vista!!<CR>
@@ -580,6 +580,7 @@ else
 
     " let g:lsp_inlay_hints_enabled = 1
     let g:lsp_experimental_workspace_folders = 1
+    let g:lsp_use_native_client = 1
 
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
@@ -619,10 +620,11 @@ else
     call minpac#add('dense-analysis/ale')
     let g:ale_floating_preview = 1
     let g:ale_floating_window_border = ['│', '─', '┌', '┐', '┘', '└']
+    let g:ale_virtualtext_cursor = 'disabled'
     let g:ale_linters_explicit = 1
     let g:ale_fix_on_save = 1
     let g:ale_fixers = {
-    "\   'javascript': ['prettier'],
+    \   'javascript': ['eslint', 'prettier'],
     \   'typescript': ['eslint', 'prettier'],
     \   'typescriptreact': ['eslint', 'prettier'],
     \   'vue': ['eslint', 'stylelint', 'prettier'],
@@ -633,7 +635,9 @@ else
     \   'ruby': ['rubocop']
     \}
     let g:ale_linters = {
+    \   'javascript': ['eslint', 'cspell'],
     \   'typescript': ['eslint', 'cspell'],
+    \   'typescriptreact': ['eslint', 'cspell'],
     \   'vue': ['eslint', 'stylelint', 'cspell'],
     \   'scss': ['stylelint', 'cspell'],
     \   'rust': ['clippy'],
@@ -715,6 +719,7 @@ augroup vimrc
     " JS
     autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2
     autocmd FileType html setlocal tabstop=2 shiftwidth=2 softtabstop=2
+    autocmd FileType typescript,js,vue,css,scss setlocal tabstop=2 shiftwidth=2 softtabstop=2
 
     " Markdown
     autocmd FileType markdown setlocal conceallevel=0
@@ -729,6 +734,41 @@ let g:html_use_css = 1
 let g:use_xhtml = 1
 let g:html_use_encoding = 'utf-8'
 
+" cspell helper
+let s:cspell_config_file = $HOME .. '/.cspell.json'
+function! s:add_word_to_cspell() abort
+    if !filewritable(s:cspell_config_file)
+        echomsg 'Error: ' .. s:cspell_config_file .. ' is not writable.'
+        return
+    endif
+
+    if !executable('jq')
+        echomsg 'Error: jq is needed.'
+        return
+    endif
+
+    let [_, loc] = ale#util#FindItemAtCursor(bufnr(''))
+    if !has_key(loc, 'text')
+        return
+    endif
+    let word = tolower(matchstr(loc.text, 'Unknown Word (\zs\w\+\ze)'))
+    if empty(word)
+        return
+    endif
+
+    let json = json_decode(join(readfile(s:cspell_config_file), ''))
+    if index(json.words, word) != -1
+        return
+    endif
+    let json.words = add(json.words, word)
+    let json.words = sort(json.words)
+    let jsonStr = system("echo '" .. json_encode(json) .. "' | jq .")
+    call writefile(split(jsonStr, "\n"), s:cspell_config_file)
+    echo word .. ' is added to ' .. s:cspell_config_file
+endfunction
+nmap [Prefix]c <Cmd>call <SID>add_word_to_cspell()<CR>
+
+
 " auto reloading vimrc
 if has('gui_running')
     autocmd vimrc BufWritePost .vimrc,_vimrc,vimrc nested
@@ -740,8 +780,17 @@ else
     \   source $MYVIMRC
 endif
 
-if filereadable(expand('~/.vimrc.local'))
-    source ~/.vimrc.local
-endif
+" load settings for each location.
+augroup vimrc
+    autocmd BufNewFile,BufReadPost * call s:vimrc_local(expand('<afile>:p:h'))
+augroup END
 
+function! s:vimrc_local(loc)
+    let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
+    for i in reverse(filter(files, 'filereadable(v:val)'))
+        source `=i`
+    endfor
+endfunction
+
+" secure
 set secure
