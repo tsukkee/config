@@ -581,6 +581,7 @@ else
     " let g:lsp_inlay_hints_enabled = 1
     let g:lsp_experimental_workspace_folders = 1
     let g:lsp_use_native_client = 1
+    let g:lsp_fold_enabled = 0 " for performance
 
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
