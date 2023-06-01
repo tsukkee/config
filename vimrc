@@ -633,7 +633,8 @@ else
     \   'rust': ['rustfmt'],
     \   'go': ['gofmt'],
     \   'python': ['black', 'isort'],
-    \   'ruby': ['rubocop']
+    \   'ruby': ['rubocop'],
+    \   'dart': ['dart-format']
     \}
     let g:ale_linters = {
     \   'javascript': ['eslint', 'cspell'],
@@ -643,16 +644,19 @@ else
     \   'scss': ['stylelint', 'cspell'],
     \   'rust': ['clippy'],
     \   'proto': ['cspell'],
-    \   'ruby': ['rubocop', 'cspell']
+    \   'ruby': ['rubocop', 'cspell'],
+    \   'dart': ['cspell']
     \}
     let g:ale_linter_aliases = {'vue': ['vue', 'typescript', 'scss']}
 
+    let g:ale_ruby_rubocop_executable = 'bin/bundle'
+    let g:ale_ruby_rubocop_auto_correct_all = 1
     let g:ale_python_auto_poetry = 1
     let g:ale_cspell_use_global = 1
 
     nmap <C-K> <Plug>(ale_detail)
-    nmap g] <Plug>(ale_next)
-    nmap g[ <Plug>(ale_previous)
+    nmap g] <Plug>(ale_next_error)
+    nmap g[ <Plug>(ale_previous_error)
     set previewheight=5
 
     " vital
@@ -724,6 +728,9 @@ augroup vimrc
 
     " Markdown
     autocmd FileType markdown setlocal conceallevel=0
+
+    " direnv
+    autocmd BufReadPost,BufNewFile .envrc,.env setlocal filetype=bash
 augroup END
 
 " JSON
