@@ -583,6 +583,12 @@ else
     let g:lsp_use_native_client = 1
     let g:lsp_fold_enabled = 0 " for performance
 
+    let g:lsp_settings = {
+    \   'typeprof': {
+    \       'disabled': 1
+    \   }
+    \}
+
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
 
@@ -656,7 +662,9 @@ else
 
     nmap <C-K> <Plug>(ale_detail)
     nmap g] <Plug>(ale_next_error)
+    nmap g} <Plug>(ale_next)
     nmap g[ <Plug>(ale_previous_error)
+    nmap g{ <Plug>(ale_previous)
     set previewheight=5
 
     " vital
