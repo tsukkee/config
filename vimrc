@@ -621,7 +621,7 @@ else
     imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
     smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
 
-    " call minpac#add('github/copilot.vim')
+    call minpac#add('github/copilot.vim')
 
     " linter
     call minpac#add('dense-analysis/ale')
