@@ -481,7 +481,8 @@ else
     nmap [Prefix]pb <Cmd>Clap buffers<CR>
     nmap [Prefix]pf <Cmd>Clap files<CR>
     nmap [Prefix]pg <Cmd>Clap grep<CR>
-    nmap [Prefix]pt <Cmd>Clap tags vim_lsp<CR>
+    nmap [Prefix]pt <Cmd>Clap tags<CR>
+    nmap [Prefix]pp <Cmd>Clap proj_tags<CR>
     nnoremap <C-p>  <Cmd>Clap history<CR>
 
     call minpac#add('liuchengxu/vista.vim')
@@ -494,6 +495,7 @@ else
     \   'css': 'vim_lsp',
     \   'python': 'vim_lsp',
     \   'go': 'vim_lsp',
+    \   'ruby': 'vim_lsp',
     \}
 
     let g:vista#renderer#icons = {

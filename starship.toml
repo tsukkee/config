@@ -1,4 +1,4 @@
-format = """[→](bold cyan) $directory$git_branch$git_commit$git_state$git_metrics$git_status
+format = """[→](bold cyan) $directory$git_branch$git_commit$git_state$git_metrics$git_status$time
 $all"""
 
 [directory]
@@ -9,3 +9,6 @@ truncation_length = 50
 
 [battery]
 disabled = true
+
+[time]
+disabled = false
