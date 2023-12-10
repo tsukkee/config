@@ -149,6 +149,7 @@ function! s:grep(word, dir='') abort
     cgetexpr system(printf("rg --vimgrep --smart-case --fixed-strings --hidden -g '!.git/' %s %s", shellescape(a:word), a:dir))
 endfunction
 command! -nargs=+ Grep call <SID>grep(<f-args>)
+command! -nargs=? GrepCursor call <SID>grep(expand("<cword>"), <f-args>)
 
 nnoremap [q <cmd>cprev<CR>
 nnoremap ]q <cmd>cnext<CR>
@@ -566,7 +567,9 @@ else
 
         nmap <buffer> gs <Plug>(lsp-document-symbol-search)
 
-        if &filetype !=# 'vim'
+        if &filetype ==# 'ruby'
+            nnoremap <buffer> <silent> K :<c-u>call lsp#internal#document_hover#under_cursor#do({'server': 'sorbet'})<cr>
+        elseif &filetype !=# 'vim'
             nmap <buffer> K <plug>(lsp-hover)
         endif
     endfunction
@@ -585,11 +588,7 @@ else
     let g:lsp_use_native_client = 1
     let g:lsp_fold_enabled = 0 " for performance
 
-    let g:lsp_settings = {
-    \   'typeprof': {
-    \       'disabled': 1
-    \   }
-    \}
+    let g:lsp_settings_filetype_ruby = ['sorbet', 'ruby-lsp']
 
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
@@ -657,8 +656,7 @@ else
     \}
     let g:ale_linter_aliases = {'vue': ['vue', 'typescript', 'scss']}
 
-    let g:ale_ruby_rubocop_executable = 'bin/bundle'
-    let g:ale_ruby_rubocop_auto_correct_all = 1
+    let g:ale_ruby_rubocop_executable = 'bundle'
     let g:ale_python_auto_poetry = 1
     let g:ale_cspell_use_global = 1
 
@@ -684,42 +682,9 @@ else
     call minpac#add('dag/vim-fish')
     call minpac#add('tmux-plugins/vim-tmux')
     call minpac#add('cespare/vim-toml')
-    " call minpac#add('leafOfTree/vim-vue-plugin')
-    let g:vim_vue_plugin_config = {
-        \'syntax': {
-        \   'script': ['typescript'],
-        \   'template': ['html'],
-        \   'style': ['scss'],
-        \},
-        \'full_syntax': ['html', 'scss', 'typescript'],
-        \'attribute': 1,
-        \'keyword': 1,
-        \'foldexpr': 0,
-        \'init_indent': 0,
-        \'debug': 0,
-        \}
     call minpac#add('hashivim/vim-terraform')
 
     call minpac#add('Shougo/context_filetype.vim')
-
-    " MEMO: will install later if needed
-    " 'SudoEdit.vim'
-    " 'deton/jasegment.vim'
-    " 'kana/vim-operator-replace'
-    "   map [Operator]r <Plug>(operator-replace)
-    " 'kana/vim-operator-user'
-    " 'kana/vim-textobj-indent'
-    " 'kana/vim-textobj-user'
-    " 't9md/vim-textmanip'
-    " 'thinca/vim-quickrun'
-    "   let g:quickrun_no_default_key_mappings = 1
-    "   vmap [Prefix]q :QuickRun<CR>
-    " 'vim-jp/autofmt'
-    "    hi ColorColumn guibg=#aaaaaa
-    "    autocmd vimrc FileType text,txt
-    "   \   setl cc+=72
-    "   \|  setl textwidth=72
-    "   \|  setl formatexpr=autofmt#japanese#formatexpr()
 endif
 
 " ==================== Others ==================== "
@@ -809,6 +774,26 @@ function! s:vimrc_local(loc)
         source `=i`
     endfor
 endfunction
+
+" im test
+function! ImStatusFunc()
+    let status = system('im-select')
+    echo status
+    if status == 'jp.sourceforge.inputmethod.aquaskk.Ascii'
+        return 0
+    endif
+    return 1
+endfunction
+" set imstatusfunc=ImStatusFunc
+
+function ImActivateFunc(active)
+    if a:active
+        call system('im-select jp.sourceforge.inputmethod.aquaskk.Hiragana')
+    else
+        call system('im-select jp.sourceforge.inputmethod.aquaskk.Ascii')
+    endif
+endfunction
+" set imactivatefunc=ImActivateFunc
 
 " secure
 set secure
