@@ -4,7 +4,8 @@ set -x __CF_USER_TEXT_ENCODING '0x1F5:0x08000100:14'
 set -x BLOCKSIZE k
 
 set -x MANPATH /usr/local/*/man /usr/*/man $MANPATH
-set -x PATH /usr/local/opt/gnu-tar/libexec/gnubin $HOME/.cargo/bin $HOME/go/bin /usr/local/bin /opt/local/bin /opt/local/sbin /usr/X11/bin $PATH
+set -x PATH $HOME/.local/bin /usr/local/opt/gnu-tar/libexec/gnubin $HOME/.cargo/bin $HOME/go/bin /usr/local/bin /opt/local/bin /opt/local/sbin /usr/X11/bin $PATH
+set -x XDG_CONFIG_HOME $HOME/.config
 
 if test -x /usr/local/bin/vim
     set -x EDITOR /usr/local/bin/vim
