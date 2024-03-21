@@ -12,3 +12,6 @@ disabled = true
 
 [time]
 disabled = false
+
+[direnv]
+disabled = false
