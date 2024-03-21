@@ -3,8 +3,8 @@ local wezterm = require 'wezterm'
 return {
     font = wezterm.font_with_fallback({
         { family = "0xProto" },
-        { family = "PlemolJP Console NF" },
-        { family = 'Noto Emoji', assume_emoji_presentation = true},
+        { family = "IBM Plex Sans JP" },
+        { family = "Noto Emoji", assume_emoji_presentation = true},
     }),
     use_ime = true,
     use_dead_keys = false,
@@ -16,13 +16,12 @@ return {
     },
     enable_tab_bar = false,
     window_padding = {
-        left = 12,
-        right = 0,
+        left = "0.5cell",
+        right = "0.5cell",
         top = 0,
         bottom = 0,
     },
-    term = 'wezterm',
-    audible_bell = 'Disabled',
+    term = "wezterm",
+    audible_bell = "Disabled",
     -- debug_key_events = true
 }
-
