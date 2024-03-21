@@ -564,13 +564,16 @@ else
         " nmap <buffer> g] <Plug>(lsp-next-diagnostic)
         " nmap <buffer> g[ <Plug>(lsp-previous-diagnostic)
         nmap <buffer> gA <Plug>(lsp-code-action)
-
         nmap <buffer> gs <Plug>(lsp-document-symbol-search)
 
-        if &filetype ==# 'ruby'
-            nnoremap <buffer> <silent> K :<c-u>call lsp#internal#document_hover#under_cursor#do({'server': 'sorbet'})<cr>
-        elseif &filetype !=# 'vim'
+        if &filetype !=# 'vim'
             nmap <buffer> K <plug>(lsp-hover)
+        endif
+
+        if &filetype ==# 'ruby'
+            nnoremap <buffer><expr><silent> K lsp#internal#document_hover#under_cursor#do({'server': 'sorbet'})
+        elseif &filetype ==# 'vue'
+            nnoremap <buffer><expr> gR lsp#ui#vim#rename({'server': 'typescript-language-server'})
         endif
     endfunction
 
@@ -587,8 +590,15 @@ else
     let g:lsp_experimental_workspace_folders = 1
     let g:lsp_use_native_client = 1
     let g:lsp_fold_enabled = 0 " for performance
+    let g:lsp_code_action_ui = 'float'
 
     let g:lsp_settings_filetype_ruby = ['sorbet', 'ruby-lsp']
+    let g:lsp_settings_filetype_vue = ['typescript-language-server', 'volar-server']
+    let g:lsp_settings = {
+    \   'sorbet': {
+    \       'args': ['--watchman-path=/usr/local/bin/watchman']
+    \   },
+    \}
 
     set completeopt& completeopt+=menuone,popup,noinsert,noselect
     set completepopup=height:10,width:60,highlight:InfoPopup
@@ -651,6 +661,7 @@ else
     \   'scss': ['stylelint', 'cspell'],
     \   'rust': ['clippy'],
     \   'proto': ['cspell'],
+    \   'python': ['flake8', 'mypy'],
     \   'ruby': ['rubocop', 'cspell'],
     \   'dart': ['cspell']
     \}
@@ -658,6 +669,8 @@ else
 
     let g:ale_ruby_rubocop_executable = 'bundle'
     let g:ale_python_auto_poetry = 1
+    let g:ale_python_auto_pipenv = 1
+    let g:ale_python_auto_virtualenv = 1
     let g:ale_cspell_use_global = 1
 
     nmap <C-K> <Plug>(ale_detail)
@@ -764,16 +777,20 @@ else
 endif
 
 " load settings for each location.
-augroup vimrc
-    autocmd BufNewFile,BufReadPost * call s:vimrc_local(expand('<afile>:p:h'))
-augroup END
-
 function! s:vimrc_local(loc)
     let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
     for i in reverse(filter(files, 'filereadable(v:val)'))
         source `=i`
     endfor
 endfunction
+let g:lsp_settings_root_markers = [
+\   '.git',
+\   '.git/',
+\   '.svn',
+\   '.hg',
+\   '.bzr'
+\ ]
+call s:vimrc_local(lsp_settings#root_path([]))
 
 " im test
 function! ImStatusFunc()
