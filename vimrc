@@ -572,7 +572,7 @@ else
 
         if &filetype ==# 'ruby'
             nnoremap <buffer><expr><silent> K lsp#internal#document_hover#under_cursor#do({'server': 'sorbet'})
-        elseif &filetype ==# 'vue'
+        elseif &filetype ==# 'vue' || &filetype ==# 'typescript'
             nnoremap <buffer><expr> gR lsp#ui#vim#rename({'server': 'typescript-language-server'})
         endif
     endfunction
@@ -679,6 +679,10 @@ else
     nmap g[ <Plug>(ale_previous_error)
     nmap g{ <Plug>(ale_previous)
     set previewheight=5
+
+    " documents
+    call minpac#add('girishji/devdocs.vim')
+    nmap [Prefix]d <Cmd>DevdocsFind<CR>
 
     " vital
     call minpac#add('vim-jp/vital.vim')
