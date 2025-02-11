@@ -1,0 +1,15 @@
+font-family = "0xProto"
+font-family = "IBM Plex Sans JP"
+font-family = "Noto Emoji"
+font-feature = -dlig
+font-size = 18
+font-thicken = true
+
+background-opacity = 0.9
+background-blur-radius = 20
+theme = "nord"
+window-colorspace = display-p3
+window-padding-balance = true
+macos-titlebar-proxy-icon = hidden
+
+keybind = ¥=text:\\
