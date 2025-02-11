@@ -12,3 +12,10 @@ disabled = true
 
 [time]
 disabled = false
+
+[aws]
+symbol = '󰸏 '
+
+[gcloud]
+format = '[$symbol$region]($style) '
+symbol = ' '

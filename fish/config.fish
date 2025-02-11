@@ -12,7 +12,7 @@ set -x PATH $PNPM_HOME $HOME/.local/bin /usr/local/opt/gnu-tar/libexec/gnubin $H
 set -x XDG_CONFIG_HOME $HOME/.config
 
 # mise
-mise activate fish | source
+# mise activate fish | source # this will be done by mise itself
 set -x PATH $HOME/.local/share/mise/shims $PATH
 
 # editor
@@ -30,6 +30,12 @@ starship init fish | source
 
 # key bindings
 fish_vi_key_bindings
+set fish_cursor_default block
+set fish_cursor_insert line
+set fish_cursor_replace_one underscore
+set fish_cursor_replace underscore
+set fish_cursor_external line
+set fish_cursor_visual block
 
 # alias
 alias ls="ls -GF"
@@ -37,4 +43,3 @@ alias ls="ls -GF"
 if test -f $HOME/.config.fish.local
     source $HOME/.config.fish.local
 end
-

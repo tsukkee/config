@@ -149,7 +149,7 @@ function! s:grep(word, dir='') abort
     cgetexpr system(printf("rg --vimgrep --smart-case --fixed-strings --hidden -g '!.git/' %s %s", shellescape(a:word), a:dir))
 endfunction
 command! -nargs=+ Grep call <SID>grep(<f-args>)
-command! -nargs=? GrepCursor call <SID>grep(expand("<cword>"), <f-args>)
+command! -nargs=? GrepCursor call histdel('cmd', -1) | call histadd('cmd', 'Grep ' .. expand("<cword>")) | call <SID>grep(expand("<cword>"), <f-args>)
 
 nnoremap [q <cmd>cprev<CR>
 nnoremap ]q <cmd>cnext<CR>
@@ -268,14 +268,14 @@ autocmd vimrc BufEnter * syntax sync fromstart
 if s:is_mac
     command! Here silent call system('open ' . expand('%:p:h'))
     command! This silent call system('open ' . expand('%:p'))
-    command! -nargs=1 -complete=file Open silent call system('open ' . shellescape(expand(<f-args>), 1))
+    command! -nargs=1 -complete=file OpenWithSystem silent call system('open ' . shellescape(expand(<f-args>), 1))
 endif
 
 " utility command for Windows
 if s:is_win
     command! Here silent execute '!explorer' expand('%:p:h')
     command! This silent execute '!start cmd /c "%"'
-    command! -nargs=1 -complete=file Open silent execute '!explorer' shellescape(expand(<f-args>), 1)
+    command! -nargs=1 -complete=file OpenWithSystem silent execute '!explorer' shellescape(expand(<f-args>), 1)
 endif
 
 " fix typo
@@ -297,6 +297,9 @@ function! s:onColorScheme()
     " ALE
     highlight ALEError ctermfg=NONE guifg=NONE cterm=undercurl gui=undercurl
     highlight ALEWarning ctermfg=NONE guifg=NONE cterm=undercurl gui=undercurl
+
+    " Background
+    highlight Normal ctermbg=NONE guibg=NONE
 endfunction
 
 syntax enable
@@ -313,6 +316,12 @@ if exists('+termguicolors')
     " see :h xterm-true-color
     let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
     let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+
+    " see :h termcap-cursor-shape
+    let &t_SH = 2        " steady bar
+    let &t_SI = "\e[6 q" " steady bar
+    let &t_SR = "\e[4 q" " steady underline
+    let &t_EI = "\e[2 q" " steady block
 
     let g:nord_bold_vertical_split_line = 1
     let g:nord_italic = 1
@@ -573,7 +582,8 @@ else
         if &filetype ==# 'ruby'
             nnoremap <buffer><expr><silent> K lsp#internal#document_hover#under_cursor#do({'server': 'sorbet'})
         elseif &filetype ==# 'vue' || &filetype ==# 'typescript'
-            nnoremap <buffer><expr> gR lsp#ui#vim#rename({'server': 'typescript-language-server'})
+            " nnoremap <buffer><expr> gR lsp#ui#vim#rename({'server': 'typescript-language-server'})
+            nnoremap <buffer><expr> gR lsp#ui#vim#rename({'server': 'vtsls'})
         endif
     endfunction
 
@@ -582,9 +592,9 @@ else
     augroup END
     command! LspDebug let lsp_log_verbose=1 | let lsp_log_file = expand('~/lsp.log')
 
-    let g:asyncomplete_auto_popup = 1
-    let g:asyncomplete_auto_completeopt = 0
-    let g:asyncomplete_popup_delay = 200
+    " let g:asyncomplete_auto_popup = 1
+    " let g:asyncomplete_auto_completeopt = 0
+    " let g:asyncomplete_popup_delay = 200
 
     " let g:lsp_inlay_hints_enabled = 1
     let g:lsp_experimental_workspace_folders = 1
@@ -593,7 +603,10 @@ else
     let g:lsp_code_action_ui = 'float'
 
     let g:lsp_settings_filetype_ruby = ['sorbet', 'ruby-lsp']
-    let g:lsp_settings_filetype_vue = ['typescript-language-server', 'volar-server']
+    " let g:lsp_settings_filetype_vue = ['typescript-language-server', 'volar-server']
+    let g:lsp_settings_filetype_vue = ['vtsls', 'volar-server']
+    let g:lsp_settings_filetype_typescript = ['vtsls']
+    let g:lsp_settings_filetype_javascript = ['vtsls']
     let g:lsp_settings = {
     \   'sorbet': {
     \       'args': ['--watchman-path=/usr/local/bin/watchman']
@@ -702,7 +715,15 @@ else
     call minpac#add('hashivim/vim-terraform')
 
     call minpac#add('Shougo/context_filetype.vim')
+
+    " test
+    " call minpac#add('vim-test/vim-test')
 endif
+
+" load ghostty vimfiles
+if exists('$GHOSTTY_RESOURCES_DIR')
+   execute 'set runtimepath+=' .. $GHOSTTY_RESOURCES_DIR .. '/../vim/vimfiles'
+end
 
 " ==================== Others ==================== "
 " FileType
