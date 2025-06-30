@@ -52,6 +52,8 @@ function! s:SID_PREFIX()
 endfunction
 
 " ==================== Settings ==================== "
+" shell
+set shell=/bin/zsh
 if s:is_win
     set shellslash
 endif
@@ -318,7 +320,7 @@ if exists('+termguicolors')
     let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 
     " see :h termcap-cursor-shape
-    let &t_SH = 2        " steady bar
+    let &t_SH = 2        " steady block
     let &t_SI = "\e[6 q" " steady bar
     let &t_SR = "\e[4 q" " steady underline
     let &t_EI = "\e[2 q" " steady block
@@ -609,7 +611,7 @@ else
     let g:lsp_settings_filetype_javascript = ['vtsls']
     let g:lsp_settings = {
     \   'sorbet': {
-    \       'args': ['--watchman-path=/usr/local/bin/watchman']
+    \       'args': ['--watchman-path=/opt/homebrew/bin/watchman']
     \   },
     \}
 
@@ -664,7 +666,8 @@ else
     \   'go': ['gofmt'],
     \   'python': ['black', 'isort'],
     \   'ruby': ['rubocop'],
-    \   'dart': ['dart-format']
+    \   'dart': ['dart-format'],
+    \   'terraform': ['terraform']
     \}
     let g:ale_linters = {
     \   'javascript': ['eslint', 'cspell'],
@@ -676,7 +679,8 @@ else
     \   'proto': ['cspell'],
     \   'python': ['flake8', 'mypy'],
     \   'ruby': ['rubocop', 'cspell'],
-    \   'dart': ['cspell']
+    \   'dart': ['cspell'],
+    \   'terraform': ['tflint']
     \}
     let g:ale_linter_aliases = {'vue': ['vue', 'typescript', 'scss']}
 

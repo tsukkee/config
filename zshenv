@@ -7,11 +7,10 @@ export __CF_USER_TEXT_ENCODING='0x1F5:0x08000100:14'
 
 # Path
 typeset -U path
-path=(/usr/local/bin(N-/) /opt/local/bin(N-/) /opt/local/sbin(N-/) /usr/X11/bin(N-/) $path)
 
 # Editor
-if test -x /usr/local/bin/vim; then
-    export EDITOR=/usr/local/bin/vim
+if test -x /opt/homebrew/bin/vim; then
+    export EDITOR=/opt/homebrew/bin/vim
 else
     export EDITOR=/usr/bin/vim
 fi

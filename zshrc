@@ -81,7 +81,7 @@ bindkey '^[d' _quote-previous-word-in-double
 
 
 # ==================== Prompt ==================== "
-eval "$(starship init zsh)"
+# eval "$(starship init zsh)"
 
 # # PROMPT
 # function _colorize_prompt {
