@@ -15,6 +15,8 @@ else
     export EDITOR=/usr/bin/vim
 fi
 
+export MISE_FISH_AUTO_ACTIVATE=0
+
 # Local
 test -f $HOME/.zshenv.local && source $HOME/.zshenv.local
 

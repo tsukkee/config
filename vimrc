@@ -271,6 +271,8 @@ if s:is_mac
     command! Here silent call system('open ' . expand('%:p:h'))
     command! This silent call system('open ' . expand('%:p'))
     command! -nargs=1 -complete=file OpenWithSystem silent call system('open ' . shellescape(expand(<f-args>), 1))
+
+    command! CopyPath silent call system('echo ' .. expand('%') .. ' | pbcopy')
 endif
 
 " utility command for Windows

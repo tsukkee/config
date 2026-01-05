@@ -10,11 +10,11 @@ fish_add_path --path $HOME/.cargo/bin
 fish_add_path --path $HOME/go/bin
 fish_add_path --path /opt/homebrew/opt/gnu-tar/libexec/gnubin
 set -x XDG_CONFIG_HOME $HOME/.config
-# homebrew環境だとmiseは自動的に読み込まれるのでここには設定がない
+mise activate fish | source
 
 # editor
-if test -x /usr/local/bin/vim
-    set -x EDITOR /usr/local/bin/vim
+if test -x /opt/homebrew/bin/vim
+    set -x EDITOR /opt/homebrew/bin/vim
 else
     set -x EDITOR /usr/bin/vim
 end
@@ -34,9 +34,17 @@ set fish_cursor_replace underscore
 set fish_cursor_external line
 set fish_cursor_visual block
 
+
 # alias
 alias ls="ls -GF"
 
 if test -f $HOME/.config.fish.local
     source $HOME/.config.fish.local
 end
+
+# pnpm
+set -gx PNPM_HOME "/Users/tsukkee/Library/pnpm"
+if not string match -q -- $PNPM_HOME $PATH
+  set -gx PATH "$PNPM_HOME" $PATH
+end
+# pnpm end
