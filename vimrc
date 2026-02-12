@@ -272,7 +272,7 @@ if s:is_mac
     command! This silent call system('open ' . expand('%:p'))
     command! -nargs=1 -complete=file OpenWithSystem silent call system('open ' . shellescape(expand(<f-args>), 1))
 
-    command! CopyPath silent call system('echo ' .. expand('%') .. ' | pbcopy')
+    command! CopyPath silent call system('echo "' .. expand('%') .. '" | pbcopy')
 endif
 
 " utility command for Windows
@@ -302,8 +302,17 @@ function! s:onColorScheme()
     highlight ALEError ctermfg=NONE guifg=NONE cterm=undercurl gui=undercurl
     highlight ALEWarning ctermfg=NONE guifg=NONE cterm=undercurl gui=undercurl
 
-    " Background
+    " Background for transparent terminal background
     highlight Normal ctermbg=NONE guibg=NONE
+
+    " diff
+    if g:colors_name == 'nord'
+        " cf https://www.reddit.com/r/neovim/comments/1k3ugsd/improving_the_vimdiff_highlighting_globally_for/
+        highlight DiffAdd gui=bold guifg=NONE guibg=#2e4b2e cterm=NONE
+        highlight DiffDelete gui=bold guifg=NONE guibg=#4c1e15 cterm=NONE
+        highlight DiffChange gui=bold guifg=NONE guibg=#45565c cterm=NONE
+        highlight DiffText gui=bold guifg=NONE guibg=#996d74 cterm=NONE
+    endif
 endfunction
 
 syntax enable
@@ -360,10 +369,10 @@ else
 
     " colorscheme
     call minpac#add('altercation/vim-colors-solarized')
-    " call minpac#add('cocopon/iceberg.vim')
-    " call minpac#add('aereal/vim-colors-japanesque')
-    " call minpac#add('morhetz/gruvbox')
-    " call minpac#add('ulwlu/elly.vim')
+    call minpac#add('cocopon/iceberg.vim')
+    call minpac#add('aereal/vim-colors-japanesque')
+    call minpac#add('morhetz/gruvbox')
+    call minpac#add('ulwlu/elly.vim')
     call minpac#add('arcticicestudio/nord-vim')
 
     " enhance statusline and tabline
